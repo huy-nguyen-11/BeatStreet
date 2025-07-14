@@ -1,0 +1,317 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6792903516704746677
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6792903516704746676}
+  - component: {fileID: 3681414080024994411}
+  - component: {fileID: 6792903516704746666}
+  - component: {fileID: 6792903516704746667}
+  - component: {fileID: 99030524411473900}
+  - component: {fileID: 1142515384810391712}
+  - component: {fileID: 8853194020888819503}
+  - component: {fileID: 2403532534765018161}
+  m_Layer: 0
+  m_Name: MG
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6792903516704746676
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6792903516704746677}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.6868484, y: -0.0174506, z: 0.0024040535}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6792903518535618586}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3681414080024994411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6792903516704746677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93bb2686dcd3242daa622b1b085f30d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Version: 0.5
+  UpdateNote: + Update UI/Effects.;+ Fixed Bugs.
+  MaxRewardAds: 20
+--- !u!114 &6792903516704746666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6792903516704746677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e67d409e09d24e79b0f5bdbf06f41c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RewardLoaded: 0
+  backupAds: 0
+  maxRewardPerDay: 0
+  StepTimeAds: 60
+  Version: 
+  UpdateNote: 
+  linkPage: 
+  linkPrivacy: https://mysticgamestudio.com/privacy-policy/
+  PackageName:
+    currentCryptoKey: 
+    hiddenValue: 
+    cryptoKey: 7c00a200e0006f00e000e0009a00
+    hiddenChars: 1f00cd008d0041008d009900e9000800cb008300410093009400f3001f00c900930007008f008f00ee001900d00093001a0090009200ff001100c7008600060087008800ee001900d000
+    inited: 1
+    fakeValue: com.mystic.stickshootersupremefighter
+    fakeValueActive: 1
+  linkMoreAndroid: https://play.google.com/store/apps/dev?id=7531996158537141569
+  IosAppId: 
+  linkMoreIos: 
+  notifyState: 0
+  removeAds: 0
+  reporter: {fileID: 6792903518535618587}
+  devMode: 1
+  testAds: 1
+  firstPageId: 0
+  rated: 0
+  isFromStore: 0
+  isFirstIAP: 0
+  isRestored: 0
+--- !u!114 &6792903516704746667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6792903516704746677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4eefc340f56748d89e2a6f70ce08e03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &99030524411473900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6792903516704746677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 665f7131f50404f9a87793e60de3600c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1142515384810391712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6792903516704746677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dea957848a8884973b92ee84623db0e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BannerEnable: 0
+  AppOpenAdEnable: 0
+  InterstitialID: ca-app-pub-3940256099942544/1033173712
+  RewardID: ca-app-pub-3940256099942544/5224354917
+  BanerID: 
+  AppOpenID: 
+  InterstitialIOS: 
+  RewardIOS: 
+  BanerIOS: 
+  AppOpenIOS: 
+--- !u!114 &8853194020888819503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6792903516704746677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8faddc3d73034e8e978c2594fc7efd6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AndroidGameId: 5476277
+  IosGameId: 5476276
+--- !u!114 &2403532534765018161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6792903516704746677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4a5f1cd1a9a543a28d07315233547b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onPurchaseComplete:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6792903516704746666}
+        m_TargetAssemblyTypeName: MG_Interface, Assembly-CSharp
+        m_MethodName: PurchaseSuccsseCallBack
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onPurchaseFailed:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6792903516704746666}
+        m_TargetAssemblyTypeName: MG_Interface, Assembly-CSharp
+        m_MethodName: PurchaseErrorCallBack
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  PackageList:
+  - packageName: Coin Pack 200
+    AndroidId: ss.g200
+    IOSId: ss.g200
+    consumable: 1
+  - packageName: Coin Pack 1250
+    AndroidId: ss.g1250
+    IOSId: ss.g1250
+    consumable: 1
+  - packageName: Coin Pack 3000
+    AndroidId: ss.g3000
+    IOSId: ss.g3000
+    consumable: 1
+  - packageName: Coin Pack 4500
+    AndroidId: ss.g4500
+    IOSId: ss.g4500
+    consumable: 1
+  - packageName: Coin Pack 16K
+    AndroidId: ss.g16000
+    IOSId: ss.g16000
+    consumable: 1
+  - packageName: Coin Pack 35K
+    AndroidId: ss.g35000
+    IOSId: ss.g35000
+    consumable: 1
+  - packageName: Remove Ads
+    AndroidId: ss.removeads
+    IOSId: ss.removeads
+    consumable: 0
+  - packageName: Starter Pack
+    AndroidId: ss.starterpack
+    IOSId: ss.starterpack
+    consumable: 0
+--- !u!1001 &5153195147038336798
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 6792903516704746676}
+    m_Modifications:
+    - target: {fileID: 1857434046287427332, guid: 29f7a562b0ccf364280079aa9aa14bc0,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1857434046287427332, guid: 29f7a562b0ccf364280079aa9aa14bc0,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1857434046287427332, guid: 29f7a562b0ccf364280079aa9aa14bc0,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1857434046287427332, guid: 29f7a562b0ccf364280079aa9aa14bc0,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1857434046287427332, guid: 29f7a562b0ccf364280079aa9aa14bc0,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1857434046287427332, guid: 29f7a562b0ccf364280079aa9aa14bc0,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1857434046287427332, guid: 29f7a562b0ccf364280079aa9aa14bc0,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1857434046287427332, guid: 29f7a562b0ccf364280079aa9aa14bc0,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1857434046287427332, guid: 29f7a562b0ccf364280079aa9aa14bc0,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1857434046287427332, guid: 29f7a562b0ccf364280079aa9aa14bc0,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1857434046287427332, guid: 29f7a562b0ccf364280079aa9aa14bc0,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1857434046287427333, guid: 29f7a562b0ccf364280079aa9aa14bc0,
+        type: 3}
+      propertyPath: m_Name
+      value: Reporter
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 29f7a562b0ccf364280079aa9aa14bc0, type: 3}
+--- !u!4 &6792903518535618586 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1857434046287427332, guid: 29f7a562b0ccf364280079aa9aa14bc0,
+    type: 3}
+  m_PrefabInstance: {fileID: 5153195147038336798}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6792903518535618587 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1857434046287427333, guid: 29f7a562b0ccf364280079aa9aa14bc0,
+    type: 3}
+  m_PrefabInstance: {fileID: 5153195147038336798}
+  m_PrefabAsset: {fileID: 0}

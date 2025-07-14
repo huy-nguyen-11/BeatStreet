@@ -1,0 +1,451 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 521d4a1ec436fe54d85cf2f64525faa3, type: 3}
+  m_Name: DataBase
+  m_EditorClassIdentifier: 
+  imgEquipItems:
+    sprPiecePlayerLevelUp:
+    - {fileID: -1427546772, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 520303397, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -807154028, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 35668504, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 1560729037, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 728258606, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -1622095953, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -1231560106, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -2110683798, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 696997615, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -319044194, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 1128236756, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    sprPiecePlayerEvolve:
+    - {fileID: 1994032869, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -504495360, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -258821558, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 23302340, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 289378691, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 795187775, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -507937156, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 707059469, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -1293164704, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -2135610869, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 588450606, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -461255187, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    sprPieceEnemy:
+    - {fileID: 2052527869, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -578678293, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -1429441665, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -115042427, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 1460255971, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 1815956888, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 294563541, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -2044678395, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -860802240, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 502738341, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 667227889, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 774046316, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 1679333965, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 1469432809, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -226101366, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 1651754375, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 497335451, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -1946955003, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    sprItem:
+    - {fileID: 391767374, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -1640490585, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 806727156, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 1503976404, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -1445593356, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 1308459639, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -1149633246, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 1887378378, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -1636724470, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 217639527, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -529842292, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 1773133695, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 1044557845, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -1344345044, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 592968358, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 859763444, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -1907229499, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 203578886, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 2063875949, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 2140287086, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -1286003805, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -56121446, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 1494562179, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: -2032239184, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 73238165, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 1870117577, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    - {fileID: 1926464125, guid: 1c8f6962840e2e94290a3b9aec83f026, type: 3}
+    namePlayer:
+    - lee
+    - Rin
+    - Tas
+    - Val
+    - Jun
+    - Pat
+    - Ana
+    - Oni
+    - Urs
+    - Rad
+    - Gui
+    - Poe and zoe
+    nameEnemy:
+    - Radley
+    - Butch
+    - Weasley
+    - Scottie
+    - Jamie
+    - Carly
+    - Dirk
+    - Joey
+    - Miles
+    - Joessette
+    - Tommy
+    - Vlad
+    - Luke
+    - Logan
+    - Bianca
+    - Don Mascarpone
+    - Chef Varka
+    - 50 Kicks
+    nameItems:
+    - Skill+++
+    - Defense+++
+    - Attack+++
+    - Skill++
+    - Defense++
+    - Attack++
+    - Skill+
+    - Defense+
+    - Attack+
+    - Large Combo orb
+    - Medium Combo orb
+    - Small Combo orb
+    - Burger
+    - Strawberry
+    - Roast Chicken
+    - Apple
+    - Steak
+    - Sushi
+    - Bamboo stick
+    - Baseball bat
+    - Steel pipe
+    - Hammer
+    - Sword
+    - Brick
+    - Bottle
+    - Ruler
+    - Selfie-stick
+    titleAttributeItems:
+    - Enemies block 30% less for 1 minute
+    - 75% less damage for 1 minute
+    - Do 100% more damage for 1 minute
+    - Enemies block 20% less for 1 minute
+    - 50% less damage for 1 minute
+    - Do 50% more damage for 1 minute
+    - Enemies block 10% less for 1 minute
+    - 25% less damage for 1 minute
+    - Do 25% more damage for 1 minute
+    - Fills 100% of your combo bar.
+    - Fills 50% of your combo bar.
+    - Fills 25% of your combo bar.
+    - Restores 25% health
+    - Restores 20% health
+    - Restores 50% health
+    - Restores 20% health
+    - Restores 50% health
+    - Restores 25% health
+    - Oriental weapon
+    - Hit a homerun
+    - Hurts like hell
+    - Hammer time!
+    - cuts through anything
+    - a weapon from th 80s
+    - The perfect tool for barfight
+    - Measure pain
+    - A weapon of modern age
+    AttributeItems: 1e0000004b000000640000001400000032000000320000000a00000019000000190000006400000032000000190000001900000014000000320000001400000032000000190000001000000014000000070000001a000000200000001a0000001a0000000700000015000000
+    StarItems: 020000000200000002000000010000000100000001000000000000000000000000000000020000000100000000000000010000000000000002000000000000000200000001000000010000000100000000000000020000000200000001000000000000000000000002000000
+  ListQuests:
+  - NameQuests: Use 60 diamonds
+    Milestone: 60
+    checkPrice: 1
+    price: 25
+  - NameQuests: Use 2000 Coin
+    Milestone: 2000
+    checkPrice: 0
+    price: 1000
+  - NameQuests: Upgrade your character 2 times
+    Milestone: 3
+    checkPrice: 1
+    price: 5
+  - NameQuests: Spin the wheel 5 times
+    Milestone: 5
+    checkPrice: 0
+    price: 500
+  - NameQuests: Revive 3 times
+    Milestone: 3
+    checkPrice: 1
+    price: 50
+  - NameQuests: Get a 10 hit combo
+    Milestone: 5
+    checkPrice: 0
+    price: 350
+  - NameQuests: Use skill 20 times
+    Milestone: 20
+    checkPrice: 0
+    price: 300
+  - NameQuests: Do 20 dash attack
+    Milestone: 20
+    checkPrice: 0
+    price: 100
+  - NameQuests: Use 5 Untimate on the enemy
+    Milestone: 5
+    checkPrice: 1
+    price: 5
+  - NameQuests: 10 knockouts with a weapon
+    Milestone: 10
+    checkPrice: 0
+    price: 200
+  - NameQuests: Use 5 items
+    Milestone: 5
+    checkPrice: 1
+    price: 25
+  HpUpgrade: 0000000012000000120000001200000012000000130000001400000013000000150000001400000016000000160000001700000018000000180000001a0000001b0000001c0000001d0000001f000000210000002200000025000000260000002a0000002c0000002f00000032000000360000003a0000003f000000440000004900000050000000560000005e000000660000006f0000007a00000084000000
+  dameUpgrade: 00000000020000000100000002000000020000000200000002000000020000000100000002000000020000000300000002000000020000000200000002000000030000000200000003000000030000000300000003000000030000000300000004000000040000000400000004000000050000000500000005000000060000000600000007000000070000000800000008000000090000000a0000000b000000
+  listLevelModeMaps:
+  - levelMode: 010000000400000007000000
+  - levelMode: 000000000000000000000000
+  - levelMode: 000000000000000000000000
+  - levelMode: 000000000000000000000000
+  - levelMode: 000000000000000000000000
+  - levelMode: 000000000000000000000000
+  - levelMode: 000000000000000000000000
+  - levelMode: 000000000000000000000000
+  - levelMode: 000000000000000000000000
+  - levelMode: 000000000000000000000000
+  - levelMode: 000000000000000000000000
+  - levelMode: 000000000000000000000000
+  - levelMode: 000000000000000000000000
+  - levelMode: 000000000000000000000000
+  - levelMode: 000000000000000000000000
+  listLevelEnemyUpgrades:
+  - HP:
+    - 24
+    - 42
+    - 55
+    - 78
+    - 95
+    - 110
+    - 130
+    - 148
+    - 169
+    - 195
+    - 230
+    - 265
+    - 296
+    - 329
+    - 363
+    Dame:
+    - 2
+    - 3
+    - 4
+    - 6
+    - 7
+    - 9
+    - 10
+    - 11
+    - 13
+    - 14
+    - 16
+    - 17
+    - 18
+    - 20
+    - 22
+  - HP:
+    - 34
+    - 50
+    - 65
+    - 88
+    - 110
+    - 135
+    - 150
+    - 180
+    - 212
+    - 240
+    - 279
+    - 310
+    - 342
+    - 379
+    - 412
+    Dame:
+    - 4
+    - 5
+    - 6
+    - 8
+    - 9
+    - 12
+    - 13
+    - 14
+    - 15
+    - 17
+    - 18
+    - 20
+    - 23
+    - 25
+    - 27
+  - HP:
+    - 30
+    - 45
+    - 65
+    - 81
+    - 104
+    - 130
+    - 147
+    - 180
+    - 212
+    - 240
+    - 279
+    - 310
+    - 342
+    - 370
+    - 400
+    Dame:
+    - 3
+    - 4
+    - 5
+    - 6
+    - 8
+    - 9
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 17
+    - 18
+    - 19
+    - 21
+  - HP:
+    - 21
+    - 39
+    - 50
+    - 74
+    - 86
+    - 99
+    - 124
+    - 134
+    - 158
+    - 187
+    - 210
+    - 241
+    - 289
+    - 310
+    - 337
+    Dame:
+    - 5
+    - 6
+    - 7
+    - 9
+    - 10
+    - 12
+    - 13
+    - 15
+    - 17
+    - 18
+    - 19
+    - 21
+    - 24
+    - 26
+    - 30
+  - HP:
+    - 42
+    - 68
+    - 99
+    - 132
+    - 167
+    - 201
+    - 239
+    - 263
+    - 287
+    - 306
+    - 333
+    - 375
+    - 402
+    - 439
+    - 485
+    Dame:
+    - 2
+    - 2
+    - 3
+    - 4
+    - 5
+    - 5
+    - 7
+    - 8
+    - 9
+    - 9
+    - 11
+    - 12
+    - 12
+    - 13
+    - 15
+  - HP:
+    - 34
+    - 50
+    - 65
+    - 88
+    - 110
+    - 135
+    - 150
+    - 180
+    - 212
+    - 240
+    - 279
+    - 310
+    - 342
+    - 379
+    - 412
+    Dame:
+    - 5
+    - 6
+    - 7
+    - 9
+    - 11
+    - 12
+    - 13
+    - 15
+    - 17
+    - 18
+    - 19
+    - 21
+    - 24
+    - 27
+    - 30
+  listModeLevelEnemyMaps:
+  - Mode: 010000000400000007000000
+  - Mode: 020000000500000008000000
+  - Mode: 030000000600000009000000
+  - Mode: 030000000600000009000000
+  - Mode: 030000000600000009000000
+  - Mode: 04000000070000000a000000
+  - Mode: 04000000070000000a000000
+  - Mode: 05000000080000000b000000
+  - Mode: 05000000080000000b000000
+  - Mode: 06000000090000000c000000
+  - Mode: 070000000a0000000d000000
+  - Mode: 070000000a0000000c000000
+  - Mode: 080000000b0000000d000000
+  - Mode: 080000000b0000000d000000
+  - Mode: 090000000c0000000e000000
+  CountUnlockListLevel: 0b000000190000002b000000410000005f000000

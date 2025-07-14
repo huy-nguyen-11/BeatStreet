@@ -1,0 +1,66 @@
+using UnityEngine;
+
+public class PlayerHit : PlayerStateManager
+{
+    public PlayerHit(PlayerController player) : base(player) { }
+    [SerializeField] private float jumpHeight = 1f;
+    [SerializeField] private float jumpDistance = 1.65f;
+    [SerializeField] private float jumpDuration = 1f;
+    [SerializeField] private int jumpCount = 1;
+    bool isFall;
+    Coroutine _coroutine;
+    public override void Enter()
+    {
+        playerController.state = PlayerController.State.Hit;
+        playerController.rb.velocity = Vector2.zero;
+        playerController.transform.rotation = Quaternion.Euler(new Vector3(0, playerController.HitDirection ? -180 : 0, 0));
+        if (playerController.HitCount < 3)
+        {
+            playerController.animator.Play("Hit");
+        }
+        else
+        {
+            playerController.isFall = true;
+            playerController.animator.Play("Dead");
+            playerController.velocity = 8;
+            _coroutine = playerController.StartCoroutine(playerController.FallCoroutine());
+            isFall = true;
+        }
+    }
+    public override void Update()
+    {
+        if (isFall)
+        {
+            playerController.ProcessGravity();
+            playerController.SetFall();
+        }
+    }
+
+    public override void Exit()
+    {
+        isFall = false;
+        if (_coroutine != null)
+        {
+            playerController.StopCoroutine(_coroutine);
+        }
+    }
+    public override void FixedUpdate()
+    {
+    }
+
+    public override void OnCollisionEnter2D(Collision2D collision)
+    {
+    }
+
+    public override void OnTriggerEnter(Collider2D collision)
+    {
+    }
+
+    public override void OnTriggerExit(Collider2D collision)
+    {
+    }
+
+    public override void OnTriggerStay(Collider2D collision)
+    {
+    }
+}
