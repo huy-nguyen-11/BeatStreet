@@ -8,12 +8,38 @@ public class ShopController : MonoBehaviour
     [SerializeField] GameObject[] _panels;
     [SerializeField] GameObject prfItem;
     [SerializeField] GameObject _content;
+    [SerializeField] List<GameObject> _listPopUp ;
+    [SerializeField] List<Image> _listImageButtons;
+    [SerializeField] Sprite spSlect, spNormal;
     [SerializeField] Button _btnVip;
     private List<string> nameChests = new List<string>() { "Classic", "Specail", "Mythic" };
     public List<int> listPlayerLevelUp = new List<int>();
     public List<int> listEnemy = new List<int>();
     public List<int> listItem = new List<int>();
     public List<int> listPlayerEvolve = new List<int>();
+
+    private void OnEnable()
+    {
+        OpenPopup(0);
+    }
+
+    public void OpenPopup(int index)
+    {
+        for (int i = 0; i < _listPopUp.Count; i++)
+        {
+            if (i == index)
+            {
+                _listPopUp[i].SetActive(true);
+                _listImageButtons[i].sprite = spSlect;
+            }
+            else
+            {
+                _listPopUp[i].SetActive(false);
+                _listImageButtons[i].sprite = spNormal;
+            }
+        }
+    }
+
     public void BtnClaim()
     {
         AudioBase.Instance.SetAudioUI(0);
@@ -217,65 +243,109 @@ public class ShopController : MonoBehaviour
             listPlayerEvolve.RemoveAll(x => x == checkNumber);
         }
     }
+    //public void BtnBuyCoin(int id)
+    //{
+    //    AudioBase.Instance.SetAudioUI(0);
+    //    if (id == 0)
+    //    {
+    //        if (PlayerPrefs.GetInt("Diamont") >= 30)
+    //        {
+    //            AudioBase.Instance.SetAudioUI(1);
+    //            MainManager.Instance.SetMission(0, 30);
+    //            PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 30);
+    //            PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 360);
+    //        }
+    //    }
+    //    else if (id == 1)
+    //    {
+    //        if (PlayerPrefs.GetInt("Diamont") >= 500)
+    //        {
+    //            AudioBase.Instance.SetAudioUI(1);
+    //            MainManager.Instance.SetMission(0, 500);
+    //            PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 500);
+    //            PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 6600);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        if (PlayerPrefs.GetInt("Diamont") >= 1000)
+    //        {
+    //            AudioBase.Instance.SetAudioUI(1);
+    //            MainManager.Instance.SetMission(0, 1000);
+    //            PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 1000);
+    //            PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 13200);
+    //        }
+    //    }
+    //    MainManager.Instance.SetTopBar();
+    //    DataManager.Instance.SaveFile();
+    //}
+
     public void BtnBuyCoin(int id)
     {
         AudioBase.Instance.SetAudioUI(0);
-        if (id == 0)
+
+        // Mảng các gói: {diamond, coin}
+        int[,] exchangePackages = new int[,]
         {
-            if (PlayerPrefs.GetInt("Diamont") >= 30)
-            {
-                AudioBase.Instance.SetAudioUI(1);
-                MainManager.Instance.SetMission(0, 30);
-                PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 30);
-                PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 360);
-            }
-        }
-        else if (id == 1)
-        {
-            if (PlayerPrefs.GetInt("Diamont") >= 500)
-            {
-                AudioBase.Instance.SetAudioUI(1);
-                MainManager.Instance.SetMission(0, 500);
-                PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 500);
-                PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 6600);
-            }
-        }
-        else
-        {
-            if (PlayerPrefs.GetInt("Diamont") >= 1000)
-            {
-                AudioBase.Instance.SetAudioUI(1);
-                MainManager.Instance.SetMission(0, 1000);
-                PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 1000);
-                PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 13200);
-            }
-        }
+        {30, 360},
+        {500, 6600},
+        {1000, 13200},
+        {2000, 26400},
+        {4000, 52800}
+        };
+
+        if (id < 0 || id >= exchangePackages.GetLength(0)) return;
+
+        int diamondCost = exchangePackages[id, 0];
+        int coinReward = exchangePackages[id, 1];
+
+        TryExchangeDiamondForCoins(diamondCost, coinReward);
         MainManager.Instance.SetTopBar();
         DataManager.Instance.SaveFile();
+    }
+
+    private void TryExchangeDiamondForCoins(int diamondCost, int coinReward)
+    {
+        int currentDiamond = PlayerPrefs.GetInt("Diamont");
+
+        if (currentDiamond >= diamondCost)
+        {
+            AudioBase.Instance.SetAudioUI(1);
+            MainManager.Instance.SetMission(0, diamondCost);
+
+            PlayerPrefs.SetInt("Diamont", currentDiamond - diamondCost);
+            PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + coinReward);
+        }
     }
     public void BtnBuyDiamont(int id)
     {
         AudioBase.Instance.SetAudioUI(0);
-        MG_Interface.Current.Purchase_Item(MG_ProductData.DiamontPacks[id].productId, (bool result, bool onIAP, string productId) =>
+        if(id == 0)
         {
-            if (result)
+            Debug.Log("watch ads to get gems!");
+        }
+        else
+        {
+            MG_Interface.Current.Purchase_Item(MG_ProductData.DiamontPacks[id].productId, (bool result, bool onIAP, string productId) =>
             {
-                AudioBase.Instance.SetAudioUI(1);
-                PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + SetDiamont(id));
-                MainManager.Instance.SetTopBar();
-                DataManager.Instance.SaveFile();
-            }
-            else
-            {
-            }
-        });
+                if (result)
+                {
+                    AudioBase.Instance.SetAudioUI(1);
+                    PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + SetDiamont(id));
+                    MainManager.Instance.SetTopBar();
+                    DataManager.Instance.SaveFile();
+                }
+                else
+                {
+                }
+            });
+        }
+
     }
     private int SetDiamont(int id)
     {
         switch (id)
         {
-            case 0:
-                return 160;
             case 1:
                 return 440;
             case 2:

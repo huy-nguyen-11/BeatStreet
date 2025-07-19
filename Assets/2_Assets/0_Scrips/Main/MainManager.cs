@@ -9,7 +9,7 @@ public class MainManager : MonoBehaviour
     public static MainManager Instance { get; private set; }
     DataManager dataManager;
     [SerializeField] GameObject[] _panels;
-    [SerializeField] GameObject _BarBottom;
+    [SerializeField] GameObject _BarBottom, buttonSetting , buttonBack ;
     [SerializeField] Transform _BarTop;
     [SerializeField] Image[] _imgBtnBottoms;
     [SerializeField] Sprite[] _sprBtnBottomsTrue;
@@ -41,8 +41,8 @@ public class MainManager : MonoBehaviour
         SetBottomBar(3);
         _panels[3].SetActive(true);
         SetImgBtnBottom(3 - 1);
-        if (3 == 3)
-            SetAvtBtn();
+        //if (3 == 3)
+        //    SetAvtBtn();
     }
     private void OnEnable()
     {
@@ -55,6 +55,10 @@ public class MainManager : MonoBehaviour
     {
         CheckBtnSetting();
         SetTopBar();
+
+        //
+        buttonSetting.SetActive(true);
+        buttonBack.SetActive(false);
     }
     public void OpenPanel(int id)
     {
@@ -64,14 +68,22 @@ public class MainManager : MonoBehaviour
         _panels[id].SetActive(true);
         SetImgBtnBottom(id - 1);
         if (id == 3)
-            SetAvtBtn();
+        {
+            buttonSetting.SetActive(true);
+            buttonBack.SetActive(false);
+        }
+        else
+        {
+            buttonSetting.SetActive(false);
+            buttonBack.SetActive(true);
+        }
     }
     public void SetTopBar()
     {
-        _BarTop.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = PlayerPrefs.GetInt("Energy").ToString() + "/20";
-        _BarTop.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = _panels[0].GetComponent<LevelControllerMain>().GetCountStar().ToString();
-        _BarTop.GetChild(2).GetChild(0).GetComponent<TextMeshProUGUI>().text = PlayerPrefs.GetInt("Diamont").ToString();
-        _BarTop.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = PlayerPrefs.GetInt("Coin").ToString();
+        //_BarTop.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = PlayerPrefs.GetInt("Energy").ToString() + "/20";
+        //_BarTop.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = _panels[0].GetComponent<LevelControllerMain>().GetCountStar().ToString();
+        //_BarTop.GetChild(2).GetChild(0).GetComponent<TextMeshProUGUI>().text = PlayerPrefs.GetInt("Diamont").ToString();
+        //_BarTop.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = PlayerPrefs.GetInt("Coin").ToString();
     }
     private void SetBottomBar(int id)
     {
@@ -87,13 +99,13 @@ public class MainManager : MonoBehaviour
     }
     private void SetImgBtnBottom(int id)
     {
-        for (int i = 0; i < _imgBtnBottoms.Length; i++)
-        {
-            if (i == id)
-                _imgBtnBottoms[i].sprite = _sprBtnBottomsTrue[i];
-            else
-                _imgBtnBottoms[i].sprite = _sprBtnBottomsFalse[i];
-        }
+        //for (int i = 0; i < _imgBtnBottoms.Length; i++)
+        //{
+        //    if (i == id)
+        //        _imgBtnBottoms[i].sprite = _sprBtnBottomsTrue[i];
+        //    else
+        //        _imgBtnBottoms[i].sprite = _sprBtnBottomsFalse[i];
+        //}
     }
     // Setting
     private void CheckBtnSetting()
