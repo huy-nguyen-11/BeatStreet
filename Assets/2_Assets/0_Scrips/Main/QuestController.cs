@@ -86,12 +86,12 @@ public class QuestController : MonoBehaviour
             }
             else
             {
-                _quests[i].transform.GetChild(1).gameObject.SetActive(false);
-                _quests[i].transform.GetChild(2).gameObject.SetActive(false);
-                _quests[i].transform.GetChild(3).gameObject.SetActive(false);
+                //_quests[i].transform.GetChild(1).gameObject.SetActive(false);
+                //_quests[i].transform.GetChild(2).gameObject.SetActive(false);
+                _quests[i].transform.GetChild(3).gameObject.SetActive(false); //button calim
                 _quests[i].transform.GetChild(4).gameObject.SetActive(true);
-                if (i == 2)
-                    _quests[i].transform.GetChild(5).gameObject.SetActive(false);
+                //if (i == 2)
+                //    _quests[i].transform.GetChild(5).gameObject.SetActive(false);//icon ads
             }
         }
     }
@@ -100,12 +100,12 @@ public class QuestController : MonoBehaviour
         if (dataManager.questsCurrent.ProgressQuest1 < dataBase.ListQuests[dataManager.questsCurrent.IdQuest1].Milestone)
         {
             Sprite spr = dataBase.ListQuests[dataManager.questsCurrent.IdQuest1].checkPrice ? _sprIcon[1] : _sprIcon[0];
-            _quests[0].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text =
-                dataBase.ListQuests[dataManager.questsCurrent.IdQuest1].NameQuests;
-            _quests[0].transform.GetChild(1).GetComponent<Image>().sprite = spr;
-            _quests[0].transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text =
-                dataBase.ListQuests[dataManager.questsCurrent.IdQuest1].price.ToString();
-            _quests[0].transform.GetChild(3).gameObject.SetActive(false);
+            _quests[0].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text =
+                dataBase.ListQuests[dataManager.questsCurrent.IdQuest1].NameQuests; //name quest
+            _quests[0].transform.GetChild(3).GetChild(1).GetComponent<Image>().sprite = spr; //icon coins or gem at button claim
+            _quests[0].transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text =
+                dataBase.ListQuests[dataManager.questsCurrent.IdQuest1].price.ToString(); // amount coins or gem at button claim
+            _quests[0].transform.GetChild(3).gameObject.GetComponent<Button>().interactable = false;//button claim
             float milestone = dataBase.ListQuests[dataManager.questsCurrent.IdQuest1].Milestone;
             float progress = dataManager.questsCurrent.ProgressQuest1;
             _quests[0].transform.GetChild(2).GetChild(0).GetComponent<Image>().DOFillAmount(progress / milestone, 0);
@@ -113,7 +113,7 @@ public class QuestController : MonoBehaviour
         }
         else
         {
-            _quests[0].transform.GetChild(3).gameObject.SetActive(true);
+            _quests[0].transform.GetChild(3).gameObject.GetComponent<Button>().interactable = true; //button claim
         }
     }
     private void SetQuest2()
@@ -121,40 +121,40 @@ public class QuestController : MonoBehaviour
         if (dataManager.questsCurrent.ProgressQuest2 < dataBase.ListQuests[dataManager.questsCurrent.IdQuest2].Milestone)
         {
             Sprite spr = dataBase.ListQuests[dataManager.questsCurrent.IdQuest2].checkPrice ? _sprIcon[1] : _sprIcon[0];
-            _quests[1].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text =
+            _quests[1].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text =
                 dataBase.ListQuests[dataManager.questsCurrent.IdQuest2].NameQuests;
-            _quests[1].transform.GetChild(1).GetComponent<Image>().sprite = spr;
+            _quests[1].transform.GetChild(3).GetChild(1).GetComponent<Image>().sprite = spr;
             _quests[1].transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text =
                 dataBase.ListQuests[dataManager.questsCurrent.IdQuest2].price.ToString();
             float milestone = dataBase.ListQuests[dataManager.questsCurrent.IdQuest2].Milestone;
             float progress = dataManager.questsCurrent.ProgressQuest2;
             _quests[1].transform.GetChild(2).GetChild(0).GetComponent<Image>().DOFillAmount(progress / milestone, 0);
             _quests[1].transform.GetChild(2).GetChild(1).GetComponent<TextMeshProUGUI>().text = progress + "/" + milestone;
-            _quests[1].transform.GetChild(3).gameObject.SetActive(false);
+            _quests[1].transform.GetChild(3).GetComponent<Button>().interactable = false;//button claim
 
         }
         else
         {
-            _quests[1].transform.GetChild(3).gameObject.SetActive(true);
+            _quests[1].transform.GetChild(3).GetComponent<Button>().interactable = true;//button claim
         }
     }
-    private void SetQuest3()
+    private void SetQuest3() //watch 5 ads
     {
         if (dataManager.questsCurrent.ProgressQuest3 < 5)
         {
-            _quests[2].transform.GetChild(3).gameObject.SetActive(false);
-            _quests[2].transform.GetChild(5).gameObject.SetActive(true);
+            _quests[2].transform.GetChild(3).gameObject.GetComponent<Button>().interactable = false;
+            //_quests[2].transform.GetChild(5).gameObject.SetActive(true);//icon ads
         }
         else
         {
-            _quests[2].transform.GetChild(3).gameObject.SetActive(true);
-            _quests[2].transform.GetChild(5).gameObject.SetActive(false);
+            _quests[2].transform.GetChild(3).gameObject.GetComponent<Button>().interactable = true;
+            //_quests[2].transform.GetChild(5).gameObject.SetActive(false);
         }
         float progress = dataManager.questsCurrent.ProgressQuest3;
         _quests[2].transform.GetChild(2).GetChild(0).GetComponent<Image>().DOFillAmount(progress / 5, 0);
         _quests[2].transform.GetChild(2).GetChild(1).GetComponent<TextMeshProUGUI>().text = progress + "/" + 5;
     }
-    private void SetQuest4()
+    private void SetQuest4() //completed 3 quest
     {
         if (dataManager.questsCurrent.ProgressQuest4 < 3)
             _quests[3].transform.GetChild(3).gameObject.SetActive(false);

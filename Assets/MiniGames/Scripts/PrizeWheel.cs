@@ -377,14 +377,14 @@ namespace I2.MiniGames
         {
             _Controller.spining = false;
             PopupItem.GetComponentInChildren<DOTweenAnimation>().DORewind();
-            PopupItem.transform.GetChild(0).GetChild(1).GetComponent<Image>().sprite = icons[id];
-            PopupItem.transform.GetChild(0).GetChild(2).GetComponent<TextMeshProUGUI>().text = numb_item[id];
+            PopupItem.transform.GetChild(1).GetChild(1).GetChild(0).GetComponent<Image>().sprite = icons[id];
+            PopupItem.transform.GetChild(1).GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text = numb_item[id];
             PopupItem.SetActive(true);
             yield return new WaitForSeconds(0.5f);
             if (true)
                 PopupItem.GetComponent<AudioSource>().Play();
             PopupItem.GetComponentInChildren<DOTweenAnimation>().DOPlay();
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(1.5f);
             GetReward(id);
             PopupItem.SetActive(false);
         }

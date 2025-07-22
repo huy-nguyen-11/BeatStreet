@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LuckySpin : MonoBehaviour
 {
@@ -57,8 +58,8 @@ public class LuckySpin : MonoBehaviour
             }
             else
             {
-                _btnSpin[2].transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = DataManager.Instance.priceSpin.ToString();
-                SetBtnSpin(2);
+                //_btnSpin[2].transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = DataManager.Instance.priceSpin.ToString();
+                //SetBtnSpin(2);
             }
         }
     }
@@ -66,9 +67,15 @@ public class LuckySpin : MonoBehaviour
     {
         for (int i = 0; i < _btnSpin.Length; i++)
             if (i == id)
-                _btnSpin[i].SetActive(true);
+            {
+                //_btnSpin[i].SetActive(true);
+                _btnSpin[i].GetComponent<Button>().interactable = true;
+            }
             else
-                _btnSpin[i].SetActive(false);
+            {
+                //_btnSpin[i].SetActive(true);
+                _btnSpin[i].GetComponent<Button>().interactable = false;
+            }     
     }
     public void BtnCoinSpin()
     {

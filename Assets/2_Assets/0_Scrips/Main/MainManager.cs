@@ -9,7 +9,7 @@ public class MainManager : MonoBehaviour
     public static MainManager Instance { get; private set; }
     DataManager dataManager;
     [SerializeField] GameObject[] _panels;
-    [SerializeField] GameObject _BarBottom, buttonSetting , buttonBack ;
+    [SerializeField] GameObject _BarBottom, buttonSetting , buttonBack , buttonNoAds , buttonStarterPack ;
     [SerializeField] Transform _BarTop;
     [SerializeField] Image[] _imgBtnBottoms;
     [SerializeField] Sprite[] _sprBtnBottomsTrue;
@@ -17,6 +17,8 @@ public class MainManager : MonoBehaviour
     [SerializeField] Transform[] _btnUpgrade;
     [SerializeField] Sprite[] _sprAvtPlayer;
     [SerializeField] Sprite[] _sprAvtEnemy;
+    [SerializeField] private TextMeshProUGUI _textCoins, _textGems;
+
     // Sound, Music
     [SerializeField] Image[] _imgBtnSetting;
     [SerializeField] Sprite[] _sprBtnSettingTrue;
@@ -59,7 +61,30 @@ public class MainManager : MonoBehaviour
         //
         buttonSetting.SetActive(true);
         buttonBack.SetActive(false);
+        SetShowButtonPack();
     }
+
+    private void Update()
+    {
+        if (PlayerPrefs.GetInt("Coin") != 0)
+        {
+            _textCoins.text = PlayerPrefs.GetInt("Coin").ToString("##,#");
+        }
+        else
+        {
+            _textCoins.text = "0";
+        }
+
+        if (PlayerPrefs.GetInt("Diamont") != 0)
+        {
+            _textGems.text = PlayerPrefs.GetInt("Diamont").ToString("##,#");
+        }
+        else
+        {
+            _textGems.text = "0";
+        }
+    }
+
     public void OpenPanel(int id)
     {
         AudioBase.Instance.SetAudioUI(0);
@@ -180,11 +205,11 @@ public class MainManager : MonoBehaviour
     {
         if (DataManager.Instance.isCheckVip)
         {
-            ScrollSnapPagination scrollSnap = _panels[3].GetComponent<ScrollSnapPagination>();
-            scrollSnap.totalPages = 1;
-            scrollSnap.transform.GetChild(1).GetChild(0).GetChild(0).GetChild(1).gameObject.SetActive(false);
-            scrollSnap.autoScroll = false;
-            scrollSnap.transform.GetChild(1).GetChild(1).gameObject.SetActive(false);
+            //ScrollSnapPagination scrollSnap = _panels[3].GetComponent<ScrollSnapPagination>();
+            //scrollSnap.totalPages = 1;
+            //scrollSnap.transform.GetChild(1).GetChild(0).GetChild(0).GetChild(1).gameObject.SetActive(false);
+            //scrollSnap.autoScroll = false;
+            //scrollSnap.transform.GetChild(1).GetChild(1).gameObject.SetActive(false);
             CheckRewardStatus();
         }
     }
@@ -196,6 +221,51 @@ public class MainManager : MonoBehaviour
         PlayerPrefs.SetString(LAST_REWARD_TIME, lastRewardTime.ToString());
         SetTopBar();
     }
+
+    //starter Pack
+    public void Onclick_StarterPack()
+    {
+        MG_Interface.Current.Purchase_Item(MG_ProductData.Starter_Pack.productId, (bool result, bool onIAP, string productId) =>
+        {
+            if (result)
+            {
+                //AudioBase.Instance.SetAudioUI(1);
+                PlayerPrefs.SetInt("StarterPack", 1);
+                SetShowButtonPack();
+                //OpenPanel(3);
+                //DataManager.Instance.SaveFile();
+            }
+            else
+            {
+            }
+        });
+    }
+
+    // No ads pack
+    public void Onclick_NoAdsPack()
+    {
+        MG_Interface.Current.Purchase_Item(MG_ProductData.NoAds_Pack.productId, (bool result, bool onIAP, string productId) =>
+        {
+            if (result)
+            {
+                AudioBase.Instance.SetAudioUI(1);
+                PlayerPrefs.SetInt("NoAds", 1);
+                SetShowButtonPack();
+                //OpenPanel(3);
+                //DataManager.Instance.SaveFile();
+            }
+            else
+            {
+            }
+        });
+    }
+
+    void SetShowButtonPack()
+    {
+        buttonNoAds.SetActive(PlayerPrefs.GetInt("NoAds") == 0);
+        buttonStarterPack.SetActive(PlayerPrefs.GetInt("StarterPack") == 0);
+    }
+
     // Home
     private void SetAvtBtn()
     {

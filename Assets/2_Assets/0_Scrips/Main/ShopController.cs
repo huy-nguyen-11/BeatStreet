@@ -17,6 +17,10 @@ public class ShopController : MonoBehaviour
     public List<int> listEnemy = new List<int>();
     public List<int> listItem = new List<int>();
     public List<int> listPlayerEvolve = new List<int>();
+    public List<Transform> _listPosGems , _listPosCoins;
+    public TimeReward timeReward1 , timeReward2;
+    public CollectItemUICtrl getReward;
+    public GameObject _contentShop;
 
     private void OnEnable()
     {
@@ -25,6 +29,7 @@ public class ShopController : MonoBehaviour
 
     public void OpenPopup(int index)
     {
+
         for (int i = 0; i < _listPopUp.Count; i++)
         {
             if (i == index)
@@ -37,6 +42,11 @@ public class ShopController : MonoBehaviour
                 _listPopUp[i].SetActive(false);
                 _listImageButtons[i].sprite = spNormal;
             }
+        }
+
+        if (index == 2)
+        {
+            SetContentSize();
         }
     }
 
@@ -299,12 +309,32 @@ public class ShopController : MonoBehaviour
         int diamondCost = exchangePackages[id, 0];
         int coinReward = exchangePackages[id, 1];
 
-        TryExchangeDiamondForCoins(diamondCost, coinReward);
+        TryExchangeDiamondForCoins(diamondCost, coinReward , id);
         MainManager.Instance.SetTopBar();
         DataManager.Instance.SaveFile();
     }
 
-    private void TryExchangeDiamondForCoins(int diamondCost, int coinReward)
+    public void ButtonWatchAdsToGteCoins()
+    {
+        Debug.Log("watch ads to get coins!");
+        if (Application.internetReachability == NetworkReachability.NotReachable)
+        {
+            Debug.Log("No internet connection available.");
+        }
+        else if (Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork || Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork)
+        {
+            timeReward2.OnFreeButtonClick();
+            MG_Interface.Current.Reward_Show(HandleRewardCoins); // get gems free
+        }
+    }
+
+    void HandleRewardCoins(bool resut)
+    {
+        PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 50);
+        getReward.DoAddCoinEffect(_listPosCoins[0].position, PlayerPrefs.GetInt("Coin") - 50, PlayerPrefs.GetInt("Coin"));
+    }
+
+    private void TryExchangeDiamondForCoins(int diamondCost, int coinReward , int _id)
     {
         int currentDiamond = PlayerPrefs.GetInt("Diamont");
 
@@ -315,6 +345,7 @@ public class ShopController : MonoBehaviour
 
             PlayerPrefs.SetInt("Diamont", currentDiamond - diamondCost);
             PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + coinReward);
+            getReward.DoAddCoinEffect(_listPosCoins[_id+1].position, PlayerPrefs.GetInt("Coin") - coinReward, PlayerPrefs.GetInt("Coin"));
         }
     }
     public void BtnBuyDiamont(int id)
@@ -323,6 +354,16 @@ public class ShopController : MonoBehaviour
         if(id == 0)
         {
             Debug.Log("watch ads to get gems!");
+            if (Application.internetReachability == NetworkReachability.NotReachable)
+            {
+               Debug.Log("No internet connection available.");
+            }
+            else if (Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork || Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork)
+            {
+                timeReward1.OnFreeButtonClick();
+                MG_Interface.Current.Reward_Show(HandleRewardGems); // get gems free
+            }
+
         }
         else
         {
@@ -332,6 +373,7 @@ public class ShopController : MonoBehaviour
                 {
                     AudioBase.Instance.SetAudioUI(1);
                     PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + SetDiamont(id));
+                    getReward.DoAddGemsEffect(_listPosGems[id].position, PlayerPrefs.GetInt("Diamont") - SetDiamont(id), PlayerPrefs.GetInt("Diamont"));
                     MainManager.Instance.SetTopBar();
                     DataManager.Instance.SaveFile();
                 }
@@ -342,6 +384,16 @@ public class ShopController : MonoBehaviour
         }
 
     }
+
+    void HandleRewardGems(bool resutl)
+    {
+        if (resutl)
+        {
+            PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + 50);
+            getReward.DoAddGemsEffect(_listPosGems[0].position, PlayerPrefs.GetInt("Diamont") - 50, PlayerPrefs.GetInt("Diamont"));
+        }
+    }
+
     private int SetDiamont(int id)
     {
         switch (id)
@@ -364,5 +416,37 @@ public class ShopController : MonoBehaviour
     {
         if (!DataManager.Instance.isCheckVip)
             MainManager.Instance.OpenPanel(8);
+    }
+
+    //ads , starterpack
+    public void OnClick_ButtonNoAds()
+    {
+        MainManager.Instance.Onclick_NoAdsPack();
+        SetContentSize();
+    }
+
+    public void OnClick_ButtonStarterPack()
+    {
+        MainManager.Instance.Onclick_StarterPack();
+        SetContentSize();
+    }
+
+    void SetContentSize()
+    {
+        if(PlayerPrefs.GetInt("NoAds") == 1 && PlayerPrefs.GetInt("StarterPack") == 1)
+        {
+            _contentShop.transform.GetChild(0).gameObject.SetActive(false);
+            _contentShop.GetComponent<VerticalLayoutGroup>().padding.top = 100;
+        }
+        else if(PlayerPrefs.GetInt("NoAds") == 1)
+        {
+            _contentShop.transform.GetChild(0).GetChild(1).gameObject.SetActive(false);
+        }
+        else if(PlayerPrefs.GetInt("StarterPack") == 1)
+        {
+            _contentShop.transform.GetChild(0).GetChild(2).gameObject.SetActive(false);
+        }
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(_contentShop.GetComponent<RectTransform>());
     }
 }

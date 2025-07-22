@@ -15,6 +15,8 @@ public class DealController : MonoBehaviour
     public List<int> PiecePlayer;
     public List<int> PieceEnemy;
     private bool TypeKey;
+    [SerializeField] private Sprite _iconNotUp , _iconUp;
+
     private void OnEnable()
     {
         dataManager = DataManager.Instance;
@@ -133,13 +135,14 @@ public class DealController : MonoBehaviour
         for (int i = 0; i < _objDeals.Length; i++)
         {
             DealsCurrent deals = dataManager.dealsCurrent[i];
-            _objDeals[i].transform.GetChild(0).GetComponent<Image>().sprite = SetImgIcon(deals);
-            _objDeals[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = SetName(deals);
-            _objDeals[i].transform.GetChild(2).GetChild(0).GetComponent<Image>().DOFillAmount((float)deals.Quantily / 5f, 0);
-            _objDeals[i].transform.GetChild(2).GetChild(1).GetComponent<TextMeshProUGUI>().text = deals.Quantily + "/5";
+            _objDeals[i].transform.GetChild(1).GetChild(0).GetComponent<Image>().sprite = SetImgIcon(deals);//icon deal
+            _objDeals[i].transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = SetName(deals); //name dael
+            _objDeals[i].transform.GetChild(2).GetChild(0).GetComponent<Image>().DOFillAmount((float)deals.Quantily / 5f, 0); //fill amount
+            _objDeals[i].transform.GetChild(2).GetChild(1).GetComponent<TextMeshProUGUI>().text = deals.Quantily + "/5"; //text quantily
+            _objDeals[i].transform.GetChild(2).GetChild(2).GetComponent<Image>().sprite = _iconNotUp; //icon not up
             if (deals.Quantily < 5)
             {
-                _objDeals[i].transform.GetChild(3).gameObject.SetActive(true);
+                _objDeals[i].transform.GetChild(3).gameObject.GetComponent<Button>().interactable = true; // button buy active
                 SetBtnBuy(deals, _objDeals[i].transform.GetChild(3).gameObject);
                 int id = i;
                 bool check = deals.TypePrice;
@@ -151,7 +154,10 @@ public class DealController : MonoBehaviour
                 });
             }
             else
-                _objDeals[i].transform.GetChild(3).gameObject.SetActive(false);
+            {
+                _objDeals[i].transform.GetChild(3).gameObject.GetComponent<Button>().interactable = false; // button buy deactive
+                _objDeals[i].transform.GetChild(2).GetChild(2).GetComponent<Image>().sprite = _iconUp; //icon up
+            }
         }
     }
     private Sprite SetImgIcon(DealsCurrent deal)
