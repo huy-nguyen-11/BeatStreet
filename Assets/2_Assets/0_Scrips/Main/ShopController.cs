@@ -293,7 +293,6 @@ public class ShopController : MonoBehaviour
     public void BtnBuyCoin(int id)
     {
         AudioBase.Instance.SetAudioUI(0);
-
         // Mảng các gói: {diamond, coin}
         int[,] exchangePackages = new int[,]
         {

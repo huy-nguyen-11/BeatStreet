@@ -305,12 +305,13 @@ public class MainManager : MonoBehaviour
     public void BtnMap()
     {
         AudioBase.Instance.SetAudioUI(0);
-        _panels[0].GetComponent<LevelControllerMain>().OnInit();
-        _BarBottom.SetActive(false);
-        for (int i = 1; i < _panels.Length; i++)
-        {
-            _panels[i].gameObject.SetActive(false);
-        }
+        //_panels[0].GetComponent<LevelControllerMain>().OnInit();
+        //_BarBottom.SetActive(false);
+        //for (int i = 1; i < _panels.Length; i++)
+        //{
+        //    _panels[i].gameObject.SetActive(false);
+        //}
+        OpenPanel(0);
     }
     //
     public void SetMission(int id, int count)

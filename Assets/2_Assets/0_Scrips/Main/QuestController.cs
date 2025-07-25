@@ -54,7 +54,7 @@ public class QuestController : MonoBehaviour
         dataManager.questsCurrent.ProgressQuest2 = 0;
         dataManager.questsCurrent.ProgressQuest3 = 0;
         dataManager.questsCurrent.ProgressQuest4 = 0;
-        idQuets1 = Random.Range(0, dataBase.ListQuests.Count);
+        idQuets1 = Random.Range(0, dataBase.ListQuests.Count);  
         idQuets2 = RandomIdQuest();
         dataManager.questsCurrent.IdQuest1 = idQuets1;
         dataManager.questsCurrent.IdQuest2 = idQuets2;
@@ -84,14 +84,19 @@ public class QuestController : MonoBehaviour
                 if (i == 3)
                     SetQuest4();
             }
-            else
+            else //is claimed
             {
-                //_quests[i].transform.GetChild(1).gameObject.SetActive(false);
-                //_quests[i].transform.GetChild(2).gameObject.SetActive(false);
-                _quests[i].transform.GetChild(3).gameObject.SetActive(false); //button calim
-                _quests[i].transform.GetChild(4).gameObject.SetActive(true);
-                //if (i == 2)
-                //    _quests[i].transform.GetChild(5).gameObject.SetActive(false);//icon ads
+                if (i == 2)
+                {
+                    _quests[2].transform.GetChild(4).gameObject.SetActive(false); //button ad
+                    _quests[2].transform.GetChild(3).gameObject.SetActive(false); //button ad
+                    _quests[2].transform.GetChild(5).gameObject.SetActive(true); //claimed
+                }
+                else
+                {
+                    _quests[i].transform.GetChild(3).gameObject.SetActive(false); //button calim
+                    _quests[i].transform.GetChild(4).gameObject.SetActive(true); //claimed
+                }
             }
         }
     }
@@ -124,7 +129,7 @@ public class QuestController : MonoBehaviour
             _quests[1].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text =
                 dataBase.ListQuests[dataManager.questsCurrent.IdQuest2].NameQuests;
             _quests[1].transform.GetChild(3).GetChild(1).GetComponent<Image>().sprite = spr;
-            _quests[1].transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text =
+            _quests[1].transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text =
                 dataBase.ListQuests[dataManager.questsCurrent.IdQuest2].price.ToString();
             float milestone = dataBase.ListQuests[dataManager.questsCurrent.IdQuest2].Milestone;
             float progress = dataManager.questsCurrent.ProgressQuest2;
@@ -142,13 +147,13 @@ public class QuestController : MonoBehaviour
     {
         if (dataManager.questsCurrent.ProgressQuest3 < 5)
         {
-            _quests[2].transform.GetChild(3).gameObject.GetComponent<Button>().interactable = false;
-            //_quests[2].transform.GetChild(5).gameObject.SetActive(true);//icon ads
+            _quests[2].transform.GetChild(3).gameObject.SetActive(false); //button claim
+            _quests[2].transform.GetChild(4).gameObject.SetActive(true); //button ads
         }
         else
         {
-            _quests[2].transform.GetChild(3).gameObject.GetComponent<Button>().interactable = true;
-            //_quests[2].transform.GetChild(5).gameObject.SetActive(false);
+            _quests[2].transform.GetChild(3).gameObject.SetActive(true); //button claim
+            _quests[2].transform.GetChild(4).gameObject.SetActive(false); //button ad
         }
         float progress = dataManager.questsCurrent.ProgressQuest3;
         _quests[2].transform.GetChild(2).GetChild(0).GetComponent<Image>().DOFillAmount(progress / 5, 0);
@@ -157,9 +162,9 @@ public class QuestController : MonoBehaviour
     private void SetQuest4() //completed 3 quest
     {
         if (dataManager.questsCurrent.ProgressQuest4 < 3)
-            _quests[3].transform.GetChild(3).gameObject.SetActive(false);
+            _quests[3].transform.GetChild(3).gameObject.GetComponent<Button>().interactable = false;
         else
-            _quests[3].transform.GetChild(3).gameObject.SetActive(true);
+            _quests[3].transform.GetChild(3).gameObject.GetComponent<Button>().interactable = true;
         float progress = dataManager.questsCurrent.ProgressQuest4;
         _quests[3].transform.GetChild(2).GetChild(0).GetComponent<Image>().DOFillAmount(progress / 3, 0);
         _quests[3].transform.GetChild(2).GetChild(1).GetComponent<TextMeshProUGUI>().text = progress + "/" + 3;

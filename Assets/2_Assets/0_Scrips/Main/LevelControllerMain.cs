@@ -16,8 +16,8 @@ public class LevelControllerMain : MonoBehaviour
     [SerializeField] Sprite[] _sprFrame;
     [SerializeField] Sprite[] _sprAutoSelect;
     [SerializeField] Sprite[] _sprStarItem;
-    // kho đồ
-    [SerializeField] GameObject _prfListItem;
+    // Inventory
+    [SerializeField] GameObject _prfListItem ;
     [SerializeField] Transform _content;
     ScrollSnapPagination _scrollSnapPagination;
     int level;
@@ -29,72 +29,85 @@ public class LevelControllerMain : MonoBehaviour
         _scrollSnapPagination = transform.GetComponent<ScrollSnapPagination>();
         OnInit();
     }
+    private void OnEnable()
+    {
+        dataManager = DataManager.Instance;
+        OnInit();
+    }
+
     public void OnInit()
     {
-        SetObjUnlockLevel();
+        //SetObjUnlockLevel();
         SetListBtn();
     }
-    private void SetObjUnlockLevel()
-    {
-        for (int i = 0; i < _UnlockLevel.Length; i++)
-        {
-            if (GetCountStar() >= dataManager.dataBase.CountUnlockListLevel[i])
-                _UnlockLevel[i].gameObject.SetActive(false);
-            else
-            {
-                _UnlockLevel[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = dataManager.dataBase.CountUnlockListLevel[i].ToString();
-                _UnlockLevel[i].gameObject.SetActive(true);
-            }
-        }
-    }
-    public int GetCountStar()
-    {
-        int count = 0;
-        for (int i = 0; i < dataManager.LevelCurren; i++)
-        {
-            count += dataManager.levelDatas[i].Star;
-        }
-        return count;
-    }
-    public void BtnLevel(int id)
+    //private void SetObjUnlockLevel()
+    //{
+    //    for (int i = 0; i < _UnlockLevel.Length; i++)
+    //    {
+    //        if (GetCountStar() >= dataManager.dataBase.CountUnlockListLevel[i])
+    //            _UnlockLevel[i].gameObject.SetActive(false);
+    //        else
+    //        {
+    //            _UnlockLevel[i].transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = dataManager.dataBase.CountUnlockListLevel[i].ToString();
+    //            _UnlockLevel[i].gameObject.SetActive(true);
+    //        }
+    //    }
+    //}
+    //public int GetCountStar()
+    //{
+    //    int count = 0;
+    //    for (int i = 0; i < dataManager.LevelCurren; i++)
+    //    {
+    //        count += dataManager.levelDatas[i].Star;
+    //    }
+    //    return count;
+    //}
+    public void BtnLevel(int id) //select level
     {
         AudioBase.Instance.SetAudioUI(0);
         if (id >= dataManager.LevelCurren) return;
-        if (id > 14)
-        {
-            _popups[5].gameObject.SetActive(true);
-            return;
-        }
+        //if (id > 14)
+        //{
+        //    _popups[5].gameObject.SetActive(true);
+        //    return;
+        //}
         level = id;
-        _popups[0].gameObject.SetActive(true);
-        _popups[0].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = "Mission " + (id + 1).ToString();
-        // Set Loot
-        _popups[0].GetChild(1).GetChild(0).GetChild(0).GetComponent<Image>().sprite = GetSprLoot(id);
-        // Difficulty
+        _popups[0].gameObject.SetActive(true); //pop level
+        _popups[0].GetChild(0).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = "LEVEL " + (id + 1).ToString(); // level text
+
+        // Set reward
+        _popups[0].GetChild(0).GetChild(2).GetChild(1).GetChild(0).GetComponent<Image>().sprite = GetSprLoot(id); // reward icon
+        _popups[0].GetChild(0).GetChild(2).GetChild(2).GetChild(0).GetComponent<Image>().sprite = GetSprLoot(id); // reward icon
+
+        // select mode
+        GameObject _modeGo = _popups[0].GetChild(0).GetChild(1).GetChild(1).gameObject; // mode game object
+        TextMeshProUGUI _modeText = _popups[0].GetChild(0).GetChild(1).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>(); // text mode
         for (int i = 0; i < 3; i++)
         {
-            _popups[0].GetChild(1).GetChild(1).GetChild(i).GetChild(2).gameObject.SetActive(i > dataManager.levelDatas[id].Star);
-            if (i == 2 && dataManager.levelDatas[id].Star == 3)
-            {
-                dataManager.LevelMode = i;
-                _popups[0].GetChild(1).GetChild(1).GetChild(2).GetComponent<Image>().sprite = _sprFrame[1];
-            }
-            else if (i == dataManager.levelDatas[id].Star)
-            {
-                dataManager.LevelMode = i;
-                _popups[0].GetChild(1).GetChild(1).GetChild(i).GetComponent<Image>().sprite = _sprFrame[1];
-            }
-            else
-                _popups[0].GetChild(1).GetChild(1).GetChild(i).GetComponent<Image>().sprite = _sprFrame[0];
+            _modeGo.transform.GetChild(i).GetComponent<Image>().sprite = i < dataManager.levelDatas[i].Star ? _sprStarLevel[1] : _sprStarLevel[0]; // set star mode
+            //_popups[0].GetChild(1).GetChild(1).GetChild(i).GetChild(2).gameObject.SetActive(i > dataManager.levelDatas[id].Star);
+            //if (i == 2 && dataManager.levelDatas[id].Star == 3)
+            //{
+            //    dataManager.LevelMode = i;
+            //    _popups[0].GetChild(1).GetChild(1).GetChild(2).GetComponent<Image>().sprite = _sprFrame[1];
+            //}
+            //else if (i == dataManager.levelDatas[id].Star)
+            //{
+            //    dataManager.LevelMode = i;
+            //    _popups[0].GetChild(1).GetChild(1).GetChild(i).GetComponent<Image>().sprite = _sprFrame[1];
+            //}
+            //else
+            //    _popups[0].GetChild(1).GetChild(1).GetChild(i).GetComponent<Image>().sprite = _sprFrame[0];
         }
         // Take Item
         SetTakeItem();
-        _popups[0].GetChild(1).GetChild(2).GetChild(2).GetComponent<Image>().sprite = dataManager.AutoSelect ? _sprAutoSelect[1] : _sprAutoSelect[0];
+        //_popups[0].GetChild(0).GetChild(5).GetComponent<Image>().sprite = dataManager.AutoSelect ? _sprAutoSelect[1] : _sprAutoSelect[0]; // icon is check
+        _popups[0].GetChild(0).GetChild(5).GetChild(0).gameObject.SetActive(dataManager.AutoSelect); // text is check
     }
     private void SetTakeItem()
     {
-        Transform item1 = _popups[0].GetChild(1).GetChild(2).GetChild(0);
-        Transform item2 = _popups[0].GetChild(1).GetChild(2).GetChild(1);
+        Transform itemButton1 = _popups[0].GetChild(0).GetChild(3); // item equip 1
+        Transform itemButton2 = _popups[0].GetChild(0).GetChild(4); // item equip 2
         if (dataManager.AutoSelect)
         {
             if (dataManager.idItem1 == 99 || dataManager.idItem2 == 99)
@@ -138,19 +151,21 @@ public class LevelControllerMain : MonoBehaviour
                 }
             }
         }
-        item1.GetChild(2).gameObject.SetActive(dataManager.idItem1 != 99);
-        item2.GetChild(2).gameObject.SetActive(dataManager.idItem2 != 99);
-        item1.GetChild(0).gameObject.SetActive(dataManager.idItem1 != 99);
-        item2.GetChild(0).gameObject.SetActive(dataManager.idItem2 != 99);
+
+        itemButton1.GetChild(1).gameObject.SetActive(dataManager.idItem1 != 99);
+        itemButton2.GetChild(1).gameObject.SetActive(dataManager.idItem2 != 99);
+        itemButton1.GetChild(0).gameObject.SetActive(dataManager.idItem1 != 99);
+        itemButton2.GetChild(0).gameObject.SetActive(dataManager.idItem2 != 99);
         if (dataManager.idItem1 != 99)
         {
-            item1.GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.idItem1];
+            itemButton1.GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.idItem1];
         }
         if (dataManager.idItem2 != 99)
         {
-            item2.GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.idItem2];
+            itemButton2.GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.idItem2];
         }
     }
+
     public void BtnMode(int id)
     {
         AudioBase.Instance.SetAudioUI(0);
@@ -186,38 +201,74 @@ public class LevelControllerMain : MonoBehaviour
     }
     private void SetListBtn()
     {
-        for (int i = 0; i < _btnLevels.Length; i++)
+        for (int i = 0; i < _btnLevels.Length; i++) 
         {
-            if (i < dataManager.LevelCurren)
+            if (i < dataManager.LevelCurren)//is unlock
             {
-                if (CountStarUnlockLevel(i) > 0 && _UnlockLevel[CountStarUnlockLevel(i) - 1].gameObject.activeSelf
-                    )
+                //if (CountStarUnlockLevel(i) > 0 && _UnlockLevel[CountStarUnlockLevel(i) - 1].gameObject.activeSelf
+                //    )
+                //{
+                //    _btnLevels[i].GetComponent<Image>().sprite = _sprBtn[0];
+                //    for (int y = 0; y < 4; y++) // 
+                //        _btnLevels[i].GetChild(y).gameObject.SetActive(false);
+                //}
+                //else
+                //{
+                //    _btnLevels[i].GetComponent<Image>().sprite = _sprBtn[1];
+                //    _btnLevels[i].GetChild(3).gameObject.SetActive(true);
+                //    _btnLevels[i].GetChild(3).GetComponent<TextMeshProUGUI>().text = (i + 1).ToString();
+                //    if (dataManager.levelDatas[i].Star == 0)
+                //        for (int y = 0; y < 3; y++)
+                //            _btnLevels[i].GetChild(y).gameObject.SetActive(false);
+                //    else
+                //        for (int y = 0; y < 3; y++)
+                //        {
+                //            _btnLevels[i].GetChild(y).gameObject.SetActive(true);
+                //            _btnLevels[i].GetChild(y).GetComponent<Image>().sprite = y < dataManager.levelDatas[i].Star ? _sprStarLevel[1] : _sprStarLevel[0];
+                //        }
+                //}
+
+                //set state button isUnLocked ( not select level )
+                if(i != dataManager.LevelSelect)
                 {
-                    _btnLevels[i].GetComponent<Image>().sprite = _sprBtn[0];
-                    for (int y = 0; y < 4; y++)
-                        _btnLevels[i].GetChild(y).gameObject.SetActive(false);
+                    _btnLevels[i].GetComponent<Image>().sprite = _sprBtn[0];//base button 
+                    _btnLevels[i].transform.GetChild(0).GetComponent<Image>().sprite = _sprBtn[1];//top base button
+                    _btnLevels[i].GetChild(0).GetChild(0).gameObject.SetActive(true); //text level
+                    _btnLevels[i].GetChild(0).GetChild(1).gameObject.SetActive(false); //text level selected
+                    _btnLevels[i].GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = (i + 1).ToString(); //text level
+                    _btnLevels[i].GetChild(0).GetChild(2).gameObject.SetActive(false); // icon lock
                 }
                 else
                 {
-                    _btnLevels[i].GetComponent<Image>().sprite = _sprBtn[1];
-                    _btnLevels[i].GetChild(3).gameObject.SetActive(true);
-                    _btnLevels[i].GetChild(3).GetComponent<TextMeshProUGUI>().text = (i + 1).ToString();
-                    if (dataManager.levelDatas[i].Star == 0)
-                        for (int y = 0; y < 3; y++)
-                            _btnLevels[i].GetChild(y).gameObject.SetActive(false);
-                    else
-                        for (int y = 0; y < 3; y++)
-                        {
-                            _btnLevels[i].GetChild(y).gameObject.SetActive(true);
-                            _btnLevels[i].GetChild(y).GetComponent<Image>().sprite = y < dataManager.levelDatas[i].Star ? _sprStarLevel[1] : _sprStarLevel[0];
-                        }
+                    //set state button isUnLocked ( select level )
+                    _btnLevels[i].GetComponent<Image>().sprite = _sprBtn[2];//base button 
+                    _btnLevels[i].transform.GetChild(0).GetComponent<Image>().sprite = _sprBtn[3];//top base button
+                    _btnLevels[i].GetChild(0).GetChild(0).gameObject.SetActive(false); //text level
+                    _btnLevels[i].GetChild(0).GetChild(1).gameObject.SetActive(true); //text level
+                    _btnLevels[i].GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text = (i + 1).ToString(); //text level selected
+                    _btnLevels[i].GetChild(0).GetChild(2).gameObject.SetActive(false); // icon lock
+
                 }
+                //set star of level unloked
+                if (dataManager.levelDatas[i].Star == 0)
+                    for (int y = 1; y <= 3; y++)
+                        _btnLevels[i].GetChild(y).GetComponent<Image>().sprite = _sprStarLevel[0]; // off all star
+                else
+                    for (int y = 1; y <=3; y++)
+                    {
+                        _btnLevels[i].GetChild(y).gameObject.SetActive(true);
+                        _btnLevels[i].GetChild(y).GetComponent<Image>().sprite = y < dataManager.levelDatas[i].Star ? _sprStarLevel[1] : _sprStarLevel[0];
+                    }
             }
-            else
+            else //is lock
             {
-                _btnLevels[i].GetComponent<Image>().sprite = _sprBtn[0];
-                for (int y = 0; y < 4; y++)
-                    _btnLevels[i].GetChild(y).gameObject.SetActive(false);
+                _btnLevels[i].GetComponent<Image>().sprite = _sprBtn[4];//base button 
+                _btnLevels[i].transform.GetChild(0).GetComponent<Image>().sprite = _sprBtn[5];//top base button
+                _btnLevels[i].GetChild(0).GetChild(0).gameObject.SetActive(false); //text level
+                _btnLevels[i].GetChild(0).GetChild(1).gameObject.SetActive(false); //text level
+                _btnLevels[i].GetChild(0).GetChild(2).gameObject.SetActive(true); // icon lock
+                for (int y = 1; y <=3; y++)
+                    _btnLevels[i].GetChild(y).GetComponent<Image>().sprite = _sprStarLevel[0];// off all star
             }
         }
     }
@@ -296,7 +347,8 @@ public class LevelControllerMain : MonoBehaviour
     {
         AudioBase.Instance.SetAudioUI(0);
         dataManager.AutoSelect = !dataManager.AutoSelect;
-        _popups[0].GetChild(1).GetChild(2).GetChild(2).GetComponent<Image>().sprite = dataManager.AutoSelect ? _sprAutoSelect[1] : _sprAutoSelect[0];
+        //_popups[0].GetChild(1).GetChild(2).GetChild(2).GetComponent<Image>().sprite = dataManager.AutoSelect ? _sprAutoSelect[1] : _sprAutoSelect[0];
+        _popups[0].GetChild(0).GetChild(5).GetChild(0).gameObject.SetActive(dataManager.AutoSelect); // text is check
         dataManager.SaveFile();
     }
     public void BtnClosePopup(int id)
