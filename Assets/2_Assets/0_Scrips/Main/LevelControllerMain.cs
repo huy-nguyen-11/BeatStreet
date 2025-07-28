@@ -359,8 +359,36 @@ public class LevelControllerMain : MonoBehaviour
     private void OpenWarehouse(int item)
     {
         _popups[1].gameObject.SetActive(true);
-        StartCoroutine(SetWarehouse(item));
+        ///
+        Transform _page0 = _content.transform.GetChild(0);
+
+        Debug.Log("item is list warehoause: " + dataManager.warehouse.ListItems + "count of list:" + dataManager.warehouse.ListItems.Count);
+
+        for (int i = 0; i < _page0.childCount; i++)
+        {
+            if(i < dataManager.warehouse.ListItems.Count) // have item in list
+            {
+                //set image icon or item
+                _page0.GetChild(i).GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.warehouse.ListItems[i]];// icon item
+                for (int y = 0; y < _page0.GetChild(i).GetChild(1).childCount; y++) // check stars
+                {
+                    _page0.GetChild(i).GetChild(1).GetChild(y).gameObject.SetActive(y < dataManager.dataBase.imgEquipItems.StarItems[dataManager.warehouse.ListItems[i]]); // active star item
+                }
+                _page0.GetChild(i).GetChild(2).GetComponent<TextMeshProUGUI>().text = dataManager.warehouse.CountItem[dataManager.warehouse.ListItems[i]].ToString(); // count item
+            }
+            else // list item empty or not enough item
+            {
+                // deactive item
+                _page0.GetChild(i).GetChild(0).gameObject.SetActive(false); // icon item
+                _page0.GetChild(i).GetChild(1).gameObject.SetActive(false); // icon star item
+                _page0.GetChild(i).GetChild(2).gameObject.SetActive(false); // count item
+            }
+        }
+
+        //StartCoroutine(SetWarehouse(item));
     }
+
+
     IEnumerator SetWarehouse(int item)
     {
         int totalItems = dataManager.warehouse.ListItems.Count;
@@ -413,6 +441,8 @@ public class LevelControllerMain : MonoBehaviour
         }
         SetSnapScrollview(totalPages);
     }
+
+
     public void BtnActiveItem(int btn, int item)
     {
         AudioBase.Instance.SetAudioUI(0);
@@ -440,6 +470,7 @@ public class LevelControllerMain : MonoBehaviour
         Transform item2 = _popups[0].GetChild(1).GetChild(2).GetChild(1);
         item1.GetChild(2).gameObject.SetActive(dataManager.idItem1 != 99);
         item2.GetChild(2).gameObject.SetActive(dataManager.idItem2 != 99);
+
         item1.GetChild(0).gameObject.SetActive(dataManager.idItem1 != 99);
         item2.GetChild(0).gameObject.SetActive(dataManager.idItem2 != 99);
         if (dataManager.idItem1 != 99)

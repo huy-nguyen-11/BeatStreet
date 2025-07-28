@@ -175,7 +175,7 @@ public class PlayerController : PlayerCharacter
         if (state == State.Hit) return;
 
         CheckTouchInput();
-        //GetJoy();
+        GetJoy();
 
         comboTimer += Time.deltaTime;
         HitTimer += Time.deltaTime;

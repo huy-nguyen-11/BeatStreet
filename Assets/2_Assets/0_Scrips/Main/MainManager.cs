@@ -117,7 +117,7 @@ public class MainManager : MonoBehaviour
     }
     private void ClossAllPanel()
     {
-        for (int i = 1; i < _panels.Length; i++)
+        for (int i = 0; i < _panels.Length; i++)
         {
             _panels[i].SetActive(false);
         }

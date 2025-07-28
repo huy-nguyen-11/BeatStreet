@@ -90,7 +90,7 @@ public class GamePlayManager : MonoBehaviour
         }
         SpawnMap();
         CheckAudio();
-        SetItem();
+        //SetItem();
     }
 
     private void Update()
@@ -377,16 +377,16 @@ public class GamePlayManager : MonoBehaviour
     private void CheckAudio()
     {
         if (PlayerPrefs.GetFloat("Sound") > 0)
-            _BtnPause[0].GetComponent<Image>().sprite = _sprBtnSettingTrue[0];
+            _BtnPause[0].GetChild(0).GetComponent<Image>().sprite = _sprBtnSettingTrue[0];
         else
-            _BtnPause[0].GetComponent<Image>().sprite = _sprBtnSettingFalse[0];
+            _BtnPause[0].GetChild(0).GetComponent<Image>().sprite = _sprBtnSettingFalse[0];
         if (PlayerPrefs.GetFloat("Music") > 0)
         {
-            _BtnPause[1].GetComponent<Image>().sprite = _sprBtnSettingTrue[1];
+            _BtnPause[1].GetChild(0).GetComponent<Image>().sprite = _sprBtnSettingTrue[1];
         }
         else
         {
-            _BtnPause[1].GetComponent<Image>().sprite = _sprBtnSettingFalse[1];
+            _BtnPause[1].GetChild(0).GetComponent<Image>().sprite = _sprBtnSettingFalse[1];
         }
     }
     public void BtnSound()
