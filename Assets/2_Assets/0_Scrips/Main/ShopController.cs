@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,9 +23,12 @@ public class ShopController : MonoBehaviour
     public CollectItemUICtrl getReward;
     public GameObject _contentShop;
 
+    private bool isOnClick = true;
+
     private void OnEnable()
     {
-        OpenPopup(0);
+        OpenPopup(MainManager.Instance.indexPopupShop);
+        isOnClick = true;
     }
 
     public void OpenPopup(int index)
@@ -133,12 +137,13 @@ public class ShopController : MonoBehaviour
         AudioBase.Instance.SetAudioUI(0);
         if (id == 0)
         {
-            if (PlayerPrefs.GetInt("Key") >= 3)
-            {
-                AudioBase.Instance.SetAudioUI(1);
-                PlayerPrefs.SetInt("Key", PlayerPrefs.GetInt("Key") - 3);
-                RandomChest(3, 1, 1, 1);
-            }
+            //if (PlayerPrefs.GetInt("Key") >= 3)
+            //{
+            //    AudioBase.Instance.SetAudioUI(1);
+            //    PlayerPrefs.SetInt("Key", PlayerPrefs.GetInt("Key") - 3);
+            //    RandomChest(3, 1, 1, 1);
+            //}
+            WatchingAdsForOpenTreasure();
         }
         else if (id == 1)
         {
@@ -201,6 +206,26 @@ public class ShopController : MonoBehaviour
         _panels[1].SetActive(true);
         DataManager.Instance.SaveFile();
     }
+
+    //for button watch ads open reward treasure
+    private void WatchingAdsForOpenTreasure()
+    {
+        if (Application.internetReachability == NetworkReachability.NotReachable)
+        {
+            Debug.Log("No internet connection available.");
+        }
+        else if (Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork || Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork)
+        {
+            timeReward2.OnFreeButtonClick();
+            MG_Interface.Current.Reward_Show(HandleOpenTreasure); 
+        }
+    }
+
+    void HandleOpenTreasure(bool resut)
+    {
+        RandomChest(3, 1, 1, 1);
+    }
+
     private void CheckPlayerLevelUp()
     {
         while (listPlayerLevelUp.Count > 0)
@@ -292,6 +317,7 @@ public class ShopController : MonoBehaviour
 
     public void BtnBuyCoin(int id)
     {
+        if (!isOnClick) return;
         AudioBase.Instance.SetAudioUI(0);
         // Mảng các gói: {diamond, coin}
         int[,] exchangePackages = new int[,]
@@ -344,11 +370,14 @@ public class ShopController : MonoBehaviour
 
             PlayerPrefs.SetInt("Diamont", currentDiamond - diamondCost);
             PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + coinReward);
+            isOnClick = false;
             getReward.DoAddCoinEffect(_listPosCoins[_id+1].position, PlayerPrefs.GetInt("Coin") - coinReward, PlayerPrefs.GetInt("Coin"));
+            StartCoroutine(WaitForCoolDownOnClick());
         }
     }
     public void BtnBuyDiamont(int id)
     {
+        if(!isOnClick) return;
         AudioBase.Instance.SetAudioUI(0);
         if(id == 0)
         {
@@ -372,9 +401,11 @@ public class ShopController : MonoBehaviour
                 {
                     AudioBase.Instance.SetAudioUI(1);
                     PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + SetDiamont(id));
+                    isOnClick = false;
                     getReward.DoAddGemsEffect(_listPosGems[id].position, PlayerPrefs.GetInt("Diamont") - SetDiamont(id), PlayerPrefs.GetInt("Diamont"));
                     MainManager.Instance.SetTopBar();
                     DataManager.Instance.SaveFile();
+                    StartCoroutine(WaitForCoolDownOnClick());
                 }
                 else
                 {
@@ -389,8 +420,16 @@ public class ShopController : MonoBehaviour
         if (resutl)
         {
             PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + 50);
+            isOnClick = false;
             getReward.DoAddGemsEffect(_listPosGems[0].position, PlayerPrefs.GetInt("Diamont") - 50, PlayerPrefs.GetInt("Diamont"));
+            StartCoroutine(WaitForCoolDownOnClick());
         }
+    }
+
+    IEnumerator WaitForCoolDownOnClick()
+    {
+        yield return new WaitForSeconds(2f);
+        isOnClick = true;
     }
 
     private int SetDiamont(int id)

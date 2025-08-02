@@ -421,6 +421,7 @@ public class GamePlayManager : MonoBehaviour
     {
         Time.timeScale = 1;
         AudioBase.Instance.SetAudioUI(0);
+        AudioBase.Instance.isCheckPlayed = true;
         _DarkScene.SetActive(true);
         Invoke(nameof(BackMain), 0.5f);
     }

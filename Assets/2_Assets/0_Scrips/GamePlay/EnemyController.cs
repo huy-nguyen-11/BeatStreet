@@ -107,6 +107,7 @@ public class EnemyController : EnemyCharacter
     {
         SwitchToRunState(enemyRun);
     }
+
     public void Movement()
     {
         if (player == null) return;
@@ -120,11 +121,6 @@ public class EnemyController : EnemyCharacter
             {
                 isStopping = false;
                 stopTimer = 0f;
-                //if (isWall)
-                //{
-                //    SetRandomPatrolTarget();
-                //    isWall = false;
-                //}
             }
             SwitchToRunState(enemyIdle);
         }
@@ -139,62 +135,15 @@ public class EnemyController : EnemyCharacter
                 patrolTimer = 0f;
             }
         }
-        //float distanceToPlayer = Vector3.Distance(Char.position, player.position);
-        //if(distanceToPlayer <= 2.5f) 
-        //{
-        //    if (isStopping)
-        //    {
-        //        stopTimer += Time.deltaTime;
-
-        //        float _stopDuration = 1f;
-        //        if (stopTimer >= _stopDuration)
-        //        {
-        //            isStopping = false;
-        //            stopTimer = 0f;
-        //            if (isWall)
-        //            {
-        //                SetRandomPatrolTarget();
-        //                isWall = false;
-        //            }
-        //        }
-        //        SwitchToRunState(enemyIdle);
-        //    }
-        //    else
-        //    {
-        //        PatrolRandomly();
-
-        //        patrolTimer += Time.deltaTime;
-        //        if (patrolTimer >= patrolDuration)
-        //        {
-        //            isStopping = true;
-        //            patrolTimer = 0f;
-        //        }
-        //    }
-        //}
-        //else
-        //{
-        //    PatrolRandomly();
-        //}
+       
         UpdateEnemyRotation(); 
     }
 
-    
-
-
     void PatrolRandomly()
     {
-        //randomTarget.y = player.position.y;
-
         Vector3 direction = (randomTarget - Char.position).normalized;
         lastDirection = direction;
         Char.position += direction * moveSpeed * Time.deltaTime;
-
-        //if (!isCheckingPlayer && CheckPlayerTooClose())
-        //{
-        //    AvoidPlayer();
-        //    isCheckingPlayer = true;
-        //    StartCoroutine(CheckPlayerCollisionRoutine());
-        //}
 
         if (Vector3.Distance(Char.position, randomTarget) < 0.2f)
         {
@@ -228,48 +177,12 @@ public class EnemyController : EnemyCharacter
 
         for (int i = 0; i < attempts; i++)
         {
-            //float directionMultiplier = Char.position.x > player.position.x ? 1 : -1;
-
-            //Vector3 randomDirection = Random.insideUnitSphere * 2.5f;
-            //randomDirection.z = 0;
-            //randomDirection.x = Mathf.Abs(randomDirection.x) * directionMultiplier;
-
             Vector3 targetDirection = (player.position - Char.position).normalized;
-
-            //ctor3 noise = Random.insideUnitCircle * 2.5f;
             Vector3 noise = GetRandomPositionInRect(GamePlayManager.Instance.minPosX, GamePlayManager.Instance.maxPosX, -2.8f , 1.4f, 0);
             noise.z = 0;
 
-            //Vector3 mixedDirection = new Vector3();
-            //float num = (float)Random.RandomRange(0f, 1f);
-            //if(num < 0.1f)
-            //{
-            //    Debug.Log("th 1");
-            //    // mixedDirection = (targetDirection * 2.5f) + new Vector3(noise.x, noise.y, 0);
-            //}
-            //else
-            //{
-            //    Debug.Log("th2");
-            //     mixedDirection =  new Vector3(noise.x, noise.y, 0);
-            //}
-
             Vector3 newTarget = /*Char.position +*/ noise;
-
-            //check randomTarget of enemy nearby
-
-            //if (!Physics.CheckSphere(newTarget, 0.5f, wallLayer) && !Physics.CheckSphere(newTarget, 0.5f, enemyLayer) 
-            //    && newTarget.y >= -2.8f && newTarget.y < 1.4f && Vector3.Distance(newTarget, lastRandomTarget) > 2f
-            //    && newTarget.x > (GamePlayManager.Instance._CameraFollow.transform.position.x - 2f) &&
-            //     newTarget.x < (GamePlayManager.Instance._CameraFollow.transform.position.x + 2f)) // limited pos target enemy
-            //{
-            //    randomTarget = newTarget;
-            //    return;
-            //}
-
-            Debug.Log("vector noise:" + noise);
-
-            if (/*newTarget.x > GamePlayManager.Instance.minPosX && newTarget.x < GamePlayManager.Instance.maxPosX &&
-               newTarget.y > -2.8f && newTarget.y < 1.4f &&*/ Vector3.Distance(newTarget, lastRandomTarget) > 1f)
+            if (Vector3.Distance(newTarget, lastRandomTarget) > 1f)
             {
                 Debug.Log("newTarget: " + newTarget);
                 randomTarget = newTarget;
@@ -283,29 +196,12 @@ public class EnemyController : EnemyCharacter
         int attempts = 10;
         for (int i = 0; i < attempts; i++)
         {
-            //float directionMultiplier = Char.position.x > player.position.x ? 1 : -1;
-            //Vector3 randomDirection = Random.insideUnitSphere * 3;
             Vector3 randomDirection = GetRandomPositionInRect(GamePlayManager.Instance.minPosX, GamePlayManager.Instance.maxPosX, -2.8f, 1.4f, 0);
             randomDirection.z = 0;
-           //
-           //randomDirection.x = Mathf.Abs(randomDirection.x) * directionMultiplier;
+
             randomDirection.y = -randomDirection.y;
             Vector3 newTarget = /*Char.position +*/ randomDirection;
-
-            //limited pos
-            //float posX = GamePlayManager.Instance._CameraFollow.transform.position.x + 2.2f;
-
-            //if (Physics.OverlapSphere(newTarget, 0.5f, wallLayer).Length == 0 && !Physics.CheckSphere(newTarget, 0.5f, enemyLayer)
-            //    && newTarget.y >= -2.8f && newTarget.y < 1.4f && Vector3.Distance(newTarget, lastRandomTarget) > 2f
-            //    && newTarget.x > (GamePlayManager.Instance._CameraFollow.transform.position.x - 2f) &&
-            //     newTarget.x < (GamePlayManager.Instance._CameraFollow.transform.position.x + 2f)) // gioi han vung du chuyen +- them 2.2 tinh tu vi tri camera
-            //{
-            //    randomTarget = newTarget;
-            //    return;
-            //}
-
-            if (/*newTarget.x > GamePlayManager.Instance.minPosX && newTarget.x < GamePlayManager.Instance.maxPosX &&
-                newTarget.y > -2.8f && newTarget.y < 1.4f && */ Vector3.Distance(newTarget, lastRandomTarget) > 1f)
+            if (Vector3.Distance(newTarget, lastRandomTarget) > 1f)
             {
                 randomTarget = newTarget;
                 return;

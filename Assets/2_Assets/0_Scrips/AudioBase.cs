@@ -16,6 +16,9 @@ public class AudioBase : MonoBehaviour
     public AudioClip[] audioSoundEnemy;
     // GameOver
     public AudioClip[] audioSoundGPL;
+    //for daily reward
+    public bool isCheckPlayed;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)

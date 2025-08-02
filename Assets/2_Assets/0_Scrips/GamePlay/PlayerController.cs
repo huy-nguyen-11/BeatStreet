@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using PinePie.SimpleJoystick;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,8 +9,8 @@ public class PlayerController : PlayerCharacter
     public static PlayerController Instance { get; private set; }
     DataManager dataManager;
     // Joystick
-    public bl_Joystick joystick;
-    public float speedThreshold = 0.5f;
+    public JoystickController joystick;
+    public float speedThreshold;
     public Transform Char;
     private bool isGetJoy = false;
     // Attribute
@@ -175,7 +176,7 @@ public class PlayerController : PlayerCharacter
         if (state == State.Hit) return;
 
         CheckTouchInput();
-        GetJoy();
+        //GetJoy();
 
         comboTimer += Time.deltaTime;
         HitTimer += Time.deltaTime;
@@ -186,30 +187,70 @@ public class PlayerController : PlayerCharacter
     }
     private void GetJoy()
     {
+        //if (GamePlayManager.Instance.isCheckUlti
+        //    && state != State.Skill1
+        //    && state != State.Skill2) return;
+        //Vector2 direction = joystick.Direction;
+        //if (Mathf.Abs(joystick.Direction.x) > 0.25f || Mathf.Abs(joystick.Direction.y) > 0.25f
+        //    && (state == State.Idle
+        //    || state == State.SpeedUp
+        //    || state == State.Change
+        //    || state == State.Walk || state == State.Run) && !isJumping)
+        //{
+        //    if (Mathf.Abs(joystick.Direction.x) > speedThreshold || Mathf.Abs(joystick.Direction.y) > speedThreshold)
+        //    {
+        //        if (state != State.Run)
+        //        {
+        //            SwitchToRunState(playerRun);
+        //        }
+
+        //    }
+        //    else
+        //    {
+        //        if (state != State.Walk)
+        //        {
+        //            SwitchToRunState(playerWalk);
+        //        }
+
+        //    }
+        //}
+        //else
+        //{
+        //    if (state != State.Idle && state != State.Change && state != State.SpeedUp)
+        //    {
+        //        SwitchToRunState(playerIdle);
+        //    }
+        //}
         if (GamePlayManager.Instance.isCheckUlti
-            && state != State.Skill1
-            && state != State.Skill2) return;
+       && state != State.Skill1
+       && state != State.Skill2) return;
+
         Vector2 direction = joystick.Direction;
-        if (Mathf.Abs(joystick.Direction.x) > 0.25f || Mathf.Abs(joystick.Direction.y) > 0.25f
-            && (state == State.Idle
-            || state == State.SpeedUp
-            || state == State.Change) && !isJumping)
+        float magnitude = direction.magnitude;
+
+        // Trạng thái có thể xử lý di chuyển
+        bool canMoveState = (state == State.Idle || state == State.SpeedUp || state == State.Change || state == State.Walk || state == State.Run);
+
+        if (!isJumping && canMoveState)
         {
-            if (Mathf.Abs(joystick.Direction.x) > speedThreshold || Mathf.Abs(joystick.Direction.y) > speedThreshold)
+            // RUN nếu joystick mạnh
+            if (magnitude >= 0.7f) // bạn có thể điều chỉnh ngưỡng này
             {
+                //Debug.Log("Run");
                 if (state != State.Run)
-                {
                     SwitchToRunState(playerRun);
-                }
-                  
             }
-            else
+            // WALK nếu joystick vừa
+            else if (magnitude >= 0.3f && magnitude < 0.7f)
             {
                 if (state != State.Walk)
-                {
                     SwitchToRunState(playerWalk);
-                }
-                   
+            }
+            // IDLE nếu joystick yếu (và không phải đang Idle sẵn)
+            else
+            {
+                if (state != State.Idle)
+                    SwitchToRunState(playerIdle);
             }
         }
     }
@@ -228,30 +269,6 @@ public class PlayerController : PlayerCharacter
         rb.velocity = movement;
     }
 
-    //void TouchDemo()
-    //{
-    //    float time1=0;
-    //    for (int i = 0; i < Input.touchCount; i++)
-    //    {
-    //        Touch touch = Input.GetTouch(i);
-    //        int touchId = touch.fingerId;
-    //        switch (touch.phase)
-    //        {
-    //            case TouchPhase.Began:
-    //                Debug.Log("touch bagan");
-    //                time1 = Time.time;
-    //                break;
-    //            case TouchPhase.Moved:
-    //                break;
-    //            case TouchPhase.Stationary:
-
-    //                break;
-    //            case TouchPhase.Ended:
-    //                Debug.Log("attack:" + (Time.time - time1));
-    //                break;
-    //        }
-    //    }
-    //}
 
     private void CheckTouchInput()
     {

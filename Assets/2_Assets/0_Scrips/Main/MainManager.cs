@@ -28,6 +28,10 @@ public class MainManager : MonoBehaviour
     private TimeSpan rewardInterval = new TimeSpan(24, 0, 0);
     private DateTime lastRewardTime;
     private DateTime currentTime;
+
+    //intdex popup shop
+    public int indexPopupShop = 0;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -62,6 +66,12 @@ public class MainManager : MonoBehaviour
         buttonSetting.SetActive(true);
         buttonBack.SetActive(false);
         SetShowButtonPack();
+
+        //opendaily reward
+        if (System.DateTime.Now.Day != PlayerPrefs.GetInt("Yesterday", 0)&& PlayerPrefs.GetInt("is claimed yesterday", 0) == 0 && AudioBase.Instance.isCheckPlayed)
+        {
+            OpenPanel(11); // open dailyreward;
+        }
     }
 
     private void Update()
@@ -330,5 +340,12 @@ public class MainManager : MonoBehaviour
                 else dataManager.questsCurrent.ProgressQuest2 += count;
             }
         }
+    }
+
+    // button shop from topbar
+    public void BtnShop(int index)
+    {
+        indexPopupShop = index;
+        OpenPanel(5);
     }
 }

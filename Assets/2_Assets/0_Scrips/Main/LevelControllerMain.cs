@@ -23,6 +23,10 @@ public class LevelControllerMain : MonoBehaviour
     int level;
     int mode;
     int countStar;
+
+    //pos show content item equip
+    private Vector3 _posContentItemEquuip = new Vector3(0, 0, 0);
+
     void Start()
     {
         dataManager = DataManager.Instance;
@@ -33,6 +37,11 @@ public class LevelControllerMain : MonoBehaviour
     {
         dataManager = DataManager.Instance;
         OnInit();
+
+        foreach(Transform pop in _popups)
+        {
+            pop.gameObject.SetActive(false);
+        }
     }
 
     public void OnInit()
@@ -312,7 +321,7 @@ public class LevelControllerMain : MonoBehaviour
             }
             else
             {
-                TitleItem(dataManager.idItem2);
+                TitleItem(dataManager.idItem2 );
                 _popups[2].GetChild(0).GetChild(4).GetComponent<Button>().onClick.RemoveAllListeners();
                 _popups[2].GetChild(0).GetChild(4).GetComponent<Button>().onClick.AddListener(delegate
                 {
@@ -338,10 +347,10 @@ public class LevelControllerMain : MonoBehaviour
             dataManager.warehouse.CountItem[dataManager.idItem2]++;
             dataManager.idItem2 = 99;
         }
-        _popups[0].GetChild(1).GetChild(2).GetChild(0).GetChild(0).gameObject.SetActive(dataManager.idItem1 != 99);
-        _popups[0].GetChild(1).GetChild(2).GetChild(0).GetChild(2).gameObject.SetActive(dataManager.idItem1 != 99);
-        _popups[0].GetChild(1).GetChild(2).GetChild(1).GetChild(0).gameObject.SetActive(dataManager.idItem2 != 99);
-        _popups[0].GetChild(1).GetChild(2).GetChild(1).GetChild(2).gameObject.SetActive(dataManager.idItem2 != 99);
+        _popups[0].GetChild(0).GetChild(3).GetChild(0).gameObject.SetActive(dataManager.idItem1 != 99); // item 1 icon
+        _popups[0].GetChild(0).GetChild(3).GetChild(1).gameObject.SetActive(dataManager.idItem1 != 99); // item 1 icon remove
+        _popups[0].GetChild(0).GetChild(4).GetChild(0).gameObject.SetActive(dataManager.idItem2 != 99); //item 2 icon
+        _popups[0].GetChild(0).GetChild(4).GetChild(1).gameObject.SetActive(dataManager.idItem2 != 99); // item 2 icon remove
     }
     public void BtnAutoSelect()
     {
@@ -370,18 +379,32 @@ public class LevelControllerMain : MonoBehaviour
             {
                 //set image icon or item
                 _page0.GetChild(i).GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.warehouse.ListItems[i]];// icon item
-                for (int y = 0; y < _page0.GetChild(i).GetChild(1).childCount; y++) // check stars
+                for (int y = 0; y < _page0.GetChild(i).GetChild(2).childCount; y++) // check stars
                 {
-                    _page0.GetChild(i).GetChild(1).GetChild(y).gameObject.SetActive(y < dataManager.dataBase.imgEquipItems.StarItems[dataManager.warehouse.ListItems[i]]); // active star item
+                    _page0.GetChild(i).GetChild(2).GetChild(y).gameObject.SetActive(y < dataManager.dataBase.imgEquipItems.StarItems[dataManager.warehouse.ListItems[i]]); // active star item
                 }
-                _page0.GetChild(i).GetChild(2).GetComponent<TextMeshProUGUI>().text = dataManager.warehouse.CountItem[dataManager.warehouse.ListItems[i]].ToString(); // count item
+                _page0.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = dataManager.warehouse.CountItem[dataManager.warehouse.ListItems[i]].ToString(); // count item
+
+                //set event for button
+                _page0.GetChild(i).GetComponent<Button>().onClick.RemoveAllListeners();
+                _page0.GetChild(i).GetComponent<Button>().onClick.AddListener(delegate
+                {
+                    TitleItem(i);
+                    _popups[2].GetChild(0).GetChild(4).GetComponent<Button>().onClick.RemoveAllListeners();
+                    _popups[2].GetChild(0).GetChild(4).GetComponent<Button>().onClick.AddListener(delegate
+                    {
+                        BtnActiveItem(item, i);
+                    });
+                });
+
             }
             else // list item empty or not enough item
             {
                 // deactive item
                 _page0.GetChild(i).GetChild(0).gameObject.SetActive(false); // icon item
-                _page0.GetChild(i).GetChild(1).gameObject.SetActive(false); // icon star item
-                _page0.GetChild(i).GetChild(2).gameObject.SetActive(false); // count item
+                _page0.GetChild(i).GetChild(1).gameObject.SetActive(false); // icon equip item
+                _page0.GetChild(i).GetChild(2).gameObject.SetActive(false); // icon star item
+                _page0.GetChild(i).GetChild(3).gameObject.SetActive(false); // count item
             }
         }
 
@@ -389,58 +412,58 @@ public class LevelControllerMain : MonoBehaviour
     }
 
 
-    IEnumerator SetWarehouse(int item)
-    {
-        int totalItems = dataManager.warehouse.ListItems.Count;
-        int itemsPerPage = 9;
-        int totalPages = Mathf.CeilToInt((float)totalItems / itemsPerPage);
-        if (_content.childCount > 0)
-            for (int i = 0; i < _content.childCount; i++)
-                Destroy(_content.GetChild(i).gameObject);
-        yield return new WaitForSeconds(0.01f);
-        if (totalPages == 0)
-        {
-            Instantiate(_prfListItem, _content.transform.position, Quaternion.identity, _content.transform);
-            for (int i = 0; i < _content.GetChild(0).childCount; i++)
-            {
-                for (int y = 0; y < _content.GetChild(0).GetChild(i).childCount; y++)
-                    _content.GetChild(0).GetChild(i).GetChild(y).gameObject.SetActive(false);
-            }
-        }
-        else
-        {
-            for (int i = 0; i < totalPages; i++)
-            {
-                Instantiate(_prfListItem, _content.transform.position, Quaternion.identity, _content.transform);
-            }
-            for (int j = 0; j < totalPages * 9; j++)
-            {
-                _content.GetChild(GetIdPage(j)).GetChild(j - (GetIdPage(j) * 9)).GetComponent<Button>().onClick.RemoveAllListeners();
-                if (j < dataManager.warehouse.ListItems.Count)
-                {
-                    int idItem = dataManager.warehouse.ListItems[j];
-                    _content.GetChild(GetIdPage(j)).GetChild(j - (GetIdPage(j) * 9)).GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.warehouse.ListItems[j]];
-                    _content.GetChild(GetIdPage(j)).GetChild(j - (GetIdPage(j) * 9)).GetChild(1).GetComponent<Image>().sprite = _sprStarItem[dataManager.dataBase.imgEquipItems.StarItems[dataManager.warehouse.ListItems[j]]];
-                    _content.GetChild(GetIdPage(j)).GetChild(j - (GetIdPage(j) * 9)).GetChild(2).GetComponent<TextMeshProUGUI>().text = dataManager.warehouse.CountItem[dataManager.warehouse.ListItems[j]].ToString();
-                    _content.GetChild(GetIdPage(j)).GetChild(j - (GetIdPage(j) * 9)).GetComponent<Button>().onClick.AddListener(delegate
-                    {
-                        TitleItem(idItem);
-                        _popups[2].GetChild(0).GetChild(4).GetComponent<Button>().onClick.RemoveAllListeners();
-                        _popups[2].GetChild(0).GetChild(4).GetComponent<Button>().onClick.AddListener(delegate
-                        {
-                            BtnActiveItem(item, idItem);
-                        });
-                    });
-                }
-                else
-                {
-                    for (int y = 0; y < _content.GetChild(GetIdPage(j)).GetChild(j - (GetIdPage(j) * 9)).childCount; y++)
-                        _content.GetChild(GetIdPage(j)).GetChild(j - (GetIdPage(j) * 9)).GetChild(y).gameObject.SetActive(false);
-                }
-            }
-        }
-        SetSnapScrollview(totalPages);
-    }
+    //IEnumerator SetWarehouse(int item)
+    //{
+    //    int totalItems = dataManager.warehouse.ListItems.Count;
+    //    int itemsPerPage = 9;
+    //    int totalPages = Mathf.CeilToInt((float)totalItems / itemsPerPage);
+    //    if (_content.childCount > 0)
+    //        for (int i = 0; i < _content.childCount; i++)
+    //            Destroy(_content.GetChild(i).gameObject);
+    //    yield return new WaitForSeconds(0.01f);
+    //    if (totalPages == 0)
+    //    {
+    //        Instantiate(_prfListItem, _content.transform.position, Quaternion.identity, _content.transform);
+    //        for (int i = 0; i < _content.GetChild(0).childCount; i++)
+    //        {
+    //            for (int y = 0; y < _content.GetChild(0).GetChild(i).childCount; y++)
+    //                _content.GetChild(0).GetChild(i).GetChild(y).gameObject.SetActive(false);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        for (int i = 0; i < totalPages; i++)
+    //        {
+    //            Instantiate(_prfListItem, _content.transform.position, Quaternion.identity, _content.transform);
+    //        }
+    //        for (int j = 0; j < totalPages * 9; j++)
+    //        {
+    //            _content.GetChild(GetIdPage(j)).GetChild(j - (GetIdPage(j) * 9)).GetComponent<Button>().onClick.RemoveAllListeners();
+    //            if (j < dataManager.warehouse.ListItems.Count)
+    //            {
+    //                int idItem = dataManager.warehouse.ListItems[j];
+    //                _content.GetChild(GetIdPage(j)).GetChild(j - (GetIdPage(j) * 9)).GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.warehouse.ListItems[j]];
+    //                _content.GetChild(GetIdPage(j)).GetChild(j - (GetIdPage(j) * 9)).GetChild(1).GetComponent<Image>().sprite = _sprStarItem[dataManager.dataBase.imgEquipItems.StarItems[dataManager.warehouse.ListItems[j]]];
+    //                _content.GetChild(GetIdPage(j)).GetChild(j - (GetIdPage(j) * 9)).GetChild(2).GetComponent<TextMeshProUGUI>().text = dataManager.warehouse.CountItem[dataManager.warehouse.ListItems[j]].ToString();
+    //                _content.GetChild(GetIdPage(j)).GetChild(j - (GetIdPage(j) * 9)).GetComponent<Button>().onClick.AddListener(delegate
+    //                {
+    //                    TitleItem(idItem);
+    //                    _popups[2].GetChild(0).GetChild(4).GetComponent<Button>().onClick.RemoveAllListeners();
+    //                    _popups[2].GetChild(0).GetChild(4).GetComponent<Button>().onClick.AddListener(delegate
+    //                    {
+    //                        BtnActiveItem(item, idItem);
+    //                    });
+    //                });
+    //            }
+    //            else
+    //            {
+    //                for (int y = 0; y < _content.GetChild(GetIdPage(j)).GetChild(j - (GetIdPage(j) * 9)).childCount; y++)
+    //                    _content.GetChild(GetIdPage(j)).GetChild(j - (GetIdPage(j) * 9)).GetChild(y).gameObject.SetActive(false);
+    //            }
+    //        }
+    //    }
+    //    SetSnapScrollview(totalPages);
+    //}
 
 
     public void BtnActiveItem(int btn, int item)
@@ -509,14 +532,17 @@ public class LevelControllerMain : MonoBehaviour
         _scrollSnapPagination.pageIndicators = tempList.ToArray();
         _scrollSnapPagination.Start();
     }
+
     private void TitleItem(int id)
     {
         AudioBase.Instance.SetAudioUI(0);
         _popups[2].gameObject.SetActive(true);
-        _popups[2].GetChild(0).GetChild(0).GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[id];
-        _popups[2].GetChild(0).GetChild(0).GetChild(1).GetComponent<Image>().sprite = _sprStarItem[dataManager.dataBase.imgEquipItems.StarItems[id]];
-        _popups[2].GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text = dataManager.dataBase.imgEquipItems.nameItems[id];
-        _popups[2].GetChild(0).GetChild(2).GetComponent<TextMeshProUGUI>().text = dataManager.dataBase.imgEquipItems.titleAttributeItems[id];
+     
+        //_popups[2].GetChild(0).GetChild(0).GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[id];
+        //_popups[2].GetChild(0).GetChild(0).GetChild(1).GetComponent<Image>().sprite = _sprStarItem[dataManager.dataBase.imgEquipItems.StarItems[id]];
+        //_popups[2].GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text = dataManager.dataBase.imgEquipItems.nameItems[id];
+        Debug.Log("text Item: " + dataManager.dataBase.imgEquipItems.titleAttributeItems[id]);
+        _popups[2].GetChild(0).GetChild(2).GetComponent<TextMeshProUGUI>().text = dataManager.dataBase.imgEquipItems.titleAttributeItems[id]; //text attribute item
     }
     public void BtnPlay()
     {

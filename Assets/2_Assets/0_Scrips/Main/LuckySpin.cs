@@ -11,10 +11,12 @@ public class LuckySpin : MonoBehaviour
     public GameObject popupRefreshTime;
     public MiniGame_Controller controllerSpin;
     private const string LAST_REWARD_TIME = "LastSpinTime";
-    private TimeSpan rewardInterval = new TimeSpan(24, 0, 0);
+    private TimeSpan rewardInterval = new TimeSpan(0, 15, 0);
     private DateTime lastRewardTime;
     private DateTime currentTime;
     public bool isRun;
+
+    public Sprite spYellowOn, spYellowOff, spGreenOn, spGreenOff;
     private void OnEnable()
     {
         CheckRewardStatus();
@@ -70,11 +72,17 @@ public class LuckySpin : MonoBehaviour
             {
                 //_btnSpin[i].SetActive(true);
                 _btnSpin[i].GetComponent<Button>().interactable = true;
+                _btnSpin[i].transform.GetChild(0).gameObject.SetActive(true); //text active
+                _btnSpin[i].transform.GetChild(1).gameObject.SetActive(false); // text deactive
+                _btnSpin[i].GetComponent<Image>().sprite = (id == 0) ? spGreenOn : spYellowOn;
             }
             else
             {
                 //_btnSpin[i].SetActive(true);
                 _btnSpin[i].GetComponent<Button>().interactable = false;
+                _btnSpin[i].transform.GetChild(0).gameObject.SetActive(false); //text active
+                _btnSpin[i].transform.GetChild(1).gameObject.SetActive(true); // text deactive
+                _btnSpin[i].GetComponent<Image>().sprite = (id == 0) ? spGreenOff : spYellowOff;
             }     
     }
     public void BtnCoinSpin()

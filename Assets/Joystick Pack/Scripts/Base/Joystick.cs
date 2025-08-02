@@ -55,9 +55,6 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         handle.anchorMax = center;
         handle.pivot = center;
         handle.anchoredPosition = Vector2.zero;
-
-        // additional
-        handle.gameObject.SetActive(false);
     }
 
     public virtual void OnPointerDown(PointerEventData eventData)
@@ -76,14 +73,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         input = (eventData.position - position) / (radius * canvas.scaleFactor);
         FormatInput();
         HandleInput(input.magnitude, input.normalized, radius, cam);
-
-        //////
-        handle.gameObject.SetActive(true);
-        input = input.magnitude > 0 ? input.normalized : Vector2.zero;
         handle.anchoredPosition = input * radius * handleRange;
-
-        float angle = Mathf.Atan2(input.y, input.x) * Mathf.Rad2Deg;
-        handle.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
     }
 
     protected virtual void HandleInput(float magnitude, Vector2 normalised, Vector2 radius, Camera cam)
@@ -143,9 +133,6 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     {
         input = Vector2.zero;
         handle.anchoredPosition = Vector2.zero;
-        handle.gameObject.SetActive(false);
-        handle.rotation = Quaternion.identity; // Reset rotation
-        handle.gameObject.SetActive(false);
     }
 
     protected Vector2 ScreenPointToAnchoredPosition(Vector2 screenPosition)

@@ -200,11 +200,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77624f28614e33247a9ad124a2d27f78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Radio: 15
+  Radio: 1
   SmoothTime: 0.85
-  OnPressScale: 1.2
+  OnPressScale: 1
   NormalColor: {r: 1, g: 1, b: 1, a: 1}
   PressColor: {r: 0.065689884, g: 0.99264705, b: 0.7924658, a: 1}
   Duration: 1
   StickRect: {fileID: 22449040}
   CenterReference: {fileID: 22496700}
+  floatingBackground: {fileID: 0}
+  playerPos: {fileID: 0}

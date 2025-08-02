@@ -10,12 +10,13 @@ public class PlayerUpgrade : MonoBehaviour
     [SerializeField] Sprite[] _sprPlayerUnLock;
     [SerializeField] Sprite[] _sprAvatarLock;
     [SerializeField] Sprite[] _sprAvatarUnLock;
-    [SerializeField] Sprite[] _sprFrame;
+    //[SerializeField] Sprite[] _sprFrame;
     [SerializeField] Transform[] _btnPlayer;
     [SerializeField] Sprite[] _sprLock;
     [SerializeField] Sprite[] _sprStatusUpgrade;
     [SerializeField] Sprite[] _sprPrice;
     [SerializeField] ScrollSnapPagination scrollSnap;
+    [SerializeField] GameObject _buttonUpgrade , _buttonSwitch , _buttonIncrease , _buttonDeacrease , _progressTicket;
     DataManager _dataManager;
     int idPlayer;
     int countUpGrade = 1;
@@ -56,7 +57,7 @@ public class PlayerUpgrade : MonoBehaviour
         else
             scrollSnap.PagesSellect(3);
     }
-    public void BtnActive()
+    public void BtnActive() // butotn select
     {
         AudioBase.Instance.SetAudioUI(0);
         if (_dataManager.playerData[idPlayer].isUnlock)
@@ -64,7 +65,7 @@ public class PlayerUpgrade : MonoBehaviour
             if (idPlayer == 0 || idPlayer == 1)
                 _dataManager.idPlayer = 0;
         }
-        MainManager.Instance.OpenPanel(3);
+        //MainManager.Instance.OpenPanel(3);
     }
     public void BtnSwitchStatus()
     {
@@ -78,9 +79,9 @@ public class PlayerUpgrade : MonoBehaviour
         countUpGrade = 1;
         int idStatus = isStatusUpgrade ? 1 : 0;
         string txt = isStatusUpgrade ? "Evolve" : "Level Up";
-        transform.GetChild(4).GetChild(0).GetComponent<Image>().sprite = _sprPrice[idStatus];
-        transform.GetChild(6).GetChild(0).GetComponent<Image>().sprite = _sprStatusUpgrade[idStatus];
-        transform.GetChild(6).GetChild(1).GetComponent<TextMeshProUGUI>().text = txt;
+       _buttonUpgrade.transform.GetChild(0).GetComponent<Image>().sprite = _sprPrice[idStatus]; // icon coe or diamont in button upgrade
+        _buttonSwitch.transform.GetChild(0).GetComponent<Image>().sprite = _sprStatusUpgrade[idStatus]; // icon evo or update in button swwitch status
+        _buttonSwitch.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = txt; // text in button switch status
     }
     private void SetOnClickBtn()
     {
@@ -100,25 +101,27 @@ public class PlayerUpgrade : MonoBehaviour
         {
             if (_dataManager.playerData[i].isUnlock)
             {
-                _btnPlayer[i].GetChild(0).GetComponent<Image>().sprite = _sprAvatarUnLock[i];
-                _btnPlayer[i].GetChild(1).gameObject.SetActive(false);
-                _btnPlayer[i].GetChild(2).gameObject.SetActive(false);
+                _btnPlayer[i].GetChild(0).GetComponent<Image>().sprite = _sprAvatarUnLock[i]; // icon char  
+                _btnPlayer[i].GetChild(1).gameObject.SetActive(true); // text level
+                _btnPlayer[i].GetChild(3).gameObject.SetActive(false); // lock
             }
             else
             {
-                _btnPlayer[i].GetChild(0).GetComponent<Image>().sprite = _sprAvatarLock[i];
+                _btnPlayer[i].GetChild(0).GetComponent<Image>().sprite = _sprAvatarLock[i]; //icon char 
+                _btnPlayer[i].GetChild(1).gameObject.SetActive(true); // text level
+                _btnPlayer[i].GetChild(3).gameObject.SetActive(true); // lock
                 if (_dataManager.warehouse.CountPiecePlayerLevelUp[i] >= _dataManager.playerData[i].pieceUnlock)
                 {
-                    _btnPlayer[i].GetChild(1).gameObject.SetActive(true);
-                    _btnPlayer[i].GetChild(2).GetComponent<Image>().sprite = _sprLock[1];
+                    _btnPlayer[i].GetChild(3).GetChild(1).GetComponent<Image>().sprite = _sprLock[1]; // icon lock
                 }
                 else
                 {
-                    _btnPlayer[i].GetChild(1).gameObject.SetActive(false);
-                    if (_dataManager.playerData[i].CheckVip)
-                        _btnPlayer[i].GetChild(2).GetComponent<Image>().sprite = _sprLock[2];
-                    else
-                        _btnPlayer[i].GetChild(2).GetComponent<Image>().sprite = _sprLock[0];
+                    //if (_dataManager.playerData[i].CheckVip)
+                    //    _btnPlayer[i].GetChild(2).GetComponent<Image>().sprite = _sprLock[2];
+                    //else
+                    //    _btnPlayer[i].GetChild(2).GetComponent<Image>().sprite = _sprLock[0];
+
+                    _btnPlayer[i].GetChild(3).GetChild(1).GetComponent<Image>().sprite = _sprLock[0]; // icon lock
                 }
             }
         }
@@ -144,14 +147,14 @@ public class PlayerUpgrade : MonoBehaviour
         for (int i = 0; i < _btnPlayer.Length; i++)
         {
             if (i == id)
-                _btnPlayer[i].GetComponent<Image>().sprite = _sprFrame[1];
+                _btnPlayer[i].transform.GetChild(2).gameObject.SetActive(true);
             else
-                _btnPlayer[i].GetComponent<Image>().sprite = _sprFrame[0];
+                _btnPlayer[i].transform.GetChild(2).gameObject.SetActive(false);
         }
     }
     private void SetParameter(int id)
     {
-        transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = _dataManager.dataBase.imgEquipItems.namePlayer[id];
+        transform.GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text = _dataManager.dataBase.imgEquipItems.namePlayer[id]; // name player
         string indexHp = "";
         string indexDame = "";
         string indexMana = "";
@@ -163,35 +166,37 @@ public class PlayerUpgrade : MonoBehaviour
             indexDame = isCheckUnLock ? "<color=yellow>+" + DAME + "</color>" : "";
             indexMana = isCheckUnLock ? "<color=yellow>+" + MANA + "</color>" : "";
         }
-        transform.GetChild(1).GetChild(2).GetChild(0).GetComponent<TextMeshProUGUI>().text = _dataManager.playerData[id].Hp + (!isStatusUpgrade ? indexHp : "");
-        transform.GetChild(1).GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = _dataManager.playerData[id].Dame + (!isStatusUpgrade ? indexDame : "");
-        transform.GetChild(1).GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = _dataManager.playerData[id].Mana + (!isStatusUpgrade ? indexMana : "");
+        //content sate infor player
+        transform.GetChild(1).GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text = _dataManager.playerData[id].Hp + (!isStatusUpgrade ? indexHp : ""); // text hp
+        transform.GetChild(1).GetChild(2).GetChild(1).GetComponent<TextMeshProUGUI>().text = _dataManager.playerData[id].Dame + (!isStatusUpgrade ? indexDame : ""); // text damage
+        transform.GetChild(1).GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text = _dataManager.playerData[id].Mana + (!isStatusUpgrade ? indexMana : ""); // text mana
     }
     private void SetTxtLevel(int id)
     {
         if (!isStatusUpgrade)
-            transform.GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text =
-                "Level " + "<color=yellow>" + _dataManager.playerData[id].Level + "</color>" + "/" + _dataManager.playerData[id].LevelEvolve;
+            transform.GetChild(0).GetChild(2).GetComponent<TextMeshProUGUI>().text =
+                "Level " + "<color=yellow>" + _dataManager.playerData[id].Level + "</color>" + "/" + _dataManager.playerData[id].LevelEvolve; // text level player
         else
-            transform.GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text =
-                "Level " + _dataManager.playerData[id].Level + "/" + "<color=yellow>" + _dataManager.playerData[id].LevelEvolve + "</color>";
+            transform.GetChild(0).GetChild(2).GetComponent<TextMeshProUGUI>().text =
+                "Level " + _dataManager.playerData[id].Level + "/" + "<color=yellow>" + _dataManager.playerData[id].LevelEvolve + "</color>"; // text level player
     }
     private void SetBtnUpGrade(int id)
     {
-        transform.GetChild(6).GetComponent<Button>().interactable = isCheckUnLock;
-        transform.GetChild(4).GetComponent<Button>().onClick.RemoveAllListeners();
-        transform.GetChild(4).GetChild(0).gameObject.SetActive(isCheckUnLock);
-        transform.GetChild(4).GetChild(1).gameObject.SetActive(isCheckUnLock);
-        transform.GetChild(4).GetChild(2).gameObject.SetActive(!isCheckUnLock);
+        _buttonSwitch.GetComponent<Button>().interactable = isCheckUnLock; //button switch status
+        _buttonUpgrade.GetComponent<Button>().onClick.RemoveAllListeners(); // button upgrade
+        _buttonUpgrade.transform.GetChild(0).gameObject.SetActive(isCheckUnLock); // icon
+        _buttonUpgrade.transform.GetChild(1).gameObject.SetActive(isCheckUnLock); // text
+        _buttonUpgrade.transform.GetChild(2).gameObject.SetActive(isCheckUnLock); // text coin
+        _buttonUpgrade.transform.GetChild(3).gameObject.SetActive(!isCheckUnLock); // text mission
         if (!isCheckUnLock)
         {
             if (_dataManager.LevelCurren < _dataManager.playerData[id].LevelUnlockCharacter)
             {
-                transform.GetChild(4).GetChild(2).GetComponent<TextMeshProUGUI>().text =
+                _buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text =
                     "Clear\r\nmission " + _dataManager.playerData[id].LevelUnlockCharacter;
                 int idPlayer = id;
                 int idStatus = 2;
-                transform.GetChild(4).GetComponent<Button>().onClick.AddListener(delegate
+                _buttonUpgrade.GetComponent<Button>().onClick.AddListener(delegate
                 {
                     BtnUpgrade(idPlayer, idStatus);
                 });
@@ -200,11 +205,11 @@ public class PlayerUpgrade : MonoBehaviour
             {
                 int idPlayer = id;
                 int idStatus = 1;
-                transform.GetChild(4).GetComponent<Button>().onClick.AddListener(delegate
+                _buttonUpgrade.GetComponent<Button>().onClick.AddListener(delegate
                 {
                     BtnUpgrade(idPlayer, idStatus);
                 });
-                transform.GetChild(4).GetChild(2).GetComponent<TextMeshProUGUI>().text = "Unlock";
+                _buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Unlock";
             }
         }
         else
@@ -212,32 +217,34 @@ public class PlayerUpgrade : MonoBehaviour
             if (isStatusUpgrade && _dataManager.playerData[id].LevelEvolve < 40
                 || !isStatusUpgrade && _dataManager.playerData[id].Level < _dataManager.playerData[id].LevelEvolve)
             {
-                transform.GetChild(4).GetChild(0).gameObject.SetActive(true);
-                transform.GetChild(4).GetChild(1).gameObject.SetActive(true);
-                transform.GetChild(4).GetChild(2).gameObject.SetActive(false);
+                _buttonUpgrade.transform.GetChild(0).gameObject.SetActive(true); // icon
+                _buttonUpgrade.transform.GetChild(1).gameObject.SetActive(true); // text
+                _buttonUpgrade.transform.GetChild(2).gameObject.SetActive(true); // text coin
+                _buttonUpgrade.transform.GetChild(3).gameObject.SetActive(false); // text mission
                 int idPlayer = id;
                 int idStatus = 0;
-                transform.GetChild(4).GetComponent<Button>().onClick.AddListener(delegate
+                _buttonUpgrade.GetComponent<Button>().onClick.AddListener(delegate
                 {
                     BtnUpgrade(idPlayer, idStatus);
                 });
                 if (countUpGrade > 1)
-                    transform.GetChild(4).GetChild(1).GetComponent<TextMeshProUGUI>().text =
+                    _buttonUpgrade.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text =
                             "level up\r\n" + countUpGrade + "x";
                 else
-                    transform.GetChild(4).GetChild(1).GetComponent<TextMeshProUGUI>().text =
+                    _buttonUpgrade.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text =
                         "level up";
             }
             else
             {
-                transform.GetChild(4).GetChild(0).gameObject.SetActive(false);
-                transform.GetChild(4).GetChild(1).gameObject.SetActive(false);
-                transform.GetChild(4).GetChild(2).gameObject.SetActive(true);
-                transform.GetChild(4).GetChild(2).GetComponent<TextMeshProUGUI>().text =
+                _buttonUpgrade.transform.GetChild(0).gameObject.SetActive(false); // icon
+                _buttonUpgrade.transform.GetChild(1).gameObject.SetActive(false); // text
+                _buttonUpgrade.transform.GetChild(2).gameObject.SetActive(false); // text coin
+                _buttonUpgrade.transform.GetChild(3).gameObject.SetActive(true);
+                _buttonUpgrade.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text =
                  "Max Level";
                 int idPlayer = id;
                 int idStatus = 2;
-                transform.GetChild(4).GetComponent<Button>().onClick.AddListener(delegate
+                _buttonUpgrade.GetComponent<Button>().onClick.AddListener(delegate
                 {
                     BtnUpgrade(idPlayer, idStatus);
                 });
@@ -263,50 +270,50 @@ public class PlayerUpgrade : MonoBehaviour
                     check = true;
             }
         }
-        transform.GetChild(7).GetComponent<Button>().interactable = check;
+       _buttonIncrease.GetComponent<Button>().interactable = check;
         if (isCheckUnLock)
-            transform.GetChild(8).GetComponent<Button>().interactable = countUpGrade > 1;
+           _buttonDeacrease.GetComponent<Button>().interactable = countUpGrade > 1;
     }
     private void SetBarPieceAndPrice(int id)
     {
         if (!isStatusUpgrade)
         {
             pieceLevelUp = _dataManager.warehouse.CountPiecePlayerLevelUp[id];
-            transform.GetChild(5).GetChild(1).GetComponent<Image>().sprite = _dataManager.dataBase.imgEquipItems.sprPiecePlayerLevelUp[id];
+           _progressTicket.transform.GetChild(3).GetComponent<Image>().sprite = _dataManager.dataBase.imgEquipItems.sprPiecePlayerLevelUp[id]; // icon piece
             if (!_dataManager.playerData[id].isUnlock)
             {
                 pieceUnlockCharacter = _dataManager.playerData[id].pieceUnlock;
                 float fill = (float)pieceLevelUp / pieceUnlockCharacter;
                 if (fill < 0) fill = 0;
                 if (fill > 1) fill = 1;
-                transform.GetChild(5).GetChild(0).GetChild(0).GetComponent<Image>().DOFillAmount(fill, 0);
-                transform.GetChild(5).GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text =
-                    pieceLevelUp + "/" + pieceUnlockCharacter;
-                transform.GetChild(5).GetChild(0).GetChild(2).gameObject.SetActive(pieceLevelUp >= pieceUnlockCharacter);
+                _progressTicket.transform.GetChild(0).GetComponent<Image>().DOFillAmount(fill, 0); // img fill
+                _progressTicket.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text =
+                    pieceLevelUp + "/" + pieceUnlockCharacter; // text fill
+                _progressTicket.transform.GetChild(2).gameObject.SetActive(pieceLevelUp >= pieceUnlockCharacter); // icon upp
             }
             else
             {
                 float fill = (float)pieceLevelUp / pieceUpgradeLevelUp;
                 if (fill < 0) fill = 0;
                 if (fill > 1) fill = 1;
-                transform.GetChild(5).GetChild(0).GetChild(0).GetComponent<Image>().
+                _progressTicket.transform.GetChild(0).GetComponent<Image>().
                     DOFillAmount(fill, 0);
-                transform.GetChild(5).GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text =
+                _progressTicket.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text =
                     pieceLevelUp + "/" + pieceUpgradeLevelUp;
-                transform.GetChild(5).GetChild(0).GetChild(2).gameObject.SetActive(pieceLevelUp >= pieceUpgradeLevelUp);
+                _progressTicket.transform.GetChild(2).gameObject.SetActive(pieceLevelUp >= pieceUpgradeLevelUp);
             }
         }
         else
         {
             pieceLevelEvolve = _dataManager.warehouse.CountPiecePlayerEvolve[id];
-            transform.GetChild(5).GetChild(1).GetComponent<Image>().sprite = _dataManager.dataBase.imgEquipItems.sprPiecePlayerEvolve[id];
+            _progressTicket.transform.GetChild(3).GetComponent<Image>().sprite = _dataManager.dataBase.imgEquipItems.sprPiecePlayerEvolve[id];
             float fill = (float)pieceLevelEvolve / pieceUpgradeLevelEvolve;
             if (fill < 0) fill = 0;
             if (fill > 1) fill = 1;
-            transform.GetChild(5).GetChild(0).GetChild(0).GetComponent<Image>().DOFillAmount(fill, 0);
-            transform.GetChild(5).GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text =
+            _progressTicket.transform.GetChild(0).GetComponent<Image>().DOFillAmount(fill, 0);
+            _progressTicket.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text =
                 pieceLevelEvolve + "/" + pieceUpgradeLevelEvolve;
-            transform.GetChild(5).GetChild(0).GetChild(2).gameObject.SetActive(pieceLevelEvolve >= pieceUpgradeLevelEvolve);
+            _progressTicket.transform.GetChild(2).gameObject.SetActive(pieceLevelEvolve >= pieceUpgradeLevelEvolve);
         }
     }
     private int PieceLevelUp(int id)
@@ -338,7 +345,7 @@ public class PlayerUpgrade : MonoBehaviour
         else
             priceDiamont = SetPrice(id);
         int price = isStatusUpgrade ? priceDiamont : priceCoin;
-        transform.GetChild(4).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = price.ToString();
+       _buttonUpgrade.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = price.ToString();
     }
     private int SetPrice(int id)
     {
@@ -403,16 +410,16 @@ public class PlayerUpgrade : MonoBehaviour
                 {
                     if (level + countUpGrade >= _dataManager.playerData[idPlayer].LevelEvolve
                         || pieceLevelUp < pieceUpgradeLevelUp + CheckCardQuantityLevelUp(idPlayer))
-                        transform.GetChild(7).GetComponent<Button>().interactable = false;
+                       _buttonIncrease.GetComponent<Button>().interactable = false;
                 }
                 else
                 {
                     if (_dataManager.playerData[idPlayer].LevelEvolve >= 40
                         || _dataManager.playerData[idPlayer].LevelEvolve + countUpGrade >= 40
                         || pieceLevelEvolve < pieceUpgradeLevelEvolve + CheckCardQuantityLevelEvolve(idPlayer))
-                        transform.GetChild(7).GetComponent<Button>().interactable = false;
+                        _buttonIncrease.GetComponent<Button>().interactable = false;
                 }
-                transform.GetChild(8).GetComponent<Button>().interactable = true;
+               _buttonDeacrease.GetComponent<Button>().interactable = true;
             }
         }
         else
@@ -426,11 +433,11 @@ public class PlayerUpgrade : MonoBehaviour
             if (countUpGrade <= 1)
             {
                 countUpGrade = 1;
-                transform.GetChild(8).GetComponent<Button>().interactable = false;
+               _buttonDeacrease.GetComponent<Button>().interactable = false;
             }
             else
             {
-                transform.GetChild(7).GetComponent<Button>().interactable = true;
+                _buttonIncrease.GetComponent<Button>().interactable = true;
             }
         }
         RefreshInformartion(idPlayer);
@@ -439,6 +446,7 @@ public class PlayerUpgrade : MonoBehaviour
     {
         idPlayer = id;
         isCheckUnLock = _dataManager.playerData[id].isUnlock;
+
         SetBtnPlayerInformation(id);
         SetParameter(id);
         SetBtnUpGrade(id);

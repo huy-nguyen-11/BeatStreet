@@ -1,0 +1,28 @@
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+
+public class ButtonSpriteSwap : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+{
+    public Sprite normalSprite;
+    public Sprite pressedSprite;
+
+    private Image image;
+
+    private void Awake()
+    {
+        image = GetComponent<Image>();
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (image != null && pressedSprite != null && GetComponent<Button>().interactable)
+            image.sprite = pressedSprite;
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        if (image != null && normalSprite != null && GetComponent<Button>().interactable)
+            image.sprite = normalSprite;
+    }
+}

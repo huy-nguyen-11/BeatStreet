@@ -27,7 +27,7 @@ public class DailyReward : MonoBehaviour
     private void OnEnable()
     {
         //can claim
-        if (System.DateTime.Now.Day != PlayerPrefs.GetInt("Yesterday", 0) && PlayerPrefs.GetInt("is claimed yesterday", 0) == 0)
+        if (System.DateTime.Now.Day != PlayerPrefs.GetInt("Yesterday", 0) && PlayerPrefs.GetInt("is claimed yesterday", 0) == 0 && AudioBase.Instance.isCheckPlayed)
         {
             currentDay = PlayerPrefs.GetInt("currentday", 0);
             SetPack();
@@ -311,6 +311,7 @@ public class DailyReward : MonoBehaviour
         //}
 
         yield return new WaitForSeconds(2f);
+        AudioBase.Instance.isCheckPlayed = false;
         MainManager.Instance.OpenPanel(3);
         //mainMenu.ClosePanel();
     }
