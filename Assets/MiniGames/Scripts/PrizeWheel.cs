@@ -275,6 +275,7 @@ namespace I2.MiniGames
         }
 
         #endregion
+        public GameObject butonBack;
 
         #region Simulation
 
@@ -387,6 +388,7 @@ namespace I2.MiniGames
             yield return new WaitForSeconds(1.5f);
             GetReward(id);
             PopupItem.SetActive(false);
+            butonBack.SetActive(true);
         }
         private void GetReward(int id)
         {

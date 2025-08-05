@@ -74,11 +74,15 @@ public class DataManager : MonoBehaviour
     }
     public void LoadFile()
     {
+        var backupDataBase = dataBase;
+
         if (File.Exists(dataPath))
         {
             string jsonData = File.ReadAllText(dataPath);
             JsonUtility.FromJsonOverwrite(jsonData, DataManager.Instance);
         }
+
+        dataBase = backupDataBase;
     }
 }
 [System.Serializable]
@@ -146,3 +150,4 @@ public class LevelData
     public int Type;
     public int idItem;
 }
+
