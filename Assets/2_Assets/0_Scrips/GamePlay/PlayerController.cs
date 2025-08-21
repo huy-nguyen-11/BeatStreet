@@ -97,6 +97,7 @@ public class PlayerController : PlayerCharacter
     private Dictionary<int, float> touchStartTimes = new Dictionary<int, float>();
     public int idTounchRun;
     private float holdTimer;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -234,25 +235,38 @@ public class PlayerController : PlayerCharacter
         if (!isJumping && canMoveState)
         {
             // RUN nếu joystick mạnh
-            if (magnitude >= 0.7f) // bạn có thể điều chỉnh ngưỡng này
+            if (magnitude > speedThreshold) // bạn có thể điều chỉnh ngưỡng này
             {
                 //Debug.Log("Run");
                 if (state != State.Run)
+                {
+                    Debug.Log("run"+ magnitude);
                     SwitchToRunState(playerRun);
+                }
+                    
             }
             // WALK nếu joystick vừa
-            else if (magnitude >= 0.3f && magnitude < 0.7f)
-            {
-                if (state != State.Walk)
-                    SwitchToRunState(playerWalk);
-            }
+            //else if (magnitude > 0.3f && magnitude < speedThreshold)
+            //{
+            //    if (state != State.Walk)
+            //    {
+            //        Debug.Log("Walk"+ magnitude);
+            //        SwitchToRunState(playerWalk);
+            //    }
+                   
+            //}
             // IDLE nếu joystick yếu (và không phải đang Idle sẵn)
             else
             {
                 if (state != State.Idle)
+                {
                     SwitchToRunState(playerIdle);
+                    Debug.Log("Idle" + magnitude);
+                }
+
             }
         }
+       
     }
 
     //todo wlak or running
@@ -264,7 +278,7 @@ public class PlayerController : PlayerCharacter
         if (Mathf.Abs(joystick.Direction.x) > 0f)
             transform.rotation = Quaternion.Euler(new Vector3(0, joystick.Direction.x > 0 ? 0 : -180, 0));
 
-        moveSpeed = (Mathf.Abs(joystick.Direction.x) > speedThreshold || Mathf.Abs(joystick.Direction.y) > speedThreshold) ? 3 : 1.5f;
+        moveSpeed = (Mathf.Abs(joystick.Direction.x) > speedThreshold || Mathf.Abs(joystick.Direction.y) > speedThreshold) ? 3.5f : 1.75f;
         Vector2 movement = direction.normalized * moveSpeed;
         rb.velocity = movement;
     }
@@ -299,7 +313,7 @@ public class PlayerController : PlayerCharacter
                     if (touchStartPositions.ContainsKey(touchId))
                     {
                         holdTimer += Time.deltaTime;
-                        if ((Mathf.Abs(joystick.Direction.x) <= 0.25f || Mathf.Abs(joystick.Direction.y) <= 0.25f)
+                        if ((Mathf.Abs(joystick.Direction.x) <= 0.3f || Mathf.Abs(joystick.Direction.y) <= 0.3f)
                             && holdTimer > changeHoldTime && state != State.Change
                             && (state == State.Idle || state == State.Attack) && !isGetJoy)
                         {
@@ -307,6 +321,16 @@ public class PlayerController : PlayerCharacter
                             SwitchToRunState(playerChange);
                         }
                     }
+
+                    if (direction.magnitude <= 0.3f && state != State.Change) // gần như không kéo
+                    {
+                        if (state != State.Idle)
+                        {
+                            SwitchToRunState(playerIdle);
+                            rb.velocity = Vector2.zero; // ngắt di chuyển
+                        }
+                    }
+
                     break;
 
                 case TouchPhase.Ended:

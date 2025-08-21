@@ -52,7 +52,6 @@ namespace PinePie.SimpleJoystick
         public float dragStartThreshold = 0.15f; 
         private bool isDragging = false;   
 
-
         void Awake()
         {
             handle.gameObject.SetActive(false);
@@ -69,40 +68,6 @@ namespace PinePie.SimpleJoystick
 
             RectTransformUtility.ScreenPointToLocalPointInRectangle(joystickBase, eventData.position, eventData.pressEventCamera,out startPoint);
 
-            ////joystickBase.gameObject.SetActive(true);
-
-            //if (baseMode == JoystickBaseMode.Floating)
-            //{
-            //    Debug.Log("01");
-            //    RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            //        parentCanvas.transform as RectTransform,
-            //        eventData.position,
-            //        eventData.pressEventCamera,
-            //        out Vector2 newPos
-            //    );
-            //    joystickBase.anchoredPosition = newPos;
-            //}
-
-            //// handle snappping
-            //if (baseMode != JoystickBaseMode.Static)
-            //{
-            //    Debug.Log("00");
-            //    RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            //            (RectTransform)joystickBase.parent,
-            //            eventData.position,
-            //            eventData.pressEventCamera,
-            //            out Vector2 touchPoint
-            //        );
-
-            //    if (snapHandleBack) joystickBase.anchoredPosition = touchPoint;
-            //    else
-            //    {
-            //        handle.gameObject.SetActive(true);
-            //        joystickBase.anchoredPosition = touchPoint - (inputDirection * joystickRange);
-            //        handle.anchoredPosition = inputDirection * joystickRange;
-            //    }
-            //}
-
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                         joystickBase, eventData.position, eventData.pressEventCamera, out Vector2 localPoint
                     );
@@ -114,24 +79,8 @@ namespace PinePie.SimpleJoystick
 
         public void OnDrag(PointerEventData eventData)
         {
-            //if (baseMode == JoystickBaseMode.Static && !dragStartedInside) return;
-
-            //RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            //    joystickBase,
-            //    eventData.position,
-            //    eventData.pressEventCamera,
-            //    out Vector2 localPoint
-            //);
-
             RectTransformUtility.ScreenPointToLocalPointInRectangle(joystickBase,eventData.position,eventData.pressEventCamera,out Vector2 currentPoint);
 
-            //Vector2 clamped = Vector2.ClampMagnitude(localPoint, joystickRange);
-            //handle.anchoredPosition = Vector2.ClampMagnitude(localPoint, joystickRange);
-            //Vector2 rawInput = localPoint / joystickRange;
-
-            //Debug.Log($"Local Point: {localPoint}");
-            //Debug.Log($"raw Input: {rawInput}");
-            //Debug.Log($"clamped: {clamped}");
             Vector2 delta = currentPoint - startPoint;
 
             // Vẽ handle tại điểm hiện tại (không cần clamp nữa)
@@ -139,7 +88,6 @@ namespace PinePie.SimpleJoystick
 
             // Chuẩn hóa đầu vào theo joystickRange nếu cần
             Vector2 rawInput = delta / joystickRange;
-
 
             // Dead zone check
             if (rawInput.magnitude < deadZone)
@@ -189,23 +137,6 @@ namespace PinePie.SimpleJoystick
             handle.gameObject.SetActive(true);
 
             OnDirectionChanged?.Invoke();
-
-            // snap to directions
-            //if (directionSnaps > 1 && inputDirection != Vector2.zero)
-            //{
-            //    float angle = Vector2.SignedAngle(Vector2.left, inputDirection);
-            //    float snapAngle = 360f / directionSnaps;
-            //    float snappedAngle = Mathf.Round(angle / snapAngle) * snapAngle;
-
-            //    inputDirection = Quaternion.Euler(0, 0, snappedAngle) * Vector2.left;
-            //    handle.anchoredPosition = inputDirection * joystickRange;
-            //}
-
-            //if (baseMode == JoystickBaseMode.Dynamic && localPoint.magnitude > joystickRange)
-            //{
-            //    Vector2 offset = localPoint.normalized * (localPoint.magnitude - joystickRange);
-            //    joystickBase.anchoredPosition += offset;
-            //}
         }
 
         public void OnPointerUp(PointerEventData eventData)
