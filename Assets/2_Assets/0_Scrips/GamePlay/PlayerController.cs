@@ -229,44 +229,45 @@ public class PlayerController : PlayerCharacter
         Vector2 direction = joystick.Direction;
         float magnitude = direction.magnitude;
 
-        // Trạng thái có thể xử lý di chuyển
+
         bool canMoveState = (state == State.Idle || state == State.SpeedUp || state == State.Change || state == State.Walk || state == State.Run);
 
         if (!isJumping && canMoveState)
         {
             // RUN nếu joystick mạnh
-            if (magnitude > speedThreshold) // bạn có thể điều chỉnh ngưỡng này
+            if (magnitude > speedThreshold)
             {
                 //Debug.Log("Run");
                 if (state != State.Run)
                 {
-                    Debug.Log("run"+ magnitude);
+                    //Debug.Log("run" + magnitude);
                     SwitchToRunState(playerRun);
-                }
-                    
-            }
-            // WALK nếu joystick vừa
-            //else if (magnitude > 0.3f && magnitude < speedThreshold)
-            //{
-            //    if (state != State.Walk)
-            //    {
-            //        Debug.Log("Walk"+ magnitude);
-            //        SwitchToRunState(playerWalk);
-            //    }
-                   
-            //}
-            // IDLE nếu joystick yếu (và không phải đang Idle sẵn)
-            else
-            {
-                if (state != State.Idle)
-                {
-                    SwitchToRunState(playerIdle);
-                    Debug.Log("Idle" + magnitude);
                 }
 
             }
+            // WALK nếu joystick vừa
+            else if (magnitude >= 0.2f && magnitude < speedThreshold)
+            {
+                if (state != State.Walk)
+                {
+                    //Debug.Log("Walk" + magnitude);
+                    SwitchToRunState(playerWalk);
+                }
+
+                //}
+                // IDLE nếu joystick yếu
+                //else
+                //{
+                //    if (state != State.Idle)
+                //    {
+                //        SwitchToRunState(playerIdle);
+                //        Debug.Log("Idle" + magnitude);
+                //    }
+
+                //}
+            }
+
         }
-       
     }
 
     //todo wlak or running
@@ -278,7 +279,7 @@ public class PlayerController : PlayerCharacter
         if (Mathf.Abs(joystick.Direction.x) > 0f)
             transform.rotation = Quaternion.Euler(new Vector3(0, joystick.Direction.x > 0 ? 0 : -180, 0));
 
-        moveSpeed = (Mathf.Abs(joystick.Direction.x) > speedThreshold || Mathf.Abs(joystick.Direction.y) > speedThreshold) ? 3.5f : 1.75f;
+        moveSpeed = (Mathf.Abs(joystick.Direction.x) > speedThreshold || Mathf.Abs(joystick.Direction.y) > speedThreshold) ? 3f : 1.5f;
         Vector2 movement = direction.normalized * moveSpeed;
         rb.velocity = movement;
     }
@@ -322,7 +323,7 @@ public class PlayerController : PlayerCharacter
                         }
                     }
 
-                    if (direction.magnitude <= 0.3f && state != State.Change) // gần như không kéo
+                    if (direction.magnitude < 0.2f && state != State.Change) // gần như không kéo
                     {
                         if (state != State.Idle)
                         {

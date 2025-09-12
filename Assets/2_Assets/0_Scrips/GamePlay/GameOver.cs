@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class GameOver : MonoBehaviour
 {
-    public TextMeshProUGUI[] _txtTopBars;
+    //public TextMeshProUGUI[] _txtTopBars;
     public GameObject[] _popupStatus;
     public GameObject[] _coinAds;
     // False Game
@@ -23,7 +23,7 @@ public class GameOver : MonoBehaviour
     }
     void Start()
     {
-        SetTopBar();
+        //SetTopBar();
     }
     public void BtnBackGameOver()
     {
@@ -85,7 +85,7 @@ public class GameOver : MonoBehaviour
                 PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + (GamePlayManager.Instance.coin * 2));
                 _coinAds[0].SetActive(false);
                 _coinAds[1].SetActive(false);
-                SetTopBar();
+                //SetTopBar();
                 _dataManager.SaveFile();
             }
         });
@@ -93,11 +93,12 @@ public class GameOver : MonoBehaviour
     }
     public void SetTopBar()
     {
-        _txtTopBars[0].text = PlayerPrefs.GetInt("Energy").ToString();
-        _txtTopBars[1].text = PlayerPrefs.GetInt("Star").ToString();
-        _txtTopBars[2].text = PlayerPrefs.GetInt("Diamont").ToString();
-        _txtTopBars[3].text = PlayerPrefs.GetInt("Coin").ToString();
+        //_txtTopBars[0].text = PlayerPrefs.GetInt("Energy").ToString();
+        //_txtTopBars[1].text = PlayerPrefs.GetInt("Star").ToString();
+        //_txtTopBars[2].text = PlayerPrefs.GetInt("Diamont").ToString();
+        //_txtTopBars[3].text = PlayerPrefs.GetInt("Coin").ToString();
     }
+
     public void SetOpenPopup(int id)
     {
         gameObject.SetActive(true);
@@ -135,7 +136,7 @@ public class GameOver : MonoBehaviour
         _popupStatus[0].transform.GetChild(1).GetChild(0).GetChild(0).GetComponent<Image>().sprite = GetSprLoot();
         _popupStatus[0].transform.GetChild(1).GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text = GetCoinBonus().ToString();
         PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + GetCoinBonus());
-        SetTopBar();
+        //SetTopBar();
     }
     private Sprite GetSprLoot()
     {
@@ -196,7 +197,7 @@ public class GameOver : MonoBehaviour
                 GamePlayManager.Instance.SetMission(0, 40);
                 GamePlayManager.Instance.SetMission(4, 1);
                 PlayerRevive();
-                SetTopBar();
+                //SetTopBar();
             }
         }
         else

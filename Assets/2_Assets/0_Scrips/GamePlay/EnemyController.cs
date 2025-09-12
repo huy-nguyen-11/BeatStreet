@@ -99,6 +99,13 @@ public class EnemyController : EnemyCharacter
         if (state != State.Hit && state != State.Fall && state != State.Attack)
             CheckAttack();
     }
+
+    private void FixedUpdate()
+    {
+        fillBar.transform.rotation = Quaternion.Euler(new Vector3(0, transform.position.y, 0));
+        stateManager.FixedUpdate();
+    }
+
     private void SetLevel()
     {
         txtLevel.text = "Level " + Level.ToString();
@@ -108,25 +115,82 @@ public class EnemyController : EnemyCharacter
         SwitchToRunState(enemyRun);
     }
 
+    private bool isAvoidingPlayer = false;
+    private bool isPatrolling = true;
+
+    private void SeparateFromOtherEnemies()
+    {
+        float minDist = 0.45f; // Khoảng cách tối thiểu giữa các enemy
+        Vector3 separation = Vector3.zero;
+        int count = 0;
+
+        foreach (var enemy in FindObjectsOfType<EnemyController>())
+        {
+            if (enemy == this || enemy.state == State.Dead) continue;
+            float dist = Vector3.Distance(Char.position, enemy.Char.position);
+            if (dist < minDist && dist > 0.01f)
+            {
+                // Đẩy enemy này ra xa enemy khác
+                separation += (Char.position - enemy.Char.position).normalized * (minDist - dist);
+                count++;
+            }
+        }
+
+        if (count > 0)
+        {
+            Char.position += separation / count * 0.7f;
+        }
+    }
+
     public void Movement()
     {
+        //UpdateEnemyRotation(); 
         if (player == null) return;
 
         if (isStopping)
         {
             stopTimer += Time.deltaTime;
-
             float _stopDuration = 1f;
             if (stopTimer >= _stopDuration)
             {
                 isStopping = false;
                 stopTimer = 0f;
+                isPatrolling = Random.value < 0.5f; //random 50% patrol, 50% move to player
+                isAvoidingPlayer = false;
+                if (isPatrolling)
+                    SetRandomPatrolTarget();
             }
             SwitchToRunState(enemyIdle);
         }
         else
         {
-            PatrolRandomly();
+            // Nếu enemy đang tránh player thì ưu tiên tránh
+            if (isAvoidingPlayer)
+            {
+                PatrolRandomly(); // dùng randomTarget đã được AvoidPlayer() set
+                if (Vector3.Distance(Char.position, randomTarget) < 0.2f)
+                {
+                    isAvoidingPlayer = false;
+                    isStopping = true;
+                    patrolTimer = 0f;
+                }
+            }
+            else if (!isPatrolling && CheckPlayerTooClose())
+            {
+                AvoidPlayer();
+                isAvoidingPlayer = true;
+            }
+            else
+            {
+                if (isPatrolling)
+                {
+                    PatrolRandomly();
+                }
+                else
+                {
+                    MoveToPlayer();
+                }
+            }
 
             patrolTimer += Time.deltaTime;
             if (patrolTimer >= patrolDuration)
@@ -135,24 +199,49 @@ public class EnemyController : EnemyCharacter
                 patrolTimer = 0f;
             }
         }
-       
-        UpdateEnemyRotation(); 
+
+        UpdateEnemyRotation();
+        SeparateFromOtherEnemies();
     }
 
-    void PatrolRandomly()
+    private void MoveToPlayer()
     {
-        Vector3 direction = (randomTarget - Char.position).normalized;
+        float targetOffset = 0.5f;
+        Vector3 leftTarget = player.position + Vector3.left * targetOffset;
+        Vector3 rightTarget = player.position + Vector3.right * targetOffset;
+
+        bool leftOccupied = IsTargetOccupiedByOtherEnemy(leftTarget);
+        bool rightOccupied = IsTargetOccupiedByOtherEnemy(rightTarget);
+
+        Vector3 targetPos;
+
+        // Nếu enemy đang ở gần vị trí tấn công thì giữ vị trí đó, không chuyển sang tuần tra
+        if (!leftOccupied && Char.position.x < player.position.x)
+            targetPos = leftTarget;
+        else if (!rightOccupied && Char.position.x > player.position.x)
+            targetPos = rightTarget;
+        else if (!leftOccupied)
+            targetPos = leftTarget;
+        else if (!rightOccupied)
+            targetPos = rightTarget;
+        else
+        {
+            // Cả hai bên đều có enemy, chuyển sang tuần tra ngẫu nhiên
+            isPatrolling = true;
+            SetRandomPatrolTarget();
+            PatrolRandomly();
+            return;
+        }
+
+        Vector3 direction = (targetPos - Char.position).normalized;
         lastDirection = direction;
         Char.position += direction * moveSpeed * Time.deltaTime;
 
-        if (Vector3.Distance(Char.position, randomTarget) < 0.2f)
+        // Nếu đã đến target, giữ vị trí đó
+        if (Vector3.Distance(Char.position, targetPos) < 0.2f)
         {
-            if (lastRandomTarget != randomTarget)
-            {
-                lastRandomTarget = randomTarget;
-            }
-
-            SetRandomPatrolTarget();
+            isStopping = true;
+            patrolTimer = 0f;
         }
 
         if (!canCheckWall && CheckWallCollision())
@@ -161,6 +250,38 @@ public class EnemyController : EnemyCharacter
             canCheckWall = true;
             StartCoroutine(CheckWallCollisionRoutine());
         }
+    }
+
+    void PatrolRandomly()
+    {
+        Vector3 direction = (randomTarget - Char.position).normalized;
+        lastDirection = direction;
+        Char.position += direction * moveSpeed * Time.deltaTime;
+
+        if (Vector3.Distance(Char.position, randomTarget) < 0.2f || IsTargetOccupiedByOtherEnemy(randomTarget, this))
+        {
+            isStopping = true;
+            patrolTimer = 0f;
+        }
+
+        if (!canCheckWall && CheckWallCollision())
+        {
+            AvoidWall();
+            canCheckWall = true;
+            StartCoroutine(CheckWallCollisionRoutine());
+        }
+    }
+
+    private bool IsTargetOccupiedByOtherEnemy(Vector3 target, EnemyController ignore = null)
+    {
+        float minDist = 0.4f;
+        foreach (var enemy in FindObjectsOfType<EnemyController>())
+        {
+            if (enemy == this || enemy == ignore || enemy.state == State.Dead) continue;
+            if (Vector3.Distance(enemy.Char.position, target) < minDist)
+                return true;
+        }
+        return false;
     }
 
     public Vector3 GetRandomPositionInRect(float minX, float maxX, float minY, float maxY, float z = 0f)
@@ -174,18 +295,13 @@ public class EnemyController : EnemyCharacter
     public void SetRandomPatrolTarget() // ramdom target when start patrol
     {
         int attempts = 10;
-
         for (int i = 0; i < attempts; i++)
         {
-            Vector3 targetDirection = (player.position - Char.position).normalized;
-            Vector3 noise = GetRandomPositionInRect(GamePlayManager.Instance.minPosX, GamePlayManager.Instance.maxPosX, -2.8f , 1.4f, 0);
+            Vector3 noise = GetRandomPositionInRect(GamePlayManager.Instance.minPosX, GamePlayManager.Instance.maxPosX, GamePlayManager.Instance.minPosY, GamePlayManager.Instance.maxPosY, 0);
             noise.z = 0;
-
-            Vector3 newTarget = /*Char.position +*/ noise;
-            if (Vector3.Distance(newTarget, lastRandomTarget) > 1f)
+            if (Vector3.Distance(noise, lastRandomTarget) > 1f && !IsTargetOccupiedByOtherEnemy(noise))
             {
-                Debug.Log("newTarget: " + newTarget);
-                randomTarget = newTarget;
+                randomTarget = noise;
                 return;
             }
         }
@@ -211,11 +327,49 @@ public class EnemyController : EnemyCharacter
 
     public void AvoidPlayer()
     {
+        Debug.Log("ne player");
+        //int attempts = 10;
+        //for (int i = 0; i < attempts; i++)
+        //{
+        //    float directionMultiplier = Char.position.x > player.position.x ? 1 : -1;
+
+        //    Vector3 randomDirection = Random.insideUnitSphere * 3;
+        //    randomDirection.z = 0;
+        //    randomDirection.y = -randomDirection.y;
+        //    randomDirection.x = Mathf.Abs(randomDirection.x) * directionMultiplier;
+        //    Vector3 newTarget = Char.position + randomDirection;
+
+        //    if (Physics.OverlapSphere(newTarget, 1.2f, playerLayer).Length == 0)
+        //    {
+        //        randomTarget = newTarget;
+        //        return;
+        //    }
+        //}
+        float rand = Random.value;
+        if (rand < 0.7f)
+        {
+            // 80%: Né về vị trí cách player 1 đơn vị, cùng trục Y, phía hiện tại
+            float direction = Char.position.x > player.position.x ? 1f : -1f;
+            Vector3 newTarget = new Vector3(
+                player.position.x + direction * 1f,
+                Char.position.y,
+                Char.position.z
+            );
+
+            // Đảm bảo không va chạm player
+            if (Physics.OverlapSphere(newTarget, 1.2f, playerLayer).Length == 0)
+            {
+                randomTarget = newTarget;
+                return;
+            }
+            // Nếu vị trí này bị chiếm, fallback sang random như bên dưới
+        }
+
+        // 20% còn lại hoặc fallback nếu vị trí trên bị chiếm
         int attempts = 10;
         for (int i = 0; i < attempts; i++)
         {
             float directionMultiplier = Char.position.x > player.position.x ? 1 : -1;
-
             Vector3 randomDirection = Random.insideUnitSphere * 3;
             randomDirection.z = 0;
             randomDirection.y = -randomDirection.y;
@@ -234,7 +388,7 @@ public class EnemyController : EnemyCharacter
     {
         float distanceX = Mathf.Abs(Char.position.x - player.position.x);
         float distanceY = Mathf.Abs(Char.position.y - player.position.y);
-        return distanceX <= 1.1f && distanceY > 0.1f;
+        return distanceX <= 0.6f && distanceY <= 1.1f;
     }
 
     IEnumerator CheckPlayerCollisionRoutine()
@@ -302,54 +456,47 @@ public class EnemyController : EnemyCharacter
         float distanceX = Mathf.Abs(Char.position.x - player.position.x);
         float distanceY = Mathf.Abs(Char.position.y - player.position.y);
 
-        if (distanceX <= 0.75f
-            && distanceX >= 0.15f
-            && distanceY <= 0.2f)
-        {
+        // Xác định vị trí tấn công lý tưởng của enemy này (bên trái hoặc phải player)
+        Vector3 myTarget = Char.position.x < player.position.x
+            ? player.position + Vector3.left * 0.5f
+            : player.position + Vector3.right * 0.5f;
 
-            if (state != State.Idle)
+        // Nếu enemy đã ở rất gần player (<= 0.15f) nhưng vị trí tấn công chưa bị chiếm, hãy di chuyển đến vị trí tấn công
+        if (distanceX <= 0.15f && distanceY <= 0.2f)
+        {
+            if (!IsTargetOccupiedByOtherEnemy(myTarget, this))
             {
-                isAttack = true;
-                SwitchToRunState(enemyIdle);
+                // Di chuyển đến vị trí tấn công lý tưởng
+                Vector3 direction = (myTarget - Char.position).normalized;
+                Char.position += direction * moveSpeed * Time.deltaTime;
             }
+            else
+            {
+                // Nếu vị trí đã bị enemy khác chiếm, mới lùi lại
+                if (!isCheckingPlayer)
+                {
+                    isCheckingPlayer = true;
+                    StartCoroutine(CheckPlayerCollisionRoutine());
+                }
+            }
+            return;
         }
-        //else if (Mathf.Abs(distanceX) <= 1.1f && Mathf.Abs(distanceY) >= 0.1f)
-        //{
-        //    //Vector3 targetPosition = new Vector3(
-        //    //player.position.x + (Char.position.x > player.position.x ? 1f : -1f),
-        //    //player.position.y, // Cùng độ lớn y
-        //    //Char.position.z);
 
-        //    //Vector3 direction = (targetPosition - Char.position).normalized;
-        //    //Char.position += direction * moveSpeed/1.3f * Time.deltaTime;
-
-        //    //if (Vector3.Distance(Char.position, targetPosition) <= 0.1f)
-        //    //{
-        //    //    SwitchToRunState(enemyIdle);
-        //    //}
-        //}
-    }
-
-    public void CheckPlayerWithRaycast()
-    {
-        Vector3 pointStart = new Vector2(Char.position.x, Char.position.y + 0.5f);
-        RaycastHit2D hitLeft = Physics2D.Raycast(pointStart, Vector2.left, raycastDistance, playerLayer);
-        RaycastHit2D hitRight = Physics2D.Raycast(pointStart, Vector2.right, raycastDistance, playerLayer);
-        Debug.DrawLine(pointStart, pointStart + Vector3.left * raycastDistance, Color.green);
-        Debug.DrawLine(pointStart, pointStart + Vector3.right * raycastDistance, Color.green);
-        if (hitLeft.collider != null && state != State.Attack)
+        // Điều kiện tấn công
+        if (distanceX <= 0.75f && distanceY <= 0.2f)
         {
-            transform.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
-            SwitchToRunState(enemyAttack);
-
-        }
-        if (hitRight.collider != null && state != State.Attack)
-        {
-            transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
-            SwitchToRunState(enemyAttack);
-        }
+            // Nếu enemy này là người chiếm vị trí tấn công (hoặc vị trí chưa bị chiếm)
+            if (!IsTargetOccupiedByOtherEnemy(myTarget, this) ||
+                Vector3.Distance(Char.position, myTarget) < 0.2f)
+            {
+                if (state != State.Idle)
+                {
+                    isAttack = true;
+                    SwitchToRunState(enemyIdle);
+                }
+            }
+        } 
     }
-
 
     public void SetAttack(int id)
     {
@@ -413,11 +560,7 @@ public class EnemyController : EnemyCharacter
     {
         SwitchToRunState(enemyIdle);
     }
-    private void FixedUpdate()
-    {
-        fillBar.transform.rotation = Quaternion.Euler(new Vector3(0, transform.position.y, 0));
-        stateManager.FixedUpdate();
-    }
+
     public void SwitchToRunState(EnemyStateMachine enemy)
     {
         if (state == State.Dead) return;

@@ -14,11 +14,15 @@ public class LevelControllerMain : MonoBehaviour
     [SerializeField] Sprite[] _sprBtn;
     [SerializeField] Sprite[] _sprStarLevel;
     [SerializeField] Sprite[] _sprFrame;
-    [SerializeField] Sprite[] _sprAutoSelect;
-    [SerializeField] Sprite[] _sprStarItem;
+
     // Inventory
     [SerializeField] GameObject _prfListItem ;
     [SerializeField] Transform _content;
+
+    //mode 
+    [SerializeField] private Transform _modeSelect;
+    [SerializeField] private Sprite starOn, starOff;
+
     ScrollSnapPagination _scrollSnapPagination;
     int level;
     int mode;
@@ -30,9 +34,12 @@ public class LevelControllerMain : MonoBehaviour
     void Start()
     {
         dataManager = DataManager.Instance;
+        mode = dataManager.LevelMode;
+
         _scrollSnapPagination = transform.GetComponent<ScrollSnapPagination>();
         OnInit();
     }
+
     private void OnEnable()
     {
         dataManager = DataManager.Instance;
@@ -45,10 +52,6 @@ public class LevelControllerMain : MonoBehaviour
 
         _popUpChangeItem1.SetActive(false);
         _popUpChangeItem2.SetActive(false);
-    }
-
-    private void Update()
-    {
     }
 
     public void OnInit()
@@ -119,6 +122,10 @@ public class LevelControllerMain : MonoBehaviour
         SetTakeItem();
         //_popups[0].GetChild(0).GetChild(5).GetComponent<Image>().sprite = dataManager.AutoSelect ? _sprAutoSelect[1] : _sprAutoSelect[0]; // icon is check
         _popups[0].GetChild(0).GetChild(5).GetChild(0).gameObject.SetActive(dataManager.AutoSelect); // text is check
+
+        //set mode
+        mode = dataManager.LevelMode;
+        SetStarImageModeLevel();
     }
     private void SetTakeItem()
     {
@@ -178,10 +185,10 @@ public class LevelControllerMain : MonoBehaviour
         }
         if (dataManager.idItem2 != 99)
         {
-            itemButton2.GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.idItem2];
+            itemButton2.GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.idItem2]; 
         }
     }
-
+     
     public void BtnMode(int id)
     {
         AudioBase.Instance.SetAudioUI(0);
@@ -198,6 +205,36 @@ public class LevelControllerMain : MonoBehaviour
             }
         }
     }
+
+    public void ButtonNextMode()
+    {
+        mode++;
+        if(mode > 2)
+            mode = 2;
+        dataManager.LevelMode = mode;
+        SetStarImageModeLevel();
+    }
+
+    public void ButtonPreviousMode()
+    {
+        mode--;
+        if (mode < 0)
+            mode = 0;
+        dataManager.LevelMode = mode;
+        SetStarImageModeLevel();
+    }
+
+    void SetStarImageModeLevel()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            if (i <= mode)
+                _modeSelect.GetChild(i).GetComponent<Image>().sprite = starOn;
+            else
+                _modeSelect.GetChild(i).GetComponent<Image>().sprite = starOff;
+        }
+    }
+
     private Sprite GetSprLoot(int level)
     {
         int type = dataManager.levelDatas[level].Type;

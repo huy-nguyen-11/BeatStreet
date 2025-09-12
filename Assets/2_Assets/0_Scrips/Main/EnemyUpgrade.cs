@@ -8,10 +8,12 @@ public class EnemyUpgrade : MonoBehaviour
 {
     [SerializeField] Sprite[] _sprAvatarLock;
     [SerializeField] Sprite[] _sprAvatarUnLock;
-    [SerializeField] Sprite[] _sprFrame;
+    //[SerializeField] Sprite[] _sprFrame;
     [SerializeField] Transform[] _btnEnemy;
     [SerializeField] Sprite[] _sprLock;
     [SerializeField] Sprite[] _sprPrice;
+    [SerializeField] Sprite spBtnBlue ,spButtonGreen, spBtnGrey;
+    [SerializeField] Button buttonEquip, buttonLevelUp;
     [SerializeField] ScrollSnapPagination scrollSnap;
     DataManager _dataManager;
     int idPet;
@@ -98,7 +100,7 @@ public class EnemyUpgrade : MonoBehaviour
             }
         }
         _dataManager.SaveFile();
-        MainManager.Instance.OpenPanel(3);
+        //MainManager.Instance.OpenPanel(3);
     }
     private void SetAttributeBlockless(bool blockless)
     {
@@ -114,28 +116,33 @@ public class EnemyUpgrade : MonoBehaviour
         {
             if (_dataManager.petData[i].isUnlock)
             {
-                _btnEnemy[i].GetChild(0).GetComponent<Image>().sprite = _sprAvatarUnLock[i];
-                _btnEnemy[i].GetChild(1).gameObject.SetActive(false);
-                _btnEnemy[i].GetChild(2).gameObject.SetActive(false);
+                _btnEnemy[i].GetChild(3).GetChild(0).GetComponent<Image>().sprite = _sprAvatarUnLock[i];
+                _btnEnemy[i].GetChild(3).gameObject.SetActive(false);
+                //_btnEnemy[i].GetChild(2).gameObject.SetActive(false);
             }
             else
             {
-                _btnEnemy[i].GetChild(0).GetComponent<Image>().sprite = _sprAvatarLock[i];
-                _btnEnemy[i].GetChild(1).gameObject.SetActive(true);
+                _btnEnemy[i].GetChild(3).GetChild(0).GetComponent<Image>().sprite = _sprAvatarLock[i];
+                _btnEnemy[i].GetChild(3).gameObject.SetActive(true);
                 _btnEnemy[i].GetChild(1).GetComponent<TextMeshProUGUI>().text = _dataManager.warehouse.CountPieceEnemy[i] + "/" + _dataManager.petData[i].countPieceUnlock;
                 if (_dataManager.warehouse.CountPieceEnemy[i] >= _dataManager.petData[i].countPieceUnlock)
                 {
-                    _btnEnemy[i].GetChild(2).GetComponent<Image>().sprite = _sprLock[1];
+                    _btnEnemy[i].GetChild(3).GetChild(1).GetComponent<Image>().sprite = _sprLock[1];
                 }
                 else
                 {
-                    _btnEnemy[i].GetChild(2).GetComponent<Image>().sprite = _sprLock[0];
+                    _btnEnemy[i].GetChild(3).GetChild(1).GetComponent<Image>().sprite = _sprLock[0];
                 }
             }
+
             if (i == idPet)
-                _btnEnemy[i].GetComponent<Image>().sprite = _sprFrame[1];
+            {
+                _btnEnemy[i].transform.GetChild(2).gameObject.SetActive(true);
+            }
             else
-                _btnEnemy[i].GetComponent<Image>().sprite = _sprFrame[0];
+            {
+                _btnEnemy[i].transform.GetChild(2).gameObject.SetActive(false);
+            }
         }
     }
     public void BtnEnemy(int id)

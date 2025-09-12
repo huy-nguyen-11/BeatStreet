@@ -53,7 +53,7 @@ public class GamePlayManager : MonoBehaviour
     //enemy AI manager
     public Dictionary<int, bool> isEnemyOnLeft = new Dictionary<int, bool>();
     public Dictionary<int, bool> isEnemyOnRight = new Dictionary<int, bool>();
-    public float minPosX , maxPosX;
+    public float minPosX , maxPosX , maxPosY , minPosY;
 
     private void Awake()
     {
@@ -90,7 +90,7 @@ public class GamePlayManager : MonoBehaviour
         }
         SpawnMap();
         CheckAudio();
-        //SetItem();
+        SetItem();
     }
 
     private void Update()
@@ -194,15 +194,15 @@ public class GamePlayManager : MonoBehaviour
     {
         _Items[0].GetChild(0).gameObject.SetActive(dataManager.idItem1 != 99);
         _Items[0].GetChild(1).gameObject.SetActive(dataManager.idItem1 != 99);
-        _Items[2].gameObject.SetActive(dataManager.idItem1 != 99);
+        _Items[2].GetChild(0).gameObject.SetActive(dataManager.idItem1 != 99);
         _Items[1].GetChild(0).gameObject.SetActive(dataManager.idItem2 != 99);
         _Items[1].GetChild(1).gameObject.SetActive(dataManager.idItem2 != 99);
-        _Items[3].gameObject.SetActive(dataManager.idItem2 != 99);
+        _Items[3].GetChild(0).gameObject.SetActive(dataManager.idItem2 != 99);
         if (dataManager.idItem1 != 99)
         {
             _Items[0].GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.idItem1];
             _Items[0].GetChild(1).GetComponent<TextMeshProUGUI>().text = dataManager.dataBase.imgEquipItems.titleAttributeItems[dataManager.idItem1];
-            _Items[2].GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.idItem1];
+            _Items[2].GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.idItem1];
             _Items[2].GetComponent<Button>().onClick.AddListener(delegate
             {
                 BtnItem(false);
@@ -212,7 +212,7 @@ public class GamePlayManager : MonoBehaviour
         {
             _Items[1].GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.idItem2];
             _Items[1].GetChild(1).GetComponent<TextMeshProUGUI>().text = dataManager.dataBase.imgEquipItems.titleAttributeItems[dataManager.idItem2];
-            _Items[3].GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.idItem2];
+            _Items[3].GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.idItem2];
             _Items[3].GetComponent<Button>().onClick.AddListener(delegate
             {
                 BtnItem(true);
@@ -228,8 +228,8 @@ public class GamePlayManager : MonoBehaviour
             dataManager.idItem1 = 99;
         else
             dataManager.idItem2 = 99;
-        _Items[2].gameObject.SetActive(dataManager.idItem1 != 99);
-        _Items[3].gameObject.SetActive(dataManager.idItem2 != 99);
+        _Items[2].GetChild(0).gameObject.SetActive(dataManager.idItem1 != 99);
+        _Items[3].GetChild(0).gameObject.SetActive(dataManager.idItem2 != 99);
     }
     private void UseOfItems(int id)
     {
