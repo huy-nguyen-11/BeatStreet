@@ -25,6 +25,7 @@ public class EnemyUpgrade : MonoBehaviour
         _dataManager = DataManager.Instance;
         GetIdPet();
         SetBtnUpgrade(idPet);
+        SetButtonEquip(idPet);
         SetBarFill(idPet);
         SetParameter(idPet);
         transform.GetChild(3).GetComponent<Image>().sprite = _sprAvatarUnLock[idPet];//avata pet
@@ -100,6 +101,7 @@ public class EnemyUpgrade : MonoBehaviour
             }
         }
         _dataManager.SaveFile();
+        SetButtonEquip(idPet);
         //MainManager.Instance.OpenPanel(3);
     }
     private void SetAttributeBlockless(bool blockless)
@@ -110,28 +112,56 @@ public class EnemyUpgrade : MonoBehaviour
             _dataManager.playerData[_dataManager.idPlayer].Mana += _dataManager.petData[4].petAttribute;
         _dataManager.SaveFile();
     }
+
+    private void SetButtonEquip(int id)
+    {
+        if (_dataManager.petData[id].isUnlock)
+        {
+            buttonEquip.GetComponent<Button>().enabled = true;
+            if ((id == _dataManager.idPet1 && _dataManager.isActivePet1) || (id == _dataManager.idPet2 && _dataManager.isActivePet2))
+            {
+                //Debug.Log("idPet 1: " + idPet);
+                buttonEquip.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Equipped";
+                buttonEquip.GetComponent<Image>().sprite = spBtnGrey;
+            }
+            else
+            {
+                //Debug.Log("idPet 2: " + idPet);
+                buttonEquip.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Equip";
+                buttonEquip.GetComponent<Image>().sprite = spBtnBlue;
+            }
+        }
+        else
+        {
+            buttonEquip.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Equip";
+            buttonEquip.GetComponent<Image>().sprite = spBtnGrey;
+            buttonEquip.GetComponent<Button>().enabled = false;
+        }
+       
+    }
+
     private void SetBtnPet()
     {
         for (int i = 0; i < _btnEnemy.Length; i++)
         {
             if (_dataManager.petData[i].isUnlock)
             {
-                _btnEnemy[i].GetChild(3).GetChild(0).GetComponent<Image>().sprite = _sprAvatarUnLock[i];
+                _btnEnemy[i].GetChild(0).GetComponent<Image>().sprite = _sprAvatarUnLock[i];
                 _btnEnemy[i].GetChild(3).gameObject.SetActive(false);
                 //_btnEnemy[i].GetChild(2).gameObject.SetActive(false);
             }
             else
             {
-                _btnEnemy[i].GetChild(3).GetChild(0).GetComponent<Image>().sprite = _sprAvatarLock[i];
+                _btnEnemy[i].GetChild(0).GetComponent<Image>().sprite = _sprAvatarLock[i];
                 _btnEnemy[i].GetChild(3).gameObject.SetActive(true);
                 _btnEnemy[i].GetChild(1).GetComponent<TextMeshProUGUI>().text = _dataManager.warehouse.CountPieceEnemy[i] + "/" + _dataManager.petData[i].countPieceUnlock;
                 if (_dataManager.warehouse.CountPieceEnemy[i] >= _dataManager.petData[i].countPieceUnlock)
                 {
-                    _btnEnemy[i].GetChild(3).GetChild(1).GetComponent<Image>().sprite = _sprLock[1];
+                    _btnEnemy[i].GetChild(3).GetChild(0).GetComponent<Image>().sprite = _sprLock[1];
                 }
                 else
                 {
-                    _btnEnemy[i].GetChild(3).GetChild(1).GetComponent<Image>().sprite = _sprLock[0];
+                    _btnEnemy[i].GetChild(3).GetChild(0).GetComponent<Image>().sprite = _sprLock[0];
                 }
             }
 
@@ -150,9 +180,18 @@ public class EnemyUpgrade : MonoBehaviour
         AudioBase.Instance.SetAudioUI(0);
         idPet = id;
         SetBtnUpgrade(id);
+        SetButtonEquip(id);
         SetBarFill(id);
         SetParameter(id);
-        transform.GetChild(3).GetComponent<Image>().sprite = _sprAvatarUnLock[id];
+        if (_dataManager.petData[id].isUnlock)
+        {
+            transform.GetChild(3).GetComponent<Image>().sprite = _sprAvatarUnLock[id];
+        }
+        else
+        {
+            transform.GetChild(3).GetComponent<Image>().sprite = _sprAvatarLock[id];
+        }
+        //transform.GetChild(3).GetComponent<Image>().sprite = _sprAvatarUnLock[id];
         transform.GetChild(5).GetComponent<Button>().onClick.RemoveAllListeners();
         if (_dataManager.petData[id].Level < 20)
         {
@@ -168,23 +207,23 @@ public class EnemyUpgrade : MonoBehaviour
         if (_dataManager.petData[id].Level < 20)
         {
             string txtUpgrade = !_dataManager.petData[id].isUnlock ? "Unlock" : "Level Up";
-            transform.GetChild(5).GetChild(0).gameObject.SetActive(_dataManager.petData[id].isUnlock);
-            transform.GetChild(5).GetChild(1).GetComponent<TextMeshProUGUI>().text = txtUpgrade;
-            transform.GetChild(5).GetChild(2).gameObject.SetActive(!_dataManager.petData[id].isUnlock);
-            transform.GetChild(5).GetChild(1).gameObject.SetActive(true);
-            transform.GetChild(5).GetChild(3).gameObject.SetActive(false);
+            buttonLevelUp.transform.GetChild(0).gameObject.SetActive(_dataManager.petData[id].isUnlock);
+            buttonLevelUp.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = txtUpgrade;
+            buttonLevelUp.transform.GetChild(2).gameObject.SetActive(!_dataManager.petData[id].isUnlock);
+            buttonLevelUp.transform.GetChild(1).gameObject.SetActive(true);
+            buttonLevelUp.transform.GetChild(3).gameObject.SetActive(false);
             if (_dataManager.petData[id].isUnlock)
             {
                 price = 50 + (75 * _dataManager.petData[id].Level);
-                transform.GetChild(5).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = price.ToString();
+                buttonLevelUp.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = price.ToString();
             }
         }
         else
         {
-            transform.GetChild(5).GetChild(0).gameObject.SetActive(false);
-            transform.GetChild(5).GetChild(1).gameObject.SetActive(false);
-            transform.GetChild(5).GetChild(2).gameObject.SetActive(false);
-            transform.GetChild(5).GetChild(3).gameObject.SetActive(true);
+            buttonLevelUp.transform.GetChild(0).gameObject.SetActive(false);
+            buttonLevelUp.transform.GetChild(1).gameObject.SetActive(false);
+            buttonLevelUp.transform.GetChild(2).gameObject.SetActive(false);
+            buttonLevelUp.transform.GetChild(3).gameObject.SetActive(true);
         }
     }
     private void SetParameter(int id)
@@ -282,7 +321,7 @@ public class EnemyUpgrade : MonoBehaviour
             SetBarFill(id);
             SetParameter(id);
             transform.GetChild(3).GetComponent<Image>().sprite = _sprAvatarUnLock[id];
-            transform.GetChild(5).GetComponent<Button>().onClick.RemoveAllListeners();
+            buttonLevelUp.transform.GetComponent<Button>().onClick.RemoveAllListeners();
             if (_dataManager.petData[id].Level < 20)
             {
                 transform.GetChild(5).GetComponent<Button>().onClick.AddListener(delegate

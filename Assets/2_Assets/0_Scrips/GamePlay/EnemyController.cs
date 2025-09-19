@@ -120,7 +120,7 @@ public class EnemyController : EnemyCharacter
 
     private void SeparateFromOtherEnemies()
     {
-        float minDist = 0.45f; // Khoảng cách tối thiểu giữa các enemy
+        float minDist = 1f; // Khoảng cách tối thiểu giữa các enemy
         Vector3 separation = Vector3.zero;
         int count = 0;
 
@@ -274,7 +274,7 @@ public class EnemyController : EnemyCharacter
 
     private bool IsTargetOccupiedByOtherEnemy(Vector3 target, EnemyController ignore = null)
     {
-        float minDist = 0.4f;
+        float minDist = 1f;
         foreach (var enemy in FindObjectsOfType<EnemyController>())
         {
             if (enemy == this || enemy == ignore || enemy.state == State.Dead) continue;
@@ -327,7 +327,7 @@ public class EnemyController : EnemyCharacter
 
     public void AvoidPlayer()
     {
-        Debug.Log("ne player");
+        //Debug.Log("ne player");
         //int attempts = 10;
         //for (int i = 0; i < attempts; i++)
         //{

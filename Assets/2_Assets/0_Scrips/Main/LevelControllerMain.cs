@@ -22,6 +22,7 @@ public class LevelControllerMain : MonoBehaviour
     //mode 
     [SerializeField] private Transform _modeSelect;
     [SerializeField] private Sprite starOn, starOff;
+    [SerializeField] private TextMeshProUGUI textModeLevel;
 
     ScrollSnapPagination _scrollSnapPagination;
     int level;
@@ -209,7 +210,7 @@ public class LevelControllerMain : MonoBehaviour
     public void ButtonNextMode()
     {
         mode++;
-        if(mode > 2)
+        if (mode > 2)
             mode = 2;
         dataManager.LevelMode = mode;
         SetStarImageModeLevel();
@@ -229,10 +230,15 @@ public class LevelControllerMain : MonoBehaviour
         for (int i = 0; i < 3; i++)
         {
             if (i <= mode)
+            {
                 _modeSelect.GetChild(i).GetComponent<Image>().sprite = starOn;
+            }
             else
+            {
                 _modeSelect.GetChild(i).GetComponent<Image>().sprite = starOff;
+            } 
         }
+        textModeLevel.text = mode == 0 ? "EASY" : mode == 1 ? "MEDIUM" : "HARD";
     }
 
     private Sprite GetSprLoot(int level)

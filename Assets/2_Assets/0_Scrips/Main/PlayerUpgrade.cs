@@ -16,7 +16,7 @@ public class PlayerUpgrade : MonoBehaviour
     [SerializeField] Sprite[] _sprStatusUpgrade;
     [SerializeField] Sprite[] _sprPrice;
     [SerializeField] ScrollSnapPagination scrollSnap;
-    [SerializeField] GameObject _buttonUpgrade , _buttonSwitch , _buttonIncrease , _buttonDeacrease , _progressTicket;
+    [SerializeField] GameObject _buttonUpgrade , _buttonSwitch , _buttonIncrease , _buttonDeacrease , _progressTicket , playerChar;
     DataManager _dataManager;
     int idPlayer;
     int countUpGrade = 1;

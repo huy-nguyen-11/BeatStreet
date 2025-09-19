@@ -48,7 +48,7 @@ public class MainManager : MonoBehaviour
         _panels[3].SetActive(true);
         SetImgBtnBottom(3 - 1);
         //if (3 == 3)
-        //    SetAvtBtn();
+        //SetAvtBtn();
     }
     private void OnEnable()
     {
@@ -72,6 +72,8 @@ public class MainManager : MonoBehaviour
         {
             OpenPanel(11); // open dailyreward;
         }
+
+        SetAvtBtn();
     }
 
     private void Update()
@@ -106,6 +108,7 @@ public class MainManager : MonoBehaviour
         {
             buttonSetting.SetActive(true);
             buttonBack.SetActive(false);
+            SetAvtBtn();
         }
         else
         {
@@ -220,7 +223,7 @@ public class MainManager : MonoBehaviour
             //scrollSnap.transform.GetChild(1).GetChild(0).GetChild(0).GetChild(1).gameObject.SetActive(false);
             //scrollSnap.autoScroll = false;
             //scrollSnap.transform.GetChild(1).GetChild(1).gameObject.SetActive(false);
-            CheckRewardStatus();
+            CheckRewardStatus(); 
         }
     }
     private void BonusVip()
@@ -279,10 +282,11 @@ public class MainManager : MonoBehaviour
     // Home
     private void SetAvtBtn()
     {
-        _btnUpgrade[0].GetChild(0).GetComponent<Image>().sprite = _sprAvtPlayer[dataManager.idPlayer];
-        _btnUpgrade[1].gameObject.SetActive(dataManager.LevelCurren >= 6);
-        _btnUpgrade[2].gameObject.SetActive(dataManager.LevelCurren >= 6);
-        if (dataManager.LevelCurren >= 6)
+        int _levelEnableEquipEnemy = 0;
+        _btnUpgrade[0].GetComponent<Image>().sprite = _sprAvtPlayer[dataManager.idPlayer];
+        _btnUpgrade[1].gameObject.SetActive(dataManager.LevelCurren >= _levelEnableEquipEnemy);
+        _btnUpgrade[2].gameObject.SetActive(dataManager.LevelCurren >= _levelEnableEquipEnemy);
+        if (dataManager.LevelCurren >= _levelEnableEquipEnemy)
         {
             if (dataManager.idPet1 != 99)
             {

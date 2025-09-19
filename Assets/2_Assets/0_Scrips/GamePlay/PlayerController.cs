@@ -372,15 +372,15 @@ public class PlayerController : PlayerCharacter
                                 else
                                 {
                                     if (!GamePlayManager.Instance.isCheckUlti
-                                        //&& state != State.Attack
+                                        && state != State.Attack
                                         && state != State.Jump
                                         && state != State.Skill2
                                         && state != State.Skill1)
                                     {
                                         //Debug.Log("attack1");
-                                        //SwitchToRunState(playerAttack);
-                                        attackQueue.Enqueue(1);
-                                        ProcessAttackQueue();
+                                        SwitchToRunState(playerAttack);
+                                        //attackQueue.Enqueue(1);
+                                        //ProcessAttackQueue();
                                     }
                                     else
                                     {
@@ -404,15 +404,15 @@ public class PlayerController : PlayerCharacter
                                 }
                             }
                             else if (deltaTime <= maxTapTime
-                                //&& state != State.Attack
+                                && state != State.Attack
                                 && state != State.Jump
                                 && state != State.Skill2
                                 && state != State.Skill1)
                             {
-                                attackQueue.Enqueue(1); 
-                                ProcessAttackQueue();
+                                //attackQueue.Enqueue(1); 
+                                //ProcessAttackQueue();
                                 //Debug.Log("attack 2");
-                                //SwitchToRunState(playerAttack);
+                                SwitchToRunState(playerAttack);
                             }
                             else
                             {

@@ -61,12 +61,11 @@ public class GameOver : MonoBehaviour
         AudioBase.Instance.SetAudioUI(0);
         if (PlayerPrefs.GetInt("Diamont") >= 40)
         {
-
             AudioBase.Instance.SetAudioUI(2);
             PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 40);
             PlayerPrefs.SetInt("Energy", PlayerPrefs.GetInt("Energy") + 20);
             GamePlayManager.Instance.SetMission(0, 40);
-            _popupStatus[3].SetActive(false);
+            _popupStatus[3].SetActive(false); 
         }
     }
     public void BtnClossBuyEnergy()
