@@ -90,7 +90,7 @@ public class PlayerController : PlayerCharacter
     public float moveThreshold = 50f;
     public float jumpThreshold = 100f;
     public float speedUpThreshold = 100f;
-    private float maxTapTime = 0.25f;
+    private float maxTapTime = 0.5f;
     public float changeHoldTime = 0.3f;
     private Dictionary<int, Vector2> touchStartPositions = new Dictionary<int, Vector2>();
     private Vector2 touchStartPositionsRun;
@@ -377,7 +377,7 @@ public class PlayerController : PlayerCharacter
                                         && state != State.Skill2
                                         && state != State.Skill1)
                                     {
-                                        //Debug.Log("attack1");
+                                        Debug.Log("attack1");
                                         SwitchToRunState(playerAttack);
                                         //attackQueue.Enqueue(1);
                                         //ProcessAttackQueue();
@@ -411,7 +411,7 @@ public class PlayerController : PlayerCharacter
                             {
                                 //attackQueue.Enqueue(1); 
                                 //ProcessAttackQueue();
-                                //Debug.Log("attack 2");
+                                Debug.Log("attack 2");
                                 SwitchToRunState(playerAttack);
                             }
                             else
@@ -479,6 +479,7 @@ public class PlayerController : PlayerCharacter
         int attack = attackQueue.Dequeue();
 
         //attack
+        Debug.Log("Attack 3");
         SwitchToRunState(playerAttack);
 
         StartCoroutine(WaitAndProcessNextAttack());

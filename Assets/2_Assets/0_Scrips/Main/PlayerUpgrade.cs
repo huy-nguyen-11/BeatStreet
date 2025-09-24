@@ -154,7 +154,7 @@ public class PlayerUpgrade : MonoBehaviour
     }
     private void SetParameter(int id)
     {
-        transform.GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text = _dataManager.dataBase.imgEquipItems.namePlayer[id]; // name player
+        transform.GetChild(0).GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text = _dataManager.dataBase.imgEquipItems.namePlayer[id]; // name player
         string indexHp = "";
         string indexDame = "";
         string indexMana = "";
@@ -167,17 +167,17 @@ public class PlayerUpgrade : MonoBehaviour
             indexMana = isCheckUnLock ? "<color=yellow>+" + MANA + "</color>" : "";
         }
         //content sate infor player
-        transform.GetChild(1).GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text = _dataManager.playerData[id].Hp + (!isStatusUpgrade ? indexHp : ""); // text hp
-        transform.GetChild(1).GetChild(2).GetChild(1).GetComponent<TextMeshProUGUI>().text = _dataManager.playerData[id].Dame + (!isStatusUpgrade ? indexDame : ""); // text damage
-        transform.GetChild(1).GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text = _dataManager.playerData[id].Mana + (!isStatusUpgrade ? indexMana : ""); // text mana
+        transform.GetChild(0).GetChild(1).GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text = _dataManager.playerData[id].Hp + (!isStatusUpgrade ? indexHp : ""); // text hp
+        transform.GetChild(0).GetChild(1).GetChild(2).GetChild(1).GetComponent<TextMeshProUGUI>().text = _dataManager.playerData[id].Dame + (!isStatusUpgrade ? indexDame : ""); // text damage
+        transform.GetChild(0).GetChild(1).GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text = _dataManager.playerData[id].Mana + (!isStatusUpgrade ? indexMana : ""); // text mana
     }
     private void SetTxtLevel(int id)
     {
         if (!isStatusUpgrade)
-            transform.GetChild(0).GetChild(2).GetComponent<TextMeshProUGUI>().text =
+            transform.GetChild(0).GetChild(0).GetChild(2).GetComponent<TextMeshProUGUI>().text =
                 "Level " + "<color=yellow>" + _dataManager.playerData[id].Level + "</color>" + "/" + _dataManager.playerData[id].LevelEvolve; // text level player
         else
-            transform.GetChild(0).GetChild(2).GetComponent<TextMeshProUGUI>().text =
+            transform.GetChild(0).GetChild(0).GetChild(2).GetComponent<TextMeshProUGUI>().text =
                 "Level " + _dataManager.playerData[id].Level + "/" + "<color=yellow>" + _dataManager.playerData[id].LevelEvolve + "</color>"; // text level player
     }
     private void SetBtnUpGrade(int id)

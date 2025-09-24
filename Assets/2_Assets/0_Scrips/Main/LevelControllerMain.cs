@@ -38,7 +38,7 @@ public class LevelControllerMain : MonoBehaviour
         mode = dataManager.LevelMode;
 
         _scrollSnapPagination = transform.GetComponent<ScrollSnapPagination>();
-        OnInit();
+        //OnInit();
     }
 
     private void OnEnable()
@@ -59,6 +59,7 @@ public class LevelControllerMain : MonoBehaviour
     {
         //SetObjUnlockLevel();
         SetListBtn();
+        UpdateModeButtons();
     }
     //private void SetObjUnlockLevel()
     //{
@@ -104,7 +105,7 @@ public class LevelControllerMain : MonoBehaviour
         TextMeshProUGUI _modeText = _popups[0].GetChild(0).GetChild(1).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>(); // text mode
         for (int i = 0; i < 3; i++)
         {
-            _modeGo.transform.GetChild(i).GetComponent<Image>().sprite = i < dataManager.levelDatas[i].Star ? _sprStarLevel[1] : _sprStarLevel[0]; // set star mode
+            _modeGo.transform.GetChild(i).GetComponent<Image>().sprite = i <= dataManager.levelDatas[i].Star ? _sprStarLevel[1] : _sprStarLevel[0]; // set star mode
             //_popups[0].GetChild(1).GetChild(1).GetChild(i).GetChild(2).gameObject.SetActive(i > dataManager.levelDatas[id].Star);
             //if (i == 2 && dataManager.levelDatas[id].Star == 3)
             //{
@@ -127,6 +128,7 @@ public class LevelControllerMain : MonoBehaviour
         //set mode
         mode = dataManager.LevelMode;
         SetStarImageModeLevel();
+        UpdateModeButtons();
     }
     private void SetTakeItem()
     {
@@ -214,6 +216,7 @@ public class LevelControllerMain : MonoBehaviour
             mode = 2;
         dataManager.LevelMode = mode;
         SetStarImageModeLevel();
+        UpdateModeButtons();
     }
 
     public void ButtonPreviousMode()
@@ -223,6 +226,19 @@ public class LevelControllerMain : MonoBehaviour
             mode = 0;
         dataManager.LevelMode = mode;
         SetStarImageModeLevel();
+        UpdateModeButtons();
+    }
+
+    [SerializeField] private Button btnNextMode;
+    [SerializeField] private Button btnPreviousMode;
+
+    // Call this after selecting a level or changing mode
+    private void UpdateModeButtons()
+    {
+        int unlockedModes = dataManager.levelDatas[level].Star + 1; // Modes unlocked for this level
+
+        btnPreviousMode.interactable = mode > 0;
+        btnNextMode.interactable = mode < unlockedModes - 1;
     }
 
     void SetStarImageModeLevel()
@@ -309,15 +325,11 @@ public class LevelControllerMain : MonoBehaviour
 
                 }
                 //set star of level unloked
-                if (dataManager.levelDatas[i].Star == 0)
-                    for (int y = 1; y <= 3; y++)
-                        _btnLevels[i].GetChild(y).GetComponent<Image>().sprite = _sprStarLevel[0]; // off all star
-                else
-                    for (int y = 1; y <=3; y++)
-                    {
-                        _btnLevels[i].GetChild(y).gameObject.SetActive(true);
-                        _btnLevels[i].GetChild(y).GetComponent<Image>().sprite = y < dataManager.levelDatas[i].Star ? _sprStarLevel[1] : _sprStarLevel[0];
-                    }
+                for (int y = 1; y <= 3; y++)
+                {
+                    _btnLevels[i].GetChild(y).gameObject.SetActive(true);
+                    _btnLevels[i].GetChild(y).GetComponent<Image>().sprite = y <= (dataManager.levelDatas[i].Star + 1) ? _sprStarLevel[1] : _sprStarLevel[0];
+                }
             }
             else //is lock
             {

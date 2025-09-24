@@ -10,7 +10,7 @@ public class PlayerThrow : PlayerStateManager
     {
 
     }
-    public void SetSwithJump()
+    public void SetThrow()
     {
     }
     public override void Exit()
