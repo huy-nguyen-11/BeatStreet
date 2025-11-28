@@ -45,7 +45,7 @@ public class EnemyHit : EnemyStateMachine
     {
         float hit = GamePlayManager.Instance._Player.Char.position.x
             <= enemyController.Char.position.x ? -0.15f : 0.15f;
-        enemyController.rb.velocity = Vector2.left * hit;
+        enemyController.rb.linearVelocity = Vector2.left * hit;
     }
     IEnumerator SetStateIdle()
     {

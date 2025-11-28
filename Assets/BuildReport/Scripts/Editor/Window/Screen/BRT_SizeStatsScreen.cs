@@ -1,4 +1,5 @@
 using System.Globalization;
+using UnityEditor;
 using UnityEngine;
 
 namespace BuildReportTool.Window.Screen
@@ -10,7 +11,8 @@ namespace BuildReportTool.Window.Screen
 			get { return Labels.SIZE_STATS_CATEGORY_LABEL; }
 		}
 
-		public override void RefreshData(BuildInfo buildReport, AssetDependencies assetDependencies, TextureData textureData, MeshData meshData, UnityBuildReport unityBuildReport)
+		public override void RefreshData(BuildInfo buildReport, AssetDependencies assetDependencies,
+			TextureData textureData, MeshData meshData, PrefabData prefabData, UnityBuildReport unityBuildReport, BuildReportTool.AssetBundleSession assetBundleSession)
 		{
 		}
 
@@ -19,16 +21,17 @@ namespace BuildReportTool.Window.Screen
 		bool _hasTotalBuildSize;
 		bool _hasUsedAssetsTotalSize;
 		bool _hasBuildSizes;
+		bool _hasAssetBundles;
 		bool _hasCompressedBuildSize;
 		bool _hasMonoDLLsToDisplay;
 		bool _hasUnityEngineDLLsToDisplay;
 		bool _hasScriptDLLsToDisplay;
 
 		public override void DrawGUI(Rect position,
-			BuildInfo buildReportToDisplay, AssetDependencies assetDependencies, TextureData textureData, MeshData meshData,
-			UnityBuildReport unityBuildReport,
-			out bool requestRepaint
-		)
+			BuildInfo buildReportToDisplay, AssetDependencies assetDependencies,
+			TextureData textureData, MeshData meshData, PrefabData prefabData,
+			UnityBuildReport unityBuildReport, BuildReportTool.ExtraData extraData, BuildReportTool.AssetBundleSession assetBundleSession,
+			out bool requestRepaint)
 		{
 			if (buildReportToDisplay == null)
 			{
@@ -53,10 +56,18 @@ namespace BuildReportTool.Window.Screen
 
 				_hasScriptDLLsToDisplay =
 					buildReportToDisplay.ScriptDLLs != null && buildReportToDisplay.ScriptDLLs.Length > 0;
+
+				_hasAssetBundles = buildReportToDisplay.HasAssetBundles;
 			}
 
+			// Toolbar at top
+			// ------------------------------------------------
+			if (_hasAssetBundles)
+			{
+				DrawTopBar(position, assetBundleSession);
+			}
 
-			GUILayout.Space(2); // top padding for scrollbar
+			// ------------------------------------------------
 
 			_assetListScrollPos = GUILayout.BeginScrollView(_assetListScrollPos);
 
@@ -65,12 +76,26 @@ namespace BuildReportTool.Window.Screen
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(10); // extra left padding
 
-			DrawTotalSize(buildReportToDisplay);
+			DrawTotalSize(buildReportToDisplay, assetBundleSession);
 
 			GUILayout.Space(BuildReportTool.Window.Settings.CATEGORY_HORIZONTAL_SPACING);
 			GUILayout.BeginVertical();
 
-			DrawBuildSizes(buildReportToDisplay);
+			BuildReportTool.SizePart[] buildSizesToDisplay;
+			if (_hasAssetBundles)
+			{
+				buildSizesToDisplay = buildReportToDisplay.AssetBundles[assetBundleSession.SelectedBundleIdx].BuildSizes;
+			}
+			else if (_hasBuildSizes)
+			{
+				buildSizesToDisplay = buildReportToDisplay.BuildSizes;
+			}
+			else
+			{
+				buildSizesToDisplay = null;
+			}
+
+			DrawBuildSizes(buildSizesToDisplay);
 
 			GUILayout.Space(BuildReportTool.Window.Settings.CATEGORY_VERTICAL_SPACING);
 
@@ -83,8 +108,46 @@ namespace BuildReportTool.Window.Screen
 			GUILayout.EndScrollView();
 		}
 
+		void DrawTopBar(Rect position, AssetBundleSession assetBundleSession)
+		{
+			var topBarBgStyle = GUI.skin.FindStyle(BuildReportTool.Window.Settings.TOP_BAR_BG_STYLE_NAME);
+			if (topBarBgStyle == null)
+			{
+				topBarBgStyle = GUI.skin.label;
+			}
 
-		void DrawTotalSize(BuildReportTool.BuildInfo buildReportToDisplay)
+			var topBarLabelStyle = GUI.skin.FindStyle(BuildReportTool.Window.Settings.TOP_BAR_LABEL_STYLE_NAME);
+			if (topBarLabelStyle == null)
+			{
+				topBarLabelStyle = GUI.skin.label;
+			}
+
+			var topBarPopupStyle = GUI.skin.FindStyle(BuildReportTool.Window.Settings.FILE_FILTER_POPUP_STYLE_NAME);
+			if (topBarPopupStyle == null)
+			{
+				topBarPopupStyle = GUI.skin.label;
+			}
+
+			GUILayout.Space(1); // top padding
+
+			GUILayout.BeginHorizontal(BRT_BuildReportWindow.LayoutHeight11);
+			GUILayout.Label(" ", topBarBgStyle, BRT_BuildReportWindow.LayoutNone);
+
+			GUILayout.Label("Bundle: ", topBarLabelStyle);
+			assetBundleSession.SelectedBundleIdx = EditorGUILayout.Popup(
+				assetBundleSession.SelectedBundleIdx, assetBundleSession.BundleNames,
+				topBarPopupStyle);
+
+			GUILayout.Space(20);
+
+			GUILayout.FlexibleSpace();
+
+			GUILayout.EndHorizontal();
+
+			GUILayout.Space(5);
+		}
+
+		void DrawTotalSize(BuildReportTool.BuildInfo buildReportToDisplay, BuildReportTool.AssetBundleSession assetBundleSession)
 		{
 			GUILayout.BeginVertical();
 
@@ -122,22 +185,68 @@ namespace BuildReportTool.Window.Screen
 			else
 			{
 				// Total Build Size
-				if (_hasTotalBuildSize)
+
+				if (_hasTotalBuildSize || _hasAssetBundles)
 				{
 					GUILayout.BeginVertical();
 
-					var buildPlatform =
-						BuildReportTool.ReportGenerator.GetBuildPlatformFromString(buildReportToDisplay.BuildType,
-							buildReportToDisplay.BuildTargetUsed);
+					// ----------------------------------------------
 
-					GUILayout.Label(
-						buildPlatform == BuildPlatform.iOS ? Labels.BUILD_XCODE_SIZE_LABEL : Labels.BUILD_TOTAL_SIZE_LABEL,
-						bigLabelStyle);
+					string buildSizeLabelToUse;
+					if (_hasAssetBundles)
+					{
+						buildSizeLabelToUse = Labels.BUNDLE_TOTAL_SIZE_LABEL;
+					}
+					else if (_hasTotalBuildSize)
+					{
+						var buildPlatform =
+							BuildReportTool.ReportGenerator.GetBuildPlatformFromString(buildReportToDisplay.BuildType,
+								buildReportToDisplay.BuildTargetUsed);
+						if (buildPlatform == BuildPlatform.iOS)
+						{
+							buildSizeLabelToUse = Labels.BUILD_XCODE_SIZE_LABEL;
+						}
+						else
+						{
+							buildSizeLabelToUse = Labels.BUILD_TOTAL_SIZE_LABEL;
+						}
+					}
+					else
+					{
+						buildSizeLabelToUse = null;
+					}
+					GUILayout.Label(buildSizeLabelToUse, bigLabelStyle);
 
-					GUILayout.Label(BuildReportTool.Util.GetBuildSizePathDescription(buildReportToDisplay),
-						descStyle);
+					// ----------------------------------------------
 
-					GUILayout.Label(buildReportToDisplay.TotalBuildSize, valueStyle);
+					string buildSizeDesc;
+					if (_hasAssetBundles)
+					{
+						buildSizeDesc = Labels.BUNDLE_TOTAL_SIZE_DESC;
+					}
+					else if (_hasTotalBuildSize)
+					{
+						buildSizeDesc = BuildReportTool.Util.GetBuildSizePathDescription(buildReportToDisplay);
+					}
+					else
+					{
+						buildSizeDesc = null;
+					}
+					GUILayout.Label(buildSizeDesc, descStyle);
+
+					// ----------------------------------------------
+
+					if (_hasAssetBundles)
+					{
+						GUILayout.Label(buildReportToDisplay.AssetBundles[assetBundleSession.SelectedBundleIdx].TotalOutputSize, valueStyle);
+					}
+					else if (_hasTotalBuildSize)
+					{
+						GUILayout.Label(buildReportToDisplay.TotalBuildSize, valueStyle);
+					}
+
+					// ----------------------------------------------
+
 					GUILayout.EndVertical();
 
 					DrawAuxiliaryBuildSizes(buildReportToDisplay);
@@ -146,10 +255,29 @@ namespace BuildReportTool.Window.Screen
 
 
 				// Used Assets
-				if (_hasUsedAssetsTotalSize)
+				if (_hasUsedAssetsTotalSize || _hasAssetBundles)
 				{
+					string totalAssetSizeToUse;
+					if (_hasUsedAssetsTotalSize)
+					{
+						totalAssetSizeToUse = buildReportToDisplay.UsedTotalSize;
+					}
+					else
+					{
+						totalAssetSizeToUse = buildReportToDisplay.AssetBundles[assetBundleSession.SelectedBundleIdx].TotalUserAssetsSize;
+					}
+
+					string descToUse;
+					if (_hasUsedAssetsTotalSize)
+					{
+						descToUse = Labels.USED_TOTAL_SIZE_DESC;
+					}
+					else
+					{
+						descToUse = Labels.BUNDLE_USED_TOTAL_SIZE_DESC;
+					}
 					BuildReportTool.Window.Utility.DrawLargeSizeDisplay(Labels.USED_TOTAL_SIZE_LABEL,
-						Labels.USED_TOTAL_SIZE_DESC, buildReportToDisplay.UsedTotalSize);
+						descToUse, totalAssetSizeToUse);
 					GUILayout.Space(40);
 				}
 
@@ -159,6 +287,25 @@ namespace BuildReportTool.Window.Screen
 				{
 					BuildReportTool.Window.Utility.DrawLargeSizeDisplay(Labels.UNUSED_TOTAL_SIZE_LABEL,
 						Labels.UNUSED_TOTAL_SIZE_DESC, buildReportToDisplay.UnusedTotalSize);
+
+					if (buildReportToDisplay.ProcessUnusedAssetsInBatches)
+					{
+						GUILayout.Space(10);
+
+						GUILayout.BeginHorizontal();
+						var warning = GUI.skin.FindStyle("Icon-Warning");
+						if (warning != null)
+						{
+							var warningIcon = warning.normal.background;
+
+							var iconWidth = warning.fixedWidth;
+							var iconHeight = warning.fixedHeight;
+
+							GUI.DrawTexture(GUILayoutUtility.GetRect(iconWidth, iconHeight), warningIcon);
+						}
+						GUILayout.Label(string.Format(Labels.UNUSED_TOTAL_IS_FROM_BATCH, buildReportToDisplay.UnusedAssetsEntriesPerBatch), descStyle);
+						GUILayout.EndHorizontal();
+					}
 				}
 			}
 
@@ -234,7 +381,7 @@ namespace BuildReportTool.Window.Screen
 		}
 
 
-		void DrawBuildSizes(BuildReportTool.BuildInfo buildReportToDisplay)
+		void DrawBuildSizes(BuildReportTool.SizePart[] buildSizes)
 		{
 			if (_hasCompressedBuildSize)
 			{
@@ -273,13 +420,13 @@ namespace BuildReportTool.Window.Screen
 				GUILayout.EndVertical();
 			}
 
-			if (_hasBuildSizes)
+			if (buildSizes != null)
 			{
 				GUILayout.BeginHorizontal(BRT_BuildReportWindow.LayoutMaxWidth500);
 
-				DrawNames(buildReportToDisplay.BuildSizes);
-				DrawReadableSizes(buildReportToDisplay.BuildSizes);
-				DrawPercentages(buildReportToDisplay.BuildSizes);
+				DrawNames(buildSizes);
+				DrawReadableSizes(buildSizes);
+				DrawPercentages(buildSizes);
 
 				GUILayout.EndHorizontal();
 			}

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using UnityEditor;
 using FuzzyString;
-
 
 namespace BuildReportTool.Window.Screen
 {
@@ -38,7 +36,7 @@ namespace BuildReportTool.Window.Screen
 			_searchResults = null;
 		}
 
-		void UpdateSearch(double timeNow, BuildInfo buildReportToDisplay)
+		void UpdateSearch(double timeNow, BuildInfo buildReportToDisplay, BuildReportTool.AssetBundleSession assetBundleSession)
 		{
 			if (string.IsNullOrEmpty(_searchTextInput) && !string.IsNullOrEmpty(_lastSearchText))
 			{
@@ -54,12 +52,12 @@ namespace BuildReportTool.Window.Screen
 			else if ((timeNow - _lastSearchTime >= SEARCH_DELAY) &&
 			         !_searchTextInput.Equals(_lastSearchText, StringComparison.Ordinal))
 			{
-				UpdateSearchNow(buildReportToDisplay);
+				UpdateSearchNow(buildReportToDisplay, assetBundleSession);
 				_lastSearchTime = timeNow;
 			}
 		}
 
-		public void UpdateSearchNow(BuildInfo buildReportToDisplay)
+		public void UpdateSearchNow(BuildInfo buildReportToDisplay, BuildReportTool.AssetBundleSession assetBundleSession)
 		{
 			if (string.IsNullOrEmpty(_searchTextInput))
 			{
@@ -72,7 +70,7 @@ namespace BuildReportTool.Window.Screen
 
 			if (buildReportToDisplay != null)
 			{
-				Search(_lastSearchText, BuildReportTool.Options.SearchType, BuildReportTool.Options.SearchFilenameOnly, BuildReportTool.Options.SearchCaseSensitive, buildReportToDisplay);
+				Search(_lastSearchText, BuildReportTool.Options.SearchType, BuildReportTool.Options.SearchFilenameOnly, BuildReportTool.Options.SearchCaseSensitive, buildReportToDisplay, assetBundleSession);
 				buildReportToDisplay.FlagOkToRefresh();
 			}
 
@@ -80,7 +78,7 @@ namespace BuildReportTool.Window.Screen
 			_currentSortType = BuildReportTool.AssetList.SortType.None;
 		}
 
-		void Search(string searchText, SearchType searchType, bool searchFilenameOnly, bool caseSensitive, BuildInfo buildReportToDisplay)
+		void Search(string searchText, SearchType searchType, bool searchFilenameOnly, bool caseSensitive, BuildInfo buildReportToDisplay, BuildReportTool.AssetBundleSession assetBundleSession)
 		{
 			if (string.IsNullOrEmpty(searchText))
 			{
@@ -88,7 +86,7 @@ namespace BuildReportTool.Window.Screen
 				return;
 			}
 
-			BuildReportTool.AssetList list = GetAssetListToDisplay(buildReportToDisplay);
+			BuildReportTool.AssetList list = GetAssetListToDisplay(buildReportToDisplay, assetBundleSession);
 
 
 			BuildReportTool.FileFilterGroup filter = buildReportToDisplay.FileFilters;

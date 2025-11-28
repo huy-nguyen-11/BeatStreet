@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 using UnityEditor;
@@ -24,15 +23,16 @@ namespace BuildReportTool.Window.Screen
 			get { return Labels.OVERVIEW_CATEGORY_LABEL; }
 		}
 
-		public override void RefreshData(BuildInfo buildReport, AssetDependencies assetDependencies, TextureData textureData, MeshData meshData, UnityBuildReport unityBuildReport)
+		public override void RefreshData(BuildInfo buildReport, AssetDependencies assetDependencies,
+			TextureData textureData, MeshData meshData, PrefabData prefabData, UnityBuildReport unityBuildReport, BuildReportTool.AssetBundleSession assetBundleSession)
 		{
 		}
 
 		public override void DrawGUI(Rect position,
-			BuildInfo buildReportToDisplay, AssetDependencies assetDependencies, TextureData textureData, MeshData meshData,
-			UnityBuildReport unityBuildReport,
-			out bool requestRepaint
-		)
+			BuildInfo buildReportToDisplay, AssetDependencies assetDependencies,
+			TextureData textureData, MeshData meshData, PrefabData prefabData,
+			UnityBuildReport unityBuildReport, BuildReportTool.ExtraData extraData, BuildReportTool.AssetBundleSession assetBundleSession,
+			out bool requestRepaint)
 		{
 			if (buildReportToDisplay == null)
 			{
@@ -118,10 +118,15 @@ namespace BuildReportTool.Window.Screen
 			GUILayout.Label(Labels.TIME_OF_BUILD_LABEL, bigLabelStyle);
 			GUILayout.Label(buildReportToDisplay.GetTimeReadable(), bigValueStyle);
 
-			GUILayout.Space(10);
-			GUILayout.Label("Project building took:", bigLabelStyle);
-			GUILayout.Label("How long the project building took. This is the time between <b>OnPreprocessBuild</b> and <b>OnPostprocessBuild</b>.", helpDescriptionStyle);
-			GUILayout.Label(buildReportToDisplay.BuildDurationTime.ToString(), bigValueStyle);
+			if (!buildReportToDisplay.HasAssetBundles)
+			{
+				GUILayout.Space(10);
+				GUILayout.Label("Project building took:", bigLabelStyle);
+				GUILayout.Label(
+					"How long the project building took. This is the time between <b>OnPreprocessBuild</b> and <b>OnPostprocessBuild</b>.",
+					helpDescriptionStyle);
+				GUILayout.Label(buildReportToDisplay.BuildDurationTime.ToString(), bigValueStyle);
+			}
 
 			GUILayout.Space(10);
 			GUILayout.Label("Report generation took:", bigLabelStyle);
@@ -149,13 +154,21 @@ namespace BuildReportTool.Window.Screen
 				emphasisColor = "white";
 			}
 
-			string largestAssetCategoryLabel = string.Format(
-				"<color={0}><size=20><b>{1}</b></size></color> are the largest,\ntaking up <color={0}><size=20><b>{2}%</b></size></color> of the build{3}",
-				emphasisColor, buildReportToDisplay.BuildSizes[0].Name,
-				buildReportToDisplay.BuildSizes[0].Percentage.ToString(CultureInfo.InvariantCulture),
-				(!buildReportToDisplay.HasStreamingAssets
-					 ? "\n<size=12>(not counting streaming assets)</size>"
-					 : ""));
+			string largestAssetCategoryLabel;
+			if (buildReportToDisplay.BuildSizes != null && buildReportToDisplay.BuildSizes.Length > 0)
+			{
+				largestAssetCategoryLabel = string.Format(
+					"<color={0}><size=20><b>{1}</b></size></color> are the largest,\ntaking up <color={0}><size=20><b>{2}%</b></size></color> of the build{3}",
+					emphasisColor, buildReportToDisplay.BuildSizes[0].Name,
+					buildReportToDisplay.BuildSizes[0].Percentage.ToString(CultureInfo.InvariantCulture),
+					(!buildReportToDisplay.HasStreamingAssets
+						? "\n<size=12>(not counting streaming assets)</size>"
+						: ""));
+			}
+			else
+			{
+				largestAssetCategoryLabel = "";
+			}
 
 			GUILayout.Label(largestAssetCategoryLabel, infoDescriptionStyle);
 			GUILayout.Space(20);
@@ -173,22 +186,39 @@ namespace BuildReportTool.Window.Screen
 			GUILayout.Label(buildReportToDisplay.UnityVersionDisplayed, bigValueStyle);
 			GUILayout.EndVertical();
 
-			DrawScenesInBuild(buildReportToDisplay.ScenesInBuild);
+			if (buildReportToDisplay.HasAssetBundles)
+			{
+				DrawAssetBundleList(buildReportToDisplay.AssetBundles);
+			}
+			else
+			{
+				DrawScenesInBuild(buildReportToDisplay.ScenesInBuild);
+			}
 
 			GUILayout.EndHorizontal();
 
 
 			GUILayout.BeginHorizontal();
 
-			var numberOfTopUsed =
-				buildReportToDisplay.HasUsedAssets ? buildReportToDisplay.UsedAssets.NumberOfTopLargest : 0;
-			var numberOfTopUnused = buildReportToDisplay.HasUnusedAssets
-				                        ? buildReportToDisplay.UnusedAssets.NumberOfTopLargest
-				                        : 0;
+			int numberOfTopUsed;
+			if (buildReportToDisplay.HasUsedAssets)
+			{
+				numberOfTopUsed = buildReportToDisplay.UsedAssets.NumberOfTopLargest;
+			}
+			else if (buildReportToDisplay.HasAssetBundles)
+			{
+				numberOfTopUsed = assetBundleSession.TopLargest.Length;
+			}
+			else
+			{
+				numberOfTopUsed = 0;
+			}
+			int numberOfTopUnused = buildReportToDisplay.HasUnusedAssets
+				? buildReportToDisplay.UnusedAssets.NumberOfTopLargest : 0;
 			if (Event.current.type == EventType.Layout)
 			{
-				_showTopUsed = numberOfTopUsed > 0 && buildReportToDisplay.UsedAssets.TopLargest != null;
-				_showTopUnused = numberOfTopUnused > 0 && buildReportToDisplay.UnusedAssets.TopLargest != null;
+				_showTopUsed = numberOfTopUsed > 0 && (buildReportToDisplay.UsedAssets?.TopLargest != null || buildReportToDisplay.HasAssetBundles && assetBundleSession.TopLargest != null);
+				_showTopUnused = numberOfTopUnused > 0 && buildReportToDisplay.UnusedAssets?.TopLargest != null;
 			}
 
 			// 1st column
@@ -206,7 +236,16 @@ namespace BuildReportTool.Window.Screen
 					buildReportToDisplay.FlagOkToRefresh();
 				}
 
-				DrawAssetList(buildReportToDisplay.UsedAssets, true, buildReportToDisplay, assetDependencies);
+				BuildReportTool.SizePart[] topLargestToDisplay;
+				if (buildReportToDisplay.HasAssetBundles)
+				{
+					topLargestToDisplay = assetBundleSession.TopLargest;
+				}
+				else
+				{
+					topLargestToDisplay = buildReportToDisplay.UsedAssets?.TopLargest;
+				}
+				DrawAssetList(topLargestToDisplay, true, buildReportToDisplay, assetDependencies);
 			}
 
 			GUILayout.EndVertical();
@@ -228,7 +267,7 @@ namespace BuildReportTool.Window.Screen
 					buildReportToDisplay.FlagOkToRefresh();
 				}
 
-				DrawAssetList(buildReportToDisplay.UnusedAssets, false, buildReportToDisplay, assetDependencies);
+				DrawAssetList(buildReportToDisplay.UnusedAssets?.TopLargest, false, buildReportToDisplay, assetDependencies);
 			}
 
 			GUILayout.EndVertical();
@@ -259,6 +298,14 @@ namespace BuildReportTool.Window.Screen
 			{
 				GUILayout.Label("Additional Unity Build Report file used:", smallLabelStyle);
 				GUILayout.Label(unityBuildReport.SavedPath, smallValueStyle);
+
+				GUILayout.Space(10);
+			}
+
+			if (!string.IsNullOrEmpty(extraData.Contents))
+			{
+				GUILayout.Label("Extra Data file used:", smallLabelStyle);
+				GUILayout.Label(extraData.SavedPath, smallValueStyle);
 
 				GUILayout.Space(10);
 			}
@@ -352,16 +399,14 @@ namespace BuildReportTool.Window.Screen
 			}
 		}
 
-		void DrawAssetList(BuildReportTool.AssetList assetList, bool usedAssets, BuildInfo buildReportToDisplay,
+		void DrawAssetList(BuildReportTool.SizePart[] assetsToShow, bool usedAssets, BuildInfo buildReportToDisplay,
 			AssetDependencies assetDependencies)
 		{
-			if (assetList == null || assetList.TopLargest == null)
+			if (assetsToShow == null)
 			{
 				//Debug.LogError("no top ten largest");
 				return;
 			}
-
-			BuildReportTool.SizePart[] assetsToShow = assetList.TopLargest;
 
 			if (assetsToShow == null)
 			{
@@ -546,6 +591,113 @@ namespace BuildReportTool.Window.Screen
 			GUILayout.EndVertical();
 			GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
+		}
+
+		void DrawAssetBundleList(BuildReportTool.BundleEntry[] bundles)
+		{
+			if (bundles == null || bundles.Length == 0)
+			{
+				//Debug.LogError("no top ten largest");
+				return;
+			}
+
+			var bigLabelStyle = GUI.skin.FindStyle(BuildReportTool.Window.Settings.INFO_TITLE_STYLE_NAME);
+			if (bigLabelStyle == null)
+			{
+				bigLabelStyle = GUI.skin.label;
+			}
+
+			var listNormalStyle = GUI.skin.FindStyle(BuildReportTool.Window.Settings.LIST_NORMAL_STYLE_NAME);
+			if (listNormalStyle == null)
+			{
+				listNormalStyle = GUI.skin.label;
+			}
+
+			var listAltStyle = GUI.skin.FindStyle(BuildReportTool.Window.Settings.LIST_NORMAL_ALT_STYLE_NAME);
+			if (listAltStyle == null)
+			{
+				listAltStyle = GUI.skin.label;
+			}
+
+			var listIconNormalStyle = GUI.skin.FindStyle(BuildReportTool.Window.Settings.LIST_ICON_STYLE_NAME);
+			if (listIconNormalStyle == null)
+			{
+				listIconNormalStyle = GUI.skin.label;
+			}
+
+			var listIconAltStyle = GUI.skin.FindStyle(BuildReportTool.Window.Settings.LIST_ICON_ALT_STYLE_NAME);
+			if (listIconAltStyle == null)
+			{
+				listIconAltStyle = GUI.skin.label;
+			}
+
+			bool useAlt = true;
+
+			GUILayout.BeginVertical(BRT_BuildReportWindow.LayoutExpandWidth);
+			GUILayout.Label("AssetBundles in Build:", bigLabelStyle);
+
+			//var prevColor = GUI.contentColor;
+
+			//GUILayout.BeginHorizontal();
+			// 1st column: name
+			GUILayout.BeginVertical(BRT_BuildReportWindow.LayoutExpandWidth);
+			for (int n = 0; n < bundles.Length; ++n)
+			{
+				var styleToUse = useAlt ? listAltStyle : listNormalStyle;
+				var iconStyleToUse = useAlt ? listIconAltStyle : listIconNormalStyle;
+
+
+				Texture icon = null;
+
+				GUILayout.BeginHorizontal(styleToUse, BRT_BuildReportWindow.LayoutExpandWidth);
+
+				// enabled status
+				//GUILayout.Toggle(scenesInBuild[n].Enabled, string.Empty, GUILayout.Width(20), GUILayout.Height(30));
+
+				// icon
+				if (icon == null)
+				{
+					//GUILayout.Space(22);
+					GUILayout.Label(string.Empty, iconStyleToUse, BRT_BuildReportWindow.Layout28x30);
+				}
+				else
+				{
+					GUILayout.Button(icon, iconStyleToUse, BRT_BuildReportWindow.Layout28x30);
+				}
+
+
+				// scene index
+
+				{
+					if (GUILayout.Button((n+1).ToString(), styleToUse, BRT_BuildReportWindow.Layout20x30))
+					{
+					}
+				}
+
+				// path
+				string prettyName;
+				{
+					{
+						prettyName = string.Format("<b>{0}</b>", bundles[n].Name);
+					}
+				}
+
+				if (GUILayout.Button(prettyName, styleToUse, BRT_BuildReportWindow.Layout100x30))
+				{
+				}
+
+				GUILayout.EndHorizontal();
+
+				useAlt = !useAlt;
+			}
+
+			GUILayout.EndVertical();
+
+
+			GUILayout.FlexibleSpace();
+			//GUILayout.EndHorizontal();
+			GUILayout.Space(5); // bottom padding
+			GUILayout.EndVertical();
 		}
 
 		void DrawScenesInBuild(BuildReportTool.BuildInfo.SceneInBuild[] scenesInBuild)

@@ -1,9 +1,6 @@
-﻿//This asset was uploaded by https://unityassetcollection.com
-
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
-
 
 namespace BuildReportTool.Window.Screen
 {
@@ -17,9 +14,9 @@ namespace BuildReportTool.Window.Screen
 		}
 
 
-		void InitiateDeleteSelectedUsed(BuildInfo buildReportToDisplay)
+		void InitiateDeleteSelectedUsed(BuildInfo buildReportToDisplay, BuildReportTool.AssetBundleSession assetBundleSession)
 		{
-			BuildReportTool.AssetList listToDeleteFrom = GetAssetListToDisplay(buildReportToDisplay);
+			BuildReportTool.AssetList listToDeleteFrom = GetAssetListToDisplay(buildReportToDisplay, assetBundleSession);
 
 			InitiateDeleteSelectedInAssetList(buildReportToDisplay, listToDeleteFrom);
 		}

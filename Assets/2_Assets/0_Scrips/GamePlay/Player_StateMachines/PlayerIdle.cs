@@ -7,8 +7,9 @@ public class PlayerIdle : PlayerStateManager
     public override void Enter()
     {
         playerController.state = PlayerController.State.Idle;
-        playerController.rb.velocity = Vector2.zero;
+        playerController.rb.linearVelocity = Vector2.zero;
         playerController.animator.Play("Idle");
+        //playerController.skeletonAnimation.AnimationState.SetAnimation(0, "Idle", true);
     }
     public override void Update()
     {

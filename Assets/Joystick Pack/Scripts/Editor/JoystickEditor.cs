@@ -14,6 +14,10 @@ public class JoystickEditor : Editor
     protected SerializedProperty background;
     private SerializedProperty handle;
 
+    // New properties added to Joystick
+    private SerializedProperty followTargetProp;
+
+
     protected Vector2 center = new Vector2(0.5f, 0.5f);
 
     protected virtual void OnEnable()
@@ -25,6 +29,9 @@ public class JoystickEditor : Editor
         snapY = serializedObject.FindProperty("snapY");
         background = serializedObject.FindProperty("background");
         handle = serializedObject.FindProperty("handle");
+
+        // Find new properties if they exist in the Joystick class
+        followTargetProp = serializedObject.FindProperty("followTarget");
     }
 
     public override void OnInspectorGUI()
@@ -33,17 +40,22 @@ public class JoystickEditor : Editor
 
         DrawValues();
         EditorGUILayout.Space();
+        DrawSmoothing();
+        EditorGUILayout.Space();
         DrawComponents();
 
         serializedObject.ApplyModifiedProperties();
 
-        if(handle != null)
+        if (handle != null && handle.objectReferenceValue != null)
         {
             RectTransform handleRect = (RectTransform)handle.objectReferenceValue;
-            handleRect.anchorMax = center;
-            handleRect.anchorMin = center;
-            handleRect.pivot = center;
-            handleRect.anchoredPosition = Vector2.zero;
+            if (handleRect != null)
+            {
+                handleRect.anchorMax = center;
+                handleRect.anchorMin = center;
+                handleRect.pivot = center;
+                handleRect.anchoredPosition = Vector2.zero;
+            }
         }
     }
 
@@ -54,6 +66,20 @@ public class JoystickEditor : Editor
         EditorGUILayout.PropertyField(axisOptions, new GUIContent("Axis Options", "Which axes the joystick uses."));
         EditorGUILayout.PropertyField(snapX, new GUIContent("Snap X", "Snap the horizontal input to a whole value."));
         EditorGUILayout.PropertyField(snapY, new GUIContent("Snap Y", "Snap the vertical input to a whole value."));
+    }
+
+    protected virtual void DrawSmoothing()
+    {
+        // Only draw smoothing fields if they exist on the target class
+        if ( followTargetProp != null)
+        {
+            EditorGUILayout.LabelField("Joystick Extras", EditorStyles.boldLabel);
+
+            if (followTargetProp != null)
+            {
+                EditorGUILayout.PropertyField(followTargetProp, new GUIContent("Follow Target", "World transform the joystick background will follow on screen."));
+            }
+        }
     }
 
     protected virtual void DrawComponents()

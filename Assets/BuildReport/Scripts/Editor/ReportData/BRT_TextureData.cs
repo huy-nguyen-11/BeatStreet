@@ -12,16 +12,19 @@ namespace BuildReportTool
 
 		/// <summary>
 		/// Name of project folder.
+		/// Included as part of the filename when saved.
 		/// </summary>
 		public string ProjectName;
 
 		/// <summary>
 		/// Type of build that the project was configured to, at the time that TextureData was collected.
+		/// Included as part of the filename when saved.
 		/// </summary>
 		public string BuildType;
 
 		/// <summary>
 		/// When TextureData was collected.
+		/// Included as part of the filename when saved.
 		/// </summary>
 		public System.DateTime TimeGot;
 
@@ -324,6 +327,7 @@ The original width and height of the image <i>before</i> it was resized by the <
 
 		public const string NPOT_SCALE_NONE_NOT_POT = "None (Not Power of 2)";
 		public const string NPOT_SCALE_NONE_IS_POT = "None (Is Power of 2)";
+		public const string IMPORT_ERROR = "Import Error";
 
 		public struct Entry
 		{
@@ -408,6 +412,7 @@ The original width and height of the image <i>before</i> it was resized by the <
 
 			/// <summary>
 			/// Maps to <see cref="UnityEditor.TextureImporter.mipMapsPreserveCoverage"/>
+			/// Added in Unity 2017.1.
 			/// <inheritdoc cref="UnityEditor.TextureImporter.mipMapsPreserveCoverage"/>
 			/// </summary>
 			public bool PreserveCoverageMipMaps;
@@ -552,6 +557,7 @@ The original width and height of the image <i>before</i> it was resized by the <
 
 			/// <summary>
 			/// Like <see cref="TextureResizeAlgorithm"/> but if the image's platform override was set, this is the overriding value.
+			/// Added in Unity 2017.2.
 			/// Maps to <see cref="UnityEditor.TextureImporterPlatformSettings.resizeAlgorithm"/>
 			/// <inheritdoc cref="UnityEditor.TextureImporterPlatformSettings.resizeAlgorithm"/>
 			/// </summary>
@@ -1071,9 +1077,23 @@ The original width and height of the image <i>before</i> it was resized by the <
 						return _shownCompressionQualityLabel;
 					// ------------------------
 					case DataId.ImportedWidthAndHeight:
-						return string.Format("{0}x{1}", ImportedWidth.ToString(), ImportedHeight.ToString());
+						if (ImportedWidth == 0 || ImportedHeight == 0)
+						{
+							return IMPORT_ERROR;
+						}
+						else
+						{
+							return string.Format("{0}x{1}", ImportedWidth.ToString(), ImportedHeight.ToString());
+						}
 					case DataId.RealWidthAndHeight:
-						return string.Format("{0}x{1}", RealWidth.ToString(), RealHeight.ToString());
+						if (RealWidth <= 0)
+						{
+							return IMPORT_ERROR;
+						}
+						else
+						{
+							return string.Format("{0}x{1}", RealWidth.ToString(), RealHeight.ToString());
+						}
 					// ------------------------
 					default:
 						return string.Empty;

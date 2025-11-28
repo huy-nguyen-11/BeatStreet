@@ -9,7 +9,8 @@ public class PlayerController : PlayerCharacter
     public static PlayerController Instance { get; private set; }
     DataManager dataManager;
     // Joystick
-    public JoystickController joystick;
+    //public JoystickController joystick;
+    public VariableJoystick joystick;
     public float speedThreshold;
     public Transform Char;
     private bool isGetJoy = false;
@@ -130,9 +131,7 @@ public class PlayerController : PlayerCharacter
         dataManager = DataManager.Instance;
         OnInit();
     }
-    private void OnEnable()
-    {
-    }
+
     public void OnInit()
     {
         id = dataManager.idPlayer;
@@ -281,9 +280,8 @@ public class PlayerController : PlayerCharacter
 
         moveSpeed = (Mathf.Abs(joystick.Direction.x) > speedThreshold || Mathf.Abs(joystick.Direction.y) > speedThreshold) ? 3f : 1.5f;
         Vector2 movement = direction.normalized * moveSpeed;
-        rb.velocity = movement;
+        rb.linearVelocity = movement;
     }
-
 
     private void CheckTouchInput()
     {
@@ -328,7 +326,7 @@ public class PlayerController : PlayerCharacter
                         if (state != State.Idle)
                         {
                             SwitchToRunState(playerIdle);
-                            rb.velocity = Vector2.zero; // ngắt di chuyển
+                            rb.linearVelocity = Vector2.zero; // ngắt di chuyển
                         }
                     }
 
@@ -411,7 +409,7 @@ public class PlayerController : PlayerCharacter
                             {
                                 //attackQueue.Enqueue(1); 
                                 //ProcessAttackQueue();
-                                Debug.Log("attack 2");
+                                //Debug.Log("attack 2");
                                 SwitchToRunState(playerAttack);
                             }
                             else
@@ -732,9 +730,9 @@ public class PlayerController : PlayerCharacter
     {
         bool Direction = transform.rotation.y != 0 ? false : true;
         if (!Direction)
-            rb.velocity = -Vector2.right * 5f;
+            rb.linearVelocity = -Vector2.right * 5f;
         else
-            rb.velocity = Vector2.right * 5f;
+            rb.linearVelocity = Vector2.right * 5f;
     }
     public void SetMana(float mana)
     {

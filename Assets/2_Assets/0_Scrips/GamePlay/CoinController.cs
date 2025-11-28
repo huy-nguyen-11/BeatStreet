@@ -47,7 +47,7 @@ public class CoinController : MonoBehaviour
     void MoveToPlayer()
     {
         Vector2 directionToPlayer = (player.position - transform.position).normalized;
-        rb.velocity = directionToPlayer * 5;
+        rb.linearVelocity = directionToPlayer * 5;
     }
     IEnumerator SetTimeStop()
     {

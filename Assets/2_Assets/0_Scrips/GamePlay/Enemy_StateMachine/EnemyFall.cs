@@ -28,9 +28,9 @@ public class EnemyFall : EnemyStateMachine
     {
         bool Direction = enemyController.player.position.x > enemyController.Char.position.x ? false : true;
         if (!Direction)
-            enemyController.rb.velocity = -Vector2.right * 5f;
+            enemyController.rb.linearVelocity = -Vector2.right * 5f;
         else
-            enemyController.rb.velocity = Vector2.right * 5f;
+            enemyController.rb.linearVelocity = Vector2.right * 5f;
     }
     private IEnumerator JumpCoroutine()
     {

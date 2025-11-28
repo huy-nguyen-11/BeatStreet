@@ -8,7 +8,7 @@ public class PlayerAttack : PlayerStateManager
     public override void Enter()
     {
         playerController.state = PlayerController.State.Attack;
-        playerController.rb.velocity = Vector2.zero;
+        playerController.rb.linearVelocity = Vector2.zero;
         PlayComboAnimation();
         AudioBase.Instance.AudioPlayer(0);
     }
@@ -71,7 +71,7 @@ public class PlayerAttack : PlayerStateManager
                 ResetAnim("Combo1");
                 break;
         }
-        playerController.rb.velocity = Vector2.left * (playerController.transform.rotation.y != 0 ? 0.1f : -0.1f);
+        playerController.rb.linearVelocity = Vector2.left * (playerController.transform.rotation.y != 0 ? 0.1f : -0.1f);
     }
     private void ResetAnim(string name)
     {

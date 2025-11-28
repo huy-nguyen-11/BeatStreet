@@ -10,7 +10,7 @@ public class PlayerDead : PlayerStateManager
     {
         playerController.animator.Play("Dead");
         playerController.state = PlayerController.State.Dead;
-        playerController.rb.velocity = Vector2.zero;
+        playerController.rb.linearVelocity = Vector2.zero;
         playerController.isFall = true;
         playerController.velocity = 8;
         AudioBase.Instance.AudioPlayer(5);
@@ -33,7 +33,7 @@ public class PlayerDead : PlayerStateManager
             yield return null;
         }
         isFall = false;
-        playerController.rb.velocity = Vector2.zero;
+        playerController.rb.linearVelocity = Vector2.zero;
     }
     public void SetSwithJump()
     {

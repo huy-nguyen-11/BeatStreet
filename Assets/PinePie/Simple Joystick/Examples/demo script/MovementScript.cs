@@ -19,9 +19,7 @@ namespace PinePie.SimpleJoystick.Examples.DemoScript
         void Update()
         {
             transform.position +=
-                moveSpeed * Time.deltaTime * (Vector3)joystickController.Direction;
-
-            Debug.Log($"Joystick Input Direction: {joystickController.Direction}");
+                moveSpeed * Time.deltaTime * (Vector3)joystickController.InputDirection;
         }
     }
     

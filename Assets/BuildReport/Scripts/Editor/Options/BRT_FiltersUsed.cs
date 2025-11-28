@@ -1,5 +1,3 @@
-//This asset was uploaded by https://unityassetcollection.com
-
 #if UNITY_EDITOR
 
 using System.IO;
@@ -38,7 +36,10 @@ namespace BuildReportTool
 						".exr",
 						".iff",
 						".pict",
-						"Built-in Texture2D:" // Unity-generated sprite atlases
+						"Built-in Texture2D:", // Unity-generated sprite atlases
+						".spriteatlas", // Sprite Atlas V1
+						".spriteatlasv2", // Sprite Atlas V2
+						".renderTexture",
 					}),
 				new FileFilters("Models",
 					new[]
@@ -52,6 +53,7 @@ namespace BuildReportTool
 						".obj",
 						".3ds",
 						".dxf",
+						".vrm",
 						"Built-in Mesh:"
 					}),
 				new FileFilters("Prefabs",
@@ -64,6 +66,7 @@ namespace BuildReportTool
 					{
 						".anim",
 						".controller",
+						".overrideController",
 						".mask"
 					}),
 				new FileFilters("Movies",
@@ -92,11 +95,15 @@ namespace BuildReportTool
 						".shader",
 						".compute",
 						".cginc",
+						".shadergraph",
 						"Built-in Shader:"
 					}),
 				new FileFilters("GUI",
 					new[]
 					{
+						".uxml",
+						".uss",
+						".tss",
 						".guiskin",
 						".fontsettings",
 						".ttf",
@@ -147,7 +154,8 @@ namespace BuildReportTool
 						".xml",
 						".yaml",
 						".json",
-						".log"
+						".log",
+						".md",
 					}),
 				new FileFilters("Misc",
 					new[]
@@ -155,7 +163,11 @@ namespace BuildReportTool
 						".asset",
 						".physicmaterial",
 						".lighting",
-						".unity"
+						".unity",
+						".playable",
+						".signal",
+						".vfx",
+						"\"AssetBundle Object\""
 					}),
 				new FileFilters("Standard Assets",
 					new[]

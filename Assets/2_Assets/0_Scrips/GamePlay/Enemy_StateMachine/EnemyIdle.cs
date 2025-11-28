@@ -11,7 +11,7 @@ public class EnemyIdle : EnemyStateMachine
     {
         enemyController.animator.Play("Idle");
         enemyController.state = EnemyController.State.Idle;
-        enemyController.rb.velocity = Vector2.zero;
+        enemyController.rb.linearVelocity = Vector2.zero;
         if (!enemyController.isAttack)
         {
             if (_isActiveRun

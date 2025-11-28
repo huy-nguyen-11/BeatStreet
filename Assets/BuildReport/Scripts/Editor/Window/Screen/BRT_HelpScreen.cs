@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEditor;
 
-
 namespace BuildReportTool.Window.Screen
 {
 	public class Help : BaseScreen
@@ -13,7 +12,8 @@ namespace BuildReportTool.Window.Screen
 
 		const int LABEL_LENGTH = 16000;
 
-		public override void RefreshData(BuildInfo buildReport, AssetDependencies assetDependencies, TextureData textureData, MeshData meshData, UnityBuildReport unityBuildReport)
+		public override void RefreshData(BuildInfo buildReport, AssetDependencies assetDependencies,
+			TextureData textureData, MeshData meshData, PrefabData prefabData, UnityBuildReport unityBuildReport, BuildReportTool.AssetBundleSession assetBundleSession)
 		{
 			const string README_FILENAME = "README.txt";
 			string readmeContents = BuildReportTool.Util.GetPackageFileContents(README_FILENAME);
@@ -21,12 +21,12 @@ namespace BuildReportTool.Window.Screen
 			const string CHANGELOG_FILENAME = "VERSION.txt";
 			string changelogContents = BuildReportTool.Util.GetPackageFileContents(CHANGELOG_FILENAME);
 
-			if (!string.IsNullOrWhiteSpace(readmeContents) && readmeContents.Length > LABEL_LENGTH)
+			if (!string.IsNullOrEmpty(readmeContents) && readmeContents.Length > LABEL_LENGTH)
 			{
 				readmeContents = readmeContents.Substring(0, LABEL_LENGTH);
 			}
 
-			if (!string.IsNullOrWhiteSpace(changelogContents) && changelogContents.Length > LABEL_LENGTH)
+			if (!string.IsNullOrEmpty(changelogContents) && changelogContents.Length > LABEL_LENGTH)
 			{
 				changelogContents = changelogContents.Substring(0, LABEL_LENGTH);
 			}
@@ -35,7 +35,7 @@ namespace BuildReportTool.Window.Screen
 			{
 				_readmeGuiContent = new GUIContent();
 			}
-			if (!string.IsNullOrWhiteSpace(readmeContents))
+			if (!string.IsNullOrEmpty(readmeContents))
 			{
 				_readmeGuiContent.text = readmeContents;
 			}
@@ -49,7 +49,7 @@ namespace BuildReportTool.Window.Screen
 			{
 				_changelogGuiContent = new GUIContent();
 			}
-			if (!string.IsNullOrWhiteSpace(changelogContents))
+			if (!string.IsNullOrEmpty(changelogContents))
 			{
 				_changelogGuiContent.text = changelogContents;
 			}
@@ -63,14 +63,14 @@ namespace BuildReportTool.Window.Screen
 		static readonly GUILayoutOption[] ButtonsLayout = { GUILayout.Width(230), GUILayout.Height(60) };
 
 		public override void DrawGUI(Rect position,
-			BuildInfo buildReportToDisplay, AssetDependencies assetDependencies, TextureData textureData, MeshData meshData,
-			UnityBuildReport unityBuildReport,
-			out bool requestRepaint
-		)
+			BuildInfo buildReportToDisplay, AssetDependencies assetDependencies,
+			TextureData textureData, MeshData meshData, PrefabData prefabData,
+			UnityBuildReport unityBuildReport, BuildReportTool.ExtraData extraData, BuildReportTool.AssetBundleSession assetBundleSession,
+			out bool requestRepaint)
 		{
 			requestRepaint = false;
 
-			var helpTextStyle = GUI.skin.GetStyle(HELP_CONTENT_GUI_STYLE);
+			var helpTextStyle = GUI.skin.FindStyle(HELP_CONTENT_GUI_STYLE);
 			if (helpTextStyle == null)
 			{
 				helpTextStyle = GUI.skin.label;

@@ -167,7 +167,7 @@ namespace BuildReportTool
 
 						//Debug.Log("match? " + _filtersList[n] + " == " + fileWithQuotes);
 
-						if (_filtersList[n].Equals(fileWithQuotes))
+						if (_filtersList[n].Equals(fileWithQuotes, StringComparison.OrdinalIgnoreCase))
 						{
 							return true;
 						}
@@ -265,6 +265,19 @@ namespace BuildReportTool
 			return _selectedFilterIdx >= 1 && _selectedFilterIdx <= _fileFilters.Length ? _fileFilters[_selectedFilterIdx-1].Label : null;
 		}
 
+		public int GetFilterIdx(string label)
+		{
+			for (int n = 0; n < _fileFilters.Length; ++n)
+			{
+				if (_fileFilters[n].Label == label)
+				{
+					return n;
+				}
+			}
+
+			return -1;
+		}
+
 		public void ForceSetSelectedFilterIdx(int idx)
 		{
 			if ((idx < _fileFilters.Length + 2) && idx >= 0)
@@ -279,7 +292,7 @@ namespace BuildReportTool
 		const string HAS_CONTENTS_UNPRESSED_STYLE_NAME = "ButtonHasContents";
 		const string HAS_CONTENTS_ALREADY_PRESSED_STYLE_NAME = "ButtonAlreadyPressed";
 
-		string GetStyleToUse(int assetNum, int selectedIdx, int idxOfThisGroup)
+		GUIStyle GetStyleToUse(int assetNum, int selectedIdx, int idxOfThisGroup)
 		{
 			string styleToUse;
 
@@ -300,7 +313,12 @@ namespace BuildReportTool
 				}
 			}
 
-			return styleToUse;
+			var style = GUI.skin.FindStyle(styleToUse);
+			if (style == null)
+			{
+				return GUI.skin.button;
+			}
+			return style;
 		}
 
 		public bool Draw(AssetList assetList, float width)
@@ -362,9 +380,9 @@ namespace BuildReportTool
 
 
 			var styleToUse = GetStyleToUse(assetList.All.Length, _selectedFilterIdx, 0);
-			var label = $"All ({assetList.All.Length.ToString()})";
+			var label = string.Format("All ({0})", assetList.All.Length.ToString());
 
-			var widthToAdd = GUI.skin.GetStyle(styleToUse).CalcSize(new GUIContent(label)).x;
+			var widthToAdd = styleToUse.CalcSize(new GUIContent(label)).x;
 
 			overallWidth += widthToAdd;
 
@@ -389,7 +407,7 @@ namespace BuildReportTool
 					styleToUse = GetStyleToUse(assetList.PerCategory[n].Length, _selectedFilterIdx, n + 1);
 					label = string.Format("{0} ({1})", _fileFilters[n].Label, assetList.PerCategory[n].Length.ToString());
 
-					widthToAdd = GUI.skin.GetStyle(styleToUse).CalcSize(new GUIContent(label)).x;
+					widthToAdd = styleToUse.CalcSize(new GUIContent(label)).x;
 
 					if (overallWidth + widthToAdd >= width)
 					{
@@ -413,7 +431,7 @@ namespace BuildReportTool
 
 				label = string.Format("Unknown ({0})",
 					assetList.PerCategory[assetList.PerCategory.Length - 1].Length.ToString());
-				widthToAdd = GUI.skin.GetStyle(styleToUse).CalcSize(new GUIContent(label)).x;
+				widthToAdd = styleToUse.CalcSize(new GUIContent(label)).x;
 				if (overallWidth + widthToAdd >= width)
 				{
 					//overallWidth = 0;

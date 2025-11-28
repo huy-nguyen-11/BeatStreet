@@ -8,43 +8,60 @@ namespace BuildReportTool
 {
 	public static class TextureDataGenerator
 	{
-		public static void CreateForUsedAssetsOnly(TextureData data, BuildReportTool.BuildInfo buildInfo, bool debugLog = false)
+		public static void Create(TextureData data, BuildReportTool.BuildInfo buildInfo, bool createForUnusedAssetsToo, bool debugLog = false)
 		{
 			if (buildInfo == null)
 			{
-				if (debugLog) Debug.LogError("Can't create TextureData for Used Assets, BuildInfo is null");
+				if (debugLog) Debug.LogError("Can't create TextureData for Assets, BuildInfo is null");
 				return;
 			}
-			if (debugLog) Debug.Log("Will create TextureData for Used Assets");
+			if (debugLog) Debug.Log("Will create TextureData for Assets");
 
 			BuildReportTool.BuildPlatform buildPlatform = BuildReportTool.ReportGenerator.GetBuildPlatformFromString(buildInfo.BuildType, buildInfo.BuildTargetUsed);
 
 			var textureDataEntries = data.GetTextureData();
 			textureDataEntries.Clear();
 
-			AppendTextureData(data, buildPlatform, buildInfo.UsedAssets.All, false, debugLog);
-		}
-
-		public static void CreateForAllAssets(TextureData data, BuildReportTool.BuildInfo buildInfo, bool debugLog = false)
-		{
-			if (buildInfo == null)
+			if (buildInfo.UsedAssets != null &&
+			    buildInfo.UsedAssets.All != null &&
+			    buildInfo.UsedAssets.All.Length > 0)
 			{
-				if (debugLog) Debug.LogError("Can't create TextureData for Used & Unused Assets, BuildInfo is null");
-				return;
+				AppendTextureData(data, buildPlatform, buildInfo.UsedAssets.All, false, debugLog);
 			}
-			if (debugLog) Debug.Log("Will create TextureData for Used & Unused Assets");
 
-			BuildReportTool.BuildPlatform buildPlatform = BuildReportTool.ReportGenerator.GetBuildPlatformFromString(buildInfo.BuildType, buildInfo.BuildTargetUsed);
+			if (buildInfo.AssetBundles != null)
+			{
+				for (int i = 0; i < buildInfo.AssetBundles.Length; ++i)
+				{
+					var bundle = buildInfo.AssetBundles[i];
+					if (bundle == null ||
+					    bundle.UsedAssets == null ||
+					    bundle.UsedAssets.All == null ||
+					    bundle.UsedAssets.All.Length == 0)
+					{
+						continue;
+					}
 
-			var textureDataEntries = data.GetTextureData();
-			textureDataEntries.Clear();
+					AppendTextureData(data, buildPlatform, bundle.UsedAssets.All, false, debugLog);
+				}
+			}
 
-			AppendTextureData(data, buildPlatform, buildInfo.UsedAssets.All, false, debugLog);
-			AppendTextureData(data, buildPlatform, buildInfo.UnusedAssets.All, false, debugLog);
+			if (createForUnusedAssetsToo &&
+			    buildInfo.UnusedAssets != null &&
+			    buildInfo.UnusedAssets.All != null &&
+			    buildInfo.UnusedAssets.All.Length > 0)
+			{
+				AppendTextureData(data, buildPlatform, buildInfo.UnusedAssets.All, false, debugLog);
+			}
 		}
 
 		static void AppendTextureData(TextureData data, BuildReportTool.BuildPlatform buildPlatform, IList<SizePart> assets, bool overwriteExistingEntries, bool debugLog = false)
 		{
+			if (assets == null || assets.Count == 0)
+			{
+				return;
+			}
+
 			if (debugLog) Debug.LogFormat("Creating Texture Data for {0} assets", assets.Count.ToString());
 
 			var platformString = GetPlatformString(buildPlatform);
@@ -109,6 +126,16 @@ namespace BuildReportTool
 			// textureImporter.textureType: enum (whether it's GUI, lightmap, normal map, sprite, etc.)
 			result.TextureType = TextureTypeToReadableString(textureImporter.textureType);
 
+			// -----------------------------------------------------------------------
+
+			var gotDimensions = GetImageRealWidthAndHeight(assetPath, textureImporter, debugLog);
+			result.RealWidth = gotDimensions.Width;
+			result.RealHeight = gotDimensions.Height;
+
+			bool importError = result.RealWidth <= 0;
+
+			// -----------------------------------------------------------------------
+
 #if UNITY_5_5_OR_NEWER
 			result.IsSRGB = textureImporter.sRGBTexture;
 #else
@@ -118,16 +145,26 @@ namespace BuildReportTool
 			{
 				switch (textureImporter.textureType)
 				{
+#if UNITY_5_5_OR_NEWER
 					case TextureImporterType.NormalMap:
+#else
+					case TextureImporterType.Bump:
+#endif
 					case TextureImporterType.Lightmap:
+#if UNITY_5_5_OR_NEWER
 					case TextureImporterType.SingleChannel:
+#endif
 						if (debugLog) Debug.LogWarningFormat("Texture: {0} was marked as sRGB but it is a {1}", assetPath, result.TextureType);
 						result.IsSRGB = false;
 						break;
 				}
 			}
 
+#if UNITY_5_5_OR_NEWER
 			result.AlphaSource = textureImporter.alphaSource.ToString();
+#else
+			result.AlphaSource = null;
+#endif
 			result.AlphaIsTransparency = textureImporter.alphaIsTransparency;
 #if UNITY_2020_1_OR_NEWER
 			result.IgnorePngGamma = textureImporter.ignorePngGamma;
@@ -146,22 +183,36 @@ namespace BuildReportTool
 			result.StreamingMipMaps = false; // doesn't exist yet in Unity 2018.1 and below
 #endif
 			result.BorderMipMaps = textureImporter.borderMipmap;
+#if UNITY_2017_1_OR_NEWER
 			result.PreserveCoverageMipMaps = textureImporter.mipMapsPreserveCoverage;
+#else
+			result.PreserveCoverageMipMaps = false;
+#endif
 			result.FadeOutMipMaps = textureImporter.fadeout;
 
 			// -----------------------------------------------------------------------
 
 			result.SpriteImportMode = textureImporter.spriteImportMode.ToString();
+#if !UNITY_2022_2_OR_NEWER
 			result.SpritePackingTag = textureImporter.spritePackingTag;
+#else
+			result.SpritePackingTag = null; // Sprite Packing Tag removed, replaced with Sprite Atlas assets
+#endif
 			result.SpritePixelsPerUnit = textureImporter.spritePixelsPerUnit;
 			result.QualifiesForSpritePacking = textureImporter.qualifiesForSpritePacking;
 
 			// -----------------------------------------------------------------------
 
 			result.WrapMode = WrapModeToReadableString(textureImporter.wrapMode);
+#if UNITY_2017_1_OR_NEWER
 			result.WrapModeU = WrapModeToReadableString(textureImporter.wrapModeU);
 			result.WrapModeV = WrapModeToReadableString(textureImporter.wrapModeV);
 			result.WrapModeW = WrapModeToReadableString(textureImporter.wrapModeW);
+#else
+			result.WrapModeU = null;
+			result.WrapModeV = null;
+			result.WrapModeW = null;
+#endif
 
 			result.FilterMode = textureImporter.filterMode.ToString();
 
@@ -178,8 +229,16 @@ namespace BuildReportTool
 #if UNITY_5_5_OR_NEWER
 			var defaultSettings = textureImporter.GetDefaultPlatformTextureSettings();
 
+#if UNITY_2017_2_OR_NEWER
 			result.TextureResizeAlgorithm = defaultSettings.resizeAlgorithm.ToString();
-			if (defaultSettings.format == TextureImporterFormat.Automatic)
+#else
+			result.TextureResizeAlgorithm = string.Empty;
+#endif
+			if (importError)
+			{
+				result.TextureFormat = BuildReportTool.TextureData.IMPORT_ERROR;
+			}
+			else if (defaultSettings.format == TextureImporterFormat.Automatic)
 			{
 				result.TextureFormat = textureImporter.GetAutomaticFormat(platform).ToString();
 			}
@@ -193,7 +252,6 @@ namespace BuildReportTool
 			// Unity 5.4 and below
 			result.TextureResizeAlgorithm = null;
 			result.TextureFormat = TextureFormatToReadableString(textureImporter.textureFormat);
-			defaultTextureFormatWasAuto = textureImporter.textureFormat == TextureImporterFormat.Automatic;
 			result.CompressionType = null; // no compression type in Unity 5.4 and below
 			result.CompressionIsCrunched = false; // no crunch compression in Unity 5.4 and below
 #endif
@@ -211,8 +269,16 @@ namespace BuildReportTool
 			{
 				result.PlatformSettingsOverriden = true;
 				result.OverridingMaxTextureSize = overrideSettings.maxTextureSize;
+#if UNITY_2017_2_OR_NEWER
 				result.OverridingTextureResizeAlgorithm = overrideSettings.resizeAlgorithm.ToString();
-				if (overrideSettings.format == TextureImporterFormat.Automatic)
+#else
+				result.OverridingTextureResizeAlgorithm = string.Empty;
+#endif
+				if (importError)
+				{
+					result.OverridingTextureFormat = BuildReportTool.TextureData.IMPORT_ERROR;
+				}
+				else if (overrideSettings.format == TextureImporterFormat.Automatic)
 				{
 					result.OverridingTextureFormat = textureImporter.GetAutomaticFormat(platform).ToString();
 				}
@@ -294,23 +360,33 @@ namespace BuildReportTool
 				result.NPotScale = textureImporter.npotScale.ToString();
 			}
 
-			var gotDimensions = GetImageRealWidthAndHeight(assetPath, textureImporter, debugLog);
-			result.RealWidth = gotDimensions.Width;
-			result.RealHeight = gotDimensions.Height;
-
 			return result;
 		}
 
 		// ========================================================================================
 
+#if !UNITY_5_5_OR_NEWER
+		static string TextureFormatToReadableString(TextureImporterFormat textureFormat)
+		{
+			return textureFormat.ToString();
+		}
+#endif
+
 		static string TextureTypeToReadableString(TextureImporterType textureType)
 		{
 			switch (textureType)
 			{
+#if UNITY_5_5_OR_NEWER
 				case TextureImporterType.Default:
 					return "Default";
+				case TextureImporterType.SingleChannel:
+					return "Single Channel";
 				case TextureImporterType.NormalMap:
 					return "Normal Map";
+#else
+				case TextureImporterType.Bump:
+					return "Normal Map";
+#endif
 				case TextureImporterType.GUI:
 					return "GUI";
 				case TextureImporterType.Sprite:
@@ -325,8 +401,6 @@ namespace BuildReportTool
 				case TextureImporterType.DirectionalLightmap:
 					return "Directional Lightmap";
 #endif
-				case TextureImporterType.SingleChannel:
-					return "Single Channel";
 				default:
 					return textureType.ToString();
 			}
@@ -340,10 +414,12 @@ namespace BuildReportTool
 					return "Repeat";
 				case TextureWrapMode.Clamp:
 					return "Clamp";
+#if UNITY_2017_1_OR_NEWER
 				case TextureWrapMode.Mirror:
 					return "Mirror";
 				case TextureWrapMode.MirrorOnce:
 					return "MirrorOnce";
+#endif
 				default:
 					if ((int)wrapMode == -1)
 					{
@@ -353,6 +429,7 @@ namespace BuildReportTool
 			}
 		}
 
+#if UNITY_5_5_OR_NEWER
 		static string CompressionTypeToReadableString(TextureImporterCompression compression)
 		{
 			switch (compression)
@@ -369,6 +446,7 @@ namespace BuildReportTool
 					return compression.ToString();
 			}
 		}
+#endif
 
 		public static string GetPlatformString(BuildPlatform buildPlatform)
 		{
@@ -407,10 +485,14 @@ namespace BuildReportTool
 					return "Standalone";
 				case BuildPlatform.WindowsStoreApp:
 					return "Windows Store Apps";
-				case BuildPlatform.XBOXOne:
+				case BuildPlatform.XboxOne:
 					return "XboxOne";
+				case BuildPlatform.XboxSeries:
+					return "GameCoreXboxSeries";
 				case BuildPlatform.PS4:
 					return "PS4";
+				case BuildPlatform.PS5:
+					return "PS5";
 				case BuildPlatform.PSVitaNative:
 					return "PSP2";
 				case BuildPlatform.WiiU:

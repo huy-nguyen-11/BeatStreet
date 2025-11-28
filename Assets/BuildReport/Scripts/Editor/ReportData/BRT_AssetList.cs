@@ -113,6 +113,7 @@ namespace BuildReportTool
 
 			TextureData,
 			MeshData,
+			PrefabData,
 		}
 
 		public enum SortOrder
@@ -125,6 +126,7 @@ namespace BuildReportTool
 		SortType _lastSortType = SortType.None;
 		BuildReportTool.TextureData.DataId _lastTextureSortType = BuildReportTool.TextureData.DataId.None;
 		BuildReportTool.MeshData.DataId _lastMeshSortType = BuildReportTool.MeshData.DataId.None;
+		BuildReportTool.PrefabData.DataId _lastPrefabSortType = BuildReportTool.PrefabData.DataId.None;
 		SortOrder _lastSortOrder = SortOrder.None;
 
 		public SortType LastSortType
@@ -191,6 +193,28 @@ namespace BuildReportTool
 			else
 			{
 				AssetListUtility.SortAssetList(_perCategory[fileFilters.SelectedFilterIdx], meshData, sortType, sortOrder);
+			}
+		}
+
+		public void Sort(BuildReportTool.PrefabData prefabData, BuildReportTool.PrefabData.DataId sortType, SortOrder sortOrder, BuildReportTool.FileFilterGroup fileFilters)
+		{
+			_lastTextureSortType = BuildReportTool.TextureData.DataId.None;
+			_lastPrefabSortType = sortType;
+			_lastSortType = SortType.PrefabData;
+			_lastSortOrder = sortOrder;
+
+			_hasListBeenSorted.Clear();
+
+			_hasListBeenSorted.Add(fileFilters.SelectedFilterIdx);
+
+			// sort only currently displayed list
+			if (fileFilters.SelectedFilterIdx == -1)
+			{
+				AssetListUtility.SortAssetList(_all, prefabData, sortType, sortOrder);
+			}
+			else
+			{
+				AssetListUtility.SortAssetList(_perCategory[fileFilters.SelectedFilterIdx], prefabData, sortType, sortOrder);
 			}
 		}
 
@@ -331,9 +355,12 @@ namespace BuildReportTool
 
 		public void UnescapeAssetNames()
 		{
-			for (int n = 0, len = _all.Length; n < len; ++n)
+			if (_all != null)
 			{
-				_all[n].Name = BuildReportTool.Util.MyHtmlDecode(_all[n].Name);
+				for (int n = 0, len = _all.Length; n < len; ++n)
+				{
+					_all[n].Name = BuildReportTool.Util.MyHtmlDecode(_all[n].Name);
+				}
 			}
 
 
@@ -404,6 +431,11 @@ namespace BuildReportTool
 
 		public void PopulateSizeInAssetsFolder()
 		{
+			if (_all == null)
+			{
+				return;
+			}
+
 			var projectPath = BuildReportTool.Util.GetProjectPath(Application.dataPath);
 			for (int n = 0, len = _all.Length; n < len; ++n)
 			{

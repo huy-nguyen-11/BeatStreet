@@ -1,32 +1,43 @@
-﻿using UnityEngine;
+﻿using Spine;
+using Spine.Unity;
+using UnityEngine;
 
 public class DemoTouch : MonoBehaviour
 {
-    private void Update()
-    {
-        TouchDemo();
-    }
+    private float speed;
+    public VariableJoystick variableJoystick;
+    public Rigidbody2D rb;
+    public Transform joyPos;
 
-    void TouchDemo()
+    // thresholds for walk/run decisions (use raw input magnitude for immediate response)
+    [SerializeField] private float walkThreshold;
+    [SerializeField] private float runThreshold;
+
+    public void FixedUpdate()
     {
-        for (int i = 0; i < Input.touchCount; i++)
+        if (variableJoystick == null || rb == null)
+            return;
+
+        // use raw magnitude (no smoothing) to decide walk vs run so it's responsive
+        Vector2 rawInput = variableJoystick.Direction;
+        float rawMag = rawInput.magnitude;
+
+        if (rawMag > 0.1f)
         {
-            Touch touch = Input.GetTouch(i);
-            int touchId = touch.fingerId;
-            switch (touch.phase)
-            {
-                case TouchPhase.Began:
-                    Debug.Log("touch bagan" + Time.time);
-                    break;
-                case TouchPhase.Moved:
-                    break;
-                case TouchPhase.Stationary:
+            float currentSpeed = 0f;
+            if (rawMag >= runThreshold)
+                currentSpeed = 4f; // run
+            else if (rawMag >= walkThreshold)
+                currentSpeed = 1.5f; // walk
 
-                    break;
-                case TouchPhase.Ended:
-                    Debug.Log("attack:" + Time.time);
-                    break;
-            }
+            if (currentSpeed > 0f)
+                rb.linearVelocity = rawInput.normalized * currentSpeed;
+            else
+                rb.linearVelocity = Vector2.zero;
+        }
+        else
+        {
+            rb.linearVelocity = Vector2.zero;
         }
     }
 }

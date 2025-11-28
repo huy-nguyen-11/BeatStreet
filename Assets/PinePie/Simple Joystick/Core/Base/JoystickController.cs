@@ -1,111 +1,136 @@
-﻿using System;
-using Unity.VisualScripting;
+using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace PinePie.SimpleJoystick
 {
+    public enum JoystickBaseMode
+    {
+        Static,
+        Dynamic,
+        Floating
+    }
+
     [AddComponentMenu("PinePie/Joystick Controller")]
     public class JoystickController : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
     {
         [Header("References")]
         public RectTransform joystickBase;
         public RectTransform handle;
-        public float joystickRange;
-        [Range(0f, 1f)] public float deadZone;
+
+        [Header("Settings")]
+        public JoystickBaseMode baseMode = JoystickBaseMode.Static;
+        public float joystickRange = 55f;
+        [Range(0f, 1f)] public float deadZone = 0.1f;
+
+        [Range(0, 16)]
+        [Tooltip("Set 0 or 1 for free handle, or set according to number of direction need like 4 or 8")]
+        public int directionSnaps = 0;
 
         [Tooltip("if true, snap handle to center when not using. Use false only when a certain direction is always needed.")]
         public bool snapHandleBack = true;
 
+
         private Vector2 inputDirection = Vector2.zero;
+        public Vector2 InputDirection => inputDirection;
         public Vector2 Direction => inputDirection;
 
         public event Action OnTouchPressed;
         public event Action OnTouchRemoved;
         public event Action OnDirectionChanged;
-        private bool dragStartedInside = false;
 
-        //new update
-        private Vector2 startPoint;
-        private Vector2 previousDirection = Vector2.zero;
-        public float reverseThreshold = 0.2f;
-        public float dragStartThreshold = 0.15f;
-        private bool isDragging = false;
+        private Vector2 baseStartPos;
+        private Canvas parentCanvas;
+        private bool dragStartedInside = false;
 
         void Awake()
         {
-            handle.gameObject.SetActive(false);
+            baseStartPos = joystickBase.anchoredPosition;
+            parentCanvas = GetComponentInParent<Canvas>();
+
+            if (baseMode != JoystickBaseMode.Static) joystickBase.gameObject.SetActive(false);
         }
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            // event for touch pressed
             OnTouchPressed?.Invoke();
 
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(joystickBase, eventData.position, eventData.pressEventCamera, out startPoint);
+            joystickBase.gameObject.SetActive(true);
+
+            if (baseMode == JoystickBaseMode.Floating)
+            {
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    parentCanvas.transform as RectTransform,
+                    eventData.position,
+                    eventData.pressEventCamera,
+                    out Vector2 newPos
+                );
+                joystickBase.anchoredPosition = newPos;
+            }
+
+            // handle snappping
+            if (baseMode != JoystickBaseMode.Static)
+            {
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                        (RectTransform)joystickBase.parent,
+                        eventData.position,
+                        eventData.pressEventCamera,
+                        out Vector2 touchPoint
+                    );
+
+                if (snapHandleBack) joystickBase.anchoredPosition = touchPoint;
+                else
+                {
+                    joystickBase.anchoredPosition = touchPoint - (inputDirection * joystickRange);
+                    handle.anchoredPosition = inputDirection * joystickRange;
+                }
+            }
+
 
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                         joystickBase, eventData.position, eventData.pressEventCamera, out Vector2 localPoint
                     );
             dragStartedInside = localPoint.magnitude <= joystickRange;
 
-            previousDirection = Vector2.zero;
+            OnDrag(eventData);
         }
 
         public void OnDrag(PointerEventData eventData)
         {
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(joystickBase, eventData.position, eventData.pressEventCamera, out Vector2 currentPoint);
+            if (baseMode == JoystickBaseMode.Static && !dragStartedInside) return;
 
-            Vector2 delta = currentPoint - startPoint;
-            handle.anchoredPosition = delta;
-            Vector2 rawInput = delta / joystickRange;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                joystickBase,
+                eventData.position,
+                eventData.pressEventCamera,
+                out Vector2 localPoint
+            );
 
-            // Dead zone check
-            if (rawInput.magnitude < deadZone)
+            Vector2 clamped = Vector2.ClampMagnitude(localPoint, joystickRange);
+            handle.anchoredPosition = clamped;
+
+            Vector2 rawInput = clamped / joystickRange;
+            inputDirection = rawInput.magnitude < deadZone ? Vector2.zero : rawInput;
+
+            if (inputDirection != Vector2.zero) OnDirectionChanged?.Invoke();
+
+            // snap to directions
+            if (directionSnaps > 1 && inputDirection != Vector2.zero)
             {
-                inputDirection = Vector2.zero;
-                handle.anchoredPosition = Vector2.zero;
-                handle.gameObject.SetActive(false);
-                isDragging = false;
-                return;
+                float angle = Vector2.SignedAngle(Vector2.left, inputDirection);
+                float snapAngle = 360f / directionSnaps;
+                float snappedAngle = Mathf.Round(angle / snapAngle) * snapAngle;
+
+                inputDirection = Quaternion.Euler(0, 0, snappedAngle) * Vector2.left;
+                handle.anchoredPosition = inputDirection * joystickRange;
             }
 
-            if (!isDragging)
+            if (baseMode == JoystickBaseMode.Dynamic && localPoint.magnitude > joystickRange)
             {
-                if (delta.magnitude < joystickRange * dragStartThreshold)
-                {
-
-                    inputDirection = Vector2.zero;
-                    handle.anchoredPosition = Vector2.zero;
-                    handle.gameObject.SetActive(false);
-                    return;
-                }
-
-                isDragging = true;
+                Vector2 offset = localPoint.normalized * (localPoint.magnitude - joystickRange);
+                joystickBase.anchoredPosition += offset;
             }
-
-
-            Vector2 newDirection = rawInput.normalized;
-
-            // Reverse threshold check
-            if (previousDirection != Vector2.zero)
-            {
-                float dot = Vector2.Dot(previousDirection, newDirection);
-                if (dot < 0f && delta.magnitude < joystickRange * reverseThreshold)
-                { 
-                    return;
-                }
-            }
-
-            // Cập nhật hướng và vị trí
-            inputDirection = rawInput;
-            previousDirection = newDirection;
-
-            handle.anchoredPosition = Vector2.ClampMagnitude(delta, joystickRange);
-            handle.gameObject.SetActive(true);
-
-            OnDirectionChanged?.Invoke();
         }
 
         public void OnPointerUp(PointerEventData eventData)
@@ -114,10 +139,56 @@ namespace PinePie.SimpleJoystick
 
             if (snapHandleBack)
             {
-                handle.gameObject.SetActive(false);
                 handle.anchoredPosition = Vector2.zero;
                 inputDirection = Vector2.zero;
             }
+
+            if (baseMode == JoystickBaseMode.Floating || baseMode == JoystickBaseMode.Dynamic)
+                joystickBase.anchoredPosition = baseStartPos;
+
+            if (baseMode != JoystickBaseMode.Static) joystickBase.gameObject.SetActive(false);
         }
+
+
+#if UNITY_EDITOR
+        void OnDrawGizmos()
+        {
+            if (joystickBase != null)
+            {
+                Vector3 baseWorldPos = joystickBase.position;
+
+                float angleStep = 360f / directionSnaps;
+
+                Handles.color = new Color(1f, 1f, 0f, 0.6f);
+                for (int i = 0; i < directionSnaps; i++)
+                {
+                    float angle = i * angleStep;
+                    Vector2 dir = Quaternion.Euler(0, 0, angle) * Vector2.left;
+
+                    Vector3 start = baseWorldPos + (Vector3)(dir * (joystickRange - 10f));
+                    Vector3 end = baseWorldPos + (Vector3)(dir * (joystickRange + 4f));
+
+                    Handles.DrawLine(start, end);
+                }
+
+                // handle range
+                Color cyanCol = Color.cyan;
+                Handles.color = new(cyanCol.r, cyanCol.g, cyanCol.b, 0.03f);
+                Handles.DrawSolidDisc(baseWorldPos, Vector3.forward, joystickRange);
+                Handles.color = cyanCol;
+                Handles.DrawWireDisc(baseWorldPos, Vector3.forward, joystickRange);
+
+                // dead zone
+                Handles.color = Color.red;
+                Handles.DrawWireDisc(baseWorldPos, Vector3.forward, joystickRange * deadZone);
+
+                // direction output
+                Handles.color = Color.white;
+                Handles.DrawLine(baseWorldPos, baseWorldPos + ((Vector3)inputDirection * joystickRange));
+            }
+        }
+#endif
+
     }
+
 }

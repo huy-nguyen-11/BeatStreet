@@ -3,31 +3,32 @@
 Note: If you are upgrading Build Report Tool in your project, delete the current BuildReport folder first before importing the new one! This will eliminate any potential metadata file conflicts with the old Build Report Tool.
 
 
-
-
 To show the Build Report Window, go to Window > Show Build Report.
 
 If Build Report Tool doesn't show up when you do that, you may have to reset your Unity Editor layout. Choose Window > Layouts > Default.
 
 Then try opening the Build Report Window again.
 
+=== ADDITIONAL NOTE! ===
 
+If you are not able to generate a proper Build Report for an existing project, try doing a Clean Build. A Clean Build will refresh the subscribers to your project's build pipeline events, which Build Report Tool needs.
 
 
 === Saved Options ===
 
 Options are saved to an XML file named "BuildReportToolOptions.xml".
 
-By default this file is saved inside the BuildReport folder, but can be moved to, and will be recognized at certain paths:
+By default this file is saved inside the ProjectSettings folder of your Unity project, but can be copied/moved to the following locations:
+
 1. inside the BuildReport folder itself
 2. inside the topmost Assets folder of your project
 3. outside the topmost Assets folder (i.e. in your project folder)
 4. in your project folder's ProjectSettings folder
 5. in the user's My Documents (inside the same folder where Build Report XML files are saved)
 
-This is in prioritized order, so even if there is an options file in the My Documents folder, if there is also one in the project folder, it will use the one in the project folder instead.
+This is in prioritized order, to allow you to have per-project options: so even if there is an options file in the My Documents folder, but there is also one in the project folder, it will use the one in the project folder instead.
 
-If at any time no options file is found anywhere, it will create a new one inside the BuildReport folder with default values. You can move this file elsewhere in the above mentioned places if you don't want it inside the BuildReport folder.
+If at any time no options file is found in any of these paths, it will create a new one inside the ProjectSettings folder of your Unity project, with default values. You can move this file elsewhere in the above mentioned places if you don't want it inside that path.
 
 
 

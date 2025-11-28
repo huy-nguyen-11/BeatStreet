@@ -54,9 +54,9 @@ public class PlayerJump : PlayerStateManager
     {
         bool Direction = playerController.transform.rotation.y != 0 ? false : true;
         if (!Direction)
-            playerController.rb.velocity = -Vector2.right * 5f;
+            playerController.rb.linearVelocity = -Vector2.right * 5f;
         else
-            playerController.rb.velocity = Vector2.right * 5f;
+            playerController.rb.linearVelocity = Vector2.right * 5f;
     }
     public override void Exit()
     {

@@ -9,7 +9,7 @@ public class PlayerChange : PlayerStateManager
         playerController.state = PlayerController.State.Change;
         playerController.animator.Play("Change");
         AudioBase.Instance.AudioPlayer(7);
-        playerController.rb.velocity = Vector2.zero;
+        playerController.rb.linearVelocity = Vector2.zero;
     }
     public override void Update()
     {

@@ -1,3 +1,4 @@
+using Spine.Unity;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,15 +12,13 @@ public class PlayerCharacter : MonoBehaviour
         Attack,
         Dead,
         Change,
+        Catch,
         Hit,
         Punch,
         SpeedUp,
         StandUp,
-        Throw,
         Walk,
         Wingame,
-        Combo1,
-        Combo3,
         Skill1,
         Skill2,
         Ulti,
@@ -29,6 +28,7 @@ public class PlayerCharacter : MonoBehaviour
     public RuntimeAnimatorController[] _anims;
     public FillBarPlayer fillBar;
     [SerializeField] public Animator animator;
+    [SerializeField] public SkeletonAnimation skeletonAnimation;
     public float Hp;
     public float Mana;
     public float Dame;

@@ -5,7 +5,6 @@ using System.Xml;
 using System.Xml.Serialization;
 using UnityEngine;
 
-
 namespace BuildReportTool
 {
 	/// <summary>
@@ -19,12 +18,16 @@ namespace BuildReportTool
 
 		public string BuildReportFolderName = BuildReportTool.Options.BUILD_REPORTS_DEFAULT_FOLDER_NAME;
 
+		public string BuildReportCustomOutputPath = BuildReportTool.Util.GetUserHomeFolder();
+
 		/// <summary>
 		/// Where build reports are saved to: <br/>
 		/// 0: in user's My Documents <br/>
 		/// 1: or outside the project folder.
 		/// </summary>
 		public int SaveType;
+
+		public bool KeepCopyOfLogOfLastSuccessfulBuild = true;
 
 		// ----------------------------------------------------------
 
@@ -35,6 +38,7 @@ namespace BuildReportTool
 		public bool CollectTextureImportSettingsOnUnusedToo = false;
 		public bool CollectMeshData = true;
 		public bool CollectMeshDataOnUnusedToo;
+		public bool CollectPrefabData = true;
 
 		public bool GetProjectSettings = true;
 
@@ -112,6 +116,19 @@ namespace BuildReportTool
 
 		// ----------------------------------------------------------
 
+		public string FileFilterNameForPrefabData = "Prefabs";
+
+		public bool ShowPrefabColumnContributeGI;
+		public bool ShowPrefabColumnBatchingStatic = true;
+		public bool ShowPrefabColumnOccluderStatic;
+		public bool ShowPrefabColumnOccludeeStatic;
+		public bool ShowPrefabColumnReflectionProbeStatic;
+
+		public bool ShowPrefabColumnNavigationStatic;
+		public bool ShowPrefabColumnOffMeshLinkGeneration;
+
+		// ----------------------------------------------------------
+
 		public bool ShowColumnAssetPath = true;
 		public bool ShowColumnSizeBeforeBuild = true;
 		public bool ShowColumnSizeInBuild = true;
@@ -150,7 +167,8 @@ namespace BuildReportTool
 		public int FilterToUseInt;
 
 		public int AssetListPaginationLength = 300;
-		public int UnusedAssetsEntriesPerBatch = 1000;
+		public bool ProcessUnusedAssetsInBatches = true;
+		public int UnusedAssetsEntriesPerBatch = 10000;
 
 		public bool DoubleClickOnAssetWillPing = false;
 
@@ -281,6 +299,7 @@ namespace BuildReportTool
 
 		public const int SAVE_TYPE_PERSONAL = 0;
 		public const int SAVE_TYPE_PROJECT = 1;
+		public const int SAVE_TYPE_CUSTOM = 2;
 
 
 		public const int ASSET_USAGE_LABEL_TYPE_VERBOSE = 0;
@@ -487,6 +506,24 @@ namespace BuildReportTool
 				if (_savedOptions.EditorLogOverridePath != value)
 				{
 					_savedOptions.EditorLogOverridePath = value;
+					SaveOptions();
+				}
+			}
+		}
+
+		public static bool KeepCopyOfLogOfLastSuccessfulBuild
+		{
+			get
+			{
+				InitializeOptionsIfNeeded();
+				return _savedOptions.KeepCopyOfLogOfLastSuccessfulBuild;
+			}
+			set
+			{
+				InitializeOptionsIfNeeded();
+				if (_savedOptions.KeepCopyOfLogOfLastSuccessfulBuild != value)
+				{
+					_savedOptions.KeepCopyOfLogOfLastSuccessfulBuild = value;
 					SaveOptions();
 				}
 			}
@@ -704,6 +741,24 @@ namespace BuildReportTool
 			}
 		}
 
+		public static bool CollectPrefabData
+		{
+			get
+			{
+				InitializeOptionsIfNeeded();
+				return _savedOptions.CollectPrefabData;
+			}
+			set
+			{
+				InitializeOptionsIfNeeded();
+				if (_savedOptions.CollectPrefabData != value)
+				{
+					_savedOptions.CollectPrefabData = value;
+					SaveOptions();
+				}
+			}
+		}
+
 		public static string BuildReportFolderName
 		{
 			get
@@ -722,6 +777,24 @@ namespace BuildReportTool
 			}
 		}
 
+		public static string BuildReportCustomOutputPath
+		{
+			get
+			{
+				InitializeOptionsIfNeeded();
+				return _savedOptions.BuildReportCustomOutputPath;
+			}
+			set
+			{
+				InitializeOptionsIfNeeded();
+				if (_savedOptions.BuildReportCustomOutputPath != value)
+				{
+					_savedOptions.BuildReportCustomOutputPath = value;
+					SaveOptions();
+				}
+			}
+		}
+
 
 		/// <summary>
 		/// Full path to folder where Build Reports are saved.
@@ -735,12 +808,23 @@ namespace BuildReportTool
 				{
 					return string.Format("{0}/{1}", BuildReportTool.Util.GetUserHomeFolder(), BuildReportFolderName);
 				}
-				else
+				else if (BuildReportTool.Options.SaveType == BuildReportTool.Options.SAVE_TYPE_PROJECT)
 				{
-					// assume BuildReportTool.Options.SaveType == BuildReportTool.Options.SAVE_TYPE_PROJECT
-
 					// makes use of Application.dataPath so it has to be called from the main thread
 					return string.Format("{0}/{1}", BuildReportTool.ReportGenerator.GetSavePathToProjectFolder(), BuildReportFolderName);
+				}
+				else // BuildReportTool.Options.SAVE_TYPE_CUSTOM
+				{
+					if (Path.IsPathRooted(BuildReportCustomOutputPath))
+					{
+						return BuildReportCustomOutputPath;
+					}
+					else
+					{
+						// relative path? it will be relative to the project folder
+						return Path.GetFullPath(Path.Combine(BuildReportTool.Util.GetProjectPath(Application.dataPath),
+							BuildReportCustomOutputPath));
+					}
 				}
 			}
 		}
@@ -1043,6 +1127,23 @@ namespace BuildReportTool
 			}
 		}
 
+		public static bool ProcessUnusedAssetsInBatches
+		{
+			get
+			{
+				InitializeOptionsIfNeeded();
+				return _savedOptions.ProcessUnusedAssetsInBatches;
+			}
+			set
+			{
+				InitializeOptionsIfNeeded();
+				if (_savedOptions.ProcessUnusedAssetsInBatches != value)
+				{
+					_savedOptions.ProcessUnusedAssetsInBatches = value;
+					SaveOptions();
+				}
+			}
+		}
 
 		public static int UnusedAssetsEntriesPerBatch
 		{
@@ -1956,6 +2057,152 @@ namespace BuildReportTool
 				if (_savedOptions.ShowMeshColumnAnimationClipCount != value)
 				{
 					_savedOptions.ShowMeshColumnAnimationClipCount = value;
+					SaveOptions();
+				}
+			}
+		}
+
+		// -----------------------------------------------------------------
+
+		public static string FileFilterNameForPrefabData
+		{
+			get
+			{
+				InitializeOptionsIfNeeded();
+				return _savedOptions.FileFilterNameForPrefabData;
+			}
+			set
+			{
+				InitializeOptionsIfNeeded();
+				if (_savedOptions.FileFilterNameForPrefabData != value)
+				{
+					_savedOptions.FileFilterNameForPrefabData = value;
+					SaveOptions();
+				}
+			}
+		}
+
+		public static bool ShowPrefabColumnContributeGI
+		{
+			get
+			{
+				InitializeOptionsIfNeeded();
+				return _savedOptions.ShowPrefabColumnContributeGI;
+			}
+			set
+			{
+				InitializeOptionsIfNeeded();
+				if (_savedOptions.ShowPrefabColumnContributeGI != value)
+				{
+					_savedOptions.ShowPrefabColumnContributeGI = value;
+					SaveOptions();
+				}
+			}
+		}
+
+		public static bool ShowPrefabColumnBatchingStatic
+		{
+			get
+			{
+				InitializeOptionsIfNeeded();
+				return _savedOptions.ShowPrefabColumnBatchingStatic;
+			}
+			set
+			{
+				InitializeOptionsIfNeeded();
+				if (_savedOptions.ShowPrefabColumnBatchingStatic != value)
+				{
+					_savedOptions.ShowPrefabColumnBatchingStatic = value;
+					SaveOptions();
+				}
+			}
+		}
+
+		public static bool ShowPrefabColumnOccluderStatic
+		{
+			get
+			{
+				InitializeOptionsIfNeeded();
+				return _savedOptions.ShowPrefabColumnOccluderStatic;
+			}
+			set
+			{
+				InitializeOptionsIfNeeded();
+				if (_savedOptions.ShowPrefabColumnOccluderStatic != value)
+				{
+					_savedOptions.ShowPrefabColumnOccluderStatic = value;
+					SaveOptions();
+				}
+			}
+		}
+
+		public static bool ShowPrefabColumnOccludeeStatic
+		{
+			get
+			{
+				InitializeOptionsIfNeeded();
+				return _savedOptions.ShowPrefabColumnOccludeeStatic;
+			}
+			set
+			{
+				InitializeOptionsIfNeeded();
+				if (_savedOptions.ShowPrefabColumnOccludeeStatic != value)
+				{
+					_savedOptions.ShowPrefabColumnOccludeeStatic = value;
+					SaveOptions();
+				}
+			}
+		}
+
+		public static bool ShowPrefabColumnReflectionProbeStatic
+		{
+			get
+			{
+				InitializeOptionsIfNeeded();
+				return _savedOptions.ShowPrefabColumnReflectionProbeStatic;
+			}
+			set
+			{
+				InitializeOptionsIfNeeded();
+				if (_savedOptions.ShowPrefabColumnReflectionProbeStatic != value)
+				{
+					_savedOptions.ShowPrefabColumnReflectionProbeStatic = value;
+					SaveOptions();
+				}
+			}
+		}
+
+		public static bool ShowPrefabColumnNavigationStatic
+		{
+			get
+			{
+				InitializeOptionsIfNeeded();
+				return _savedOptions.ShowPrefabColumnNavigationStatic;
+			}
+			set
+			{
+				InitializeOptionsIfNeeded();
+				if (_savedOptions.ShowPrefabColumnNavigationStatic != value)
+				{
+					_savedOptions.ShowPrefabColumnNavigationStatic = value;
+					SaveOptions();
+				}
+			}
+		}
+
+		public static bool ShowPrefabColumnOffMeshLinkGeneration
+		{
+			get
+			{
+				InitializeOptionsIfNeeded();
+				return _savedOptions.ShowPrefabColumnOffMeshLinkGeneration;
+			}
+			set
+			{
+				InitializeOptionsIfNeeded();
+				if (_savedOptions.ShowPrefabColumnOffMeshLinkGeneration != value)
+				{
+					_savedOptions.ShowPrefabColumnOffMeshLinkGeneration = value;
 					SaveOptions();
 				}
 			}

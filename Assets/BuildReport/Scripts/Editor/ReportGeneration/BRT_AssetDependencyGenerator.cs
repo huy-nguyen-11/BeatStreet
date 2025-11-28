@@ -2,9 +2,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using UnityEditor;
+using UnityEditor.Compilation;
 using UnityEngine;
+using UnityEngine.U2D;
 
 namespace BuildReportTool
 {
@@ -122,7 +125,7 @@ namespace BuildReportTool
 			Create(data, startingOpenSet, debugLog);
 		}
 
-		public static void CreateForUsedAssetsOnly(AssetDependencies data, BuildReportTool.BuildInfo buildInfo,
+		public static void Create(AssetDependencies data, BuildReportTool.BuildInfo buildInfo, bool createForUnusedAssetsToo,
 			bool debugLog = false)
 		{
 			if (buildInfo == null)
@@ -132,62 +135,88 @@ namespace BuildReportTool
 
 			var startingOpenSet = new Queue<string>();
 
-			// we'll start with the scenes to be included in the build:
-			var scenes = buildInfo.ScenesInBuild;
-			if (scenes != null)
+			if (!buildInfo.HasAssetBundles) // Asset Bundle builds do not include the scenes-in-build
 			{
-				for (int n = 0, len = scenes.Length; n < len; ++n)
+				// we'll start with the scenes to be included in the build:
+				var scenes = buildInfo.ScenesInBuild;
+				if (scenes != null)
 				{
-					if (scenes[n].Enabled && !string.IsNullOrEmpty(scenes[n].Path))
+					for (int n = 0, len = scenes.Length; n < len; ++n)
 					{
-						startingOpenSet.Enqueue(scenes[n].Path);
+						if (scenes[n].Enabled && !string.IsNullOrEmpty(scenes[n].Path))
+						{
+							startingOpenSet.Enqueue(scenes[n].Path);
+						}
 					}
 				}
 			}
 
 			// plus all Resources assets (since they are not referred
 			// to in any scenes, we have to add them explicitly)
-			if (buildInfo.UsedAssets != null && buildInfo.UsedAssets.All != null)
+			if (buildInfo.UsedAssets != null)
 			{
-				var allUsedAssets = buildInfo.UsedAssets.All;
-				for (int n = 0, len = allUsedAssets.Length; n < len; ++n)
+				if (buildInfo.UsedAssets.All != null)
 				{
-					if (!string.IsNullOrEmpty(allUsedAssets[n].Name) &&
-					    allUsedAssets[n].Name.IndexOf("/Resources/", StringComparison.OrdinalIgnoreCase) > -1)
+					var allUsedAssets = buildInfo.UsedAssets.All;
+					for (int n = 0, len = allUsedAssets.Length; n < len; ++n)
 					{
-						startingOpenSet.Enqueue(allUsedAssets[n].Name);
+						if (!string.IsNullOrEmpty(allUsedAssets[n].Name) &&
+						    allUsedAssets[n].Name.IndexOf("/Resources/", StringComparison.OrdinalIgnoreCase) > -1)
+						{
+							startingOpenSet.Enqueue(allUsedAssets[n].Name);
+						}
+					}
+				}
+
+				// also include sprite atlases
+				int textureFilterIdx = buildInfo.FileFilters.GetFilterIdx("Textures");
+				SizePart[] usedTextures;
+				if (buildInfo.HasUsedAssets && textureFilterIdx != -1 && buildInfo.UsedAssets != null && buildInfo.UsedAssets.PerCategory != null)
+				{
+					usedTextures = buildInfo.UsedAssets.PerCategory[textureFilterIdx];
+				}
+				else
+				{
+					usedTextures = null;
+				}
+
+				if (usedTextures != null)
+				{
+					foreach (var texture in usedTextures)
+					{
+						if (texture.Name.IsSpriteAtlasFile())
+						{
+							startingOpenSet.Enqueue(texture.Name);
+						}
 					}
 				}
 			}
 
-			Create(data, startingOpenSet, debugLog);
-		}
-
-		public static void CreateForAllAssets(AssetDependencies data, BuildReportTool.BuildInfo buildInfo,
-			bool debugLog = false)
-		{
-			if (buildInfo == null)
+			if (buildInfo.HasAssetBundles)
 			{
-				return;
-			}
-
-			var startingOpenSet = new Queue<string>();
-
-			if (buildInfo.UsedAssets != null && buildInfo.UsedAssets.All != null)
-			{
-				var allUsedAssets = buildInfo.UsedAssets.All;
-				for (int n = 0, len = allUsedAssets.Length; n < len; ++n)
+				for (int i = 0; i < buildInfo.AssetBundles.Length; ++i)
 				{
-					if (string.IsNullOrEmpty(allUsedAssets[n].Name))
+					var bundle = buildInfo.AssetBundles[i];
+					if (bundle == null ||
+					    bundle.UsedAssets == null ||
+					    bundle.UsedAssets.All == null ||
+					    bundle.UsedAssets.All.Length == 0)
 					{
 						continue;
 					}
 
-					startingOpenSet.Enqueue(allUsedAssets[n].Name);
+					var allBundleUsedAssets = bundle.UsedAssets.All;
+					for (int n = 0, len = allBundleUsedAssets.Length; n < len; ++n)
+					{
+						if (!string.IsNullOrEmpty(allBundleUsedAssets[n].Name))
+						{
+							startingOpenSet.Enqueue(allBundleUsedAssets[n].Name);
+						}
+					}
 				}
 			}
 
-			if (buildInfo.UnusedAssets != null && buildInfo.UnusedAssets.All != null)
+			if (createForUnusedAssetsToo && buildInfo.UnusedAssets != null && buildInfo.UnusedAssets.All != null)
 			{
 				var allUnusedAssets = buildInfo.UnusedAssets.All;
 				for (int n = 0, len = allUnusedAssets.Length; n < len; ++n)
@@ -202,6 +231,7 @@ namespace BuildReportTool
 			}
 
 			Create(data, startingOpenSet, debugLog);
+			CalculateScriptDependencies(data, buildInfo);
 		}
 
 		// ==================================================================================
@@ -528,7 +558,11 @@ namespace BuildReportTool
 					if (newAssetToInspect.IsMaterialFile() && foundDependencies[n].IsTextureFile())
 					{
 						bool textureFound = false;
+#if UNITY_5_6_OR_NEWER
 						var material = AssetDatabase.LoadAssetAtPath<Material>(newAssetToInspect);
+#else
+						var material = (Material)AssetDatabase.LoadAssetAtPath(newAssetToInspect, typeof(Material));
+#endif
 						if (material == null)
 						{
 							// couldn't find material in current project
@@ -540,16 +574,28 @@ namespace BuildReportTool
 							// no shader assigned to material
 							continue;
 						}
+#if UNITY_6000_2_OR_NEWER
+						int shaderPropertyCount = shader.GetPropertyCount();
+#else
 						int shaderPropertyCount = ShaderUtil.GetPropertyCount(shader);
+#endif
 						for (int pIdx = 0; pIdx < shaderPropertyCount; ++pIdx)
 						{
+#if UNITY_6000_2_OR_NEWER
+							if (shader.GetPropertyType(pIdx) != UnityEngine.Rendering.ShaderPropertyType.Texture)
+#else
 							if (ShaderUtil.GetPropertyType(shader, pIdx) != ShaderUtil.ShaderPropertyType.TexEnv)
+#endif
 							{
 								// go through texture properties only
 								continue;
 							}
 
+#if UNITY_6000_2_OR_NEWER
+							var texture = material.GetTexture(shader.GetPropertyName(pIdx));
+#else
 							var texture = material.GetTexture(ShaderUtil.GetPropertyName(shader, pIdx));
+#endif
 							if (texture == null)
 							{
 								// no texture currently assigned to this texture property
@@ -974,6 +1020,66 @@ namespace BuildReportTool
 					}
 
 					Debug.Log(stringBuilder.ToString());
+				}
+			}
+		}
+
+		// ==================================================================================
+
+		static void CalculateScriptDependencies(AssetDependencies data, BuildReportTool.BuildInfo buildInfo)
+		{
+			int scriptsFilterIdx = buildInfo.FileFilters.GetFilterIdx("Scripts");
+			SizePart[] usedScripts;
+			if (buildInfo.HasUsedAssets && scriptsFilterIdx != -1 && buildInfo.UsedAssets != null && buildInfo.UsedAssets.PerCategory != null)
+			{
+				usedScripts = buildInfo.UsedAssets.PerCategory[scriptsFilterIdx];
+			}
+			else
+			{
+				return;
+			}
+
+			var assetDependencies = data.GetAssetDependencies();
+
+			var assemblies = CompilationPipeline.GetAssemblies();
+			foreach (Assembly assembly in assemblies)
+			{
+				string assemblyFilename = Path.GetFileName(assembly.outputPath);
+
+				if (!buildInfo.ScriptDLLs.Exists(assemblyFilename) && !buildInfo.UnityEngineDLLs.Exists(assemblyFilename))
+				{
+					continue;
+				}
+
+				foreach (string sourceFile in assembly.sourceFiles)
+				{
+					if (!usedScripts.Exists(sourceFile))
+					{
+						continue;
+					}
+
+					DependencyEntry assetDependency;
+					if (assetDependencies.ContainsKey(sourceFile))
+					{
+						assetDependency = assetDependencies[sourceFile];
+					}
+					else
+					{
+						assetDependency = new DependencyEntry();
+						assetDependencies.Add(sourceFile, assetDependency);
+					}
+
+					assetDependency.Users.Add(assemblyFilename);
+
+					var usersFlattened = new List<AssetUserFlattened>(assetDependency.Users.Count);
+					assetDependency.UsersFlattened = usersFlattened;
+
+					var newEntry = new AssetUserFlattened(assemblyFilename, 1
+#if BRT_ASSET_DEPENDENCY_DEBUG
+					, "[initial]"
+#endif
+					);
+					usersFlattened.Add(newEntry);
 				}
 			}
 		}

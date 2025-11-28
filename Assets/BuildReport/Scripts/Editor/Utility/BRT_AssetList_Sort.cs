@@ -1,6 +1,4 @@
-﻿//This asset was uploaded by https://unityassetcollection.com
-
-using System;
+﻿using System;
 
 namespace BuildReportTool
 {

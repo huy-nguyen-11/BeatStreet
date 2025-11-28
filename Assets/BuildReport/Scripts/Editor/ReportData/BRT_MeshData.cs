@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace BuildReportTool
@@ -12,16 +10,19 @@ namespace BuildReportTool
 
 		/// <summary>
 		/// Name of project folder.
+		/// Included as part of the filename when saved.
 		/// </summary>
 		public string ProjectName;
 
 		/// <summary>
 		/// Type of build that the project was configured to, at the time that MeshData was collected.
+		/// Included as part of the filename when saved.
 		/// </summary>
 		public string BuildType;
 
 		/// <summary>
 		/// When MeshData was collected.
+		/// Included as part of the filename when saved.
 		/// </summary>
 		public System.DateTime TimeGot;
 
@@ -245,7 +246,7 @@ Number of imported Animation Clips in the asset.";
 		{
 			_meshData.Clear();
 
-			var platformName = TextureData.GetPlatformNameFromBuildType(BuildType);
+			//var platformName = TextureData.GetPlatformNameFromBuildType(BuildType);
 			var len = Mathf.Min(Assets.Count, Data.Count);
 			for (int n = 0; n < len; ++n)
 			{

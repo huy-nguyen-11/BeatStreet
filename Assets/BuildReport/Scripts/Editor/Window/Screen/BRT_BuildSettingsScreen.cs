@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-
 
 namespace BuildReportTool.Window.Screen
 {
@@ -11,7 +11,7 @@ namespace BuildReportTool.Window.Screen
 			get { return Labels.BUILD_SETTINGS_CATEGORY_LABEL; }
 		}
 
-		public override void RefreshData(BuildInfo buildReport, AssetDependencies assetDependencies, TextureData textureData, MeshData meshData, UnityBuildReport unityBuildReport)
+		public override void RefreshData(BuildInfo buildReport, AssetDependencies assetDependencies, TextureData textureData, MeshData meshData, PrefabData prefabData, UnityBuildReport unityBuildReport, BuildReportTool.AssetBundleSession assetBundleSession)
 		{
 			_selectedSettingsIdxFromDropdownBox = UnityBuildSettingsUtility.GetIdxFromBuildReportValues(buildReport);
 		}
@@ -33,6 +33,11 @@ namespace BuildReportTool.Window.Screen
 		void DrawSetting(string name, int val, bool showEvenIfEmpty = true)
 		{
 			DrawSetting(name, val.ToString(), showEvenIfEmpty);
+		}
+
+		void DrawSetting(string name, int val, string textToDisplayIfZero, bool showEvenIfEmpty = true)
+		{
+			DrawSetting(name, val == 0 ? textToDisplayIfZero: val.ToString(), showEvenIfEmpty);
 		}
 
 		void DrawSetting(string name, uint val, bool showEvenIfEmpty = true)
@@ -159,7 +164,7 @@ namespace BuildReportTool.Window.Screen
 			GUILayout.Space(SETTING_SPACING);
 		}
 
-		void DrawSettingsGroupTitle(string name)
+		void DrawSettingsGroupTitle(string name, string description = null)
 		{
 			var titleStyle = GUI.skin.FindStyle(BuildReportTool.Window.Settings.INFO_TITLE_STYLE_NAME);
 			if (titleStyle == null)
@@ -168,6 +173,17 @@ namespace BuildReportTool.Window.Screen
 			}
 
 			GUILayout.Label(name, titleStyle, BRT_BuildReportWindow.LayoutNone);
+			if (!string.IsNullOrEmpty(description))
+			{
+				var textStyle = GUI.skin.FindStyle(BuildReportTool.Window.Settings.SETTING_VALUE_STYLE_NAME);
+				if (textStyle == null)
+				{
+					textStyle = GUI.skin.label;
+				}
+
+				GUILayout.Label(description, textStyle, BRT_BuildReportWindow.LayoutNone);
+				GUILayout.Space(SETTINGS_GROUP_MINOR_SPACING);
+			}
 			GUILayout.Space(SETTINGS_GROUP_TITLE_SPACING);
 		}
 
@@ -224,6 +240,11 @@ namespace BuildReportTool.Window.Screen
 		bool IsShowingiOSSettings
 		{
 			get { return _settingsShown == BuildSettingCategory.iOS; }
+		}
+
+		bool IsShowingTvOSSettings
+		{
+			get { return _settingsShown == BuildSettingCategory.tvOS; }
 		}
 
 		bool IsShowingAndroidSettings
@@ -312,6 +333,18 @@ namespace BuildReportTool.Window.Screen
 			DrawSettingsGroupTitle("Project");
 
 			DrawSetting("Product name:", settings.ProductName);
+			if (IsShowingiOSSettings || IsShowingTvOSSettings || IsShowingMacSettings)
+			{
+				DrawSetting("Bundle identifier:", settings.MobileBundleIdentifier);
+			}
+			else if (IsShowingAndroidSettings)
+			{
+				DrawSetting("Package identifier:", settings.MobileBundleIdentifier);
+			}
+			else
+			{
+				DrawSetting("Application identifier:", settings.ApplicationIdentifier);
+			}
 			DrawSetting("Company name:", settings.CompanyName);
 			DrawSetting("Build type:", buildReportToDisplay.BuildType);
 			DrawSetting("Unity version:", buildReportToDisplay.UnityVersion);
@@ -321,15 +354,13 @@ namespace BuildReportTool.Window.Screen
 			{
 				GUILayout.Space(SETTINGS_GROUP_MINOR_SPACING);
 				DrawSetting("App display name:", settings.iOSAppDisplayName);
-				DrawSetting("Bundle identifier:", settings.MobileBundleIdentifier);
 				DrawSetting("Bundle version:", settings.MobileBundleVersion);
 			}
 			else if (IsShowingAndroidSettings)
 			{
 				GUILayout.Space(SETTINGS_GROUP_MINOR_SPACING);
-				DrawSetting("Package identifier:", settings.MobileBundleIdentifier);
 				DrawSetting("Version name:", settings.MobileBundleVersion);
-				DrawSetting("Version code:", settings.AndroidVersionCode);
+				DrawSetting("Bundle Version code:", settings.AndroidVersionCode);
 			}
 			else if (IsShowingXbox360Settings)
 			{
@@ -381,6 +412,18 @@ namespace BuildReportTool.Window.Screen
 
 			// --------------------------------------------------
 			// build settings
+
+			if (unityBuildReport != null)
+			{
+#if UNITY_2021_2_OR_NEWER
+				DrawSetting("Clean Build:",
+					unityBuildReport.HasBuildOption(BuildOptions.CleanBuildCache));
+#endif
+				DrawSetting("Build Asset Bundle for streamed scenes:",
+					unityBuildReport.HasBuildOption(BuildOptions.BuildAdditionalStreamedScenes));
+				GUILayout.Space(SETTINGS_GROUP_MINOR_SPACING);
+			}
+
 			if (IsShowingStandaloneSettings)
 			{
 				DrawSetting("Headless (server) build:", settings.EnableHeadlessMode);
@@ -389,6 +432,10 @@ namespace BuildReportTool.Window.Screen
 			{
 				DrawSetting("Generate reference projects:", settings.WSAGenerateReferenceProjects);
 				DrawSetting("Target Windows Store App SDK:", settings.WSASDK);
+			}
+			else if (IsShowingMacSettings)
+			{
+				DrawSetting("Xcode project scheme:", settings.MacXcodeBuildConfig);
 			}
 			else if (IsShowingWebPlayerSettings)
 			{
@@ -413,11 +460,19 @@ namespace BuildReportTool.Window.Screen
 				DrawSetting("SDK version:", settings.iOSSDKVersionUsed);
 				DrawSetting("Target iOS version:", settings.iOSTargetOSVersion);
 				DrawSetting("Target device:", settings.iOSTargetDevice);
-				DrawSetting("Symlink libraries:", settings.iOSSymlinkLibraries);
-
+#if UNITY_2021_2_OR_NEWER
 				if (unityBuildReport != null)
 				{
-					DrawSetting("Is appended build:",
+					DrawSetting("Symlink libraries:",
+						unityBuildReport.HasBuildOption(BuildOptions.SymlinkSources));
+				}
+#else
+				DrawSetting("Symlink libraries:", settings.iOSSymlinkLibraries);
+#endif
+				DrawSetting("Xcode project scheme:", settings.iOSXcodeBuildConfig);
+				if (unityBuildReport != null)
+				{
+					DrawSetting("Append to existing Xcode project:",
 						unityBuildReport.HasBuildOption(BuildOptions.AcceptExternalModificationsToPlayer));
 				}
 
@@ -425,20 +480,54 @@ namespace BuildReportTool.Window.Screen
 			}
 			else if (IsShowingAndroidSettings)
 			{
-				DrawSetting("Build subtarget:", settings.AndroidBuildSubtarget);
 				DrawSetting("Min SDK version:", settings.AndroidMinSDKVersion);
-				DrawSetting("Target device:", settings.AndroidTargetDevice);
-				DrawSetting("Automatically create APK Expansion File:", settings.AndroidUseAPKExpansionFiles);
-				DrawSetting("Export Android project:", settings.AndroidAsAndroidProject);
+				DrawSetting("Target SDK version:", settings.AndroidTargetSDKVersion);
+
+				DrawSetting("Build Type:", settings.AndroidBuildType);
+				if (buildReportToDisplay.IsUnityVersionLessThan(6000, 0, 0))
+				{
+					DrawSetting("Target device:", settings.AndroidTargetDevice);
+				}
+
+				DrawSetting("Target architectures:", settings.AndroidTargetArchitectures);
+				GUILayout.Space(SETTINGS_GROUP_MINOR_SPACING);
+
 				if (unityBuildReport != null)
 				{
-					DrawSetting("New Eclipse project on each build:",
+					DrawSetting("Patch existing app on device (instead of building):",
+#if UNITY_2019_1_OR_NEWER
+						// Application patching was added in 2019.1
+						unityBuildReport.HasBuildOption(BuildOptions.PatchPackage));
+#else
+						false);
+#endif
+					DrawSetting("Symlink Sources:",
+#if UNITY_2021_1_OR_NEWER
+						unityBuildReport.HasBuildOption(BuildOptions.SymlinkSources));
+#else
+						unityBuildReport.HasBuildOption(BuildOptions.SymlinkLibraries));
+#endif
+				}
+				DrawSetting("Build a separate APK for each CPU architecture:", settings.AndroidBuildApkPerCpuArch);
+				DrawSetting("Build APK Expansion File (.obb file):", settings.AndroidUseAPKExpansionFiles);
+				DrawSetting("Build Google Play App Bundle (.aab file):", settings.AndroidAppBundle);
+				DrawSetting("Export Android Studio/Gradle project:", settings.AndroidAsAndroidProject);
+				if (unityBuildReport != null)
+				{
+					DrawSetting("Create Android Studio/Eclipse project on each build:",
 						unityBuildReport.HasBuildOption(BuildOptions.AcceptExternalModificationsToPlayer));
 				}
 				GUILayout.Space(SETTINGS_GROUP_MINOR_SPACING);
 
 
-				DrawSetting("Is game:", settings.AndroidIsGame);
+				if (buildReportToDisplay.IsUnityVersionAtLeast(6000, 2, 0))
+				{
+					DrawSetting("App Category:", settings.AndroidAppCategory);
+				}
+				else
+				{
+					DrawSetting("Is game:", settings.AndroidIsGame);
+				}
 				DrawSetting("TV-compatible:", settings.AndroidTvCompatible);
 				GUILayout.Space(SETTINGS_GROUP_MINOR_SPACING);
 
@@ -642,33 +731,47 @@ namespace BuildReportTool.Window.Screen
 
 			if (unityBuildReport != null)
 			{
+#if UNITY_5_6_OR_NEWER
 				if (unityBuildReport.HasBuildOption(BuildOptions.CompressWithLz4))
 				{
 					DrawSetting("Compression Method:", "LZ4");
 				}
+#endif
+#if UNITY_2017_2_OR_NEWER
 				else if (unityBuildReport.HasBuildOption(BuildOptions.CompressWithLz4HC))
 				{
 					DrawSetting("Compression Method:", "LZ4HC");
 				}
+#endif
+#if UNITY_5_6_OR_NEWER
 				else
+#endif
 				{
 					DrawSetting("Compression Method:", "Default");
 				}
+#if UNITY_2018_1_OR_NEWER
 				DrawSetting("Test Assemblies included in build:", unityBuildReport.HasBuildOption(BuildOptions.IncludeTestAssemblies));
+#endif
+#if UNITY_5_6_OR_NEWER
 				DrawSetting("No Unique Identifier (force build GUID to all zeros):", unityBuildReport.HasBuildOption(BuildOptions.NoUniqueIdentifier));
+#endif
 #if UNITY_2020_1_OR_NEWER
 				DrawSetting("Detailed Build Report:", unityBuildReport.HasBuildOption(BuildOptions.DetailedBuildReport));
 #endif
 			}
 
+#if UNITY_2018_3_OR_NEWER
+			DrawSetting("Managed stripping level:", settings.StrippingLevelUsed);
+#else
 			if (IsShowingMobileSettings)
 			{
 				DrawSetting("Stripping level:", settings.StrippingLevelUsed);
 			}
-			else if (IsShowingWebGlSettings)
-			{
-				DrawSetting("Strip engine code (IL2CPP):", settings.StripEngineCode);
-			}
+#endif
+
+			DrawSetting("Strip unused engine code (IL2CPP-only):", settings.StripEngineCode);
+			DrawSetting("Strip unused mips from textures:", settings.StripUnusedMips);
+
 			GUILayout.EndVertical();
 			if (Event.current.type == EventType.Repaint)
 			{
@@ -686,6 +789,11 @@ namespace BuildReportTool.Window.Screen
 
 			GUILayout.BeginVertical(GUIContent.none, groupStyle, NoExpandWidth);
 			DrawSettingsGroupTitle("Runtime Settings");
+
+			if (IsShowingMobileSettings)
+			{
+				DrawSetting("Mute other audio sources:", settings.MuteOtherAudioSources);
+			}
 
 			if (IsShowingiOSSettings)
 			{
@@ -765,6 +873,12 @@ namespace BuildReportTool.Window.Screen
 				GUILayout.Space(SETTINGS_GROUP_MINOR_SPACING);
 			}
 
+			if (IsShowingWindowsDesktopSettings)
+			{
+				DrawSetting("Desired API for gamepad input:", settings.WinGamepadInputHint);
+				GUILayout.Space(SETTINGS_GROUP_MINOR_SPACING);
+			}
+
 			// --------------------------------------------------
 			// security settings
 			if (IsShowingMacSettings)
@@ -774,7 +888,9 @@ namespace BuildReportTool.Window.Screen
 			else if (IsShowingAndroidSettings)
 			{
 				DrawSetting("Use license verification:", settings.AndroidUseLicenseVerification);
+				DrawSetting("Enable ARMv9 security features:", settings.AndroidEnableArmV9SecurityFeatures);
 			}
+			DrawSetting("Allow plain-text (insecure) HTTP connections:", settings.InsecureHttpOption);
 
 			GUILayout.EndVertical();
 			if (Event.current.type == EventType.Repaint)
@@ -801,7 +917,6 @@ namespace BuildReportTool.Window.Screen
 				DrawSetting("Create Visual Studio Solution:", settings.WinCreateVisualStudioSolution);
 			}
 			DrawSetting("Debug Log enabled:", settings.EnableDebugLog);
-
 
 			if (buildReportToDisplay.IsUnityVersionAtLeast(5, 4, 0))
 			{
@@ -835,6 +950,17 @@ namespace BuildReportTool.Window.Screen
 				}
 				GUILayout.Space(SETTINGS_GROUP_MINOR_SPACING);
 			}
+			else if (IsShowingAndroidSettings)
+			{
+				if (buildReportToDisplay.IsUnityVersionAtLeast(6000, 0, 0))
+				{
+					DrawSetting("Create debug symbols:", settings.AndroidDebugSymbols);
+				}
+				else if (buildReportToDisplay.IsUnityVersionAtLeast(2021, 1, 0))
+				{
+					DrawSetting("Create symbol package:", settings.AndroidCreateSymbols);
+				}
+			}
 			else if (IsShowingWebGlSettings)
 			{
 				DrawSetting("Use pre-built WebGL Unity engine:", settings.WebGLUsePreBuiltUnityEngine);
@@ -851,10 +977,14 @@ namespace BuildReportTool.Window.Screen
 			{
 				DrawSetting("Enable explicit divide-by-zero checks:", settings.EnableExplicitDivideByZeroChecks);
 			}
+			DrawSetting("Enable explicit array bounds checks:", settings.EnableArrayBoundsChecks);
 
 			if (buildReportToDisplay.IsUnityVersionAtLeast(5, 0, 0))
 			{
-				DrawSetting("Action on unhandled .NET exception:", settings.ActionOnDotNetUnhandledException);
+				if (buildReportToDisplay.IsUnityVersionAtMost(6000, 1, 0))
+				{
+					DrawSetting("Action on unhandled .NET exception:", settings.ActionOnDotNetUnhandledException);
+				}
 
 				DrawSetting("Enable internal profiler:", settings.EnableInternalProfiler);
 
@@ -867,14 +997,16 @@ namespace BuildReportTool.Window.Screen
 			if (unityBuildReport != null)
 			{
 #if UNITY_2019_3_OR_NEWER
-				DrawSetting("Deep Profiling Support:", unityBuildReport.HasBuildOption(BuildOptions.EnableDeepProfilingSupport));
+				DrawSetting("Deep profiling support:", unityBuildReport.HasBuildOption(BuildOptions.EnableDeepProfilingSupport));
 #endif
+#if UNITY_5_2 || UNITY_5_3_OR_NEWER
 				DrawSetting("Force enable assertions in release build:", unityBuildReport.HasBuildOption(BuildOptions.ForceEnableAssertions));
+#endif
 			}
-			DrawSetting("Allow script Debugger:", settings.EnableSourceDebugging);
+			DrawSetting("Allow remote script debuggers:", settings.EnableSourceDebugging);
 			DrawSetting("Wait for Managed Debugger before executing scripts:", settings.WaitForManagedDebugger);
 
-			//DrawSetting("Force script optimization on debug builds:", settings.ForceOptimizeScriptCompilation);
+			DrawSetting("Collect CPU/GPU frame timing statistics:", settings.FrameTimingStats);
 
 			GUILayout.EndVertical();
 			if (Event.current.type == EventType.Repaint)
@@ -883,7 +1015,7 @@ namespace BuildReportTool.Window.Screen
 			}
 		}
 
-		void DrawCodeSettings(BuildInfo buildReportToDisplay, UnityBuildSettings settings)
+		void DrawCodeSettings(BuildInfo buildReportToDisplay, UnityBuildSettings settings, UnityBuildReport unityBuildReport)
 		{
 			var groupStyle = GUI.skin.FindStyle("ProjectSettingsGroup");
 			if (groupStyle == null)
@@ -894,12 +1026,30 @@ namespace BuildReportTool.Window.Screen
 			GUILayout.BeginVertical(GUIContent.none, groupStyle, NoExpandWidth);
 			DrawSettingsGroupTitle("Code Settings");
 
-			DrawSetting("Script Compilation Defines:", settings.CompileDefines);
-
+			DrawSetting("Scripting Backend:", settings.ScriptingBackend);
 			DrawSetting(".NET API compatibility level:", settings.NETApiCompatibilityLevel);
-			DrawSetting("AOT options:", settings.AOTOptions);
+			DrawSetting("Incremental garbage collection:", settings.IncrementalGC);
+			DrawSetting("Suppress common C# warnings:", settings.SuppressCommonWarnings);
+			DrawSetting("Allow 'unsafe' code:", settings.AllowUnsafeCode);
+			DrawSetting("Exact version matching for Strong-named assemblies:", settings.AssemblyVersionValidation);
+			DrawSetting("IL2CPP code generation:", settings.IL2CPPCodeGeneration);
+			DrawSetting("IL2CPP compiler configuration:", settings.IL2CPPCompilerConfig);
+			DrawSetting("IL2CPP stacktrace information:", settings.IL2CPPStacktraceInfo);
+
+			if (buildReportToDisplay.IsUnityVersionLessThan(6000, 1, 0))
+			{
+				DrawSetting("AOT options:", settings.AOTOptions);
+			}
+
 			DrawSetting("Location usage description:", settings.LocationUsageDescription);
 
+			if (unityBuildReport != null)
+			{
+#if UNITY_2019_2_OR_NEWER
+				DrawSetting("Enable Code Coverage:",
+					unityBuildReport.HasBuildOption(BuildOptions.EnableCodeCoverage));
+#endif
+			}
 			if (IsShowingiOSSettings)
 			{
 				DrawSetting("Script call optimized:", settings.iOSScriptCallOptimizationUsed);
@@ -910,6 +1060,11 @@ namespace BuildReportTool.Window.Screen
 				DrawSetting("Mono environment variables:", settings.PS4MonoEnvVars);
 				DrawSetting("Enable Player Prefs support:", settings.PS4EnablePlayerPrefsSupport);
 			}
+
+			DrawSetting("Additional Compiler Arguments:", settings.AdditionalCompilerArguments);
+			DrawSetting("Additional IL2CPP Arguments:", settings.AdditionalIL2CPPArguments);
+			DrawSetting("Script Compilation Defines:", settings.CompileDefines);
+
 			GUILayout.EndVertical();
 			if (Event.current.type == EventType.Repaint)
 			{
@@ -928,16 +1083,51 @@ namespace BuildReportTool.Window.Screen
 			GUILayout.BeginVertical(GUIContent.none, groupStyle, NoExpandWidth);
 			DrawSettingsGroupTitle("Graphics Settings");
 
+			if (IsShowingAndroidSettings)
+			{
+				DrawSetting("Texture Compression:", settings.AndroidBuildSubtarget);
+			}
+
+			DrawSetting("Max Texture Size Override:", settings.OverrideMaxTextureSize, "No Override");
+			DrawSetting("Texture Compression Override:", settings.OverrideTextureCompression);
+
+			DrawSetting("Use HDR display if available:", settings.UseHDRDisplay);
+			DrawSetting("Allow HDR display support:", settings.AllowHDRDisplaySupport);
+			DrawSetting("HDR bit depth:", settings.HdrBitDepth);
 			DrawSetting("Use 32-bit display buffer:", settings.Use32BitDisplayBuffer);
+			if (IsShowingMacSettings)
+			{
+				DrawSetting("Enable Retina support:", settings.MacRetinaSupport);
+			}
 			DrawSetting("Rendering path:", settings.RenderingPathUsed);
 			DrawSetting("Color space:", settings.ColorSpaceUsed);
 			DrawSetting("Use multi-threaded rendering:", settings.UseMultithreadedRendering);
+			DrawSetting("Virtual texturing support enabled:", settings.VirtualTexturingSupportEnabled);
 			DrawSetting("Use graphics jobs:", settings.UseGraphicsJobs);
 			DrawSetting("Graphics jobs mode:", settings.GraphicsJobsType);
 			DrawSetting("Use GPU skinning:", settings.UseGPUSkinning);
+			DrawSetting("Clamp BlendShape weights (deprecated):", settings.LegacyClampBlendShapeWeights);
 			DrawSetting("Enable Virtual Reality Support:", settings.EnableVirtualRealitySupport);
+			DrawSetting("Stereo rendering path:", settings.StereoRenderingPath);
 
-#if UNITY_2020_2_OR_NEWER
+			if (IsShowingWindowsDesktopSettings || IsShowingMacSettings)
+			{
+				DrawSetting("Enable 360 stereo capture:", settings.Enable360StereoCapture);
+			}
+
+			if (IsShowingiOSSettings || IsShowingTvOSSettings || IsShowingAndroidSettings)
+			{
+				DrawSetting("Normal map encoding:", settings.NormalMapEncoding);
+			}
+
+			DrawSetting("Shader chunk count for platform:", settings.ShaderChunkCountForPlatform);
+			DrawSetting("Shader chunk size in MB for platform:", settings.ShaderChunkSizeInMBForPlatform);
+			DrawSetting("Shader precision model:", settings.ShaderPrecisionModel);
+			DrawSetting("Strict shader variant matching:", settings.StrictShaderVariantMatching);
+			DrawSetting("Max vertex limit for Sprite batching:", settings.SpriteBatchVertexThreshold);
+
+#if UNITY_2020_2_OR_NEWER && !UNITY_2023_1_OR_NEWER
+			// Shader Live Link added in 2020.2, removed in 2023.1
 			if (unityBuildReport != null)
 			{
 				DrawSetting("Enable Shader Livelink Support:",
@@ -1004,12 +1194,15 @@ namespace BuildReportTool.Window.Screen
 						DrawSetting("Direct3D11 Fullscreen Mode:", settings.WinDirect3D11FullscreenModeUsed);
 					}
 
+					DrawSetting("Use DXGI flip model swap chain if possible (for Direct3D11):", settings.WinUseFlipModelSwapchain);
+
 					DrawSetting("Visible in background (for Fullscreen Windowed mode):", settings.VisibleInBackground);
 				}
 				else if (IsShowingMacSettings)
 				{
 					// removed in 2018
-					if (buildReportToDisplay.IsUnityVersionAtLeast(2017, 0, 0))
+					if (buildReportToDisplay.IsUnityVersionAtLeast(2017, 0, 0) &&
+					    buildReportToDisplay.IsUnityVersionAtMost(2017, 4, 0))
 					{
 						DrawSetting("Fullscreen mode:", settings.MacFullscreenModeUsed);
 						GUILayout.Space(SETTINGS_GROUP_MINOR_SPACING);
@@ -1018,7 +1211,12 @@ namespace BuildReportTool.Window.Screen
 
 				DrawSetting("Allow OS switching between full-screen and window mode:",
 					settings.StandaloneAllowFullScreenSwitch);
-				DrawSetting("Darken secondary monitors on full-screen:", settings.StandaloneCaptureSingleScreen);
+
+				if (buildReportToDisplay.IsUnityVersionLessThan(6000, 1, 0))
+				{
+					DrawSetting("Darken secondary monitors on full-screen:", settings.StandaloneCaptureSingleScreen);
+				}
+
 				DrawSetting("Force single instance:", settings.StandaloneForceSingleInstance);
 
 				DrawSetting("Stereoscopic Rendering:", settings.StandaloneUseStereoscopic3d);
@@ -1063,6 +1261,8 @@ namespace BuildReportTool.Window.Screen
 					DrawSetting("Disable depth and stencil buffers:", settings.AndroidDisableDepthAndStencilBuffers);
 				}
 
+				DrawSetting("Preserve alpha in framebuffer:", settings.AndroidPreserveFramebufferAlpha);
+
 				GUILayout.Space(SETTINGS_GROUP_MINOR_SPACING);
 			}
 			else if (IsShowingPS4Settings)
@@ -1071,6 +1271,15 @@ namespace BuildReportTool.Window.Screen
 				DrawSetting("Video out resolution:", settings.PS4VideoOutResolution);
 				GUILayout.Space(SETTINGS_GROUP_MINOR_SPACING);
 			}
+
+			DrawSetting("Enable SetSRGBWrite on Vulkan:", settings.VulkanEnableSetSRGBWrite);
+			DrawSetting("Number of swapchain buffers on Vulkan:", settings.vulkanNumSwapchainBuffers);
+			DrawSetting("Acquire swapchain image as late as possible on Vulkan:", settings.VulkanEnableLateAcquireNextImage);
+			if (IsShowingAndroidSettings)
+			{
+				DrawSetting("Apply display rotation during rendering:", settings.VulkanEnablePreTransform);
+			}
+
 			GUILayout.EndVertical();
 			if (Event.current.type == EventType.Repaint)
 			{
@@ -1081,9 +1290,11 @@ namespace BuildReportTool.Window.Screen
 		void DrawPackageSettings(BuildInfo buildReportToDisplay, UnityBuildSettings settings)
 		{
 			var packageList = settings.PackageEntries;
+			var dependencyPackageList = settings.DependencyPackageEntries;
 			var builtInPackageList = settings.BuiltInPackageEntries;
 
 			bool packageListIsEmpty = packageList == null || packageList.Count == 0;
+			bool dependencyPackageListIsEmpty = dependencyPackageList == null || dependencyPackageList.Count == 0;
 			bool builtInPackageListIsEmpty = builtInPackageList == null || builtInPackageList.Count == 0;
 
 			if (packageListIsEmpty && builtInPackageListIsEmpty)
@@ -1114,72 +1325,37 @@ namespace BuildReportTool.Window.Screen
 			if (!packageListIsEmpty)
 			{
 				DrawSettingsGroupTitle("Packages");
+
 				for (int n = 0, len = packageList.Count; n < len; ++n)
 				{
-					if (!string.IsNullOrEmpty(packageList[n].DisplayName))
-					{
-						if (!string.IsNullOrEmpty(packageList[n].Location) && packageList[n].Location.EndsWith(".git") && packageList[n].VersionUsed.Length > 7)
-						{
-							// show commit hash as short
-							GUILayout.BeginHorizontal(GUIContent.none, groupStyle, NoExpandWidth);
-							GUILayout.Label(packageList[n].DisplayName, nameStyle);
-							GUILayout.Space(4);
-							GUILayout.TextField(packageList[n].VersionUsed.Substring(0, DEFAULT_SHORT_COMMIT_HASH_LENGTH_DISPLAYED), valueStyle);
-							GUILayout.Space(4);
-							DrawPackagePingButton(packageList[n]);
-							GUILayout.EndHorizontal();
-							GUILayout.TextField(packageList[n].PackageName, valueStyle);
-						}
-						else if (packageList[n].VersionUsed.Length <= 10)
-						{
-							// version is short enough, put it in the same line as the Package Name
-							GUILayout.BeginHorizontal(GUIContent.none, groupStyle, NoExpandWidth);
-							GUILayout.Label(packageList[n].DisplayName, nameStyle);
-							GUILayout.Space(4);
-							GUILayout.TextField(packageList[n].VersionUsed, valueStyle);
-							GUILayout.Space(4);
-							DrawPackagePingButton(packageList[n]);
-							GUILayout.EndHorizontal();
-							GUILayout.TextField(packageList[n].PackageName, valueStyle);
-						}
-						else
-						{
-							// version is too long, put it as a 2nd line after the Display Name
-							GUILayout.Label(packageList[n].DisplayName, nameStyle);
-							GUILayout.TextField(packageList[n].VersionUsed, valueStyle);
-							GUILayout.TextField(packageList[n].PackageName, valueStyle);
-							DrawPackagePingButton(packageList[n]);
-						}
-					}
-					else
-					{
-						// no display name
-						if (packageList[n].VersionUsed.Length <= 10)
-						{
-							// version is short enough, put it in the same line as the Package Name
-							GUILayout.BeginHorizontal(GUIContent.none, groupStyle, NoExpandWidth);
-							GUILayout.TextField(packageList[n].PackageName, nameStyle);
-							GUILayout.Space(4);
-							GUILayout.TextField(packageList[n].VersionUsed, valueStyle);
-							GUILayout.Space(4);
-							DrawPackagePingButton(packageList[n]);
-							GUILayout.EndHorizontal();
-						}
-						else
-						{
-							// version is too long, put it as a 2nd line after the Package Name
-							GUILayout.TextField(packageList[n].PackageName, nameStyle);
-							GUILayout.TextField(packageList[n].VersionUsed, valueStyle);
-							DrawPackagePingButton(packageList[n]);
-						}
-					}
-
-					if (!string.IsNullOrEmpty(packageList[n].Location) && packageList[n].Location != BuildReportTool.UnityBuildSettingsUtility.DEFAULT_REGISTRY_URL)
-					{
-						GUILayout.TextField(packageList[n].Location, valueStyle);
-					}
+					DrawPackageEntry(packageList[n].PackageName, packageList[n].DisplayName,
+						packageList[n].VersionUsed, packageList[n].Location, packageList[n].LocalPath);
 
 					GUILayout.Space(10);
+				}
+
+				if (!dependencyPackageListIsEmpty)
+				{
+					GUILayout.Space(14);
+					DrawSettingsGroupTitle("Dependencies",
+						"Packages that have been included in the project\nonly because they are needed by the other Packages.");
+
+					for (int n = 0, len = dependencyPackageList.Count; n < len; ++n)
+					{
+						DrawPackageEntry(dependencyPackageList[n].PackageName, dependencyPackageList[n].DisplayName,
+							dependencyPackageList[n].VersionUsed, dependencyPackageList[n].Location, dependencyPackageList[n].LocalPath);
+						if (dependencyPackageList[n].Dependents != null && dependencyPackageList[n].Dependents.Count > 0)
+						{
+							GUILayout.Label("Used by:", nameStyle);
+							for (int i = 0, dLen = dependencyPackageList[n].Dependents.Count; i < dLen; ++i)
+							{
+								string dependent = dependencyPackageList[n].Dependents[i];
+								GUILayout.Label(dependent, valueStyle);
+							}
+						}
+
+						GUILayout.Space(10);
+					}
 				}
 
 				if (!builtInPackageListIsEmpty)
@@ -1213,19 +1389,87 @@ namespace BuildReportTool.Window.Screen
 			{
 				_pathSettingsRect = GUILayoutUtility.GetLastRect();
 			}
+
+			void DrawPackageEntry(string packageName, string displayName, string versionUsed, string location, string localPath)
+			{
+				if (!string.IsNullOrEmpty(displayName))
+				{
+					if (!string.IsNullOrEmpty(location) && location.EndsWith(".git") && versionUsed.Length > 7)
+					{
+						// show commit hash as short
+						GUILayout.BeginHorizontal(GUIContent.none, groupStyle, NoExpandWidth);
+						GUILayout.Label(displayName, nameStyle);
+						GUILayout.Space(4);
+						GUILayout.TextField(versionUsed.Substring(0, DEFAULT_SHORT_COMMIT_HASH_LENGTH_DISPLAYED), valueStyle);
+						GUILayout.Space(4);
+						DrawPackagePingButton(packageName, localPath);
+						GUILayout.EndHorizontal();
+						GUILayout.TextField(packageName, valueStyle);
+					}
+					else if (!string.IsNullOrEmpty(versionUsed) && versionUsed.Length <= 10)
+					{
+						// version is short enough, put it in the same line as the Package Name
+						GUILayout.BeginHorizontal(GUIContent.none, groupStyle, NoExpandWidth);
+						GUILayout.Label(displayName, nameStyle);
+						GUILayout.Space(4);
+						GUILayout.TextField(versionUsed, valueStyle);
+						GUILayout.Space(4);
+						DrawPackagePingButton(packageName, localPath);
+						GUILayout.EndHorizontal();
+						GUILayout.TextField(packageName, valueStyle);
+					}
+					else
+					{
+						// version is too long, put it as a 2nd line after the Display Name
+						GUILayout.Label(displayName, nameStyle);
+						GUILayout.TextField(versionUsed, valueStyle);
+						GUILayout.TextField(packageName, valueStyle);
+						DrawPackagePingButton(packageName, localPath);
+					}
+				}
+				else
+				{
+					// no display name, use package name instead
+					if (!string.IsNullOrEmpty(versionUsed) && versionUsed.Length <= 10)
+					{
+						// version is short enough, put it in the same line as the Package Name
+						GUILayout.BeginHorizontal(GUIContent.none, groupStyle, NoExpandWidth);
+						GUILayout.TextField(packageName, nameStyle);
+						GUILayout.Space(4);
+						GUILayout.TextField(versionUsed, valueStyle);
+						GUILayout.Space(4);
+						DrawPackagePingButton(packageName, localPath);
+						GUILayout.EndHorizontal();
+					}
+					else
+					{
+						// version is too long, put it as a 2nd line after the Package Name
+						GUILayout.TextField(packageName, nameStyle);
+						GUILayout.TextField(versionUsed, valueStyle);
+						DrawPackagePingButton(packageName, localPath);
+					}
+				}
+
+				if (!string.IsNullOrEmpty(location) && location != BuildReportTool.UnityBuildSettingsUtility.DEFAULT_REGISTRY_URL)
+				{
+					GUILayout.TextField(location, valueStyle);
+				}
+			}
 		}
 
-		void DrawPackagePingButton(BuildReportTool.UnityBuildSettings.PackageEntry packageEntry)
+
+
+		void DrawPackagePingButton(string packageName, string localPath)
 		{
-			if (!string.IsNullOrEmpty(packageEntry.LocalPath))
+			if (!string.IsNullOrEmpty(localPath))
 			{
 				if (GUILayout.Button("Ping", "MiniButton"))
 				{
-					Utility.PingAssetInProject($"Packages/{packageEntry.PackageName}/package.json");
+					Utility.PingAssetInProject(string.Format("Packages/{0}/package.json", packageName));
 				}
 				if (GUILayout.Button("Explore", "MiniButton"))
 				{
-					BuildReportTool.Util.OpenInFileBrowser(packageEntry.LocalPath);
+					BuildReportTool.Util.OpenInFileBrowser(localPath);
 				}
 			}
 		}
@@ -1253,10 +1497,10 @@ namespace BuildReportTool.Window.Screen
 
 
 		public override void DrawGUI(Rect position,
-			BuildInfo buildReportToDisplay, AssetDependencies assetDependencies, TextureData textureData, MeshData meshData,
-			UnityBuildReport unityBuildReport,
-			out bool requestRepaint
-		)
+			BuildInfo buildReportToDisplay, AssetDependencies assetDependencies,
+			TextureData textureData, MeshData meshData, PrefabData prefabData,
+			UnityBuildReport unityBuildReport, BuildReportTool.ExtraData extraData, BuildReportTool.AssetBundleSession assetBundleSession,
+			out bool requestRepaint)
 		{
 			if (buildReportToDisplay == null)
 			{
@@ -1310,7 +1554,7 @@ namespace BuildReportTool.Window.Screen
 				_settingDropdownBoxLabels, fileFilterPopupStyle);
 			GUILayout.Space(15);
 
-			GUILayout.Label($"Note: Project was built in {_buildTargetOfReport} target", topBarLabelStyle);
+			GUILayout.Label(string.Format("Note: Project was built in {0} target", _buildTargetOfReport), topBarLabelStyle);
 			GUILayout.FlexibleSpace();
 
 			BuildReportTool.Options.ShowProjectSettingsInMultipleColumns = GUILayout.Toggle(BuildReportTool.Options.ShowProjectSettingsInMultipleColumns, "Multiple Columns");
@@ -1393,7 +1637,7 @@ namespace BuildReportTool.Window.Screen
 				GUILayout.BeginVertical(NoExpandWidth);
 			}
 			// =================================================================
-			DrawCodeSettings(buildReportToDisplay, settings);
+			DrawCodeSettings(buildReportToDisplay, settings, unityBuildReport);
 			GUILayout.Space(SETTINGS_GROUP_SPACING);
 
 

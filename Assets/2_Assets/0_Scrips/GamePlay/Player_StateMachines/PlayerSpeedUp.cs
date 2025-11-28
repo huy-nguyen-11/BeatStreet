@@ -16,7 +16,7 @@ public class PlayerSpeedUp : PlayerStateManager
     public void SetSpeedUp()
     {
         Vector2 direction = playerController.joystick.Direction;
-        playerController.rb.velocity = Vector2.right * (!playerController.SpeedupDirection ? -4f : 4);
+        playerController.rb.linearVelocity = Vector2.right * (!playerController.SpeedupDirection ? -4f : 4);
         playerController.transform.rotation = Quaternion.Euler(new Vector3(0, playerController.SpeedupDirection ? 0 : -180, 0));
     }
     public override void Exit()

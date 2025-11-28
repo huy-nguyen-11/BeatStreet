@@ -6,7 +6,6 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Globalization;
 
-
 namespace BuildReportTool.Window.Screen
 {
 	public partial class AssetList
@@ -22,6 +21,11 @@ namespace BuildReportTool.Window.Screen
 		/// "which is used by"
 		/// </summary>
 		static readonly GUIContent AssetUsageWhichIsUsedByLabel = new GUIContent("which is used by");
+
+		/// <summary>
+		/// "is compiled into"
+		/// </summary>
+		static readonly GUIContent AssetUsageIsCompiledIntoLabel = new GUIContent("is compiled into");
 
 		// ---------------------------------------
 
@@ -73,10 +77,21 @@ namespace BuildReportTool.Window.Screen
 		static readonly GUIContent AssetUsageWhichIsInTheBuildLabel = new GUIContent("which is in the build");
 
 		/// <summary>
+		/// "which is explicitly added into the Asset Bundle"
+		/// </summary>
+		static readonly GUIContent AssetUsageWhichIsExplicitlyInAssetBundleLabel = new GUIContent("which is explicitly added into the Asset Bundle");
+
+		/// <summary>
 		/// "is a Resources asset, so it's always in the build"
 		/// </summary>
 		static readonly GUIContent AssetUsageIsAResourcesAssetLabel =
 			new GUIContent("is a Resources asset, so it's always in the build");
+
+		/// <summary>
+		/// "is explicitly added into the Asset Bundle"
+		/// </summary>
+		static readonly GUIContent AssetUsageIsExplicitlyInAssetBundleLabel =
+			new GUIContent("is explicitly added into the Asset Bundle");
 
 		/// <summary>
 		/// "which is a Resources asset, so it's always in the build"
@@ -129,15 +144,25 @@ namespace BuildReportTool.Window.Screen
 				var path = BuildReportTool.Util.GetAssetPath(assetPath);
 				var filename = BuildReportTool.Util.GetAssetFilename(assetPath);
 
-				entry.AssetPathSelected = string.Format("<color=#{0}>{1}</color><color=white><b>{2}</b></color>",
-					BuildReportTool.Window.Screen.AssetList.GetPathColor(true),
-					path, filename);
+				if (path == filename)
+				{
+					// no path
+					entry.AssetPathSelected = string.Format("<color=white><b>{0}</b></color>", filename);
+					entry.AssetPath = entry.AssetPathSelected;
+					entry.AssetName = string.Format("<b>{0}</b>", filename);
+				}
+				else
+				{
+					entry.AssetPathSelected = string.Format("<color=#{0}>{1}</color><color=white><b>{2}</b></color>",
+						BuildReportTool.Window.Screen.AssetList.GetPathColor(true),
+						path, filename);
 
-				entry.AssetPath = string.Format("<color=#{0}>{1}</color><b>{2}</b>",
-					BuildReportTool.Window.Screen.AssetList.GetPathColor(false),
-					path, filename);
+					entry.AssetPath = string.Format("<color=#{0}>{1}</color><b>{2}</b>",
+						BuildReportTool.Window.Screen.AssetList.GetPathColor(false),
+						path, filename);
 
-				entry.AssetName = string.Format("<b>{0}</b>", filename);
+					entry.AssetName = string.Format("<b>{0}</b>", filename);
+				}
 
 				_prettyAssetLabels.Add(assetPath, entry);
 			}
@@ -289,15 +314,14 @@ namespace BuildReportTool.Window.Screen
 		bool _selectedIsAResourcesAsset;
 
 		/// <summary>
-		/// When the selected asset in the main asset list is a Resources asset, this stores
-		/// the filename and icon.
+		/// Filename and icon of the selected asset.
 		/// </summary>
-		readonly GUIContent _selectedResourcesAsset = new GUIContent();
+		readonly GUIContent _selectedAsset = new GUIContent();
 
 		/// <summary>
-		/// Path to the selected Resources asset, starting from "Assets/"
+		/// Path to the selected asset, starting from "Assets/"
 		/// </summary>
-		string _selectedResourcesAssetPath;
+		string _selectedAssetPath;
 
 		/// <summary>
 		/// Special case when a scene is using an fbx directly (did not save it as a prefab first).
@@ -486,7 +510,10 @@ namespace BuildReportTool.Window.Screen
 				// But if it's a Resources asset, we will at least indicate so.
 				// It's most likely this Resources asset is only referenced in code,
 				// (or also could be not at all!)
-				if (_selectedIsAResourcesAsset)
+				//
+				// If this Build Report is for Asset Bundles, then when asset has no Asset Dependencies, that means
+				// it was explicitly added into the Asset Bundle.
+				if (_selectedIsAResourcesAsset || buildReportToDisplay.HasAssetBundles)
 				{
 					var height = ASSET_INFO_ROW_HEIGHT + assetInfoPanelNoListStyle.padding.vertical;
 					_assetUsageRect =
@@ -501,10 +528,16 @@ namespace BuildReportTool.Window.Screen
 					GUILayout.BeginVertical(string.Empty, assetInfoPanelNoListStyle, BRT_BuildReportWindow.LayoutNone);
 					GUILayout.BeginHorizontal(BRT_BuildReportWindow.LayoutNone);
 
-					if (GUILayout.Button(_selectedResourcesAsset, assetStyle, BRT_BuildReportWindow.LayoutNone))
+#if UNITY_6000_0
+					assetStyle.padding.right += BRT_BuildReportWindow.ASSET_STYLE_ADDITIONAL_WIDTH_FOR_UNITY_6_0;
+#endif
+					if (GUILayout.Button(_selectedAsset, assetStyle, BRT_BuildReportWindow.LayoutNone))
 					{
-						Utility.PingAssetInProject(_selectedResourcesAssetPath);
+						Utility.PingAssetInProject(_selectedAssetPath);
 					}
+#if UNITY_6000_0
+					assetStyle.padding.right -= BRT_BuildReportWindow.ASSET_STYLE_ADDITIONAL_WIDTH_FOR_UNITY_6_0;
+#endif
 
 					if (Event.current.type == EventType.Repaint &&
 					    (Event.current.mousePosition.x < position.width ||
@@ -521,7 +554,7 @@ namespace BuildReportTool.Window.Screen
 							// ----------------
 							// update what is considered the hovered asset, for use later on
 							// when the tooltip will be drawn
-							BRT_BuildReportWindow.UpdateHoveredAsset(_selectedResourcesAssetPath,
+							BRT_BuildReportWindow.UpdateHoveredAsset(_selectedAssetPath,
 								assetUsageAncestryEntryRect, IsShowingUsedAssets,
 								buildReportToDisplay, assetDependencies);
 
@@ -529,7 +562,7 @@ namespace BuildReportTool.Window.Screen
 							// if mouse is hovering over the correct area, we signify that
 							// the tooltip thumbnail should be drawn
 							if (BuildReportTool.Options.ShowTooltipThumbnail &&
-							    BRT_BuildReportWindow.GetAssetPreview(_selectedResourcesAssetPath) != null)
+							    BRT_BuildReportWindow.GetAssetPreview(_selectedAssetPath) != null)
 							{
 								_shouldShowThumbnailOnHoveredAsset = true;
 							}
@@ -548,7 +581,10 @@ namespace BuildReportTool.Window.Screen
 						}
 					}
 
-					GUILayout.Label(AssetUsageIsAResourcesAssetLabel, labelSingleLineStyle, BRT_BuildReportWindow.LayoutNone);
+					var label = buildReportToDisplay.HasAssetBundles
+						? AssetUsageIsExplicitlyInAssetBundleLabel
+						: AssetUsageIsAResourcesAssetLabel;
+					GUILayout.Label(label, labelSingleLineStyle, BRT_BuildReportWindow.LayoutNone);
 
 					GUILayout.EndHorizontal();
 					GUILayout.EndVertical();
@@ -1167,7 +1203,7 @@ namespace BuildReportTool.Window.Screen
 
 				_assetUsageEntryLabel.text =
 					GetPrettyAssetPath(assetPath, BuildReportTool.Options.ShowColumnAssetPath, _selectedAssetUserIdx == directUserN);
-				_assetUsageEntryLabel.image = AssetDatabase.GetCachedIcon(assetPath);
+				_assetUsageEntryLabel.image = BuildReportTool.Window.Utility.GetIcon(assetPath);
 
 				if (_assetUsageEntryLabel.image == null)
 				{
@@ -1627,7 +1663,7 @@ namespace BuildReportTool.Window.Screen
 
 				_assetUsageEntryLabel.text = GetPrettyAssetPath(usersFlattened[userFlattenedN].AssetPath, BuildReportTool.Options.ShowColumnAssetPath,
 					_selectedAssetUserIdx == userFlattenedN);
-				_assetUsageEntryLabel.image = AssetDatabase.GetCachedIcon(assetPath);
+				_assetUsageEntryLabel.image = BuildReportTool.Window.Utility.GetIcon(assetPath);
 
 				if (_assetUsageEntryLabel.image == null)
 				{
@@ -1944,6 +1980,10 @@ namespace BuildReportTool.Window.Screen
 			{
 				assetHoveredStyle = GUI.skin.label;
 			}
+#if UNITY_6000_0
+			assetStyle.padding.right += BRT_BuildReportWindow.ASSET_STYLE_ADDITIONAL_WIDTH_FOR_UNITY_6_0;
+			assetHoveredStyle.padding.right += BRT_BuildReportWindow.ASSET_STYLE_ADDITIONAL_WIDTH_FOR_UNITY_6_0;
+#endif
 			if (assetLabelInBetweenStyle == null)
 			{
 				assetLabelInBetweenStyle = GUI.skin.label;
@@ -2046,6 +2086,7 @@ namespace BuildReportTool.Window.Screen
 				widthToAdd = 0;
 
 				var isMaterialUsedByMesh = IsFileNextToFile(_assetUsageAncestry, n, ".mat", ".fbx");
+				var isScriptUsedByAssembly = IsFileNextToFile(_assetUsageAncestry, n, ".cs", ".dll");
 				var isAResourcesAsset = _assetUsageAncestry[n].AssetPath.IsInResourcesFolder();
 				var isAssetUsedByScript = (n < len - 1) && _assetUsageAncestry[n + 1].AssetPath.IsFileOfType(".cs");
 
@@ -2064,6 +2105,10 @@ namespace BuildReportTool.Window.Screen
 						else if (isAssetUsedByScript)
 						{
 							widthToAdd = assetLabelInBetweenStyle.CalcSize(AssetUsageIsUsedAsDefaultValueByLabel).x;
+						}
+						else if (isScriptUsedByAssembly)
+						{
+							widthToAdd = assetLabelInBetweenStyle.CalcSize(AssetUsageIsCompiledIntoLabel).x;
 						}
 						else
 						{
@@ -2101,6 +2146,11 @@ namespace BuildReportTool.Window.Screen
 							widthToAdd = assetLabelInBetweenStyle.CalcSize(AssetUsageWhichIsInTheBuildLabel).x +
 							             assetLabelInBetweenStyle.margin.horizontal;
 						}
+						else if (_assetUsageAncestry[n].AssetPath.IsAnAssembly())
+						{
+							widthToAdd = assetLabelInBetweenStyle.CalcSize(AssetUsageWhichIsInTheBuildLabel).x +
+							             assetLabelInBetweenStyle.margin.horizontal;
+						}
 						else if (_assetUsageAncestry[n].AssetPath.IsInResourcesFolder())
 						{
 							widthToAdd = assetLabelInBetweenStyle.CalcSize(AssetUsageWhichIsAResourcesAssetLabel).x +
@@ -2109,6 +2159,11 @@ namespace BuildReportTool.Window.Screen
 						else if (_assetUsageAncestry[n].CyclicDependency)
 						{
 							widthToAdd = assetLabelInBetweenStyle.CalcSize(AssetUsageWhichIsACyclicDependencyLabel).x +
+							             assetLabelInBetweenStyle.margin.horizontal;
+						}
+						else if (buildReportToDisplay.HasAssetBundles)
+						{
+							widthToAdd = assetLabelInBetweenStyle.CalcSize(AssetUsageWhichIsExplicitlyInAssetBundleLabel).x +
 							             assetLabelInBetweenStyle.margin.horizontal;
 						}
 					}
@@ -2173,6 +2228,11 @@ namespace BuildReportTool.Window.Screen
 							GUILayout.Label(AssetUsageIsUsedAsDefaultValueByLabel,
 								assetLabelInBetweenStyle, BRT_BuildReportWindow.LayoutNone);
 						}
+						else if (isScriptUsedByAssembly)
+						{
+							GUILayout.Label(AssetUsageIsCompiledIntoLabel,
+								assetLabelInBetweenStyle, BRT_BuildReportWindow.LayoutNone);
+						}
 						else
 						{
 							GUILayout.Label(AssetUsageIsUsedByLabel,
@@ -2209,6 +2269,11 @@ namespace BuildReportTool.Window.Screen
 							GUILayout.Label(AssetUsageWhichIsInTheBuildLabel,
 								assetLabelInBetweenStyle, BRT_BuildReportWindow.LayoutNone);
 						}
+						else if (_assetUsageAncestry[n].AssetPath.IsAnAssembly())
+						{
+							GUILayout.Label(AssetUsageWhichIsInTheBuildLabel,
+								assetLabelInBetweenStyle, BRT_BuildReportWindow.LayoutNone);
+						}
 						else if (_assetUsageAncestry[n].AssetPath.IsInResourcesFolder())
 						{
 							GUILayout.Label(AssetUsageWhichIsAResourcesAssetLabel,
@@ -2217,6 +2282,11 @@ namespace BuildReportTool.Window.Screen
 						else if (_assetUsageAncestry[n].CyclicDependency)
 						{
 							GUILayout.Label(AssetUsageWhichIsACyclicDependencyLabel,
+								assetLabelInBetweenStyle, BRT_BuildReportWindow.LayoutNone);
+						}
+						else if (buildReportToDisplay.HasAssetBundles)
+						{
+							GUILayout.Label(AssetUsageWhichIsExplicitlyInAssetBundleLabel,
 								assetLabelInBetweenStyle, BRT_BuildReportWindow.LayoutNone);
 						}
 					}
@@ -2290,6 +2360,10 @@ namespace BuildReportTool.Window.Screen
 			{
 				GUILayout.Label(AssetUsageAncestryDefaultMaterialInFbxOfScene, BRT_BuildReportWindow.LayoutNone);
 			}
+#if UNITY_6000_0
+			assetStyle.padding.right -= BRT_BuildReportWindow.ASSET_STYLE_ADDITIONAL_WIDTH_FOR_UNITY_6_0;
+			assetHoveredStyle.padding.right -= BRT_BuildReportWindow.ASSET_STYLE_ADDITIONAL_WIDTH_FOR_UNITY_6_0;
+#endif
 		}
 
 
@@ -2328,6 +2402,9 @@ namespace BuildReportTool.Window.Screen
 				// width of the asset name
 
 				var widthToAdd = assetStyle.CalcSize(list[n].Label).x;
+#if UNITY_6000_0
+				widthToAdd += BRT_BuildReportWindow.ASSET_STYLE_ADDITIONAL_WIDTH_FOR_UNITY_6_0;
+#endif
 
 #if BRT_ASSET_LIST_SCREEN_DEBUG
 				_debugText.AppendFormat("Item {0} name width: {1}\n",
@@ -2371,6 +2448,10 @@ namespace BuildReportTool.Window.Screen
 						{
 							widthToAdd = assetLabelInBetweenStyle.CalcSize(AssetUsageIsUsedAsDefaultValueByLabel).x;
 						}
+						else if (IsFileNextToFile(list, n, ".cs", ".dll"))
+						{
+							widthToAdd = assetLabelInBetweenStyle.CalcSize(AssetUsageIsCompiledIntoLabel).x;
+						}
 						else
 						{
 							widthToAdd = assetLabelInBetweenStyle.CalcSize(AssetUsageIsUsedByLabel).x;
@@ -2403,6 +2484,11 @@ namespace BuildReportTool.Window.Screen
 					else if (n == len - 1)
 					{
 						if (list[n].AssetPath.IsSceneFile())
+						{
+							widthToAdd = assetLabelInBetweenStyle.CalcSize(AssetUsageWhichIsInTheBuildLabel).x +
+							             assetLabelInBetweenStyle.margin.horizontal;
+						}
+						else if (list[n].AssetPath.IsAnAssembly())
 						{
 							widthToAdd = assetLabelInBetweenStyle.CalcSize(AssetUsageWhichIsInTheBuildLabel).x +
 							             assetLabelInBetweenStyle.margin.horizontal;
@@ -2535,6 +2621,28 @@ namespace BuildReportTool.Window.Screen
 			}
 
 			// ----------------
+			// find the first deepest asset user
+
+			int deepestLevel = 0;
+			int idxOfDeepest = -1;
+			for (int n = 0, len = usersFlattened.Count; n < len; ++n)
+			{
+				if (deepestLevel < usersFlattened[n].IndentLevel)
+				{
+					deepestLevel = usersFlattened[n].IndentLevel;
+					idxOfDeepest = n;
+				}
+			}
+
+			if (idxOfDeepest != -1)
+			{
+				_selectedAssetUserIdx = idxOfDeepest;
+				SetAssetUsageAncestry(_assetUsageAncestry, usersFlattened, idxOfDeepest, rootAsset);
+				_assetUsageAncestryHasFbxUsingDefaultMaterialUsedInScene = false;
+				return;
+			}
+
+			// ----------------
 			// no end user found, just select the first user
 
 			_selectedAssetUserIdx = 0;
@@ -2586,7 +2694,7 @@ namespace BuildReportTool.Window.Screen
 			lastEntry.Label =
 				new GUIContent(
 					lastEntry.AssetPath.GetFileNameOnly(),
-					AssetDatabase.GetCachedIcon(lastEntry.AssetPath));
+					BuildReportTool.Window.Utility.GetIcon(lastEntry.AssetPath));
 
 			destination.Add(lastEntry);
 
@@ -2611,7 +2719,7 @@ namespace BuildReportTool.Window.Screen
 				newEntry.Label =
 					new GUIContent(
 						newEntry.AssetPath.GetFileNameOnly(),
-						AssetDatabase.GetCachedIcon(newEntry.AssetPath));
+						BuildReportTool.Window.Utility.GetIcon(newEntry.AssetPath));
 
 				destination.Insert(0, newEntry);
 			}
@@ -2624,7 +2732,7 @@ namespace BuildReportTool.Window.Screen
 			firstEntry.Label =
 				new GUIContent(
 					firstEntry.AssetPath.GetFileNameOnly(),
-					AssetDatabase.GetCachedIcon(firstEntry.AssetPath));
+					BuildReportTool.Window.Utility.GetIcon(firstEntry.AssetPath));
 			destination.Insert(0, firstEntry);
 		}
 	}

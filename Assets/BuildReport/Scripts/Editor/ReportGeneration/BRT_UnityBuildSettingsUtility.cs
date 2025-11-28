@@ -1,42 +1,9 @@
-#if UNITY_5 && (!UNITY_5_0 && !UNITY_5_1)
-#define UNITY_5_2_AND_GREATER
-#endif
-
-#if UNITY_5 && (!UNITY_5_0 && !UNITY_5_1 && !UNITY_5_2)
-#define UNITY_5_3_AND_GREATER
-#endif
-
-#if UNITY_4 || UNITY_5_0 || UNITY_5_1
-#define UNITY_5_1_AND_LESSER
-#endif
-
-#if UNITY_4 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2
-#define UNITY_5_2_AND_LESSER
-#endif
-
-#if UNITY_4 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2 || UNITY_5_3
-#define UNITY_5_3_AND_LESSER
-#endif
-
-#if UNITY_4 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2 || UNITY_5_3 || UNITY_5_4
-#define UNITY_5_4_AND_LESSER
-#endif
-
-#if UNITY_4 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2 || UNITY_5_3 || UNITY_5_4 || UNITY_5_5
-#define UNITY_5_5_AND_LESSER
-#endif
-
-#if !UNITY_2018
-#define UNITY_2017_AND_LESSER
-#endif
-
-#if !UNITY_4 && !UNITY_5 && !UNITY_2017
-#define UNITY_2018_AND_NEWER
-#endif
-
 using System;
 using System.Collections.Generic;
-#if !UNITY_5_1_AND_LESSER // 5.2 and greater
+#if UNITY_ANDROID
+using Unity.Android.Types;
+#endif
+#if UNITY_5_3_OR_NEWER // 5.2 and greater
 using System.Linq;
 #endif
 using UnityEditor;
@@ -59,25 +26,28 @@ namespace BuildReportTool
 			//
 			return new[]
 			{
-				/* 0 */ new GUIContent("Windows"),
-				/* 1 */ new GUIContent("Mac"),
-				/* 2 */ new GUIContent("Linux"),
+				/*  0 */ new GUIContent("Windows"),
+				/*  1 */ new GUIContent("Mac"),
+				/*  2 */ new GUIContent("Linux"),
 
-				/* 3 */ new GUIContent("Web"),
+				/*  3 */ new GUIContent("Web"),
 				/*  4 */ new GUIContent("Web GL"),
 
 				/*  5 */ new GUIContent("iOS"),
-				/*  6 */ new GUIContent("Android"),
-				/*  7 */ new GUIContent("Blackberry"),
+				/*  6 */ new GUIContent("tvOS"),
+				/*  7 */ new GUIContent("Android"),
+				/*  8 */ new GUIContent("Blackberry"),
 
-				/*  8 */ new GUIContent("Xbox 360"),
-				/*  9 */ new GUIContent("Xbox One"),
-				/* 10 */ new GUIContent("Playstation 3"),
-				/* 11 */ new GUIContent("Playstation 4"),
+				/*  9 */ new GUIContent("Xbox 360"),
+				/* 10 */ new GUIContent("Xbox One"),
+				/* 11 */ new GUIContent("Xbox Series"),
+				/* 12 */ new GUIContent("Playstation 3"),
+				/* 13 */ new GUIContent("Playstation 4"),
+				/* 14 */ new GUIContent("Playstation 5"),
 
-				/* 12 */ new GUIContent("Playstation Vita (Native)"),
+				/* 15 */ new GUIContent("Playstation Vita (Native)"),
 
-				/* 13 */ new GUIContent("Samsung TV"),
+				/* 16 */ new GUIContent("Samsung TV"),
 			};
 		}
 
@@ -102,25 +72,31 @@ namespace BuildReportTool
 
 				case BuildSettingCategory.iOS:
 					return 5;
-				case BuildSettingCategory.Android:
+				case BuildSettingCategory.tvOS:
 					return 6;
-				case BuildSettingCategory.Blackberry:
+				case BuildSettingCategory.Android:
 					return 7;
+				case BuildSettingCategory.Blackberry:
+					return 8;
 
 				case BuildSettingCategory.Xbox360:
-					return 8;
-				case BuildSettingCategory.XboxOne:
 					return 9;
-				case BuildSettingCategory.PS3:
+				case BuildSettingCategory.XboxOne:
 					return 10;
-				case BuildSettingCategory.PS4:
+				case BuildSettingCategory.XboxSeries:
 					return 11;
+				case BuildSettingCategory.PS3:
+					return 12;
+				case BuildSettingCategory.PS4:
+					return 13;
+				case BuildSettingCategory.PS5:
+					return 14;
 
 				case BuildSettingCategory.PSVita:
-					return 12;
+					return 15;
 
 				case BuildSettingCategory.SamsungTV:
-					return 13;
+					return 16;
 			}
 
 			return -1;
@@ -145,23 +121,29 @@ namespace BuildReportTool
 				case 5:
 					return BuildSettingCategory.iOS;
 				case 6:
-					return BuildSettingCategory.Android;
+					return BuildSettingCategory.tvOS;
 				case 7:
+					return BuildSettingCategory.Android;
+				case 8:
 					return BuildSettingCategory.Blackberry;
 
-				case 8:
-					return BuildSettingCategory.Xbox360;
 				case 9:
-					return BuildSettingCategory.XboxOne;
+					return BuildSettingCategory.Xbox360;
 				case 10:
-					return BuildSettingCategory.PS3;
+					return BuildSettingCategory.XboxOne;
 				case 11:
-					return BuildSettingCategory.PS4;
-
+					return BuildSettingCategory.XboxSeries;
 				case 12:
+					return BuildSettingCategory.PS3;
+				case 13:
+					return BuildSettingCategory.PS4;
+				case 14:
+					return BuildSettingCategory.PS5;
+
+				case 15:
 					return BuildSettingCategory.PSVita;
 
-				case 13:
+				case 16:
 					return BuildSettingCategory.SamsungTV;
 			}
 
@@ -196,11 +178,15 @@ namespace BuildReportTool
 					return "Xbox 360";
 				case BuildSettingCategory.XboxOne:
 					return "Xbox One";
+				case BuildSettingCategory.XboxSeries:
+					return "Xbox Series";
 
 				case BuildSettingCategory.PS3:
 					return "Playstation 3";
 				case BuildSettingCategory.PS4:
 					return "Playstation 4";
+				case BuildSettingCategory.PS5:
+					return "Playstation 5";
 
 				case BuildSettingCategory.PSVita:
 					return "Playstation Vita (Native)";
@@ -266,6 +252,10 @@ namespace BuildReportTool
 
 			settings.UsingAdvancedLicense = PlayerSettings.advancedLicense;
 
+#if UNITY_5_6_OR_NEWER
+			settings.ApplicationIdentifier = PlayerSettings.applicationIdentifier;
+#endif
+
 			// debug settings
 			// ---------------------------------------------------------------
 			settings.EnableDevelopmentBuild = EditorUserBuildSettings.development;
@@ -277,23 +267,37 @@ namespace BuildReportTool
 			settings.EnableExplicitNullChecks = EditorUserBuildSettings.explicitNullChecks;
 
 #if UNITY_EDITOR_WIN
+#if UNITY_5_6_OR_NEWER
 			settings.WinIncludeNativePdbFilesInBuild = UnityEditor.WindowsStandalone.UserBuildSettings.copyPDBFiles;
+#else
+			settings.WinIncludeNativePdbFilesInBuild = false;
+#endif
+#if UNITY_2017_1_OR_NEWER
 			settings.WinCreateVisualStudioSolution = UnityEditor.WindowsStandalone.UserBuildSettings.createSolution;
+#else
+			settings.WinCreateVisualStudioSolution = false;
+#endif
 #endif
 
-#if !UNITY_5_3_AND_LESSER
+#if UNITY_5_4_OR_NEWER
 			settings.EnableExplicitDivideByZeroChecks = EditorUserBuildSettings.explicitDivideByZeroChecks;
+#endif
+#if UNITY_2018_1_OR_NEWER
+			settings.EnableArrayBoundsChecks = EditorUserBuildSettings.explicitArrayBoundsChecks;
 #endif
 
 #if !UNITY_4
 			settings.EnableCrashReportApi = PlayerSettings.enableCrashReportAPI;
 			settings.EnableInternalProfiler = PlayerSettings.enableInternalProfiler;
+
+#if !UNITY_6000_2_OR_NEWER
 			settings.ActionOnDotNetUnhandledException = PlayerSettings.actionOnDotNetUnhandledException.ToString();
+#endif
 #endif
 
 			settings.ConnectProfiler = EditorUserBuildSettings.connectProfiler;
 
-#if UNITY_5_3_AND_GREATER
+#if UNITY_5_3_OR_NEWER && !UNITY_2017_1_OR_NEWER
 			// this setting actually started appearing in Unity 5.2.2 (it is not present in 5.2.1)
 			// but our script compilation defines can't detect the patch number in the version,
 			// so we have no choice but to restrict this to 5.3
@@ -328,8 +332,12 @@ namespace BuildReportTool
 #endif
 			settings.StripUnusedMeshComponents = PlayerSettings.stripUnusedMeshComponents;
 
-#if !UNITY_5_1_AND_LESSER // 5.2 and greater
+#if UNITY_5_3_OR_NEWER // 5.2 and greater (but Unity 5.2 doesn't have a define so we use 5.3)
 			settings.StripEngineCode = PlayerSettings.stripEngineCode;
+#endif
+
+#if UNITY_2020_1_OR_NEWER
+			settings.StripUnusedMips = PlayerSettings.mipStripping;
 #endif
 
 
@@ -352,8 +360,38 @@ namespace BuildReportTool
 
 			settings.CompileDefines = defines.ToArray();
 
+#if UNITY_2019_1_OR_NEWER
+			settings.IncrementalGC = PlayerSettings.gcIncremental;
+#endif
+#if UNITY_2019_4_OR_NEWER
+			settings.SuppressCommonWarnings = PlayerSettings.suppressCommonWarnings;
+#endif
 
-#if UNITY_2018_3_OR_NEWER
+			BuildTarget buildTarget = EditorUserBuildSettings.activeBuildTarget;
+			BuildTargetGroup targetGroup = BuildPipeline.GetBuildTargetGroup(buildTarget);
+#if UNITY_2021_2_OR_NEWER
+			var namedBuildTarget = UnityEditor.Build.NamedBuildTarget.FromBuildTargetGroup(targetGroup);
+#endif
+
+#if UNITY_2021_2_OR_NEWER
+			settings.ScriptingBackend = PlayerSettings.GetScriptingBackend(namedBuildTarget).ToString();
+#elif UNITY_2017_1_OR_NEWER
+			settings.ScriptingBackend = PlayerSettings.GetScriptingBackend(targetGroup).ToString();
+#endif
+
+#if UNITY_2017_1_OR_NEWER
+			settings.AdditionalIL2CPPArguments = PlayerSettings.GetAdditionalIl2CppArgs();
+#endif
+
+#if UNITY_2021_2_OR_NEWER
+			settings.AdditionalCompilerArguments = PlayerSettings.GetAdditionalCompilerArguments(namedBuildTarget);
+#endif
+
+#if UNITY_2021_3_OR_NEWER
+			settings.StrippingLevelUsed = PlayerSettings
+			                              .GetManagedStrippingLevel(namedBuildTarget)
+			                              .ToString();
+#elif UNITY_2018_3_OR_NEWER
 			settings.StrippingLevelUsed = PlayerSettings
 			                              .GetManagedStrippingLevel(EditorUserBuildSettings.selectedBuildTargetGroup)
 			                              .ToString();
@@ -361,15 +399,66 @@ namespace BuildReportTool
 			settings.StrippingLevelUsed = PlayerSettings.strippingLevel.ToString();
 #endif
 
-#if UNITY_5_6_OR_NEWER
-			settings.NETApiCompatibilityLevel = PlayerSettings
-			                                    .GetApiCompatibilityLevel(EditorUserBuildSettings.selectedBuildTargetGroup)
-			                                    .ToString();
+			ApiCompatibilityLevel apiCompat;
+#if UNITY_2021_3_OR_NEWER
+			apiCompat = PlayerSettings.GetApiCompatibilityLevel(namedBuildTarget);
+#elif UNITY_5_6_OR_NEWER
+			apiCompat = PlayerSettings.GetApiCompatibilityLevel(EditorUserBuildSettings.selectedBuildTargetGroup);
 #else
-			settings.NETApiCompatibilityLevel = PlayerSettings.apiCompatibilityLevel.ToString();
+			apiCompat = PlayerSettings.apiCompatibilityLevel;
 #endif
 
+			switch (apiCompat)
+			{
+				case ApiCompatibilityLevel.NET_Standard_2_0:
+					// NET_Standard_2_0 is deprecated, change to NET_Standard instead
+					// both NET_Standard_2_0 and NET_Standard have the same int value, so we have to force the change
+					settings.NETApiCompatibilityLevel = "NET_Standard";
+					break;
+				case ApiCompatibilityLevel.NET_4_6:
+					// NET_4_6 is deprecated, change to NET_Unity_4_8 instead
+					// both NET_4_6 and NET_Unity_4_8 have the same int value, so we have to force the change
+					settings.NETApiCompatibilityLevel = "NET_Unity_4_8";
+					break;
+				default:
+					settings.NETApiCompatibilityLevel = apiCompat.ToString();
+					break;
+			}
+
+#if UNITY_2022_1_OR_NEWER
+			settings.IL2CPPCodeGeneration = PlayerSettings.GetIl2CppCodeGeneration(namedBuildTarget).ToString();
+#elif UNITY_2021_2_OR_NEWER
+			// Added in 2021.2, marked as obsolete in 2022.1
+			settings.IL2CPPCodeGeneration = EditorUserBuildSettings.il2CppCodeGeneration.ToString();
+#endif
+
+#if UNITY_2023_1_OR_NEWER
+			settings.IL2CPPStacktraceInfo = PlayerSettings.GetIl2CppStacktraceInformation(namedBuildTarget).ToString();
+#endif
+
+#if UNITY_2022_1_OR_NEWER
+			settings.InsecureHttpOption = PlayerSettings.insecureHttpOption.ToString();
+#endif
+
+#if UNITY_2021_2_OR_NEWER
+			settings.IL2CPPCompilerConfig = PlayerSettings.GetIl2CppCompilerConfiguration(namedBuildTarget).ToString();
+#elif UNITY_2018_1_OR_NEWER
+			settings.IL2CPPCompilerConfig = PlayerSettings.GetIl2CppCompilerConfiguration(targetGroup).ToString();
+#endif
+
+#if UNITY_2018_1_OR_NEWER
+			settings.AllowUnsafeCode = PlayerSettings.allowUnsafeCode;
+#endif
+
+#if UNITY_2022_2_OR_NEWER
+#elif UNITY_2019_4_OR_NEWER
+			// Added in Unity 2019.4, marked as obsolete in Unity 2022.2
+			settings.AssemblyVersionValidation = PlayerSettings.assemblyVersionValidation;
+#endif
+
+#if !UNITY_6000_0_OR_NEWER
 			settings.AOTOptions = PlayerSettings.aotOptions;
+#endif
 
 #if UNITY_5_5_OR_NEWER
 			settings.LocationUsageDescription = PlayerSettings.iOS.locationUsageDescription;
@@ -380,16 +469,61 @@ namespace BuildReportTool
 
 			// rendering settings
 			// ---------------------------------------------------------------
+
+			settings.Use32BitDisplayBuffer = PlayerSettings.use32BitDisplayBuffer;
+			settings.UseHDRDisplay = PlayerSettings.useHDRDisplay;
 			settings.ColorSpaceUsed = PlayerSettings.colorSpace.ToString();
 			settings.UseMultithreadedRendering = PlayerSettings.MTRendering;
 			settings.UseGPUSkinning = PlayerSettings.gpuSkinning;
 			settings.VisibleInBackground = PlayerSettings.visibleInBackground;
+
+#if UNITY_2022_3_OR_NEWER
+			settings.AllowHDRDisplaySupport = PlayerSettings.allowHDRDisplaySupport;
+#endif
+
+#if UNITY_2022_2_OR_NEWER
+			settings.HdrBitDepth = PlayerSettings.hdrBitDepth.ToString();
+#endif
+
+#if UNITY_2018_3_OR_NEWER
+			settings.LegacyClampBlendShapeWeights = PlayerSettings.legacyClampBlendShapeWeights;
+#endif
+
+#if UNITY_2021_2_OR_NEWER
+			settings.OverrideMaxTextureSize = EditorUserBuildSettings.overrideMaxTextureSize;
+			settings.OverrideTextureCompression = EditorUserBuildSettings.overrideTextureCompression.ToString();
+#endif
+
+#if UNITY_2020_1_OR_NEWER
+			settings.VirtualTexturingSupportEnabled = PlayerSettings.GetVirtualTexturingSupportEnabled();
+#endif
+
+#if UNITY_2021_2_OR_NEWER
+			settings.NormalMapEncoding = PlayerSettings.GetNormalMapEncoding(namedBuildTarget).ToString();
+#elif UNITY_2020_2_OR_NEWER
+			settings.NormalMapEncoding = PlayerSettings.GetNormalMapEncoding(targetGroup).ToString();
+#endif
+
+#if UNITY_2020_2_OR_NEWER
+			settings.ShaderPrecisionModel = PlayerSettings.GetShaderPrecisionModel().ToString();
+#endif
+
+#if UNITY_2021_3_OR_NEWER && !UNITY_2021_3_0 && !UNITY_2021_3_1 && !UNITY_2021_3_2 && !UNITY_2021_3_3 && !UNITY_2021_3_4 && !UNITY_2021_3_5 && !UNITY_2021_3_6 && !UNITY_2021_3_7 && !UNITY_2021_3_8 && !UNITY_2021_3_9 && !UNITY_2021_3_10 && !UNITY_2021_3_11
+			settings.ShaderChunkCountForPlatform = PlayerSettings.GetShaderChunkCountForPlatform(buildTarget);
+			settings.ShaderChunkSizeInMBForPlatform = PlayerSettings.GetShaderChunkSizeInMBForPlatform(buildTarget);
+#endif
+
+#if UNITY_2022_1_OR_NEWER
+			settings.StrictShaderVariantMatching = PlayerSettings.strictShaderVariantMatching;
+			settings.SpriteBatchVertexThreshold = PlayerSettings.spriteBatchVertexThreshold;
+#endif
 
 #if UNITY_5_4_OR_NEWER
 			settings.UseGraphicsJobs = PlayerSettings.graphicsJobs;
 #endif
 #if UNITY_5_5_OR_NEWER
 			settings.GraphicsJobsType = PlayerSettings.graphicsJobMode.ToString();
+			settings.StereoRenderingPath = PlayerSettings.stereoRenderingPath.ToString();
 #endif
 
 #if (UNITY_EDITOR_WIN || UNITY_EDITOR_OSX)
@@ -402,12 +536,13 @@ namespace BuildReportTool
 #endif
 #endif
 
-#if !UNITY_5_1_AND_LESSER && !UNITY_2019_3_OR_NEWER // 5.2 to 2019.2
+#if UNITY_5_3_OR_NEWER && !UNITY_2019_3_OR_NEWER // 5.2 (but Unity 5.2 doesn't have a define so we use 5.3) to 2019.2
 			settings.EnableVirtualRealitySupport = PlayerSettings.virtualRealitySupported;
 #elif UNITY_2019_3_OR_NEWER
 			settings.EnableVirtualRealitySupport = UnityEngine.XR.XRSettings.enabled;
 #endif
 
+#if !UNITY_2022_2_OR_NEWER
 			// collect all aspect ratios
 			UnityEditor.AspectRatio[] aspectRatios =
 			{
@@ -432,12 +567,31 @@ namespace BuildReportTool
 			}
 
 			settings.AspectRatiosAllowed = aspectRatiosList.ToArray();
+#else
+			settings.AspectRatiosAllowed = new string[]{"N/A"}; // AspectRatio enum removed in Unity 2022.2
+#endif
 
-#if !UNITY_5_1_AND_LESSER // 5.2 and greater
+#if UNITY_5_3_OR_NEWER // 5.2 and greater (but Unity 5.2 doesn't have a define so we use 5.3)
 			settings.GraphicsAPIsUsed = PlayerSettings.GetGraphicsAPIs(EditorUserBuildSettings.activeBuildTarget)
 			                                          .Select(type => type.ToString()).ToArray();
 #endif
 
+
+#if UNITY_2018_2_OR_NEWER
+			settings.VulkanEnableSetSRGBWrite = PlayerSettings.vulkanEnableSetSRGBWrite;
+#endif
+
+#if UNITY_2019_3_OR_NEWER
+			settings.vulkanNumSwapchainBuffers = PlayerSettings.vulkanNumSwapchainBuffers;
+#endif
+
+#if UNITY_2019_4_OR_NEWER
+			settings.VulkanEnableLateAcquireNextImage = PlayerSettings.vulkanEnableLateAcquireNextImage;
+#endif
+
+#if UNITY_2020_2_OR_NEWER
+			settings.VulkanEnablePreTransform = PlayerSettings.vulkanEnablePreTransform;
+#endif
 
 			// shared settings
 			// ---------------------------------------------------------------
@@ -464,16 +618,16 @@ namespace BuildReportTool
 			settings.WebPlayerDeployOffline = EditorUserBuildSettings.webPlayerOfflineDeployment;
 #endif
 
-#if UNITY_5_2_AND_LESSER
-			settings.WebPlayerFirstStreamedLevelWithResources = PlayerSettings.firstStreamedLevelWithResources;
-#else
+#if UNITY_5_3_OR_NEWER
 			settings.WebPlayerFirstStreamedLevelWithResources = 0;
+#else
+			settings.WebPlayerFirstStreamedLevelWithResources = PlayerSettings.firstStreamedLevelWithResources;
 #endif
 
 			// Web GL settings
 			// ---------------------------------------------------------------
 
-#if UNITY_5_3_AND_LESSER
+#if !UNITY_5_4_OR_NEWER
 			settings.WebGLOptimizationLevel = EditorUserBuildSettings.webGLOptimizationLevel.ToString();
 #endif
 #if UNITY_5_4_OR_NEWER && !UNITY_2019_1_OR_NEWER
@@ -500,23 +654,25 @@ namespace BuildReportTool
 			// standalone (windows/mac/linux) build settings
 			// ---------------------------------------------------------------
 #if !UNITY_2019_1_OR_NEWER
-		settings.StandaloneResolutionDialogSettingUsed = PlayerSettings.displayResolutionDialog.ToString();
+			settings.StandaloneResolutionDialogSettingUsed = PlayerSettings.displayResolutionDialog.ToString();
 #endif
-#if UNITY_2018_AND_NEWER
+#if UNITY_2018_1_OR_NEWER
 			settings.StandaloneFullScreenModeUsed = PlayerSettings.fullScreenMode.ToString();
 #endif
 
 			settings.StandaloneDefaultScreenWidth = PlayerSettings.defaultScreenWidth;
 			settings.StandaloneDefaultScreenHeight = PlayerSettings.defaultScreenHeight;
 
-#if UNITY_2017_AND_LESSER && !UNITY_2019_1_OR_NEWER
-		settings.StandaloneFullScreenByDefault = PlayerSettings.defaultIsFullScreen;
+#if !UNITY_2019_1_OR_NEWER
+			settings.StandaloneFullScreenByDefault = PlayerSettings.defaultIsFullScreen;
 #endif
-#if !UNITY_5_2_AND_LESSER
+#if UNITY_5_3_OR_NEWER
 			settings.StandaloneAllowFullScreenSwitch = PlayerSettings.allowFullscreenSwitch;
 #endif
 
+#if !UNITY_6000_0_OR_NEWER
 			settings.StandaloneCaptureSingleScreen = PlayerSettings.captureSingleScreen;
+#endif
 
 			settings.StandaloneForceSingleInstance = PlayerSettings.forceSingleInstance;
 			settings.StandaloneEnableResizableWindow = PlayerSettings.resizableWindow;
@@ -524,38 +680,68 @@ namespace BuildReportTool
 
 			// windows only build settings
 			// ---------------------------------------------------------------
-#if UNITY_5_1_AND_LESSER
-		settings.WinUseDirect3D11IfAvailable = PlayerSettings.useDirect3D11;
+#if !UNITY_5_3_OR_NEWER
+			settings.WinUseDirect3D11IfAvailable = PlayerSettings.useDirect3D11;
 #endif
 
 #if !UNITY_2017_3_OR_NEWER
-		settings.WinDirect3D9FullscreenModeUsed = PlayerSettings.d3d9FullscreenMode.ToString();
+			settings.WinDirect3D9FullscreenModeUsed = PlayerSettings.d3d9FullscreenMode.ToString();
 #endif
 
-#if !UNITY_4 && UNITY_2017_AND_LESSER && !UNITY_2019_1_OR_NEWER
-		settings.WinDirect3D11FullscreenModeUsed = PlayerSettings.d3d11FullscreenMode.ToString();
+#if !UNITY_4 && !UNITY_2019_1_OR_NEWER
+			settings.WinDirect3D11FullscreenModeUsed = PlayerSettings.d3d11FullscreenMode.ToString();
 #endif
 
-#if UNITY_5_3_AND_LESSER
-		settings.StandaloneUseStereoscopic3d = PlayerSettings.stereoscopic3D;
+#if !UNITY_5_4_OR_NEWER
+			settings.StandaloneUseStereoscopic3d = PlayerSettings.stereoscopic3D;
 #endif
 
+#if UNITY_2019_1_OR_NEWER
+			settings.WinUseFlipModelSwapchain = PlayerSettings.useFlipModelSwapchain;
+#endif
+
+#if UNITY_2021_3_OR_NEWER && !UNITY_2021_3_0 && !UNITY_2021_3_1 && !UNITY_2021_3_2 && !UNITY_2021_3_3 && !UNITY_2021_3_4 && !UNITY_2021_3_5 && !UNITY_2021_3_6 && !UNITY_2021_3_7 && !UNITY_2021_3_8 && !UNITY_2021_3_9 && !UNITY_2021_3_10 && !UNITY_2021_3_11 && !UNITY_2021_3_12
+			settings.WinGamepadInputHint = PlayerSettings.windowsGamepadBackendHint.ToString();
+
+			// simplify value
+			switch (settings.WinGamepadInputHint)
+			{
+				case "WindowsGamepadBackendHintDefault":
+					settings.WinGamepadInputHint = "Default";
+					break;
+				case "WindowsGamepadBackendHintXInput":
+					settings.WinGamepadInputHint = "XInput API";
+					break;
+				case "WindowsGamepadBackendHintWindowsGamingInput":
+					settings.WinGamepadInputHint = "GamingInput API";
+					break;
+			}
+#endif
 
 			// Windows Store App only build settings
 			// ---------------------------------------------------------------
 #if !UNITY_4 && !UNITY_2019_1_OR_NEWER
-		settings.WSAGenerateReferenceProjects = EditorUserBuildSettings.wsaGenerateReferenceProjects;
+			settings.WSAGenerateReferenceProjects = EditorUserBuildSettings.wsaGenerateReferenceProjects;
 #endif
-#if UNITY_5_2_AND_GREATER
-		settings.WSASDK = EditorUserBuildSettings.wsaSDK.ToString();
+#if UNITY_5_3_OR_NEWER && !UNITY_2017_1_OR_NEWER
+			settings.WSASDK = EditorUserBuildSettings.wsaSDK.ToString();
 #endif
 
 
 			// mac only build settings
 			// ---------------------------------------------------------------
+
+#if UNITY_2017_2_OR_NEWER
+			settings.MacRetinaSupport = PlayerSettings.macRetinaSupport;
+#endif
+
+#if UNITY_2021_2_OR_NEWER
+			settings.MacXcodeBuildConfig = EditorUserBuildSettings.macOSXcodeBuildConfig.ToString();
+#endif
+
 			settings.MacUseAppStoreValidation = PlayerSettings.useMacAppStoreValidation;
-#if UNITY_2017_AND_LESSER && !UNITY_2019_1_OR_NEWER
-		settings.MacFullscreenModeUsed = PlayerSettings.macFullscreenMode.ToString();
+#if !UNITY_2019_1_OR_NEWER
+			settings.MacFullscreenModeUsed = PlayerSettings.macFullscreenMode.ToString();
 #endif
 		}
 
@@ -565,17 +751,14 @@ namespace BuildReportTool
 			// Mobile build settings
 			// ---------------------------------------------------------------
 
-
-#if UNITY_5_5_AND_LESSER
-		settings.MobileBundleIdentifier =
- PlayerSettings.bundleIdentifier; // ("Bundle Identifier" in iOS, "Package Identifier" in Android)
+			// ("Bundle Identifier" in iOS, "Package Identifier" in Android)
+#if UNITY_5_6_OR_NEWER
+			settings.MobileBundleIdentifier = PlayerSettings.applicationIdentifier;
 #else
-			settings.MobileBundleIdentifier =
-				PlayerSettings.applicationIdentifier; // ("Bundle Identifier" in iOS, "Package Identifier" in Android)
+			settings.MobileBundleIdentifier = PlayerSettings.bundleIdentifier;
 #endif
-
-			settings.MobileBundleVersion =
-				PlayerSettings.bundleVersion; // ("Bundle Version" in iOS, "Version Name" in Android)
+			// ("Bundle Version" in iOS, "Version Name" in Android)
+			settings.MobileBundleVersion = PlayerSettings.bundleVersion;
 			settings.MobileHideStatusBar = PlayerSettings.statusBarHidden;
 
 			settings.MobileAccelerometerFrequency = PlayerSettings.accelerometerFrequency;
@@ -586,8 +769,7 @@ namespace BuildReportTool
 			settings.MobileEnableAutorotateToLandscapeLeft = PlayerSettings.allowedAutorotateToLandscapeLeft;
 			settings.MobileEnableAutorotateToLandscapeRight = PlayerSettings.allowedAutorotateToLandscapeRight;
 			settings.MobileEnableOSAutorotation = PlayerSettings.useAnimatedAutorotation;
-
-			settings.Use32BitDisplayBuffer = PlayerSettings.use32BitDisplayBuffer;
+			settings.MuteOtherAudioSources = PlayerSettings.muteOtherAudioSources;
 
 
 			// iOS only build settings
@@ -613,7 +795,11 @@ namespace BuildReportTool
 			settings.iOSSDKVersionUsed = PlayerSettings.iOS.sdkVersion.ToString();
 			settings.iOSTargetDevice = PlayerSettings.iOS.targetDevice.ToString();
 
-#if UNITY_5_2_AND_LESSER
+#if UNITY_2021_2_OR_NEWER
+			settings.iOSXcodeBuildConfig = EditorUserBuildSettings.iOSXcodeBuildConfig.ToString();
+#endif
+
+#if !UNITY_5_3_OR_NEWER
 			settings.iOSTargetResolution = PlayerSettings.iOS.targetResolution.ToString();
 #else
 			// not sure what the equivalent is for PlayerSettings.iOS.targetResolution in Unity 5.3
@@ -636,7 +822,7 @@ namespace BuildReportTool
 			settings.iOSLogObjCUncaughtExceptions = PlayerSettings.logObjCUncaughtExceptions;
 #endif
 
-#if UNITY_5_1_AND_LESSER
+#if !UNITY_5_3_OR_NEWER
 			settings.iOSTargetGraphics = PlayerSettings.targetIOSGraphics.ToString();
 #else
 			settings.iOSTargetGraphics = string.Join(",",
@@ -646,17 +832,68 @@ namespace BuildReportTool
 			// Android only build settings
 			// ---------------------------------------------------------------
 
+			settings.AndroidBuildType = EditorUserBuildSettings.androidBuildType.ToString();
 			settings.AndroidBuildSubtarget = EditorUserBuildSettings.androidBuildSubtarget.ToString();
 
+#if UNITY_2018_2_OR_NEWER
+			settings.AndroidBuildApkPerCpuArch = PlayerSettings.Android.buildApkPerCpuArchitecture;
+#endif
+
+#if UNITY_6000_0_OR_NEWER
+#if UNITY_ANDROID
+			var debugSymbolsFormat = UnityEditor.Android.UserBuildSettings.DebugSymbols.format;
+			string debugSymbolsFormatText = null;
+			if ((debugSymbolsFormat & DebugSymbolFormat.Zip) == DebugSymbolFormat.Zip)
+			{
+				debugSymbolsFormatText = "Zip";
+			}
+			if ((debugSymbolsFormat & DebugSymbolFormat.IncludeInBundle) == DebugSymbolFormat.IncludeInBundle)
+			{
+				if (!string.IsNullOrEmpty(debugSymbolsFormatText))
+				{
+					debugSymbolsFormatText += ", ";
+				}
+				debugSymbolsFormatText += "Include In Bundle";
+			}
+			if ((debugSymbolsFormat & DebugSymbolFormat.LegacyExtensions) == DebugSymbolFormat.LegacyExtensions)
+			{
+				if (!string.IsNullOrEmpty(debugSymbolsFormatText))
+				{
+					debugSymbolsFormatText += ", ";
+				}
+				debugSymbolsFormatText += "Legacy Extensions";
+			}
+			settings.AndroidDebugSymbols = $"{debugSymbolsFormatText} (Level: {UnityEditor.Android.UserBuildSettings.DebugSymbols.level})";
+#endif
+#elif UNITY_2021_1_OR_NEWER
+			settings.AndroidCreateSymbols = EditorUserBuildSettings.androidCreateSymbols.ToString();
+#endif
+
+#if UNITY_2023_1_OR_NEWER
+			settings.AndroidUseAPKExpansionFiles = PlayerSettings.Android.splitApplicationBinary;
+#else
 			settings.AndroidUseAPKExpansionFiles = PlayerSettings.Android.useAPKExpansionFiles;
+#endif
 
 #if !UNITY_4
 			settings.AndroidAsAndroidProject = EditorUserBuildSettings.exportAsGoogleAndroidProject;
+#if UNITY_6000_2_OR_NEWER
+			settings.AndroidAppCategory = PlayerSettings.Android.appCategory;
+#else
 			settings.AndroidIsGame = PlayerSettings.Android.androidIsGame;
+#endif
 			settings.AndroidTvCompatible = PlayerSettings.Android.androidTVCompatibility;
 #endif
 
+#if UNITY_2017_4_OR_NEWER
+			settings.AndroidAppBundle = EditorUserBuildSettings.buildAppBundle;
+#endif
+
 			settings.AndroidUseLicenseVerification = PlayerSettings.Android.licenseVerification;
+
+#if UNITY_2022_2_OR_NEWER
+			settings.AndroidEnableArmV9SecurityFeatures = PlayerSettings.Android.enableArmv9SecurityFeatures;
+#endif
 
 
 #if UNITY_4
@@ -665,13 +902,27 @@ namespace BuildReportTool
 			settings.AndroidDisableDepthAndStencilBuffers = PlayerSettings.Android.disableDepthAndStencilBuffers;
 #endif
 
+#if UNITY_2017_3_OR_NEWER
+			settings.AndroidPreserveFramebufferAlpha = PlayerSettings.preserveFramebufferAlpha;
+#endif
+
 			settings.AndroidVersionCode = PlayerSettings.Android.bundleVersionCode;
 
 			settings.AndroidMinSDKVersion = PlayerSettings.Android.minSdkVersion.ToString();
-#if UNITY_2018_AND_NEWER
-			settings.AndroidTargetDevice = PlayerSettings.Android.targetArchitectures.ToString();
-#else
+
+#if UNITY_5_6_OR_NEWER
+			settings.AndroidTargetSDKVersion = PlayerSettings.Android.targetSdkVersion.ToString();
+#endif
+
+			// Available in 2019.4+ (but was removed in 2020.3.0 to 2020.3.16, returned in 2020.3.17, removed in 6000.0)
+#if UNITY_2019_4_OR_NEWER && !UNITY_2020_3_0 && !UNITY_2020_3_1 && !UNITY_2020_3_2 && !UNITY_2020_3_3 && !UNITY_2020_3_4 && !UNITY_2020_3_5 && !UNITY_2020_3_6 && !UNITY_2020_3_7 && !UNITY_2020_3_8 && !UNITY_2020_3_9 && !UNITY_2020_3_10 && !UNITY_2020_3_11 && !UNITY_2020_3_12 && !UNITY_2020_3_13 && !UNITY_2020_3_14 && !UNITY_2020_3_15 && !UNITY_2020_3_16 && !UNITY_6000_0_OR_NEWER
+			settings.AndroidTargetDevice = PlayerSettings.Android.androidTargetDevices.ToString();
+#elif !UNITY_2020_3_OR_NEWER
 			settings.AndroidTargetDevice = PlayerSettings.Android.targetDevice.ToString();
+#endif
+
+#if UNITY_2017_4_OR_NEWER
+			settings.AndroidTargetArchitectures = PlayerSettings.Android.targetArchitectures.ToString();
 #endif
 
 			settings.AndroidSplashScreenScaleMode = PlayerSettings.Android.splashScreenScale.ToString();
@@ -688,7 +939,7 @@ namespace BuildReportTool
 			settings.AndroidKeystoreName = PlayerSettings.Android.keystoreName;
 
 
-#if UNITY_5_3_AND_LESSER // blackberry build option no longer in Unity 5.4
+#if !UNITY_5_4_OR_NEWER // blackberry build option no longer in Unity 5.4
 			// BlackBerry only build settings
 			// ---------------------------------------------------------------
 
@@ -865,7 +1116,7 @@ namespace BuildReportTool
 			settings.PSVUpgradable = PlayerSettings.PSVita.upgradable;
 			settings.PSVTvBootMode = PlayerSettings.PSVita.tvBootMode.ToString();
 			settings.PSVAcquireBgm = PlayerSettings.PSVita.acquireBGM;
-#if UNITY_5_2_AND_LESSER
+#if !UNITY_5_3_OR_NEWER
 			settings.PSVAllowTwitterDialog = PlayerSettings.PSVita.AllowTwitterDialog;
 #endif
 
@@ -874,7 +1125,7 @@ namespace BuildReportTool
 			settings.PSVTvDisableEmu = PlayerSettings.PSVita.tvDisableEmu;
 			settings.PSVNpSupportGbmOrGjp = PlayerSettings.PSVita.npSupportGBMorGJP;
 			settings.PSVPowerMode = PlayerSettings.PSVita.powerMode.ToString();
-#if UNITY_5_2_AND_LESSER
+#if !UNITY_5_3_OR_NEWER
 			settings.PSVUseLibLocation = PlayerSettings.PSVita.useLibLocation;
 #endif
 
@@ -902,6 +1153,7 @@ namespace BuildReportTool
 		public static void PopulateBigConsoleGen08Settings(UnityBuildSettings settings)
 		{
 #if !UNITY_4
+#if !UNITY_2021_1_OR_NEWER
 			// Xbox One build settings
 			// ---------------------------------------------------------------
 			settings.XboxOneDeployMethod = EditorUserBuildSettings.xboxOneDeployMethod.ToString();
@@ -909,7 +1161,7 @@ namespace BuildReportTool
 			settings.XboxOneContentId = PlayerSettings.XboxOne.ContentId;
 			settings.XboxOneProductId = PlayerSettings.XboxOne.ProductId;
 
-#if UNITY_5_5_AND_LESSER
+#if !UNITY_5_6_OR_NEWER
 			settings.XboxOneSandboxId = PlayerSettings.XboxOne.SandboxId;
 #endif
 
@@ -933,6 +1185,7 @@ namespace BuildReportTool
 			settings.XboxOneGameOsOverridePath = PlayerSettings.XboxOne.GameOsOverridePath;
 			settings.XboxOneAppManifestOverridePath = PlayerSettings.XboxOne.AppManifestOverridePath;
 			settings.XboxOnePackagingOverridePath = PlayerSettings.XboxOne.PackagingOverridePath;
+#endif
 
 
 			// PS4 build settings
@@ -992,6 +1245,9 @@ namespace BuildReportTool
 			var packageList = settings.PackageEntries;
 			packageList.Clear();
 
+			var dependencyPackageList = settings.DependencyPackageEntries;
+			dependencyPackageList.Clear();
+
 			var builtInPackageList = settings.BuiltInPackageEntries;
 			builtInPackageList.Clear();
 
@@ -1019,13 +1275,15 @@ namespace BuildReportTool
 				packagesLockJsonText = null;
 			}
 
-			PopulatePackageList(manifestJsonText, packagesLockJsonText, packageList, builtInPackageList);
+			PopulatePackageList(manifestJsonText, packagesLockJsonText, packageList, dependencyPackageList, builtInPackageList);
 		}
 
 		public const string DEFAULT_REGISTRY_URL = "https://packages.unity.com";
 
 		static void PopulatePackageList(string manifestJsonText, string packagesLockJsonText,
-			List<BuildReportTool.UnityBuildSettings.PackageEntry> packageList, List<BuildReportTool.UnityBuildSettings.BuiltInPackageEntry> builtInPackageList)
+			List<BuildReportTool.UnityBuildSettings.PackageEntry> packageList,
+			List<BuildReportTool.UnityBuildSettings.PackageDependencyEntry> dependencyPackageList,
+			List<BuildReportTool.UnityBuildSettings.BuiltInPackageEntry> builtInPackageList)
 		{
 			//Debug.Log($"Exists: {manifestJsonPath}");
 			var manifest = MiniJSON.Json.Deserialize(manifestJsonText) as Dictionary<string, object>;
@@ -1073,6 +1331,10 @@ namespace BuildReportTool
 				externalLock = null;
 			}
 
+			string projectPackagesCachePath = Application.dataPath;
+			projectPackagesCachePath = projectPackagesCachePath.Substring(0, projectPackagesCachePath.Length - 6);
+			projectPackagesCachePath = string.Format("{0}Library/PackageCache/", projectPackagesCachePath);
+
 			if (manifest.ContainsKey("dependencies"))
 			{
 				Dictionary<string, object> embeddedLockUsed;
@@ -1088,11 +1350,6 @@ namespace BuildReportTool
 				var dependencies = manifest["dependencies"] as Dictionary<string, object>;
 				if (dependencies != null)
 				{
-
-					var projectPackagesCachePath = Application.dataPath;
-					projectPackagesCachePath = projectPackagesCachePath.Substring(0, projectPackagesCachePath.Length - 6);
-					projectPackagesCachePath = string.Format("{0}Library/PackageCache/", projectPackagesCachePath);
-
 					foreach (var pair in dependencies)
 					{
 						//Debug.Log($"package name: {pair.Key} version: {pair.Value}");
@@ -1116,12 +1373,12 @@ namespace BuildReportTool
 						newEntry.VersionUsed = null;
 						newEntry.LocalPath = null;
 
-						var gotValue = pair.Value as string;
+						string version = pair.Value as string;
 						if (embeddedLockUsed != null && embeddedLockUsed.ContainsKey(newEntry.PackageName))
 						{
 							// if this is a git package, it should have an entry in the manifest's lock
 
-							newEntry.Location = gotValue;
+							newEntry.Location = version;
 							var lockEntry = embeddedLockUsed[newEntry.PackageName] as Dictionary<string, object>;
 							if (lockEntry != null && lockEntry.ContainsKey("hash"))
 							{
@@ -1147,7 +1404,7 @@ namespace BuildReportTool
 									}
 
 									// for git packages, the git url is the value in the manifest
-									newEntry.Location = gotValue;
+									newEntry.Location = version;
 								}
 								else if (source == "registry" && lockEntry.ContainsKey("url"))
 								{
@@ -1158,62 +1415,66 @@ namespace BuildReportTool
 									}
 									else
 									{
+										// url is null
 										newEntry.Location = null;
 									}
 								}
 								else
 								{
+									// source isn't git or url
 									newEntry.Location = null;
 								}
 							}
 							else
 							{
+								// no source
 								newEntry.Location = null;
 							}
 						}
 						else
 						{
+							// no lock
 							newEntry.Location = null;
 						}
 
 						if (string.IsNullOrEmpty(newEntry.VersionUsed))
 						{
-							if (gotValue != null &&
-							    (gotValue.StartsWith("file://") ||
-							     gotValue.StartsWith("https://") ||
-							     gotValue.StartsWith("git://") ||
-							     gotValue.StartsWith("ssh://") ||
-							     gotValue.StartsWith("git+https://") ||
-							     gotValue.StartsWith("git+ssh://") ||
-							     gotValue.StartsWith("git+file://")))
+							if (version != null &&
+							    (version.StartsWith("file://") ||
+							     version.StartsWith("https://") ||
+							     version.StartsWith("git://") ||
+							     version.StartsWith("ssh://") ||
+							     version.StartsWith("git+https://") ||
+							     version.StartsWith("git+ssh://") ||
+							     version.StartsWith("git+file://")))
 							{
 								// git package, but no entry in the manifest's lock
 
 								// check if commit hash is specified in the url
-								var lastHash = gotValue.LastIndexOf('#');
+								var lastHash = version.LastIndexOf('#');
 								if (lastHash > -1)
 								{
-									var afterHash = gotValue.Substring(lastHash);
+									var afterHash = version.Substring(lastHash);
 									newEntry.VersionUsed = afterHash;
-									newEntry.Location = gotValue.Substring(0, lastHash);
+									newEntry.Location = version.Substring(0, lastHash);
 								}
 								else
 								{
 									// no commit hash specified
 									newEntry.VersionUsed = null;
-									newEntry.Location = gotValue;
+									newEntry.Location = version;
 								}
 							}
-							else if (gotValue != null && gotValue.StartsWith("file:") && !gotValue.StartsWith("file://"))
+							else if (version != null && version.StartsWith("file:") && !version.StartsWith("file://"))
 							{
-								// local package
+								// local/embedded package
 								newEntry.VersionUsed = null;
-								newEntry.Location = gotValue;
+								newEntry.Location = version;
 							}
 							else
 							{
 								// regular package
-								newEntry.VersionUsed = gotValue;
+								newEntry.VersionUsed = version;
 								if (scopedRegistries != null)
 								{
 									newEntry.Location = GetMatchingRegistry(newEntry.PackageName, scopedRegistries);
@@ -1231,32 +1492,142 @@ namespace BuildReportTool
 						// we need the VersionUsed since that's used as part of the folder name
 						if (!string.IsNullOrEmpty(newEntry.VersionUsed))
 						{
-							newEntry.LocalPath = GetPackageCachePath(newEntry, projectPackagesCachePath);
-
-							if (!string.IsNullOrEmpty(newEntry.LocalPath))
-							{
-								string packageManifestPath = string.Format("{0}package.json", newEntry.LocalPath);
-								if (System.IO.File.Exists(packageManifestPath))
-								{
-									var packageManifest = MiniJSON.Json.Deserialize(System.IO.File.ReadAllText(packageManifestPath)) as Dictionary<string, object>;
-									if (packageManifest != null && packageManifest.ContainsKey("displayName"))
-									{
-										newEntry.DisplayName = packageManifest["displayName"] as string;
-									}
-									else
-									{
-										// no package.json, or package.json has no displayName
-										// we can hardcode some detections here
-										if (newEntry.PackageName == "com.unity.ads")
-										{
-											newEntry.DisplayName = "Advertisement";
-										}
-									}
-								}
-							}
+							newEntry.LocalPath = GetPackageCachePath(newEntry.PackageName, newEntry.VersionUsed, newEntry.Location, projectPackagesCachePath);
+							newEntry.DisplayName = FindDisplayName(newEntry.PackageName, newEntry.LocalPath);
 						}
 
 						packageList.Add(newEntry);
+					}
+				}
+			}
+
+			if (externalLock != null)
+			{
+				// loop through the packages lock, and find the ones we haven't had a package for
+				// those will be the packages that got included only because they are dependencies
+				foreach (var pair in externalLock)
+				{
+					if (pair.Key.StartsWith("com.unity.modules."))
+					{
+						continue;
+					}
+
+					bool packageIsAlreadyInList = false;
+					for (int n = 0, len = packageList.Count; n < len; ++n)
+					{
+						if (packageList[n].PackageName == pair.Key)
+						{
+							packageIsAlreadyInList = true;
+							break;
+						}
+					}
+
+					if (packageIsAlreadyInList)
+					{
+						continue;
+					}
+
+					BuildReportTool.UnityBuildSettings.PackageDependencyEntry newEntry;
+					newEntry.PackageName = pair.Key;
+					newEntry.DisplayName = null;
+					newEntry.VersionUsed = null;
+					newEntry.Location = null;
+					newEntry.LocalPath = null;
+					newEntry.Dependents = null;
+					var lockEntry = pair.Value as Dictionary<string, object>;
+					if (lockEntry != null && lockEntry.ContainsKey("source"))
+					{
+						if (lockEntry.ContainsKey("version"))
+						{
+							newEntry.VersionUsed = lockEntry["version"] as string;
+						}
+
+						string source = lockEntry["source"] as string;
+						if (source == "registry" && lockEntry.ContainsKey("url"))
+						{
+							string packageUrl = lockEntry["url"] as string;
+							if (packageUrl != null)
+							{
+								newEntry.Location = packageUrl;
+							}
+							else
+							{
+								// url is null
+								newEntry.Location = null;
+							}
+						}
+
+						if (!string.IsNullOrEmpty(newEntry.VersionUsed))
+						{
+							newEntry.LocalPath = GetPackageCachePath(newEntry.PackageName, newEntry.VersionUsed, newEntry.Location, projectPackagesCachePath);
+							newEntry.DisplayName = FindDisplayName(newEntry.PackageName, newEntry.LocalPath);
+						}
+					}
+
+					foreach (var depPair in externalLock)
+					{
+						if (depPair.Key.StartsWith("com.unity.modules."))
+						{
+							continue;
+						}
+						if (pair.Key == depPair.Key)
+						{
+							continue;
+						}
+
+						var depEntry = depPair.Value as Dictionary<string, object>;
+						if (depEntry.ContainsKey("dependencies"))
+						{
+							var deps = depEntry["dependencies"] as Dictionary<string, object>;
+							if (deps.ContainsKey(pair.Key))
+							{
+								if (newEntry.Dependents == null)
+								{
+									newEntry.Dependents = new List<string>();
+								}
+								newEntry.Dependents.Add(depPair.Key);
+							}
+						}
+					}
+
+					dependencyPackageList.Add(newEntry);
+				}
+
+				// convert the dependents from their package name to their display name
+				for (int n = 0, len = dependencyPackageList.Count; n < len; ++n)
+				{
+					if (dependencyPackageList[n].Dependents == null || dependencyPackageList[n].Dependents.Count == 0)
+					{
+						continue;
+					}
+
+					for (int i = 0, dLen = dependencyPackageList[n].Dependents.Count; i < dLen; ++i)
+					{
+						string dependent = dependencyPackageList[n].Dependents[i];
+
+						bool foundInPackageList = false;
+						for (int p = 0, pLen = packageList.Count; p < pLen; ++p)
+						{
+							if (packageList[p].PackageName == dependent)
+							{
+								dependencyPackageList[n].Dependents[i] = packageList[p].DisplayName;
+								foundInPackageList = true;
+								break;
+							}
+						}
+
+						if (!foundInPackageList)
+						{
+							// try to find in dependencyPackageList itself
+							for (int p = 0, pLen = dependencyPackageList.Count; p < pLen; ++p)
+							{
+								if (dependencyPackageList[p].PackageName == dependent)
+								{
+									dependencyPackageList[n].Dependents[i] = dependencyPackageList[p].DisplayName;
+									break;
+								}
+							}
+						}
 					}
 				}
 			}
@@ -1267,25 +1638,60 @@ namespace BuildReportTool
 				Debug.Log($"{packageList[n].PackageName} {packageList[n].VersionUsed}\n{packageList[n].DisplayName}\n{packageList[n].Location}");
 			}
 #endif
+
+			string FindDisplayName(string packageName, string localPath)
+			{
+				if (string.IsNullOrEmpty(localPath))
+				{
+					return null;
+				}
+
+				string packageManifestPath = string.Format("{0}package.json", localPath);
+				if (!System.IO.File.Exists(packageManifestPath))
+				{
+					return null;
+				}
+				//Debug.Log($"packageName: {packageName} packageManifestPath: {packageManifestPath}");
+
+				var packageManifest = MiniJSON.Json.Deserialize(System.IO.File.ReadAllText(packageManifestPath)) as Dictionary<string, object>;
+				if (packageManifest != null && packageManifest.ContainsKey("displayName"))
+				{
+					return packageManifest["displayName"] as string;
+				}
+				else
+				{
+					// no package.json, or package.json has no displayName
+					// we can hardcode some detections here
+					if (packageName == "com.unity.ads")
+					{
+						return "Advertisement";
+					}
+				}
+
+				return null;
+			}
 		}
-
+#if UNITY_6000_0_OR_NEWER
+		const int DEFAULT_SHORT_HASH_LENGTH = 12;
+#else
 		const int DEFAULT_SHORT_HASH_LENGTH = 10;
+#endif
 
-		static string GetPackageCachePath(BuildReportTool.UnityBuildSettings.PackageEntry entry, string projectPackagesCachePath)
+		static string GetPackageCachePath(string packageName, string versionUsed, string location, string projectPackagesCachePath)
 		{
-			string packageCachePath = string.Format("{0}{1}@{2}/", projectPackagesCachePath, entry.PackageName, entry.VersionUsed);
+			string packageCachePath = string.Format("{0}{1}@{2}/", projectPackagesCachePath, packageName, versionUsed);
 			if (System.IO.Directory.Exists(packageCachePath))
 			{
 				return packageCachePath;
 			}
 
-			if (entry.VersionUsed.Length > DEFAULT_SHORT_HASH_LENGTH)
+			if (versionUsed.Length > DEFAULT_SHORT_HASH_LENGTH)
 			{
 				// in Unity 2019+, git packages now only use the first 10 characters of the commit hash, so try that
 				// in case this is a git package
 				packageCachePath = string.Format("{0}{1}@{2}/",
-					projectPackagesCachePath, entry.PackageName,
-					entry.VersionUsed.Substring(0, DEFAULT_SHORT_HASH_LENGTH));
+					projectPackagesCachePath, packageName,
+					versionUsed.Substring(0, DEFAULT_SHORT_HASH_LENGTH));
 
 				if (System.IO.Directory.Exists(packageCachePath))
 				{
@@ -1293,9 +1699,19 @@ namespace BuildReportTool
 				}
 			}
 
+			// in Unity 6, packages are suffixed with the first 12 characters of the commit hash even if the manifest specifies a semantic version
+			foreach (string f in System.IO.Directory.EnumerateDirectories(projectPackagesCachePath))
+			{
+				string folderName = System.IO.Path.GetFileName(f);
+				if (folderName.StartsWith(packageName))
+				{
+					return f + "/";
+				}
+			}
+
 			// Not found in project's packageCache. Now Try finding from user's AppData
 
-			if (string.IsNullOrEmpty(entry.Location))
+			if (string.IsNullOrEmpty(location))
 			{
 				// we need the url found in Location since that's used as the folder name
 				// if we don't have it, we can't determine the package cache path
@@ -1304,10 +1720,10 @@ namespace BuildReportTool
 
 			// get the registry url and remove the url, that will be the folder name
 			string registryName;
-			int registrySlashIdx = entry.Location.LastIndexOf("//", StringComparison.Ordinal);
+			int registrySlashIdx = location.LastIndexOf("//", StringComparison.Ordinal);
 			if (registrySlashIdx > -1)
 			{
-				registryName = entry.Location.Substring(registrySlashIdx+2);
+				registryName = location.Substring(registrySlashIdx+2);
 			}
 			else
 			{
@@ -1332,24 +1748,34 @@ namespace BuildReportTool
 #endif
 
 			packageCachePath = string.Format("{0}/Unity/cache/packages/{1}/{2}@{3}/",
-				localAppDataVar, registryName, entry.PackageName, entry.VersionUsed);
+				localAppDataVar, registryName, packageName, versionUsed);
 
 			if (System.IO.Directory.Exists(packageCachePath))
 			{
 				return packageCachePath;
 			}
 
-			if (entry.VersionUsed.Length > DEFAULT_SHORT_HASH_LENGTH)
+			if (versionUsed.Length > DEFAULT_SHORT_HASH_LENGTH)
 			{
 				// in Unity 2019+, git packages now only use the first 10 characters of the commit hash, so try that
 				// in case this is a git package
 				packageCachePath = string.Format("{0}/Unity/cache/packages/{1}/{2}@{3}/",
-					localAppDataVar, registryName, entry.PackageName,
-					entry.VersionUsed.Substring(0, DEFAULT_SHORT_HASH_LENGTH));
+					localAppDataVar, registryName, packageName,
+					versionUsed.Substring(0, DEFAULT_SHORT_HASH_LENGTH));
 
 				if (System.IO.Directory.Exists(packageCachePath))
 				{
 					return packageCachePath;
+				}
+			}
+
+			// in Unity 6, packages are suffixed with the first 12 characters of the commit hash even if the manifest specifies a semantic version
+			foreach (string f in System.IO.Directory.EnumerateDirectories(string.Format("{0}/Unity/cache/packages/{1}", localAppDataVar, registryName)))
+			{
+				string folderName = System.IO.Path.GetFileName(f);
+				if (folderName.StartsWith(packageName))
+				{
+					return f + "/";
 				}
 			}
 

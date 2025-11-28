@@ -27,6 +27,7 @@ namespace BuildReportTool.Window
 		public const string UNUSED_TOTAL_SIZE_LABEL = "Total Unused\nAssets Size:";
 		public const string USED_TOTAL_SIZE_LABEL = "Total Used\nAssets Size:";
 		public const string STREAMING_ASSETS_TOTAL_SIZE_LABEL = "Streaming\nAssets Size:";
+		public const string BUNDLE_TOTAL_SIZE_LABEL = "Bundle Size:";
 		public const string BUILD_TOTAL_SIZE_LABEL = "Total Build Size:";
 		public const string BUILD_XCODE_SIZE_LABEL = "Size of Xcode Project Folder";
 
@@ -36,10 +37,16 @@ namespace BuildReportTool.Window
 		public const string ANDROID_OBB_FILE_SIZE_LABEL = "Size of .obb File:";
 
 
+		public const string BUNDLE_TOTAL_SIZE_DESC = "File size of compressed bundle.";
 		public const string UNUSED_TOTAL_SIZE_DESC = "Total size of project assets not included in the build.";
+		public const string UNUSED_TOTAL_IS_FROM_BATCH = "This size only accounts for the first {0:N0} assets in the project due to the <b><color=white>Unused Assets batching</color></b>. You can turn this off from the Options (under the <b><color=white>In Unused Assets List</color></b> section) then regenerate the Build Report.";
 
 		public const string USED_TOTAL_SIZE_DESC =
 			"Total size of the used assets before being packed.\nAlso includes size of compiled Mono scripts.\nDoes not include size of files in StreamingAssets.";
+
+		public const string BUNDLE_USED_TOTAL_SIZE_DESC =
+			"Total size of the used assets before being compressed.";
+
 
 		public const string STREAMING_ASSETS_SIZE_DESC = "Total size of all files in the StreamingAssets folder.";
 
@@ -89,6 +96,7 @@ namespace BuildReportTool.Window
 		public const string SIZE_STATS_CATEGORY_LABEL = "Total Size";
 		public const string USED_ASSETS_CATEGORY_LABEL = "Used Assets";
 		public const string UNUSED_ASSETS_CATEGORY_LABEL = "Unused Assets";
+		public const string EXTRA_DATA_CATEGORY_LABEL = "Extra Data";
 		public const string OPTIONS_CATEGORY_LABEL = "Options";
 		public const string HELP_CATEGORY_LABEL = "Help & Info";
 
@@ -133,6 +141,7 @@ namespace BuildReportTool.Window
 		public const string SAVE_PATH_TYPE_PERSONAL_WIN_LABEL = "In \"My Documents\" folder";
 		public const string SAVE_PATH_TYPE_PERSONAL_MAC_LABEL = "In Home folder";
 		public const string SAVE_PATH_TYPE_PROJECT_LABEL = "Beside project folder";
+		public const string SAVE_PATH_TYPE_CUSTOM_LABEL = "Custom";
 
 		public const string EDITOR_LOG_LABEL = "Unity Editor.log path ";
 		public const string DEFAULT_EDITOR_LOG_NOT_FOUND_MSG = "Warning: Unity Editor Log file not found.";

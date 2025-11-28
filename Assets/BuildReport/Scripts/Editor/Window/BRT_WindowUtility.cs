@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-
 namespace BuildReportTool.Window
 {
 	public static class Utility
@@ -15,6 +14,34 @@ namespace BuildReportTool.Window
 			float y = (position.height - h) * 0.25f;
 
 			GUI.Label(new Rect(x, y, w, h), msg);
+		}
+
+		public static Texture AssemblyIcon
+		{
+			get
+			{
+				var assemblyGuiContent = EditorGUIUtility.IconContent("Assembly Icon");
+				if (assemblyGuiContent != null)
+				{
+					return assemblyGuiContent.image;
+				}
+
+				return null;
+			}
+		}
+
+		public static Texture GetIcon(string assetPath)
+		{
+			if (assetPath.IsAnAssembly())
+			{
+				// an assembly (dll) doesn't exist yet in the library,
+				// so we'll use a hardcoded icon
+				return AssemblyIcon;
+			}
+			else
+			{
+				return AssetDatabase.GetCachedIcon(assetPath);
+			}
 		}
 
 		public static void PingSelectedAssets(AssetList list)

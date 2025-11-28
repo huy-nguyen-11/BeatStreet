@@ -21,7 +21,7 @@ public class PlayerSkill1 : PlayerStateManager
     public void SetSkill1()
     {
         float point = playerController.transform.rotation.y == 0 ? 4f : -4f;
-        playerController.rb.velocity = Vector3.right * point;
+        playerController.rb.linearVelocity = Vector3.right * point;
         coroutine = playerController.StartCoroutine(ResetStatus());
     }
     IEnumerator ResetStatus()

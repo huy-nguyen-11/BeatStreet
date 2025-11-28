@@ -12,7 +12,7 @@ public class PlayerHit : PlayerStateManager
     public override void Enter()
     {
         playerController.state = PlayerController.State.Hit;
-        playerController.rb.velocity = Vector2.zero;
+        playerController.rb.linearVelocity = Vector2.zero;
         playerController.transform.rotation = Quaternion.Euler(new Vector3(0, playerController.HitDirection ? -180 : 0, 0));
         if (playerController.HitCount < 3)
         {

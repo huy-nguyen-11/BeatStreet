@@ -7,39 +7,58 @@ namespace BuildReportTool
 {
 	public static class MeshDataGenerator
 	{
-		public static void CreateForUsedAssetsOnly(MeshData data, BuildReportTool.BuildInfo buildInfo, bool debugLog = false)
+		public static void Create(MeshData data, BuildReportTool.BuildInfo buildInfo, bool createForUnusedAssetsToo, bool debugLog = false)
 		{
 			if (buildInfo == null)
 			{
-				if (debugLog) Debug.LogError("Can't create MeshData for Used Assets, BuildInfo is null");
+				if (debugLog) Debug.LogError("Can't create MeshData for Assets, BuildInfo is null");
 				return;
 			}
-			if (debugLog) Debug.Log("Will create MeshData for Used Assets");
+			if (debugLog) Debug.Log("Will create MeshData for Assets");
 
 			var meshDataEntries = data.GetMeshData();
 			meshDataEntries.Clear();
 
-			AppendMeshData(data, buildInfo.UsedAssets.All, false, debugLog);
-		}
-
-		public static void CreateForAllAssets(MeshData data, BuildReportTool.BuildInfo buildInfo, bool debugLog = false)
-		{
-			if (buildInfo == null)
+			if (buildInfo.UsedAssets != null &&
+			    buildInfo.UsedAssets.All != null &&
+			    buildInfo.UsedAssets.All.Length > 0)
 			{
-				if (debugLog) Debug.LogError("Can't create MeshData for Used & Unused Assets, BuildInfo is null");
-				return;
+				AppendMeshData(data, buildInfo.UsedAssets.All, false, debugLog);
 			}
-			if (debugLog) Debug.Log("Will create MeshData for Used & Unused Assets");
 
-			var meshDataEntries = data.GetMeshData();
-			meshDataEntries.Clear();
+			if (buildInfo.AssetBundles != null)
+			{
+				for (int i = 0; i < buildInfo.AssetBundles.Length; ++i)
+				{
+					var bundle = buildInfo.AssetBundles[i];
+					if (bundle == null ||
+					    bundle.UsedAssets == null ||
+					    bundle.UsedAssets.All == null ||
+					    bundle.UsedAssets.All.Length == 0)
+					{
+						continue;
+					}
 
-			AppendMeshData(data, buildInfo.UsedAssets.All, false, debugLog);
-			AppendMeshData(data, buildInfo.UnusedAssets.All, false, debugLog);
+					AppendMeshData(data, bundle.UsedAssets.All, false, debugLog);
+				}
+			}
+
+			if (createForUnusedAssetsToo &&
+			    buildInfo.UnusedAssets != null &&
+			    buildInfo.UnusedAssets.All != null &&
+			    buildInfo.UnusedAssets.All.Length > 0)
+			{
+				AppendMeshData(data, buildInfo.UnusedAssets.All, false, debugLog);
+			}
 		}
 
 		static void AppendMeshData(MeshData data, IList<SizePart> assets, bool overwriteExistingEntries, bool debugLog = false)
 		{
+			if (assets == null || assets.Count == 0)
+			{
+				return;
+			}
+
 			if (debugLog) Debug.LogFormat("Creating Mesh Data for {0} assets", assets.Count.ToString());
 
 			var meshDataEntries = data.GetMeshData();
@@ -74,8 +93,9 @@ namespace BuildReportTool
 
 		static readonly List<MeshFilter> MeshFilters = new List<MeshFilter>();
 		static readonly List<SkinnedMeshRenderer> SkinnedMeshRenderers = new List<SkinnedMeshRenderer>();
-
+#if UNITY_5_5_OR_NEWER
 		static readonly List<int> TriangleBuffer = new List<int>();
+#endif
 
 		static MeshData.Entry CreateEntry(string assetPath, bool debugLog = false)
 		{
@@ -127,8 +147,16 @@ namespace BuildReportTool
 
 					for (int m = 0; m < subMeshCount; ++m)
 					{
+#if UNITY_2017_3_OR_NEWER
 						MeshFilters[n].sharedMesh.GetTriangles(TriangleBuffer, m, false);
 						totalTriangleCount += TriangleBuffer.Count/3;
+#elif UNITY_5_5_OR_NEWER
+						MeshFilters[n].sharedMesh.GetTriangles(TriangleBuffer, m);
+						totalTriangleCount += TriangleBuffer.Count/3;
+#else
+						var triangles = MeshFilters[n].sharedMesh.GetTriangles(m);
+						totalTriangleCount += triangles.Length/3;
+#endif
 					}
 				}
 
@@ -142,8 +170,16 @@ namespace BuildReportTool
 
 					for (int m = 0; m < subMeshCount; ++m)
 					{
+#if UNITY_2017_3_OR_NEWER
 						SkinnedMeshRenderers[n].sharedMesh.GetTriangles(TriangleBuffer, m, false);
 						totalTriangleCount += TriangleBuffer.Count/3;
+#elif UNITY_5_5_OR_NEWER
+						SkinnedMeshRenderers[n].sharedMesh.GetTriangles(TriangleBuffer, m);
+						totalTriangleCount += TriangleBuffer.Count/3;
+#else
+						var triangles = SkinnedMeshRenderers[n].sharedMesh.GetTriangles(m);
+						totalTriangleCount += triangles.Length/3;
+#endif
 					}
 				}
 			}

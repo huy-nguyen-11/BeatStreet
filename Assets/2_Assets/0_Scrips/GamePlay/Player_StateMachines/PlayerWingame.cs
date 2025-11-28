@@ -6,7 +6,7 @@ public class PlayerWingame : PlayerStateManager
     public override void Enter()
     {
         playerController.state = PlayerController.State.Wingame;
-        playerController.rb.velocity = Vector2.zero;
+        playerController.rb.linearVelocity = Vector2.zero;
         playerController.animator.Play("WinGame");
     }
     public override void Update()

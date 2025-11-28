@@ -1,8 +1,8 @@
+using System.IO;
 using UnityEngine;
 using UnityEditor;
 using System.Text.RegularExpressions;
 using UnityEditorInternal;
-
 
 namespace BuildReportTool.Window.Screen
 {
@@ -160,11 +160,12 @@ namespace BuildReportTool.Window.Screen
 		Vector2 _assetListScrollPos;
 
 
-		public override void RefreshData(BuildInfo buildReport, AssetDependencies assetDependencies, TextureData textureData, MeshData meshData, UnityBuildReport unityBuildReport)
+		public override void RefreshData(BuildInfo buildReport, AssetDependencies assetDependencies,
+			TextureData textureData, MeshData meshData, PrefabData prefabData, UnityBuildReport unityBuildReport, BuildReportTool.AssetBundleSession assetBundleSession)
 		{
 			if (_saveTypeLabels == null)
 			{
-				_saveTypeLabels = new[] {SAVE_PATH_TYPE_PERSONAL_OS_SPECIFIC_LABEL, Labels.SAVE_PATH_TYPE_PROJECT_LABEL};
+				_saveTypeLabels = new[] {SAVE_PATH_TYPE_PERSONAL_OS_SPECIFIC_LABEL, Labels.SAVE_PATH_TYPE_PROJECT_LABEL, Labels.SAVE_PATH_TYPE_CUSTOM_LABEL};
 			}
 
 			_selectedCalculationLevelIdx = GetCalculationLevelGuiIdxFromOptions();
@@ -193,14 +194,16 @@ namespace BuildReportTool.Window.Screen
 		readonly GUIContent _basicSearchRadioLabel = new GUIContent("Basic");
 		readonly GUIContent _regexSearchRadioLabel = new GUIContent("Regex");
 
+		readonly GUIContent _infoMessage = new GUIContent();
+
 		Texture2D _iconValid;
 		Texture2D _iconInvalid;
 
 		public override void DrawGUI(Rect position,
-			BuildInfo buildReportToDisplay, AssetDependencies assetDependencies, TextureData textureData, MeshData meshData,
-			UnityBuildReport unityBuildReport,
-			out bool requestRepaint
-		)
+			BuildInfo buildReportToDisplay, AssetDependencies assetDependencies,
+			TextureData textureData, MeshData meshData, PrefabData prefabData,
+			UnityBuildReport unityBuildReport, BuildReportTool.ExtraData extraData, BuildReportTool.AssetBundleSession assetBundleSession,
+			out bool requestRepaint)
 		{
 			if (Event.current.type == EventType.Repaint)
 			{
@@ -279,7 +282,7 @@ namespace BuildReportTool.Window.Screen
 			GUILayout.BeginHorizontal(BRT_BuildReportWindow.LayoutNone);
 			GUILayout.Space(20);
 			GUILayout.Label(
-				"Note: For batchmode builds, to create build reports, call <b>BuildReportTool.ReportGenerator.CreateReport()</b> after <b>BuildPipeline.BuildPlayer()</b> in your build scripts.\n\nAlso call <b>BuildReportTool.ReportGenerator.OnPreBuild()</b> in your <b>OnPreprocessBuild()</b> methods so the build time can be recorded properly.\n\nThe Build Report is automatically saved as an XML file.",
+				"Note: For batchmode builds, to create build reports, call <b>BuildReportTool.ReportGenerator.CreateReport()</b> after <b>BuildPipeline.BuildPlayer()</b> in your build scripts.\n\nThe Build Report is automatically saved as an XML file.",
 				boxedLabelStyle, LayoutMaxWidth593);
 			GUILayout.EndHorizontal();
 			GUILayout.Space(10);
@@ -295,6 +298,13 @@ namespace BuildReportTool.Window.Screen
 			BuildReportTool.Options.AllowDeletingOfUsedAssets = GUILayout.Toggle(
 				BuildReportTool.Options.AllowDeletingOfUsedAssets,
 				"Allow deleting of Used Assets (practice caution!)", BRT_BuildReportWindow.LayoutNone);
+
+			GUILayout.Space(20);
+
+			BuildReportTool.Options.KeepCopyOfLogOfLastSuccessfulBuild = GUILayout.Toggle(
+				BuildReportTool.Options.KeepCopyOfLogOfLastSuccessfulBuild,
+				"Keep a copy of the last successful build's Editor.log, which will be re-used if no build was detected in the current Editor.log.",
+				BRT_BuildReportWindow.LayoutNone);
 
 			GUILayout.Space(20);
 
@@ -404,8 +414,45 @@ namespace BuildReportTool.Window.Screen
 				"This bug has already been fixed in Unity 2017.1, 5.5.3p1 and 5.6.0p1. Only enable this if you are affected by the bug.", BRT_BuildReportWindow.LayoutNone);
 			#endregion
 
-			GUILayout.Space(10);
+			GUILayout.Space(15);
 			GUILayout.Label("In Unused Assets List", header2Style, BRT_BuildReportWindow.LayoutNone);
+
+			// process unused assets in batches?
+
+			BuildReportTool.Options.ProcessUnusedAssetsInBatches =
+				GUILayout.Toggle(BuildReportTool.Options.ProcessUnusedAssetsInBatches, "Process unused assets in batches (Warning: report generation can become slow for large projects when turned off)", BRT_BuildReportWindow.LayoutNone);
+
+			GUILayout.Space(2);
+
+			// unused assets entries per batch
+			GUI.enabled = prevEnabled && BuildReportTool.Options.ProcessUnusedAssetsInBatches;
+			GUILayout.BeginHorizontal(BRT_BuildReportWindow.LayoutNone);
+			GUILayout.Label("Batch count (only process this much files at a time when checking for unused assets):", BRT_BuildReportWindow.LayoutNone);
+			string entriesPerBatchInput =
+				GUILayout.TextField(BuildReportTool.Options.UnusedAssetsEntriesPerBatch.ToString(), LayoutMinWidth100);
+			entriesPerBatchInput =
+				Regex.Replace(entriesPerBatchInput, @"[^0-9]", ""); // positive numbers only, no fractions
+			if (string.IsNullOrEmpty(entriesPerBatchInput))
+			{
+				entriesPerBatchInput = "0";
+			}
+
+			BuildReportTool.Options.UnusedAssetsEntriesPerBatch = int.Parse(entriesPerBatchInput);
+			GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
+
+			GUI.enabled = prevEnabled;
+			if (BuildReportTool.Options.ProcessUnusedAssetsInBatches)
+			{
+				GUILayout.BeginHorizontal(LayoutNoExpandWidth);
+				GUILayout.Space(20);
+				GUILayout.Label(
+					string.Format("Note: Due to the batch processing, only the first {0:N0} assets at most will be included for the Unused Assets List in the saved Build Report file.", BuildReportTool.Options.UnusedAssetsEntriesPerBatch),
+					boxedLabelStyle, LayoutMaxWidth593);
+				GUILayout.EndHorizontal();
+			}
+
+			GUILayout.Space(10);
 
 			BuildReportTool.Options.IncludeSvnInUnused =
 				GUILayout.Toggle(BuildReportTool.Options.IncludeSvnInUnused, Labels.INCLUDE_SVN_LABEL, BRT_BuildReportWindow.LayoutNone);
@@ -984,7 +1031,7 @@ namespace BuildReportTool.Window.Screen
 
 			GUILayout.Space(30);
 
-			#region Column 2
+			#region Column 3
 			GUILayout.BeginVertical(BRT_BuildReportWindow.LayoutNone);
 
 			BuildReportTool.Options.ShowMeshColumnAnimationType = GUILayout.Toggle(
@@ -1007,6 +1054,91 @@ namespace BuildReportTool.Window.Screen
 			GUILayout.FlexibleSpace();
 
 			GUILayout.EndHorizontal();
+
+			// --------------------------------------------
+
+			GUILayout.Space(10);
+			GUILayout.Label("Prefab Data", header2Style, BRT_BuildReportWindow.LayoutNone);
+
+			GUILayout.BeginHorizontal(BRT_BuildReportWindow.LayoutNone);
+			GUILayout.Label("Name of File Filter where Prefab Data will be shown:", BRT_BuildReportWindow.LayoutNone);
+			BuildReportTool.Options.FileFilterNameForPrefabData =
+				GUILayout.TextField(BuildReportTool.Options.FileFilterNameForPrefabData, LayoutMinWidth200);
+			GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
+
+			GUILayout.Space(3);
+			GUILayout.Label("Prefab Data To Show in Asset Lists:", BRT_BuildReportWindow.LayoutNone);
+			GUILayout.BeginHorizontal(BRT_BuildReportWindow.LayoutNone);
+			GUILayout.Space(10);
+
+			#region Column 1
+			GUILayout.BeginVertical(BRT_BuildReportWindow.LayoutNone);
+
+			BuildReportTool.Options.ShowPrefabColumnContributeGI = GUILayout.Toggle(
+				BuildReportTool.Options.ShowPrefabColumnContributeGI, "Contribute Global Illumination", BRT_BuildReportWindow.LayoutNone);
+			if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+			{
+				_hoveredControlTooltipText = BuildReportTool.PrefabData.GetTooltipTextFromId(BuildReportTool.PrefabData.DataId.ContributeGI);
+			}
+
+			BuildReportTool.Options.ShowPrefabColumnBatchingStatic = GUILayout.Toggle(
+				BuildReportTool.Options.ShowPrefabColumnBatchingStatic, "Static Batching", BRT_BuildReportWindow.LayoutNone);
+			if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+			{
+				_hoveredControlTooltipText = BuildReportTool.PrefabData.GetTooltipTextFromId(BuildReportTool.PrefabData.DataId.BatchingStatic);
+			}
+
+			BuildReportTool.Options.ShowPrefabColumnReflectionProbeStatic = GUILayout.Toggle(
+				BuildReportTool.Options.ShowPrefabColumnReflectionProbeStatic, "Reflection Probe Static", BRT_BuildReportWindow.LayoutNone);
+			if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+			{
+				_hoveredControlTooltipText = BuildReportTool.PrefabData.GetTooltipTextFromId(BuildReportTool.PrefabData.DataId.ReflectionProbeStatic);
+			}
+
+			GUILayout.EndVertical();
+			#endregion
+
+			GUILayout.Space(30);
+
+			#region Column 2
+			GUILayout.BeginVertical(BRT_BuildReportWindow.LayoutNone);
+
+			BuildReportTool.Options.ShowPrefabColumnOccluderStatic = GUILayout.Toggle(
+				BuildReportTool.Options.ShowPrefabColumnOccluderStatic, "Occluder Static", BRT_BuildReportWindow.LayoutNone);
+			if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+			{
+				_hoveredControlTooltipText = BuildReportTool.PrefabData.GetTooltipTextFromId(BuildReportTool.PrefabData.DataId.OccluderStatic);
+			}
+
+			BuildReportTool.Options.ShowPrefabColumnOccludeeStatic = GUILayout.Toggle(
+				BuildReportTool.Options.ShowPrefabColumnOccludeeStatic, "Occludee Static", BRT_BuildReportWindow.LayoutNone);
+			if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+			{
+				_hoveredControlTooltipText = BuildReportTool.PrefabData.GetTooltipTextFromId(BuildReportTool.PrefabData.DataId.OccludeeStatic);
+			}
+
+			BuildReportTool.Options.ShowPrefabColumnNavigationStatic = GUILayout.Toggle(
+				BuildReportTool.Options.ShowPrefabColumnNavigationStatic, "Navigation Static", BRT_BuildReportWindow.LayoutNone);
+			if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+			{
+				_hoveredControlTooltipText = BuildReportTool.PrefabData.GetTooltipTextFromId(BuildReportTool.PrefabData.DataId.NavigationStatic);
+			}
+
+			BuildReportTool.Options.ShowPrefabColumnOffMeshLinkGeneration = GUILayout.Toggle(
+				BuildReportTool.Options.ShowPrefabColumnOffMeshLinkGeneration, "Off-Mesh Link Generation", BRT_BuildReportWindow.LayoutNone);
+			if (Event.current.type == EventType.Repaint && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+			{
+				_hoveredControlTooltipText = BuildReportTool.PrefabData.GetTooltipTextFromId(BuildReportTool.PrefabData.DataId.OffMeshLinkGeneration);
+			}
+
+			GUILayout.EndVertical();
+			#endregion
+
+			GUILayout.FlexibleSpace();
+
+			GUILayout.EndHorizontal();
+
 			// --------------------------------------------
 
 			GUILayout.Space(10);
@@ -1014,7 +1146,7 @@ namespace BuildReportTool.Window.Screen
 
 			// pagination length
 			GUILayout.BeginHorizontal(BRT_BuildReportWindow.LayoutNone);
-			GUILayout.Label("View assets per groups of:", BRT_BuildReportWindow.LayoutNone);
+			GUILayout.Label("Asset List entries per page:", BRT_BuildReportWindow.LayoutNone);
 			string pageInput = GUILayout.TextField(BuildReportTool.Options.AssetListPaginationLength.ToString(), LayoutMinWidth100);
 			pageInput = Regex.Replace(pageInput, @"[^0-9]", ""); // positive numbers only, no fractions
 			if (string.IsNullOrEmpty(pageInput))
@@ -1026,25 +1158,7 @@ namespace BuildReportTool.Window.Screen
 			GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
 
-			GUILayout.Space(10);
-
-			// unused assets entries per batch
-			GUILayout.BeginHorizontal(BRT_BuildReportWindow.LayoutNone);
-			GUILayout.Label("Process unused assets per batches of:", BRT_BuildReportWindow.LayoutNone);
-			string entriesPerBatchInput =
-				GUILayout.TextField(BuildReportTool.Options.UnusedAssetsEntriesPerBatch.ToString(), LayoutMinWidth100);
-			entriesPerBatchInput =
-				Regex.Replace(entriesPerBatchInput, @"[^0-9]", ""); // positive numbers only, no fractions
-			if (string.IsNullOrEmpty(entriesPerBatchInput))
-			{
-				entriesPerBatchInput = "0";
-			}
-
-			BuildReportTool.Options.UnusedAssetsEntriesPerBatch = int.Parse(entriesPerBatchInput);
-			GUILayout.FlexibleSpace();
-			GUILayout.EndHorizontal();
-
-			GUILayout.Space(10);
+			GUILayout.Space(2);
 
 			// log messages
 			GUILayout.BeginHorizontal(BRT_BuildReportWindow.LayoutNone);
@@ -1255,25 +1369,6 @@ namespace BuildReportTool.Window.Screen
 
 			GUILayout.Label("Build Report Files", header1Style, BRT_BuildReportWindow.LayoutNone);
 
-			// build report files save path
-			GUILayout.BeginHorizontal(BRT_BuildReportWindow.LayoutNone);
-			GUILayout.Label(string.Format("{0}{1}", Labels.SAVE_PATH_LABEL, BuildReportTool.Options.BuildReportSavePath), BRT_BuildReportWindow.LayoutNone);
-			if (GUILayout.Button(OPEN_IN_FILE_BROWSER_OS_SPECIFIC_LABEL, BRT_BuildReportWindow.LayoutNone))
-			{
-				BuildReportTool.Util.OpenInFileBrowser(BuildReportTool.Options.BuildReportSavePath);
-			}
-
-			GUILayout.FlexibleSpace();
-			GUILayout.EndHorizontal();
-
-			// change name of build reports folder
-			GUILayout.BeginHorizontal(BRT_BuildReportWindow.LayoutNone);
-			GUILayout.Label(Labels.SAVE_FOLDER_NAME_LABEL, BRT_BuildReportWindow.LayoutNone);
-			BuildReportTool.Options.BuildReportFolderName =
-				GUILayout.TextField(BuildReportTool.Options.BuildReportFolderName, LayoutMinWidth250);
-			GUILayout.FlexibleSpace();
-			GUILayout.EndHorizontal();
-
 			// where to save build reports (my docs/home, or beside project)
 			GUILayout.BeginHorizontal(BRT_BuildReportWindow.LayoutNone);
 			GUILayout.Label(Labels.SAVE_PATH_TYPE_LABEL, BRT_BuildReportWindow.LayoutNone);
@@ -1281,13 +1376,92 @@ namespace BuildReportTool.Window.Screen
 			if (_saveTypeLabels == null)
 			{
 				_saveTypeLabels = new[]
-					{SAVE_PATH_TYPE_PERSONAL_OS_SPECIFIC_LABEL, Labels.SAVE_PATH_TYPE_PROJECT_LABEL};
+					{SAVE_PATH_TYPE_PERSONAL_OS_SPECIFIC_LABEL, Labels.SAVE_PATH_TYPE_PROJECT_LABEL, Labels.SAVE_PATH_TYPE_CUSTOM_LABEL};
 			}
 
 			BuildReportTool.Options.SaveType = GUILayout.SelectionGrid(BuildReportTool.Options.SaveType, _saveTypeLabels,
 				_saveTypeLabels.Length, BRT_BuildReportWindow.LayoutNone);
 			GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
+
+			GUILayout.Space(10);
+
+			if (BuildReportTool.Options.SaveType == BuildReportTool.Options.SAVE_TYPE_CUSTOM)
+			{
+				GUILayout.BeginHorizontal(BRT_BuildReportWindow.LayoutNone);
+				GUILayout.Label(Labels.SAVE_PATH_LABEL, BRT_BuildReportWindow.LayoutNone);
+				BuildReportTool.Options.BuildReportCustomOutputPath =
+					GUILayout.TextField(BuildReportTool.Options.BuildReportCustomOutputPath, LayoutMinWidth250);
+				if (GUILayout.Button("Change", BRT_BuildReportWindow.LayoutNone))
+				{
+					bool isRelative;
+					string fullPath;
+					if (Path.IsPathRooted(BuildReportTool.Options.BuildReportCustomOutputPath))
+					{
+						isRelative = false;
+						fullPath = BuildReportTool.Options.BuildReportCustomOutputPath;
+					}
+					else
+					{
+						isRelative = true;
+						fullPath = Path.GetFullPath(Path.Combine(BuildReportTool.Util.GetProjectPath(Application.dataPath),
+							BuildReportTool.Options.BuildReportCustomOutputPath));
+					}
+
+					string gotPath = EditorUtility.OpenFolderPanel(
+						"Choose output path for Build Reports", fullPath, "");
+					if (isRelative && !string.IsNullOrEmpty(gotPath))
+					{
+						// convert it back to being relative to project folder
+						gotPath = BuildReportTool.Util.MakeRelativePath(BuildReportTool.Util.GetProjectPath(Application.dataPath), gotPath);
+					}
+					if (!string.IsNullOrEmpty(gotPath))
+					{
+						BuildReportTool.Options.BuildReportCustomOutputPath = gotPath;
+					}
+				}
+				if (GUILayout.Button(OPEN_IN_FILE_BROWSER_OS_SPECIFIC_LABEL, BRT_BuildReportWindow.LayoutNone))
+				{
+					BuildReportTool.Util.OpenFolderInFileBrowser(BuildReportTool.Options.BuildReportSavePath);
+				}
+				GUILayout.FlexibleSpace();
+				GUILayout.EndHorizontal();
+
+				if (!Path.IsPathRooted(BuildReportTool.Options.BuildReportCustomOutputPath))
+				{
+					GUILayout.BeginHorizontal(BRT_BuildReportWindow.LayoutNone);
+					GUILayout.BeginVertical(EditorStyles.helpBox);
+					_infoMessage.image = EditorGUIUtility.IconContent("console.infoicon").image;
+					string fullPath = Path.GetFullPath(Path.Combine(BuildReportTool.Util.GetProjectPath(Application.dataPath),
+						BuildReportTool.Options.BuildReportCustomOutputPath));
+					_infoMessage.text = $"Relative path detected. Path is:\n{fullPath}";
+					GUILayout.Label(_infoMessage);
+					GUILayout.EndVertical();
+					GUILayout.FlexibleSpace();
+					GUILayout.EndHorizontal();
+				}
+			}
+			else // non-custom save path type
+			{
+				// build report files save path
+				GUILayout.BeginHorizontal(BRT_BuildReportWindow.LayoutNone);
+				GUILayout.Label(string.Format("{0}{1}", Labels.SAVE_PATH_LABEL, BuildReportTool.Options.BuildReportSavePath), BRT_BuildReportWindow.LayoutNone);
+				if (GUILayout.Button(OPEN_IN_FILE_BROWSER_OS_SPECIFIC_LABEL, BRT_BuildReportWindow.LayoutNone))
+				{
+					BuildReportTool.Util.OpenFolderInFileBrowser(BuildReportTool.Options.BuildReportSavePath);
+				}
+
+				GUILayout.FlexibleSpace();
+				GUILayout.EndHorizontal();
+
+				// change name of build reports folder
+				GUILayout.BeginHorizontal(BRT_BuildReportWindow.LayoutNone);
+				GUILayout.Label(Labels.SAVE_FOLDER_NAME_LABEL, BRT_BuildReportWindow.LayoutNone);
+				BuildReportTool.Options.BuildReportFolderName =
+					GUILayout.TextField(BuildReportTool.Options.BuildReportFolderName, LayoutMinWidth250);
+				GUILayout.FlexibleSpace();
+				GUILayout.EndHorizontal();
+			}
 
 			GUILayout.Space(BuildReportTool.Window.Settings.CATEGORY_VERTICAL_SPACING);
 

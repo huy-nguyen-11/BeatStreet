@@ -4,6 +4,7 @@
 
 using UnityEditor;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace BuildReportTool
 {
@@ -23,13 +24,19 @@ namespace BuildReportTool
 			get
 			{
 				// build sizes can't be empty (they are always there when you build)
-				return !string.IsNullOrEmpty(ProjectName) && (BuildSizes != null && BuildSizes.Length > 0);
+				return !string.IsNullOrEmpty(ProjectName) &&
+				       ((BuildSizes != null && BuildSizes.Length > 0) || (AssetBundles != null && AssetBundles.Length > 0));
 			}
 		}
 
 		public bool IsUnityVersionAtLeast(int majorAtLeast, int minorAtLeast, int patchAtLeast)
 		{
 			return DldUtil.UnityVersion.IsUnityVersionAtLeast(UnityVersion, majorAtLeast, minorAtLeast, patchAtLeast);
+		}
+
+		public bool IsUnityVersionLessThan(int majorAtLeast, int minorAtLeast, int patchAtLeast)
+		{
+			return !IsUnityVersionAtLeast(majorAtLeast, minorAtLeast, patchAtLeast);
 		}
 
 		public bool IsUnityVersionAtMost(int majorAtMost, int minorAtMost, int patchAtMost)
@@ -117,6 +124,11 @@ namespace BuildReportTool
 		public bool HasStreamingAssets
 		{
 			get { return StreamingAssetsSize != "0 B"; }
+		}
+
+		public bool HasAssetBundles
+		{
+			get { return AssetBundles != null && AssetBundles.Length > 0; }
 		}
 
 		// Commands
@@ -225,6 +237,11 @@ namespace BuildReportTool
 
 		public void SortSizes()
 		{
+			if (BuildSizes == null)
+			{
+				return;
+			}
+
 			System.Array.Sort(BuildSizes, delegate(BuildReportTool.SizePart b1, BuildReportTool.SizePart b2)
 			{
 				if (b1.Percentage > b2.Percentage) return -1;
@@ -369,10 +386,13 @@ namespace BuildReportTool
 
 			//Debug.LogFormat("BuildSizes total: {0}", totalSize);
 
-			for (int n = 0, len = BuildSizes.Length; n < len; ++n)
+			if (BuildSizes != null)
 			{
-				BuildSizes[n].Percentage = System.Math.Round((BuildSizes[n].UsableSize / totalSize) * 100, 2,
-					System.MidpointRounding.AwayFromZero);
+				for (int n = 0, len = BuildSizes.Length; n < len; ++n)
+				{
+					BuildSizes[n].Percentage = System.Math.Round((BuildSizes[n].UsableSize / totalSize) * 100, 2,
+						System.MidpointRounding.AwayFromZero);
+				}
 			}
 
 
@@ -513,26 +533,38 @@ namespace BuildReportTool
 		}
 
 
-		int _unusedAssetsBatchNum;
+		int _unusedAssetsBatchIdx;
 
-		public int UnusedAssetsBatchNum
+		public int UnusedAssetsBatchIdx
 		{
-			get { return _unusedAssetsBatchNum; }
+			get { return _unusedAssetsBatchIdx; }
+		}
+
+		/// <summary>
+		/// Last asset number that each batch displays.
+		/// </summary>
+		[System.Xml.Serialization.XmlIgnore]
+		public List<int> UnusedAssetsBatchFinalNum = new List<int>();
+
+		public void ResetUnusedAssetsBatchData()
+		{
+			_unusedAssetsBatchIdx = 0;
+			UnusedAssetsBatchFinalNum.Clear();
 		}
 
 		public void MoveUnusedAssetsBatchNumToNext()
 		{
-			++_unusedAssetsBatchNum;
+			++_unusedAssetsBatchIdx;
 		}
 
 		public void MoveUnusedAssetsBatchNumToPrev()
 		{
-			if (_unusedAssetsBatchNum == 0)
+			if (_unusedAssetsBatchIdx == 0)
 			{
 				return;
 			}
 
-			--_unusedAssetsBatchNum;
+			--_unusedAssetsBatchIdx;
 		}
 
 		// ---------------------------------------
