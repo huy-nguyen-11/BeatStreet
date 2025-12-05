@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -7,7 +8,6 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
 {
     public float Horizontal { get { return (snapX) ? SnapFloat(smoothedInput.x, AxisOptions.Horizontal) : smoothedInput.x; } }
     public float Vertical { get { return (snapY) ? SnapFloat(smoothedInput.y, AxisOptions.Vertical) : smoothedInput.y; } }
-    //public Vector2 Direction { get { return new Vector2(Horizontal, Vertical); } }
 
     public float HandleRange
     {
@@ -26,7 +26,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     public bool SnapY { get { return snapY; } set { snapY = value; } }
 
     [SerializeField] private float handleRange = 1;
-    [SerializeField] private float deadZone = 0;
+    [SerializeField] private float deadZone = 0.2f; // DeadZone mặc định 0.2 để tránh input khi chỉ chạm nhẹ
     [SerializeField] private AxisOptions axisOptions = AxisOptions.Both;
     [SerializeField] private bool snapX = false;
     [SerializeField] private bool snapY = false;
@@ -63,9 +63,20 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     private Vector2 rawInput = Vector2.zero;
 
     // Expose raw (immediate) input and magnitudes
-    public Vector2 Direction { get { return rawInput; } }
+    public Vector2 Direction { get { return input; } }
+    public Vector2 RawDirection { get { return rawInput; } }
     public float RawMagnitude { get { return rawInput.magnitude; } }
     public float SmoothedMagnitude { get { return smoothedInput.magnitude; } }
+    // Expose smoothed direction vector
+    public Vector2 SmoothedDirection { get { return smoothedInput; } }
+
+    // Event for smoothed direction changes
+    public event Action<Vector2, float> OnSmoothedDirectionChanged;
+    
+    // Track previous magnitude to detect significant changes
+    private float previousSmoothedMagnitude = 0f;
+    [SerializeField, Tooltip("Threshold for detecting significant magnitude changes (0.05 = 5% change)")]
+    private float magnitudeChangeThreshold = 0.05f;
 
     protected virtual void Start()
     {
@@ -99,6 +110,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         // init smoothing
         handleTargetPosition = handle.anchoredPosition;
         smoothedInput = input;
+        previousSmoothedMagnitude = smoothedInput.magnitude;
 
         // Ensure handle is visible at start
         if (handle != null)
@@ -128,11 +140,41 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         if (radius.x != 0 && handleRange != 0)
         {
             // invert the earlier relation: handle.anchoredPosition = input * radius * handleRange
-            input = handle.anchoredPosition / (radius * handleRange);
+            Vector2 calculatedInput = handle.anchoredPosition / (radius * handleRange);
+            float calculatedMagnitude = calculatedInput.magnitude;
+            
+            // Chỉ tính input khi vượt qua deadZone
+            if (calculatedMagnitude > deadZone)
+            {
+                input = calculatedInput;
+            }
+            else
+            {
+                input = Vector2.zero;
+            }
         }
 
         // Smooth Direction output
+        Vector2 previousSmoothed = smoothedInput;
         smoothedInput = Vector2.SmoothDamp(smoothedInput, input, ref inputVelocity, directionSmoothTime);
+        
+        // Đảm bảo smoothedInput cũng tuân theo deadZone
+        if (smoothedInput.magnitude <= deadZone)
+        {
+            smoothedInput = Vector2.zero;
+        }
+        
+        // Check for significant magnitude change and fire event
+        float currentMagnitude = smoothedInput.magnitude;
+        float magnitudeDelta = Mathf.Abs(currentMagnitude - previousSmoothedMagnitude);
+        
+        if (magnitudeDelta >= magnitudeChangeThreshold || 
+            (previousSmoothedMagnitude == 0f && currentMagnitude > deadZone) ||
+            (previousSmoothedMagnitude > deadZone && currentMagnitude <= deadZone))
+        {
+            previousSmoothedMagnitude = currentMagnitude;
+            OnSmoothedDirectionChanged?.Invoke(smoothedInput, currentMagnitude);
+        }
     }
 
     public virtual void OnPointerDown(PointerEventData eventData)
@@ -151,24 +193,45 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         if (canvas.renderMode == RenderMode.ScreenSpaceCamera)
             cam = canvas.worldCamera;
 
-        // Determine the center for input calculations.
-        Vector2 position;
+        // Determine center in screen space
+        Vector2 centerScreen;
         if (useInitialTouchAsCenter && isDragging)
         {
-            // use the recorded initial touch screen position as center
-            position = dragStartScreenPosition;
+            centerScreen = dragStartScreenPosition;
         }
         else
         {
-            // use background position on screen as center
-            position = RectTransformUtility.WorldToScreenPoint(cam, background.position);
+            centerScreen = RectTransformUtility.WorldToScreenPoint(cam, background.position);
         }
-        Vector2 radius = background.sizeDelta / 2;
-        // calculate raw input (immediate, before smoothing/clamping)
-        rawInput = (eventData.position - position) / (radius * canvas.scaleFactor);
-        input = rawInput;
+
+        // Convert points to background local coordinates (same unit as sizeDelta)
+        Vector2 localPoint;
+        Vector2 localCenter;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(background, eventData.position, cam, out localPoint);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(background, centerScreen, cam, out localCenter);
+
+        Vector2 radius = background.sizeDelta / 2f;
+
+        // rawInput in -1..1 range relative to the background rect
+        Vector2 calculatedRawInput = (localPoint - localCenter) / radius;
+        float calculatedMagnitude = calculatedRawInput.magnitude;
+        
+        // Chỉ tính input khi vượt qua deadZone
+        if (calculatedMagnitude > deadZone)
+        {
+            rawInput = calculatedRawInput;
+            input = rawInput;
+        }
+        else
+        {
+            // Nếu chưa vượt deadZone, set về zero
+            rawInput = Vector2.zero;
+            input = Vector2.zero;
+        }
+
         FormatInput();
         HandleInput(input.magnitude, input.normalized, radius, cam);
+
         // Set target position for smoothing instead of snapping immediately
         handleTargetPosition = input * radius * handleRange;
 
@@ -192,6 +255,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     public virtual void OnPointerUp(PointerEventData eventData)
     {
         input = Vector2.zero;
+        rawInput = Vector2.zero;
         // Smoothly return handle to center
         handleTargetPosition = Vector2.zero;
 
@@ -202,6 +266,13 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         // reset drag state
         isDragging = false;
         dragStartScreenPosition = Vector2.zero;
+        
+        // Fire event when joystick is released (magnitude becomes 0)
+        if (previousSmoothedMagnitude > 0.01f)
+        {
+            previousSmoothedMagnitude = 0f;
+            OnSmoothedDirectionChanged?.Invoke(Vector2.zero, 0f);
+        }
     }
 
     protected Vector2 ScreenPointToAnchoredPosition(Vector2 screenPosition)

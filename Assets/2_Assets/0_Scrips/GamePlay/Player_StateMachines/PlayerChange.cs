@@ -7,7 +7,8 @@ public class PlayerChange : PlayerStateManager
     public override void Enter()
     {
         playerController.state = PlayerController.State.Change;
-        playerController.animator.Play("Change");
+    
+        playerController.PlayAnim("Strength", false);
         AudioBase.Instance.AudioPlayer(7);
         playerController.rb.linearVelocity = Vector2.zero;
     }

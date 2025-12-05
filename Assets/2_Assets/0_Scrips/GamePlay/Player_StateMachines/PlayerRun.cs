@@ -6,7 +6,8 @@ public class PlayerRun : PlayerStateManager
     private float holdThreshold = 0.15f;
     public override void Enter()
     {
-        playerController.animator.Play("Run");
+
+        playerController.PlayAnim("Run", true);
         playerController.state = PlayerController.State.Run;
     }
     public override void Update()

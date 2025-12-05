@@ -17,22 +17,22 @@ public class PlayerSkill2 : PlayerStateManager
     public override void Enter()
     {
         lastXPosition = playerController.Char.position.x;
-        playerController.animator.Play("Skill2");
+        playerController.PlayAnim("Strength_Attack_Max", false);
         playerController.state = PlayerController.State.Skill2;
         GamePlayManager.Instance.SetMission(6, 1);
-        if (playerController.id == 0)
-        {
-            moveTimer = 0;
-            PlayerDirection = playerController.transform.rotation.y == 0 ? Vector3.right : Vector3.left;
-            isCheckRunSkillTurn = true;
-            playerController.SetRunSkill2();
-        }
-        else
-        {
-            playerController.velocity = 8;
-            _coroutine = playerController.StartCoroutine(playerController.JumpCoroutine());
-            playerController.SetAttack(4);
-        }
+        //if (playerController.id == 0)
+        //{
+        //    moveTimer = 0;
+        //    PlayerDirection = playerController.transform.rotation.y == 0 ? Vector3.right : Vector3.left;
+        //    isCheckRunSkillTurn = true;
+        //    playerController.SetRunSkill2();
+        //}
+        //else
+        //{
+        //    playerController.velocity = 8;
+        //    _coroutine = playerController.StartCoroutine(playerController.JumpCoroutine());
+        //    playerController.SetAttack(4);
+        //}
         playerController.isCheckSkill2 = false;
     }
     public override void Update()

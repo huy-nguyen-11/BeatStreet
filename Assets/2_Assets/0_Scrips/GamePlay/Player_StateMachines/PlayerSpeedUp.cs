@@ -5,7 +5,8 @@ public class PlayerSpeedUp : PlayerStateManager
     public PlayerSpeedUp(PlayerController player) : base(player) { }
     public override void Enter()
     {
-        playerController.animator.Play("SpeedUp");
+        //playerController.animator.Play("SpeedUp");
+        playerController.PlayAnim("Speed_Run", true);
         playerController.state = PlayerController.State.SpeedUp;
         AudioBase.Instance.AudioPlayer(2);
     }
@@ -16,7 +17,7 @@ public class PlayerSpeedUp : PlayerStateManager
     public void SetSpeedUp()
     {
         Vector2 direction = playerController.joystick.Direction;
-        playerController.rb.linearVelocity = Vector2.right * (!playerController.SpeedupDirection ? -4f : 4);
+        playerController.rb.linearVelocity = Vector2.right * (!playerController.SpeedupDirection ? -6f : 6);
         playerController.transform.rotation = Quaternion.Euler(new Vector3(0, playerController.SpeedupDirection ? 0 : -180, 0));
     }
     public override void Exit()

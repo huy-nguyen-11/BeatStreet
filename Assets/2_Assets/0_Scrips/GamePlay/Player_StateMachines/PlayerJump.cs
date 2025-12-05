@@ -22,14 +22,14 @@ public class PlayerJump : PlayerStateManager
             playerController.velocity = 5;
             GamePlayManager.Instance.SetMission(6, 1);
             playerController.SetMana(-5);
-            playerController.animator.Play("JumpKick");
+            playerController.PlayAnim("Jump_Attack", false);
             /*if (playerController.id != 0)
                 playerController.SetRunSkill2();*/
         }
         else
         {
             playerController.velocity = 4;
-            playerController.animator.Play("Jump");
+            playerController.PlayAnim("Jump", false);
         }
         _coroutine = playerController.StartCoroutine(playerController.JumpCoroutine());
     }
@@ -64,6 +64,8 @@ public class PlayerJump : PlayerStateManager
         {
             playerController.StopCoroutine(_coroutine);
         }
+
+        //playerController.ClearFxTrack();
     }
     public override void FixedUpdate()
     {

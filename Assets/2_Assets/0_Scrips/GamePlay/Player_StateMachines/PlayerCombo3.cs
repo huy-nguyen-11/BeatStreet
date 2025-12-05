@@ -7,11 +7,11 @@ public class PlayerCombo3 : PlayerStateManager
     public override void Enter()
     {
         playerController.state = PlayerController.State.Attack;
-        playerController.animator.Play("Combo3");
+        playerController.PlayAnim("Strength_Attack" , false);
         AudioBase.Instance.AudioPlayer(0);
         if (coroutine != null)
             playerController.StopCoroutine(coroutine);
-        coroutine = playerController.StartCoroutine(playerController.CheckAnimationAndTriggerEvent("Combo3"));
+        coroutine = playerController.StartCoroutine(playerController.CheckAnimationAndTriggerEvent("Strength_Attack"));
     }
     public override void Update()
     {

@@ -8,8 +8,8 @@ public class PlayerIdle : PlayerStateManager
     {
         playerController.state = PlayerController.State.Idle;
         playerController.rb.linearVelocity = Vector2.zero;
-        playerController.animator.Play("Idle");
-        //playerController.skeletonAnimation.AnimationState.SetAnimation(0, "Idle", true);
+
+        playerController.PlayAnim("Idle", true);
     }
     public override void Update()
     {
@@ -17,7 +17,7 @@ public class PlayerIdle : PlayerStateManager
     }
     public override void Exit()
     {
-        playerController.TimeCheckChange = 0;
+        //playerController.TimeCheckChange = 0;
     }
     public override void FixedUpdate()
     {

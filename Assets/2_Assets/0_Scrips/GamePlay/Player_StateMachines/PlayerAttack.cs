@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+using System.Collections;
+using Spine;
+
 public class PlayerAttack : PlayerStateManager
 {
     public PlayerAttack(PlayerController player) : base(player) { }
@@ -9,74 +12,99 @@ public class PlayerAttack : PlayerStateManager
     {
         playerController.state = PlayerController.State.Attack;
         playerController.rb.linearVelocity = Vector2.zero;
-        PlayComboAnimation();
+        // Start first attack in combo
+        //StartCombo();
+        PlayComboAttackWithEvent();
         AudioBase.Instance.AudioPlayer(0);
     }
     public override void Update()
     {
     }
 
-    private void PlayComboAnimation()
+    // Public entry point for controller to start/continue a combo attack
+    //public void StartCombo()
+    //{
+    //    int idx = playerController.comboAttack;
+    //    string animName = "Attack_1";
+    //    switch (idx)
+    //    {
+    //        case 0: animName = "Attack_1"; break;
+    //        case 1: animName = "Attack_1_2"; break;
+    //        case 2: animName = "Attack_1_3"; break;
+    //    }
+
+    //    // Use PlayerCharacter helper that attaches event handler directly to the TrackEntry
+    //    playerController.PlayAnimWithEventHandler(animName, false, OnAttackEnd);
+
+    //    // apply small lunge
+    //    playerController.rb.linearVelocity = Vector2.left * (playerController.transform.rotation.y != 0 ? 0.1f : -0.1f);
+    //}
+
+    //// Callback from PlayAnimWithEventHandler when animation signals end (via Spine event or timeout)
+    //private void OnAttackEnd(TrackEntry entry)
+    //{
+    //    if (playerController.state != PlayerController.State.Attack) return;
+
+    //    // increment combo index and wrap
+    //    playerController.comboAttack++;
+    //    if (playerController.comboAttack > 2) playerController.comboAttack = 0;
+
+    //    if (playerController.queuedComboAttack)
+    //    {
+    //        playerController.queuedComboAttack = false;
+    //        Debug.Log("Continuing combo attack " + playerController.comboAttack + " time:" + Time.time);
+    //        StartCombo();
+    //    }
+    //    else
+    //    {
+    //        Debug.Log("Attack ended, returning to idle" + Time.time);
+    //        playerController.ResetStatus();
+    //    }
+    //}
+
+    private void PlayComboAttackWithEvent()
     {
-        switch (playerController.comboAttack)
+        // Lấy animation name theo combo index
+        int idx = playerController.comboIndex % playerController.comboAttackAnims.Count;
+        string animName = playerController.comboAttackAnims[idx];
+
+        // Phát animation và gắn event handler
+        playerController.PlayAnimWithEventHandler(animName, false, OnAttackEventFired);
+
+        // Apply velocity
+        playerController.rb.linearVelocity = Vector2.left *
+            (playerController.transform.rotation.y != 0 ? 0.1f : -0.1f);
+    }
+
+    /// <summary>
+    /// Callback khi event "Attack_end" được kích hoạt
+    /// </summary>
+    private void OnAttackEventFired(Spine.TrackEntry entry)
+    {
+        if (playerController.state != PlayerController.State.Attack)
+            return;
+
+        // Tăng combo index
+        playerController.comboIndex++;
+        if (playerController.comboIndex >= playerController.comboAttackAnims.Count)
+            playerController.comboIndex = 0;
+
+        // Kiểm tra xem có spam attack không
+        if (playerController.queuedComboAttack)
         {
-            case 0:
-                playerController.animator.Play("Combo1");
-                ResetAnim("Combo1");
-                break;
-            case 1:
-                if (playerController.id == 0)
-                {
-                    playerController.animator.Play("Combo1");
-                    ResetAnim("Combo1");
-                }
-                else
-                {
-                    playerController.animator.Play("Combo2");
-                    ResetAnim("Combo2");
-                }
-                break;
-            case 2:
-                AudioBase.Instance.AudioPlayer(3);
-                if (playerController.id == 0)
-                {
-                    playerController.animator.Play("Combo2");
-                    ResetAnim("Combo2");
-                }
-                else
-                {
-                    playerController.animator.Play("Combo3");
-                    ResetAnim("Combo3");
-                }
-                break;
-            case 3:
-                playerController.animator.Play("Combo1");
-                ResetAnim("Combo1");
-                break;
-            case 4:
-                AudioBase.Instance.AudioPlayer(4);
-                if (playerController.id == 0)
-                {
-                    playerController.animator.Play("Combo3");
-                    ResetAnim("Combo3");
-                }
-                else
-                {
-                    playerController.animator.Play("Combo4");
-                    ResetAnim("Combo4");
-                }
-                break;
-            default:
-                playerController.animator.Play("Combo1");
-                ResetAnim("Combo1");
-                break;
+            Debug.Log("Continuing combo attack " + playerController.comboIndex + " time:" + Time.time);
+            playerController.queuedComboAttack = false;
+            PlayComboAttackWithEvent(); // Chạy combo tiếp
         }
-        playerController.rb.linearVelocity = Vector2.left * (playerController.transform.rotation.y != 0 ? 0.1f : -0.1f);
+        else
+        {
+            Debug.Log("Attack ended, returning to idle" + Time.time);
+            // Không có attack tiếp → quay về Idle
+            playerController.ResetStatus();
+        }
     }
-    private void ResetAnim(string name)
-    {
-        coroutine = playerController.StartCoroutine(playerController.CheckAnimationAndTriggerEvent(name));
-    }
+
+
     public override void Exit()
     {
         if (coroutine != null)

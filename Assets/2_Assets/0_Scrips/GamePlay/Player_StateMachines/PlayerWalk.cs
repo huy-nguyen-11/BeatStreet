@@ -7,7 +7,7 @@ public class PlayerWalk : PlayerStateManager
     private float holdThreshold = 0.15f;
     public override void Enter()
     {
-        playerController.animator.Play("Walk");
+        playerController.PlayAnim("Walk", true);
         playerController.state = PlayerController.State.Walk;
     }
     public override void Update()

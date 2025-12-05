@@ -13810,7 +13810,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1784792935
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13823,7 +13823,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: spine-unity::Spine.Unity.SkeletonAnimation
-  skeletonDataAsset: {fileID: 11400000, guid: d81655c7f3b65b0438d0709834634b70, type: 2}
+  skeletonDataAsset: {fileID: 11400000, guid: cb891287ea84c0c43b95ea5a32215c19, type: 2}
   initialSkinName: 
   fixPrefabOverrideViaMeshFilter: 2
   initialFlipX: 0
@@ -13879,7 +13879,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 05a6947ad4ff3d34196ef4fcdf2be39a, type: 2}
+  - {fileID: 2100000, guid: bc6883538302c4d498428953597fc05e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -13920,7 +13920,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.35, y: 0.35, z: 0.35}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6449018361175443567}
@@ -13949,8 +13949,8 @@ MonoBehaviour:
   Mana: 0
   Dame: 0
   keyAnim: []
-  joystick: {fileID: 0}
-  speedThreshold: 0.75
+  joystick: {fileID: 4895289207271944840}
+  speedThreshold: 0.9
   Char: {fileID: 0}
   _attributesPet:
   - 0
@@ -17299,7 +17299,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &3493795206524674959
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17444,7 +17444,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   handleRange: 1
-  deadZone: 0.2
+  deadZone: 0
   axisOptions: 0
   snapX: 0
   snapY: 0
@@ -17452,7 +17452,8 @@ MonoBehaviour:
   handle: {fileID: 4895289207768730865}
   followTarget: {fileID: 339951806}
   useInitialTouchAsCenter: 1
-  moveThreshold: 0.8
+  magnitudeChangeThreshold: 0.05
+  moveThreshold: 0.9
   joystickType: 2
 --- !u!114 &4895289207271944841
 MonoBehaviour:
@@ -17549,7 +17550,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 256, y: 256}
+  m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &4895289207537135345
 MonoBehaviour:
@@ -17564,7 +17565,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -17657,7 +17658,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.6603774, g: 0.65815747, b: 0.6323425, a: 0.21176471}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -17947,6 +17948,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7047138250831187924}
+  - {fileID: 1784792938}
   - {fileID: 8916645963040219845}
   - {fileID: 3717342592686906131}
   - {fileID: 5792144159331959960}
@@ -17955,7 +17957,6 @@ RectTransform:
   - {fileID: 2915965426763529667}
   - {fileID: 1445246790}
   - {fileID: 339951806}
-  - {fileID: 1784792938}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -18048,7 +18049,7 @@ Transform:
   m_GameObject: {fileID: 3384719714981226802}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -1.737, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -18149,7 +18150,7 @@ MonoBehaviour:
   Dame: 0
   keyAnim: []
   joystick: {fileID: 4895289207271944840}
-  speedThreshold: 0.75
+  speedThreshold: 0.9
   Char: {fileID: 0}
   _attributesPet:
   - 0
