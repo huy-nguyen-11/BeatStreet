@@ -54,7 +54,7 @@ public class DemoTouch : MonoBehaviour
         //        HandleTouchInput();          // build mobile → dùng touch
         //#endif
         HandleTouchInput();
-        HandleJoystickMovement();
+        //HandleJoystickMovement();
     }
 
     void HandleJoystickMovement()

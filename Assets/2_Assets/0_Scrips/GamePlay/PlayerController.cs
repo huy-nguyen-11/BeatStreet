@@ -9,6 +9,7 @@ using Spine;
 [DefaultExecutionOrder(-1000)]
 public class PlayerController : PlayerCharacter
 {
+    #region fields
     public static PlayerController Instance { get; private set; }
     DataManager dataManager;
     // Joystick
@@ -96,7 +97,7 @@ public class PlayerController : PlayerCharacter
     public float jumpThreshold = 100f;
     public float speedUpThreshold = 100f;
     // Match DemoTouch timing to reduce perceived tap delay
-    private float maxTapTime = 0.35f;
+    private float maxTapTime = 0.2f;
     public float changeHoldTime = 0.3f;
     private Dictionary<int, Vector2> touchStartPositions = new Dictionary<int, Vector2>();
     private Vector2 touchStartPositionsRun;
@@ -117,6 +118,8 @@ public class PlayerController : PlayerCharacter
 {
     "Attack_1", "Attack_1_2", "Attack_1_3" // Điều chỉnh tên animation
 };
+
+    #endregion
 
     private void Awake()
     {
@@ -155,14 +158,11 @@ public class PlayerController : PlayerCharacter
 
         dataManager = DataManager.Instance;
         OnInit();
-        
 
         if (joystick != null)
         {
             joystick.OnSmoothedDirectionChanged += OnJoystickDirectionChanged;
         }
-
-
     }
     
     private void OnDestroy()
@@ -180,7 +180,6 @@ public class PlayerController : PlayerCharacter
         UpdateAnimationStateFromJoystick();
     }
     
-
     private void UpdateAnimationStateFromJoystick()
     {
         if (!allowAnimationUpdateFromEvent) return;
@@ -199,7 +198,7 @@ public class PlayerController : PlayerCharacter
         bool canMoveState = (state == State.Idle || state == State.Walk || state == State.Run);
         if (!canMoveState) return;
 
-        Vector2 smoothDir = joystick != null ? joystick.SmoothedDirection : Vector2.zero;
+        Vector2 smoothDir = joystick != null ? joystick.RawDirection : Vector2.zero;
         float magnitude = smoothDir.magnitude;
 
         float walkThreshold = 0.2f;
@@ -258,12 +257,6 @@ public class PlayerController : PlayerCharacter
     }
     void Update()
     {
-        if (Input.GetMouseButtonDown(0)) // Hoặc Touch input
-        {
-            Debug.Log("Attack from mouse");
-            TriggerAttack();
-        }
-
         stateManager.Update();
         if (IsDead
             || state == State.Dead
@@ -273,7 +266,7 @@ public class PlayerController : PlayerCharacter
             ) return;
         if (state == State.Hit) return;
 
-        //CheckTouchInput();
+        CheckTouchInput();
 
         comboTimer += Time.deltaTime;
         HitTimer += Time.deltaTime;
@@ -289,10 +282,8 @@ public class PlayerController : PlayerCharacter
       && state != State.Skill2) return;
 
         // Use both raw and smoothed magnitude
-        Vector2 smoothDir = joystick != null ? joystick.SmoothedDirection : Vector2.zero;
-        Vector2 rawDir = joystick != null ? joystick.RawDirection : Vector2.zero;
+        Vector2 smoothDir = joystick != null ? joystick.RawDirection : Vector2.zero;
         float smoothMag = smoothDir.magnitude;
-        float rawMag = rawDir.magnitude;
 
         // Configure thresholds (walkThreshold < speedThreshold)
         float walkThreshold = 0.2f;
@@ -307,15 +298,15 @@ public class PlayerController : PlayerCharacter
                 if (state != State.Run)
                     SwitchToRunState(playerRun);
             }
-            else if (rawMag >= walkThreshold && smoothMag < runThreshold)
+            else if (smoothMag >= walkThreshold && smoothMag < runThreshold)
             {
                 if (state != State.Walk)
                     SwitchToRunState(playerWalk);
             }
             else
             {
-                if (state != State.Idle && state != State.Change && state != State.SpeedUp)
-                    SwitchToRunState(playerIdle);
+                //if (state != State.Idle && state != State.Change && state != State.SpeedUp)
+                //    SwitchToRunState(playerIdle);
             }
         }
     }
@@ -324,20 +315,22 @@ public class PlayerController : PlayerCharacter
     public void SetMovePlayer()
     {
         if (IsDead) return;
-
+        //Vector2 smoothDir = joystick != null ? joystick.SmoothedDirection : Vector2.zero;
         Vector2 rawDir = joystick != null ? joystick.RawDirection : Vector2.zero;
-        Vector2 smoothDir = joystick != null ? joystick.SmoothedDirection : Vector2.zero;
+        float rawMag = joystick.RawMagnitude;
 
         // Use smoothed magnitude for speed calculation
-        float smoothMag = Mathf.Clamp01(smoothDir.magnitude);
+        //float smoothMag = Mathf.Clamp01(smoothDir.magnitude);
         float runThreshold = Mathf.Clamp(speedThreshold, 0f, 1f);
 
-        float walkSpeed = 2f;
+        float walkSpeed = 1.2f;
         float runSpeed = 3f;
-        float baseSpeed = smoothMag >= runThreshold ? runSpeed : walkSpeed;
+        //float baseSpeed = smoothMag >= runThreshold ? runSpeed : walkSpeed;
+        float baseSpeed = rawMag >= runThreshold ? runSpeed : walkSpeed;
 
-        // Movement scales with smoothed direction (magnitude already included)
-        Vector2 movement = smoothDir * baseSpeed;
+        Vector2 movement = rawDir.sqrMagnitude > 0f
+    ? rawDir.normalized * baseSpeed
+    : Vector2.zero;
 
         rb.linearVelocity = movement;
 
@@ -397,16 +390,6 @@ public class PlayerController : PlayerCharacter
                             SwitchToRunState(playerChange);
                         }
                     }
-
-                    //if (direction.magnitude < 0.2 && state != State.Change)
-                    //{
-                    //    if (state != State.Idle)
-                    //    {
-                    //        SwitchToRunState(playerIdle);
-                    //        rb.linearVelocity = Vector2.zero; 
-                    //    }
-                    //}
-
                     break;
 
                 case TouchPhase.Ended:
@@ -427,64 +410,30 @@ public class PlayerController : PlayerCharacter
                         {
                             if (state == State.Change)
                             {
-                                if (fillBar.mana >= 20)
+                                if(holdTime> 0.3)
                                 {
-                                    SetMana(-20);
-                                    SwitchToRunState(playerSkill2);
+                                    if (fillBar.mana >= 20)
+                                    {
+                                        SetMana(-20);
+                                        SwitchToRunState(playerSkill2);
+                                    }
+                                    else
+                                    {
+                                        if (!GamePlayManager.Instance.isCheckUlti)
+                                            SwitchToRunState(playerCombo3);
+                                        else
+                                        {
+                                            if (state != State.Jump
+                                                && state != State.Skill1
+                                                && state != State.Skill2)
+                                                SwitchToRunState(playerIdle);
+                                        }
+                                    }
                                 }
                                 else
                                 {
-                                    if (!GamePlayManager.Instance.isCheckUlti)
-                                        SwitchToRunState(playerCombo3);
-                                    else
-                                    {
-                                        if (state != State.Jump
-                                            && state != State.Skill1
-                                            && state != State.Skill2)
-                                            SwitchToRunState(playerIdle);
-                                    }
+                                    SwitchToRunState(playerIdle);
                                 }
-                                //if (isCheckSkill2)
-                                //{
-                                //    if (fillBar.mana >= 20)
-                                //    {
-                                //        SetMana(-20);
-                                //        SwitchToRunState(playerSkill2);
-                                //    }
-                                //    else
-                                //    {
-                                //        if (!GamePlayManager.Instance.isCheckUlti)
-                                //            SwitchToRunState(playerCombo3);
-                                //        else
-                                //        {
-                                //            if (state != State.Jump
-                                //                && state != State.Skill1
-                                //                && state != State.Skill2)
-                                //                SwitchToRunState(playerIdle);
-                                //        }
-                                //    }
-                                //}
-                                //else
-                                //{
-                                //    if (!GamePlayManager.Instance.isCheckUlti
-                                //        && state != State.Attack
-                                //        && state != State.Jump
-                                //        && state != State.Skill2
-                                //        && state != State.Skill1)
-                                //    {
-                                //        Debug.Log("attack1");
-                                //        SwitchToRunState(playerAttack);
-                                //        //attackQueue.Enqueue(1);
-                                //        //ProcessAttackQueue();
-                                //    }
-                                //    else
-                                //    {
-                                //        if (state != State.Jump
-                                //            && state != State.Skill1
-                                //            && state != State.Skill2)
-                                //            SwitchToRunState(playerIdle);
-                                //    }
-                                //}
                             }
                             else if (state == State.SpeedUp)
                             {
@@ -501,14 +450,11 @@ public class PlayerController : PlayerCharacter
                             else if (deltaTime <= maxTapTime
                                 && state != State.Attack
                                 && state != State.Jump
+
                                 && state != State.Skill2
                                 && state != State.Skill1)
                             {
-                                //attackQueue.Enqueue(1);                                                                                                                                                                                           
-                                //ProcessAttackQueue();
-
-                                //SwitchToRunState(playerAttack);
-                                //TriggerAttack();
+                                TriggerAttack();
                             }
                             else if (state == State.Attack && deltaTime <= maxTapTime)
                             {

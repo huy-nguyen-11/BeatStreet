@@ -83,23 +83,17 @@ public class PlayerAttack : PlayerStateManager
     {
         if (playerController.state != PlayerController.State.Attack)
             return;
-
-        // Tăng combo index
         playerController.comboIndex++;
         if (playerController.comboIndex >= playerController.comboAttackAnims.Count)
             playerController.comboIndex = 0;
 
-        // Kiểm tra xem có spam attack không
         if (playerController.queuedComboAttack)
         {
-            Debug.Log("Continuing combo attack " + playerController.comboIndex + " time:" + Time.time);
             playerController.queuedComboAttack = false;
-            PlayComboAttackWithEvent(); // Chạy combo tiếp
+            PlayComboAttackWithEvent();
         }
         else
         {
-            Debug.Log("Attack ended, returning to idle" + Time.time);
-            // Không có attack tiếp → quay về Idle
             playerController.ResetStatus();
         }
     }
@@ -107,8 +101,8 @@ public class PlayerAttack : PlayerStateManager
 
     public override void Exit()
     {
-        if (coroutine != null)
-            playerController.StopCoroutine(coroutine);
+        //if (coroutine != null)
+        //    playerController.StopCoroutine(coroutine);
     }
     public override void FixedUpdate()
     {

@@ -7,11 +7,13 @@ public class PlayerCombo1 : PlayerStateManager
     public override void Enter()
     {
         playerController.state = PlayerController.State.Attack;
-        playerController.animator.Play("Combo1");
+        //playerController.animator.Play("Combo1");
+        playerController.PlayAnimAttack("Attack_1_5");
+        playerController.rb.linearVelocity = Vector3.zero;
         AudioBase.Instance.AudioPlayer(0);
-        if (coroutine != null)
-            playerController.StopCoroutine(coroutine);
-        coroutine = playerController.StartCoroutine(playerController.CheckAnimationAndTriggerEvent("Combo1"));
+        //if (coroutine != null)
+        //    playerController.StopCoroutine(coroutine);
+        //coroutine = playerController.StartCoroutine(playerController.CheckAnimationAndTriggerEvent("Combo1"));
     }
     public override void Update()
     {

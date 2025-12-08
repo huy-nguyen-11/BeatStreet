@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Drawing;
 using UnityEngine;
 
 public class PlayerSkill1 : PlayerStateManager
@@ -7,12 +8,14 @@ public class PlayerSkill1 : PlayerStateManager
     private Coroutine coroutine;
     public override void Enter()
     {
-        playerController.animator.Play("Skill1");
+        //playerController.animator.Play("Skill1");
+        playerController.PlayAnimAttack("Attack_1_4");
+        playerController.rb.linearVelocity = Vector3.zero;
         playerController.state = PlayerController.State.Skill1;
         GamePlayManager.Instance.SetMission(6, 1);
         AudioBase.Instance.AudioPlayer(0);
         AudioBase.Instance.AudioPlayer(4);
-        SetSkill1();
+        //SetSkill1();
     }
     public override void Update()
     {
@@ -31,7 +34,7 @@ public class PlayerSkill1 : PlayerStateManager
     }
     public override void Exit()
     {
-        playerController.StopCoroutine(coroutine);
+        //playerController.StopCoroutine(coroutine);
     }
 
     public override void FixedUpdate()

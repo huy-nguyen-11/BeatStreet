@@ -14,9 +14,11 @@ public class PlayerChange : PlayerStateManager
     }
     public override void Update()
     {
+        playerController.holdTime += Time.deltaTime;
     }
     public override void Exit()
     {
+        playerController.holdTime = 0f;
     }
 
     public override void FixedUpdate()

@@ -17,7 +17,7 @@ public class PlayerSkill2 : PlayerStateManager
     public override void Enter()
     {
         lastXPosition = playerController.Char.position.x;
-        playerController.PlayAnim("Strength_Attack_Max", false);
+        playerController.PlayAnimAttack("Strength_Attack_Max");
         playerController.state = PlayerController.State.Skill2;
         GamePlayManager.Instance.SetMission(6, 1);
         //if (playerController.id == 0)
@@ -37,12 +37,12 @@ public class PlayerSkill2 : PlayerStateManager
     }
     public override void Update()
     {
-        playerController.ProcessGravity();
+        //playerController.ProcessGravity();
     }
     public override void FixedUpdate()
     {
-        if (playerController.id == 0 && isCheckRunSkillTurn)
-            MoveLeftAndReturn();
+        //if (playerController.id == 0 && isCheckRunSkillTurn)
+        //    MoveLeftAndReturn();
     }
 
     private void MoveLeftAndReturn()
@@ -79,10 +79,10 @@ public class PlayerSkill2 : PlayerStateManager
 
     public override void Exit()
     {
-        if (_coroutine != null)
-        {
-            playerController.StopCoroutine(_coroutine);
-        }
+        //if (_coroutine != null)
+        //{
+        //    playerController.StopCoroutine(_coroutine);
+        //}
     }
 
     public override void OnCollisionEnter2D(Collision2D collision)

@@ -7,11 +7,12 @@ public class PlayerCombo3 : PlayerStateManager
     public override void Enter()
     {
         playerController.state = PlayerController.State.Attack;
-        playerController.PlayAnim("Strength_Attack" , false);
+        //playerController.PlayAnim("Strength_Attack" , false);
+        playerController.PlayAnimAttack("Strength_Attack");
         AudioBase.Instance.AudioPlayer(0);
-        if (coroutine != null)
-            playerController.StopCoroutine(coroutine);
-        coroutine = playerController.StartCoroutine(playerController.CheckAnimationAndTriggerEvent("Strength_Attack"));
+        //if (coroutine != null)
+        //    playerController.StopCoroutine(coroutine);
+        //coroutine = playerController.StartCoroutine(playerController.CheckAnimationAndTriggerEvent("Strength_Attack"));
     }
     public override void Update()
     {
@@ -22,8 +23,8 @@ public class PlayerCombo3 : PlayerStateManager
     }
     public override void Exit()
     {
-        if (coroutine != null)
-            playerController.StopCoroutine(coroutine);
+        //if (coroutine != null)
+        //    playerController.StopCoroutine(coroutine);
     }
 
     public override void FixedUpdate()

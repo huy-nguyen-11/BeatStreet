@@ -13945,6 +13945,7 @@ MonoBehaviour:
   fillBar: {fileID: 673722066}
   animator: {fileID: 8595577820068901366}
   skeletonAnimation: {fileID: 1784792935}
+  playerController: {fileID: 1784792939}
   Hp: 0
   Mana: 0
   Dame: 0
@@ -14020,6 +14021,13 @@ MonoBehaviour:
   speedUpThreshold: 100
   changeHoldTime: 0.3
   idTounchRun: 0
+  comboIndex: 0
+  isAttackingCombo: 0
+  queuedComboAttack: 0
+  comboAttackAnims:
+  - Attack_1
+  - Attack_1_2
+  - Attack_1_3
   velocity: 0
   isCheckGravity: 0
 --- !u!1 &1794654186
@@ -18145,6 +18153,7 @@ MonoBehaviour:
   fillBar: {fileID: 673722066}
   animator: {fileID: 8595577820068901366}
   skeletonAnimation: {fileID: 0}
+  playerController: {fileID: 0}
   Hp: 0
   Mana: 0
   Dame: 0
@@ -18220,6 +18229,13 @@ MonoBehaviour:
   speedUpThreshold: 100
   changeHoldTime: 0.3
   idTounchRun: 0
+  comboIndex: 0
+  isAttackingCombo: 0
+  queuedComboAttack: 0
+  comboAttackAnims:
+  - Attack_1
+  - Attack_1_2
+  - Attack_1_3
   velocity: 0
   isCheckGravity: 0
 --- !u!212 &8500395648746366524

@@ -32,13 +32,14 @@ public class PlayerCharacter : MonoBehaviour
     public FillBarPlayer fillBar;
     [SerializeField] public Animator animator;
     [SerializeField] public SkeletonAnimation skeletonAnimation;
+    [SerializeField] public PlayerController playerController;
     public float Hp;
     public float Mana;
     public float Dame;
     public List<string> keyAnim = new List<string>() { "Idle","Run","Walk","Jump","JumpKick","SpeedUp",
         "StandUp","Hit","Punch","Change","Throw","Combo1","Combo2","Combo3","Skill1","Skill2","Ulti"};
 
-     //Play an animation using Spine if available; otherwise fallback to Animator
+    //Play an animation using Spine if available; otherwise fallback to Animator
     public void PlayAnim(string animName, bool loop = true)
     {
         if (skeletonAnimation != null)
@@ -54,10 +55,15 @@ public class PlayerCharacter : MonoBehaviour
                 skeletonAnimation.AnimationName = animName;
             }
         }
-        else if (animator != null)
+    }
+
+    public void PlayAnimAttack(string animName)
+    {
+        var entry = skeletonAnimation.AnimationState.SetAnimation(0,animName, false);
+        entry.Complete += (t) =>
         {
-            animator.Play(animName);
-        }
+            playerController.SwitchToRunState(playerController.playerIdle);
+        };
     }
 
     // Play animation on Spine and attach event handler. onEnd will be called once when either
@@ -162,10 +168,6 @@ public class PlayerCharacter : MonoBehaviour
 
                 skeletonAnimation.AnimationState.Event += handler;
             }
-        }
-        else if (animator != null)
-        {
-            animator.Play(animName);
         }
     }
 
