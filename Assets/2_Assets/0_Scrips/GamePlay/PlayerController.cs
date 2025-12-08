@@ -163,6 +163,11 @@ public class PlayerController : PlayerCharacter
         {
             joystick.OnSmoothedDirectionChanged += OnJoystickDirectionChanged;
         }
+
+        if(skeletonAnimation != null)
+        {
+            skeletonAnimation.AnimationState.Event += HandleAttackEvent;
+        }
     }
     
     private void OnDestroy()
@@ -596,6 +601,15 @@ public class PlayerController : PlayerCharacter
         stateManager = player;
         stateManager.Enter();
     }
+
+    void HandleAttackEvent(TrackEntry trackEntry , Spine.Event e)
+    {
+        if (e.Data.Name == "Hit")
+        {
+            SetAttack(id);
+        }
+    }
+
     public void SetAttack(int id)
     {
         if (id != 4)
@@ -615,6 +629,7 @@ public class PlayerController : PlayerCharacter
                 attackJumKickR.SetAttackSkill(Dame * (state == State.Jump ? SetFatal(11) : SetFatal(10)), id);
         }
     }
+
     public float SetFatal(int id)
     {
         float Fatal = _attributesPet[id];

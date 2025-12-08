@@ -502,6 +502,7 @@ public class EnemyController : EnemyCharacter
     {
         attackArea.SetAttack(dame, id);
     }
+
     public IEnumerator SetTimeHit()
     {
         yield return new WaitForSeconds(HitTimeout);
