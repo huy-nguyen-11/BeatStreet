@@ -31,6 +31,7 @@ public class EnemyController : EnemyCharacter
     public EnemyAttack enemyAttack;
     public EnemyDead enemyDead;
     public EnemyFall enemyFall;
+    public EnemyGrabed enemyGrabed;
     public GameObject prfCoin;
     // Hit
     [SerializeField] Transform _pointTxtHit;
@@ -59,8 +60,8 @@ public class EnemyController : EnemyCharacter
     private bool isCheckingPlayer = false;
 
     private float patrolDuration = 1.5f;
-    private float patrolTimer = 0f; 
-    private float stopTimer = 0f; 
+    public float patrolTimer = 0f; 
+    public float stopTimer = 0f; 
     public bool isStopping = false;
     //private float stopDuration = 1.25f;
 
@@ -74,6 +75,7 @@ public class EnemyController : EnemyCharacter
         enemyFall = new EnemyFall(this);
         enemyAttack = new EnemyAttack(this);
         enemyDead = new EnemyDead(this);
+        enemyGrabed = new EnemyGrabed(this);
     }
     void Start()
     {
@@ -589,4 +591,9 @@ public class EnemyController : EnemyCharacter
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(randomTarget, 0.5f);
     }
+
+    //public void EnemyIsCatched()
+    //{
+    //    Debug.Log("enemy is catched");
+    //}
 }

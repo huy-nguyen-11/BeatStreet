@@ -15,7 +15,7 @@ public class PlayerCharacter : MonoBehaviour
         Attack,
         Dead,
         Change,
-        Catch,
+        Grab,
         Hit,
         Punch,
         SpeedUp,
@@ -63,6 +63,15 @@ public class PlayerCharacter : MonoBehaviour
         entry.Complete += (t) =>
         {
             playerController.SwitchToRunState(playerController.playerIdle);
+        };
+    }
+
+    public void PlayAnim2(string anim)
+    {
+        var entry = skeletonAnimation.AnimationState.SetAnimation(0, anim, false);
+        entry.Complete += (t) =>
+        {
+            playerController.ResetStatus();
         };
     }
 
@@ -220,17 +229,17 @@ public class PlayerCharacter : MonoBehaviour
         }
 
         // Fallback to Animator
-        if (animator != null)
-        {
-            AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
-            // Wait until animator enters the state
-            int attempts = 0;
-            while ((!state.IsName(animName) || state.normalizedTime < 1f) && attempts < 10000)
-            {
-                state = animator.GetCurrentAnimatorStateInfo(0);
-                attempts++;
-                yield return null;
-            }
-        }
+        //if (animator != null)
+        //{
+        //    AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+        //    // Wait until animator enters the state
+        //    int attempts = 0;
+        //    while ((!state.IsName(animName) || state.normalizedTime < 1f) && attempts < 10000)
+        //    {
+        //        state = animator.GetCurrentAnimatorStateInfo(0);
+        //        attempts++;
+        //        yield return null;
+        //    }
+        //}
     }
 }

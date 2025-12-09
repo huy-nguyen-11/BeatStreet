@@ -56,7 +56,17 @@ public class AttackArea : MonoBehaviour
         Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
         if (hits.Length == 0) return;
         bool Direction = CheckDirection(hits);
-        GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
+        //GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
+        // Use PlayerController API to set facing so internal flag and visual rotation stay in sync
+        if (PlayerController.Instance != null)
+        {
+            PlayerController.Instance.SetFacingDirection(Direction);
+        }
+        else
+        {
+            // fallback: keep previous behavior if instance missing
+            GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
+        }
         foreach (var hit in hits)
         {
             float distanceX = GamePlayManager.Instance._Player.transform.position.x - hit.transform.position.x;
@@ -80,7 +90,17 @@ public class AttackArea : MonoBehaviour
         Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
         if (hits.Length == 0) return;
         bool Direction = CheckDirection(hits);
-        GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
+        //GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
+        // Use PlayerController API to set facing so internal flag and visual rotation stay in sync
+        if (PlayerController.Instance != null)
+        {
+            PlayerController.Instance.SetFacingDirection(Direction);
+        }
+        else
+        {
+            // fallback
+            GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
+        }
         foreach (var hit in hits)
         {
             hit.GetComponent<EnemyChar>().enemyController.currentHitIndex = 4;

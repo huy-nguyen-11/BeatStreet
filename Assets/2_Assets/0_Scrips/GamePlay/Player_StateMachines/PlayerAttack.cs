@@ -12,6 +12,12 @@ public class PlayerAttack : PlayerStateManager
     {
         playerController.state = PlayerController.State.Attack;
         playerController.rb.linearVelocity = Vector2.zero;
+
+        Transform target = playerController.Char ?? playerController.transform;
+        float yRot = target.localEulerAngles.y;
+        bool facingRight = Mathf.Abs(Mathf.DeltaAngle(yRot, 0f)) < 90f;
+        playerController.SetFacingDirection(facingRight);
+
         // Start first attack in combo
         //StartCombo();
         PlayComboAttackWithEvent();
@@ -64,16 +70,14 @@ public class PlayerAttack : PlayerStateManager
 
     private void PlayComboAttackWithEvent()
     {
-        // Lấy animation name theo combo index
         int idx = playerController.comboIndex % playerController.comboAttackAnims.Count;
         string animName = playerController.comboAttackAnims[idx];
 
-        // Phát animation và gắn event handler
         playerController.PlayAnimWithEventHandler(animName, false, OnAttackEventFired);
 
-        // Apply velocity
-        playerController.rb.linearVelocity = Vector2.left *
-            (playerController.transform.rotation.y != 0 ? 0.1f : -0.1f);
+        // Apply velocity using isFacingRight (reliable, not rotation.y)
+        float lunge = playerController.isFacingRight ? 0.1f : -0.1f;
+        playerController.rb.linearVelocity = Vector2.left * lunge;
     }
 
     /// <summary>

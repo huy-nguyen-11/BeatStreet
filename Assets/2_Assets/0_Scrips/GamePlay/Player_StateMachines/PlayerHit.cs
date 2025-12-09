@@ -13,15 +13,18 @@ public class PlayerHit : PlayerStateManager
     {
         playerController.state = PlayerController.State.Hit;
         playerController.rb.linearVelocity = Vector2.zero;
-        playerController.transform.rotation = Quaternion.Euler(new Vector3(0, playerController.HitDirection ? -180 : 0, 0));
+
+        bool shouldFaceRight = !playerController.HitDirection;
+        playerController.SetFacingDirection(shouldFaceRight);
+
         if (playerController.HitCount < 3)
         {
-            playerController.animator.Play("Hit");
+            playerController.PlayAnim2("Hit");
         }
         else
         {
             playerController.isFall = true;
-            playerController.animator.Play("Dead");
+            playerController.PlayAnim("Dead", false);
             playerController.velocity = 8;
             _coroutine = playerController.StartCoroutine(playerController.FallCoroutine());
             isFall = true;

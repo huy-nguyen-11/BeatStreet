@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerUlti : PlayerStateManager
@@ -7,23 +8,38 @@ public class PlayerUlti : PlayerStateManager
     public override void Enter()
     {
         //playerController.animator.Play("Ulti");
+       
         playerController.state = PlayerController.State.Ulti;
         AudioBase.Instance.AudioPlayer(8);
-        UltiVal();
+        playerController.StartCoroutine(WaitForResetSkin());
+        //UltiVal();
     }
+
+    IEnumerator WaitForResetSkin()
+    {
+        playerController.PlayAnim("Skill_1" , false);
+        yield return new WaitForSeconds(5f);
+        GamePlayManager.Instance.SetStopFollowCamera();
+        GamePlayManager.Instance.isCheckUlti = false;
+        GamePlayManager.Instance._Enemy.SetHit(playerController.Dame * 15);
+        playerController.SwitchToRunState(playerController.playerIdle);
+        GamePlayManager.Instance.SetFollowCamera();
+
+    }
+
     public void UltiVal()
     {
         switch (playerController.id)
         {
             case 0:
-                playerController.animator.Play("Walk");
+                playerController.PlayAnim("Walk", true);
                 playerController.Char.DOMoveY(GamePlayManager.Instance._Enemy.transform.position.y, 0.5f);
                 playerController.Char.DOMoveX(GamePlayManager.Instance._Enemy.transform.position.x
                 + (playerController.Char.position.x < GamePlayManager.Instance._Enemy.transform.position.x ? -2.5f : 2.5f), 0.5f).OnComplete(() =>
                 {
                     playerController.transform.rotation = Quaternion.Euler(0, playerController.Char.position.x
                         < GamePlayManager.Instance._Enemy.transform.position.x ? 0 : 180, 0);
-                    playerController.animator.Play("ChangeUlti");
+                    playerController.PlayAnim("Strength", false);
                     playerController.AnimUlti.SetActive(true);
                     playerController.Char.DOMoveX(GamePlayManager.Instance._Enemy.Char.position.x
             + (playerController.Char.position.x < GamePlayManager.Instance._Enemy.transform.position.x ? -0.5f : 0.5f), 0.45f).OnComplete(() =>
@@ -46,14 +62,14 @@ public class PlayerUlti : PlayerStateManager
                 });
                 break;
             case 1:
-                playerController.animator.Play("Walk");
+                playerController.PlayAnim("Walk", true);
                 playerController.Char.DOMoveY(GamePlayManager.Instance._Enemy.transform.position.y, 0.5f);
                 playerController.Char.DOMoveX(GamePlayManager.Instance._Enemy.transform.position.x
                 + (playerController.Char.position.x < GamePlayManager.Instance._Enemy.transform.position.x ? -2.5f : 2.5f), 0.5f).OnComplete(() =>
                 {
                     playerController.transform.rotation = Quaternion.Euler(0, playerController.Char.position.x
                         < GamePlayManager.Instance._Enemy.transform.position.x ? 0 : 180, 0);
-                    playerController.animator.Play("ChangeUlti");
+                    playerController.PlayAnim("Strength", false);
                     playerController.AnimUlti.SetActive(true);
                     playerController.Char.DOMoveX(GamePlayManager.Instance._Enemy.Char.position.x
             + (playerController.Char.position.x < GamePlayManager.Instance._Enemy.transform.position.x ? -0.5f : 0.5f), 0.45f).OnComplete(() =>
@@ -81,13 +97,14 @@ public class PlayerUlti : PlayerStateManager
                 break;
         }
     }
+
     public override void Update()
     {
 
     }
     public override void Exit()
     {
-        playerController.AnimUlti.SetActive(false);
+        //playerController.AnimUlti.SetActive(false);
     }
 
     public override void FixedUpdate()

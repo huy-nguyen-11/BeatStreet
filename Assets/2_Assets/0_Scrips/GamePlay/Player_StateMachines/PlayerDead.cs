@@ -8,7 +8,7 @@ public class PlayerDead : PlayerStateManager
     Coroutine _coroutine;
     public override void Enter()
     {
-        playerController.animator.Play("Dead");
+        playerController.PlayAnim("Dead" , false);
         playerController.state = PlayerController.State.Dead;
         playerController.rb.linearVelocity = Vector2.zero;
         playerController.isFall = true;

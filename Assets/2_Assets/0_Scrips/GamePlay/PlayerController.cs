@@ -55,6 +55,7 @@ public class PlayerController : PlayerCharacter
     public PlayerAttack playerAttack;
     public PlayerJump playerJump;
     public PlayerChange playerChange;
+    public PlayerGrab playerGrab;
     public PlayerDead playerDead;
     public PlayerHit playerHit;
     public PlayerPunch playerPunch;
@@ -106,7 +107,7 @@ public class PlayerController : PlayerCharacter
     private float holdTimer;
 
     // Facing state to avoid repeated flips/snapping
-    private bool isFacingRight = true;
+    public bool isFacingRight = true;
 
     // track last processed entry to avoid duplicate handling
     private TrackEntry lastProcessedAttackEntry = null;
@@ -132,6 +133,7 @@ public class PlayerController : PlayerCharacter
         playerAttack = new PlayerAttack(this);
         playerJump = new PlayerJump(this);
         playerChange = new PlayerChange(this);
+        playerGrab = new PlayerGrab(this);
         playerDead = new PlayerDead(this);
         playerHit = new PlayerHit(this);
         playerPunch = new PlayerPunch(this);
@@ -200,7 +202,7 @@ public class PlayerController : PlayerCharacter
 
         if (isGetJoy) return;
         
-        bool canMoveState = (state == State.Idle || state == State.Walk || state == State.Run);
+        bool canMoveState = (state == State.Idle || state == State.Change || state == State.Walk || state == State.Run);
         if (!canMoveState) return;
 
         Vector2 smoothDir = joystick != null ? joystick.RawDirection : Vector2.zero;
@@ -231,7 +233,7 @@ public class PlayerController : PlayerCharacter
     public void OnInit()
     {
         id = dataManager.idPlayer;
-        animator.runtimeAnimatorController = _anims[id];
+        //animator.runtimeAnimatorController = _anims[id];
         stateManager = playerIdle;
         stateManager.Enter();
         SetAttributePet();
@@ -301,7 +303,10 @@ public class PlayerController : PlayerCharacter
             if (smoothMag >= runThreshold)
             {
                 if (state != State.Run)
+                {
                     SwitchToRunState(playerRun);
+                }
+
             }
             else if (smoothMag >= walkThreshold && smoothMag < runThreshold)
             {
@@ -355,7 +360,6 @@ public class PlayerController : PlayerCharacter
         }
     }
 
-
     private void CheckTouchInput()
     {
         Vector2 direction = joystick != null ? joystick.SmoothedDirection : Vector2.zero;
@@ -379,6 +383,33 @@ public class PlayerController : PlayerCharacter
                         return;
                     allowAnimationUpdateFromEvent = false;
                     GetJoy();
+
+                    //grab enemy
+                    if ((state == State.Walk || state == State.Run) && playerGrab.CanGrab())
+                    {
+                        // Check grab condition
+                        var (enemy, distance) = GetNearestEnemy();
+                        if (enemy != null)
+                        {
+                            Vector2 playerPos = transform.position;
+                            Vector2 enemyPos = enemy.transform.position;
+
+                            float distX = Mathf.Abs(enemyPos.x - playerPos.x);
+                            float distY = Mathf.Abs(enemyPos.y - playerPos.y);
+
+                            if (distX < 0.75f && distY < 0.5f)
+                            {
+                                bool enemyInFront = isFacingRight ? enemyPos.x > playerPos.x : enemyPos.x < playerPos.x;
+                                if (enemyInFront && enemy.enemyController.state != EnemyCharacter.State.Dead &&
+                                    enemy.enemyController.state != EnemyCharacter.State.Fall)
+                                {
+                                    playerGrab.StartGrabCooldown();
+                                    SwitchToRunState(playerGrab);
+                                }
+                            }
+                        }
+                    }
+
                     isGetJoy = true;
                     break;
                 case TouchPhase.Stationary:
@@ -480,10 +511,25 @@ public class PlayerController : PlayerCharacter
                                 if (delta.magnitude > swipeThreshold)
                                 {
 
-                                    if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y) && (state == State.Run || state == State.Walk) && !isJumping)
+                                    if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y) /*&& (state == State.Run || state == State.Walk)*/ && !isJumping)
                                     {
-                                        SpeedupDirection = delta.x > 0 ? true : false;
-                                        SwitchToRunState(playerSpeedUp);
+                                        bool isMovingInput = joystick != null && joystick.RawMagnitude > 0.2f;
+                                        if (state == State.Run || state == State.Walk || isMovingInput)
+                                        {
+                                            SpeedupDirection = delta.x > 0;
+                                            Debug.Log("SpeedupDirection: " + SpeedupDirection);
+                                            SwitchToRunState(playerSpeedUp);
+                                        }
+                                        else
+                                        {
+                                            // not moving: treat as idle fallback
+                                            if (state != State.Jump
+                                                && state != State.Skill1
+                                                && state != State.Skill2)
+                                                SwitchToRunState(playerIdle);
+                                        }
+                                        //SpeedupDirection = delta.x > 0 ? true : false;
+                                        //SwitchToRunState(playerSpeedUp);
                                     }
                                     else if (delta.y > 0 && state != State.Jump && (state == State.Run || state == State.Walk))
                                     {
@@ -596,6 +642,10 @@ public class PlayerController : PlayerCharacter
     }
     public void SwitchToRunState(PlayerStateManager player)
     {
+        //string from = stateManager != null ? stateManager.GetType().Name : "null";
+        //string to = player != null ? player.GetType().Name : "null";
+        //Debug.Log($"SwitchToRunState: {from} -> {to} at {Time.time}");
+
         if (stateManager != null)
             stateManager.Exit();
         stateManager = player;
@@ -694,9 +744,9 @@ public class PlayerController : PlayerCharacter
     {
         AnimUlti.SetActive(false);
         if (id == 0)
-            animator.Play("Summary");
+            playerController.PlayAnim("Strength", false);
         else if (id == 1)
-            animator.Play("Ulti");
+            playerController.PlayAnim("Strength", false);
     }
     public void SetImmortal()
     {
@@ -810,6 +860,18 @@ public class PlayerController : PlayerCharacter
         else
             rb.linearVelocity = Vector2.right * 5f;
     }
+
+    // Public helper to set facing consistently (updates flag + visual rotation)
+    public void SetFacingDirection(bool facingRight)
+    {
+        isFacingRight = facingRight;
+        Transform target = Char ?? transform;
+        float yRot = isFacingRight ? 0f : 180f;
+        Vector3 angles = target.localEulerAngles;
+        angles.y = yRot;
+        target.localEulerAngles = angles;
+    }
+
     public void SetMana(float mana)
     {
         Mana += mana;
@@ -829,16 +891,16 @@ public class PlayerController : PlayerCharacter
         isJumping = false;
         SwitchToRunState(playerIdle);
     }
-    public IEnumerator CheckAnimationAndTriggerEvent(string name)
-    {
-        AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
-        while (state.normalizedTime < 1f || !state.IsName(name))
-        {
-            state = animator.GetCurrentAnimatorStateInfo(0);
-            yield return new WaitForSecondsRealtime(0f);
-        }
-        ResetStatus();
-    }
+    //public IEnumerator CheckAnimationAndTriggerEvent(string name)
+    //{
+    //    AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+    //    while (state.normalizedTime < 1f || !state.IsName(name))
+    //    {
+    //        state = animator.GetCurrentAnimatorStateInfo(0);
+    //        yield return new WaitForSecondsRealtime(0f);
+    //    }
+    //    ResetStatus();
+    //}
     public IEnumerator setPlayerNextTurn()
     {
         yield return new WaitForSeconds(0.5f);

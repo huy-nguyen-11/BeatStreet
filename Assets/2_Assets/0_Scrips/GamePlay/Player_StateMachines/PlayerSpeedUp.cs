@@ -5,10 +5,13 @@ public class PlayerSpeedUp : PlayerStateManager
     public PlayerSpeedUp(PlayerController player) : base(player) { }
     public override void Enter()
     {
-        //playerController.animator.Play("SpeedUp");
+        Debug.Log("Enter Speed Up State");
         playerController.PlayAnim("Speed_Run", true);
         playerController.state = PlayerController.State.SpeedUp;
         AudioBase.Instance.AudioPlayer(2);
+
+        //var entry = playerController.skeletonAnimation != null ? playerController.skeletonAnimation.AnimationState.GetCurrent(0) : null;
+        //Debug.Log("After PlayAnim: spine entry = " + (entry != null && entry.Animation != null ? entry.Animation.Name : "null"));
     }
     public override void Update()
     {

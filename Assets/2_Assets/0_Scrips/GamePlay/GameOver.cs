@@ -189,15 +189,19 @@ public class GameOver : MonoBehaviour
         AudioBase.Instance.SetAudioUI(0);
         if (!Revive)
         {
-            if (PlayerPrefs.GetInt("Diamont") >= 40)
-            {
-                AudioBase.Instance.AudioGPl(2);
-                PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 40);
-                GamePlayManager.Instance.SetMission(0, 40);
-                GamePlayManager.Instance.SetMission(4, 1);
-                PlayerRevive();
-                //SetTopBar();
-            }
+            //if (PlayerPrefs.GetInt("Diamont") >= 40)
+            //{
+            //    AudioBase.Instance.AudioGPl(2);
+            //    PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 40);
+            //    GamePlayManager.Instance.SetMission(0, 40);
+            //    GamePlayManager.Instance.SetMission(4, 1);
+            //    PlayerRevive();
+            //    //SetTopBar();
+            //}
+            AudioBase.Instance.AudioGPl(2);
+            GamePlayManager.Instance.SetMission(0, 40);
+            GamePlayManager.Instance.SetMission(4, 1);
+            PlayerRevive();
         }
         else
         {
