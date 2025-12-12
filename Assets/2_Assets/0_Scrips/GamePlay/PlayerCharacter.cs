@@ -25,6 +25,7 @@ public class PlayerCharacter : MonoBehaviour
         Skill1,
         Skill2,
         Ulti,
+        Throw
     }
     public State state = State.Idle;
     public int id;
@@ -74,78 +75,6 @@ public class PlayerCharacter : MonoBehaviour
             playerController.ResetStatus();
         };
     }
-
-    // Play animation on Spine and attach event handler. onEnd will be called once when either
-    //  - a Spine event with name "Attack_end" / "End_attack" / "End_<animName>" fires for this TrackEntry
-    //  - or the entry is not interrupted and a fallback timeout expires (one loop duration)
-    //public void PlayAnimWithEventHandler(string animName, bool loop, Action<TrackEntry> onEnd)
-    //{
-    //    if (skeletonAnimation != null && skeletonAnimation.AnimationState != null)
-    //    {
-    //        var animState = skeletonAnimation.AnimationState;
-    //        Spine.TrackEntry entry = animState.SetAnimation(0, animName, loop);
-
-    //        if (entry == null)
-    //        {
-    //            return;
-    //        }
-
-    //        bool eventFired = false;
-    //        Spine.AnimationState.TrackEntryEventDelegate eventHandler = null;
-
-    //        eventHandler = (trackEntry, e) =>
-    //        {
-    //            try
-    //            {
-    //                if (trackEntry != entry) return;
-    //                if (e == null || e.Data == null) return;
-    //                string evtName = e.Data.Name;
-    //                if (evtName == "Attack_end" || evtName == "End_attack" || evtName == ("End_" + animName))
-    //                {
-    //                    if (eventFired) return;
-    //                    eventFired = true;
-    //                    // Unsubscribe
-    //                    animState.Event -= eventHandler;
-    //                    onEnd?.Invoke(entry);
-    //                }
-    //            }
-    //            catch { }
-    //        };
-
-    //        // subscribe to event timelines
-    //        animState.Event += eventHandler;
-
-    //        // start a coroutine to wait for completion fallback
-    //        float duration = entry != null && entry.Animation != null ? entry.Animation.Duration : 0f;
-    //        // if loop, duration may not indicate intent; still use event first, else wait one loop
-    //        float waitTime = Mathf.Max(0.05f, duration);
-    //        StartCoroutine(WaitForEntryTimeout(entry, waitTime, () =>
-    //        {
-    //            if (eventFired) return;
-    //            // ensure same entry still active
-    //            var current = animState.GetCurrent(0);
-    //            if (current != entry) return; // interrupted
-    //            // unsubscribe event
-    //            animState.Event -= eventHandler;
-    //            eventFired = true;
-    //            onEnd?.Invoke(entry);
-    //        }));
-
-    //        //return;
-    //    }
-    //}
-
-    //private IEnumerator WaitForEntryTimeout(TrackEntry entry, float waitTime, Action onTimeout)
-    //{
-    //    float timer = 0f;
-    //    while (timer < waitTime)
-    //    {
-    //        if (entry == null) yield break;
-    //        timer += Time.deltaTime * (entry.TimeScale);
-    //        yield return null;
-    //    }
-    //    onTimeout?.Invoke();
-    //}
 
     public void PlayAnimWithEventHandler(string animName, bool loop,
     System.Action<Spine.TrackEntry> onEventFired = null)
@@ -227,19 +156,5 @@ public class PlayerCharacter : MonoBehaviour
 
             yield break;
         }
-
-        // Fallback to Animator
-        //if (animator != null)
-        //{
-        //    AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
-        //    // Wait until animator enters the state
-        //    int attempts = 0;
-        //    while ((!state.IsName(animName) || state.normalizedTime < 1f) && attempts < 10000)
-        //    {
-        //        state = animator.GetCurrentAnimatorStateInfo(0);
-        //        attempts++;
-        //        yield return null;
-        //    }
-        //}
     }
 }

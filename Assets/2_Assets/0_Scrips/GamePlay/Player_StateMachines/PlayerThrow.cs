@@ -5,6 +5,8 @@ public class PlayerThrow : PlayerStateManager
     public PlayerThrow(PlayerController player) : base(player) { }
     public override void Enter()
     {
+        playerController.state = PlayerController.State.Throw;
+        playerController.PlayAnim("Grab_L", false);
     }
     public override void Update()
     {

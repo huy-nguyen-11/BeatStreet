@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using Spine;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -33,6 +34,8 @@ public class EnemyController : EnemyCharacter
     public EnemyFall enemyFall;
     public EnemyGrabed enemyGrabed;
     public GameObject prfCoin;
+    // NEW: Flag to indicate grabbed state - prevents all movement and state changes
+    public bool isGrabbed = false;
     // Hit
     [SerializeField] Transform _pointTxtHit;
     [SerializeField] GameObject _prfTxtHit;
@@ -65,6 +68,21 @@ public class EnemyController : EnemyCharacter
     public bool isStopping = false;
     //private float stopDuration = 1.25f;
 
+    // --- Movement animation helpers ---
+    // animation names (adjust to your Spine/Animator naming)
+    private const string ANIM_RUN = "Run";
+    private const string ANIM_WALK = "Move";
+    private const string ANIM_RUN_BACK = "Run"; // adjust if your project uses different naming
+    private const string ANIM_WALK_BACK = "Move_Back"; // adjust if your project uses different naming
+    private const string ANIM_IDLE = "Idle";
+
+    // thresholds (tweak to taste)
+    public float runThreshold = 1.0f;
+    public float walkThreshold = 0.25f;
+    public float animationHysteresis = 0.15f;
+
+    private string currentMoveAnim = null;
+
     private void Awake()
     {
         playerController = FindObjectOfType<PlayerController>();
@@ -89,6 +107,8 @@ public class EnemyController : EnemyCharacter
         dame = dataManager.dataBase.listLevelEnemyUpgrades[idEnemy].Dame[Level] * (isBoss ? 1.5f : 1f);
         fillBar.OnInit(Hp);
         SetLevel();
+
+        skeletonAnimation.AnimationState.Event += HandleAttackEvent;
     }
     void Update()
     {
@@ -98,6 +118,15 @@ public class EnemyController : EnemyCharacter
         if (state != State.Idle && GamePlayManager.Instance.isCheckUlti)
             SwitchToRunState(enemyIdle);
         if (GamePlayManager.Instance.isCheckUlti) return;
+        // Skip attack check if grabbed
+        if (isGrabbed)
+        {
+            if (state != State.Grabed)
+            {
+                Debug.LogWarning($"[EnemyController.Update] ⚠️ State mismatch! isGrabbed=true but state={state}. Should be Grabed!");
+            }
+            return;
+        }
         if (state != State.Hit && state != State.Fall && state != State.Attack)
             CheckAttack();
     }
@@ -144,8 +173,67 @@ public class EnemyController : EnemyCharacter
         }
     }
 
+    // Helper: pick move animation based on next target
+    private void SetMoveAnimationByTarget(Vector3 nextTarget)
+    {
+        // Safety checks
+        if (isGrabbed) return;
+        if (Char == null || player == null) return;
+        if (state == State.Dead || state == State.Attack || state == State.Hit || state == State.Fall) return;
+
+        Vector3 toTarget = nextTarget - Char.position;
+        float absDistX = Mathf.Abs(toTarget.x);
+
+        // If nearly zero horizontal movement -> idle
+        if (absDistX <= 0.01f)
+        {
+            TryPlayMoveAnim(ANIM_IDLE);
+            return;
+        }
+
+        // Determine forward/backward relative to facing
+        bool facingRight = player.position.x > Char.position.x; // matches UpdateEnemyRotation
+        int moveDirX = (int)Mathf.Sign(toTarget.x);
+        bool movingForward = (moveDirX == (facingRight ? 1 : -1));
+
+        string targetAnim;
+        if (absDistX <= walkThreshold)
+            targetAnim = ANIM_WALK;
+        else if (absDistX <= runThreshold)
+            targetAnim = ANIM_WALK;
+        else
+            targetAnim = ANIM_RUN;
+
+        // choose back variants if moving backwards
+        if (!movingForward)
+        {
+            if (targetAnim == ANIM_RUN)
+                targetAnim = ANIM_RUN_BACK;
+            else if (targetAnim == ANIM_WALK)
+                targetAnim = ANIM_WALK_BACK;
+        }
+
+        TryPlayMoveAnim(targetAnim);
+    }
+
+    // Helper: only change animation when necessary (avoid restarting same anim)
+    private void TryPlayMoveAnim(string anim)
+    {
+        if (string.IsNullOrEmpty(anim)) return;
+        if (currentMoveAnim == anim) return;
+        currentMoveAnim = anim;
+        // Use EnemyCharacter.PlayAnim wrapper
+        PlayAnim(anim, true);
+    }
+
     public void Movement()
     {
+        // If grabbed, stop all movement immediately
+        if (isGrabbed)
+        {
+            return;
+        }
+
         //UpdateEnemyRotation(); 
         if (player == null) return;
 
@@ -163,6 +251,8 @@ public class EnemyController : EnemyCharacter
                     SetRandomPatrolTarget();
             }
             SwitchToRunState(enemyIdle);
+            // set idle when stopping
+            SetMoveAnimationByTarget(Char.position);
         }
         else
         {
@@ -235,6 +325,9 @@ public class EnemyController : EnemyCharacter
             return;
         }
 
+        // set animation based on where we're heading
+        SetMoveAnimationByTarget(targetPos);
+
         Vector3 direction = (targetPos - Char.position).normalized;
         lastDirection = direction;
         Char.position += direction * moveSpeed * Time.deltaTime;
@@ -258,6 +351,10 @@ public class EnemyController : EnemyCharacter
     {
         Vector3 direction = (randomTarget - Char.position).normalized;
         lastDirection = direction;
+
+        // set animation based on random target
+        SetMoveAnimationByTarget(randomTarget);
+
         Char.position += direction * moveSpeed * Time.deltaTime;
 
         if (Vector3.Distance(Char.position, randomTarget) < 0.2f || IsTargetOccupiedByOtherEnemy(randomTarget, this))
@@ -401,6 +498,9 @@ public class EnemyController : EnemyCharacter
         player.position.y,
         Char.position.z);
 
+        // set animation for this micro-move
+        SetMoveAnimationByTarget(targetPosition);
+
         Vector3 direction = (targetPosition - Char.position).normalized;
         Char.position += direction * moveSpeed / 1.3f * Time.deltaTime;
 
@@ -500,6 +600,14 @@ public class EnemyController : EnemyCharacter
         } 
     }
 
+    void HandleAttackEvent(TrackEntry trackEntry, Spine.Event e)
+    {
+        if (e.Data.Name == "Hit")
+        {
+            SetAttack(idEnemy);
+        }
+    }
+
     public void SetAttack(int id)
     {
         attackArea.SetAttack(dame, id);
@@ -567,6 +675,43 @@ public class EnemyController : EnemyCharacter
     public void SwitchToRunState(EnemyStateMachine enemy)
     {
         if (state == State.Dead) return;
+        
+        string fromState = stateManager?.GetType().Name ?? "null";
+        string toState = enemy?.GetType().Name ?? "null";
+        string enemyName = gameObject.name;
+
+        // If we're switching INTO Grabed, set isGrabbed immediately to block other callers
+        if (enemy == enemyGrabed)
+        {
+            if (!isGrabbed)
+            {
+                isGrabbed = true;
+            }
+        }
+
+        // Log caller stack for every transition to help debug
+        var stack = new System.Diagnostics.StackTrace();
+    
+
+        // Prevent other systems from overwriting Grabed state while enemy is grabbed
+        if (isGrabbed)
+        {
+            // allow transition only to states that release the grab (Fall/Dead) or keep Grabed
+            if (enemy != enemyGrabed && enemy != enemyFall && enemy != enemyDead)
+            {
+               
+                return;
+            }
+            else
+            {
+               
+            }
+        }
+        else
+        {
+           
+        }
+        
         if (stateManager != null)
             stateManager.Exit();
         stateManager = enemy;
@@ -596,4 +741,31 @@ public class EnemyController : EnemyCharacter
     //{
     //    Debug.Log("enemy is catched");
     //}
+
+    // Forcefully set Grabed state immediately (atomic) to avoid races
+    public void ForceEnterGrabbed()
+    {
+        // Exit current state safely
+        if (stateManager != null)
+        {
+            try { stateManager.Exit(); } catch { }
+        }
+
+        // Set flag early to block other transitions
+        isGrabbed = true;
+
+        // reset movement/attack timers/flags
+        isStopping = false;
+        stopTimer = 0f;
+        patrolTimer = 0f;
+        isAttack = false;
+        isCheckingPlayer = false;
+
+        // assign and enter grab state
+        stateManager = enemyGrabed;
+        if (stateManager != null)
+            stateManager.Enter();
+
+       
+    }
 }

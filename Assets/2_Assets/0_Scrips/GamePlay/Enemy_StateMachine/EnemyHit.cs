@@ -20,7 +20,7 @@ public class EnemyHit : EnemyStateMachine
         if (enemyController.currentHitIndex >= 0 && enemyController.currentHitIndex <= 2)
         {
             SetHitbox();
-            enemyController.animator.Play("Hurt1");
+            enemyController.PlayAnim("Hit", false);
             if (coroutine != null)
                 enemyController.StopCoroutine(coroutine);
             coroutine = enemyController.StartCoroutine(SetStateIdle());
@@ -28,7 +28,8 @@ public class EnemyHit : EnemyStateMachine
         else if (enemyController.currentHitIndex >= 3 && enemyController.currentHitIndex <= 4)
         {
             SetHitbox();
-            enemyController.animator.Play("Hurt2");
+            //enemyController.animator.Play("Hurt2");
+            enemyController.PlayAnim("Hit", false);
             if (coroutine != null)
                 enemyController.StopCoroutine(coroutine);
             coroutine = enemyController.StartCoroutine(SetStateIdle());

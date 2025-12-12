@@ -5,21 +5,35 @@ public class EnemyRun : EnemyStateMachine
     public EnemyRun(EnemyController enemy) : base(enemy) { }
     public override void Enter()
     {
-        if (!enemyController.isStopping)
-        {
-            enemyController.animator.Play("Run");
-            enemyController.state = EnemyController.State.Run;
-        }
+        //if (!enemyController.isStopping)
+        //{
+        //    enemyController.PlayAnim("Run", true);
+
+        //    enemyController.state = EnemyController.State.Run;
+        //}
+        enemyController.state = EnemyController.State.Run;
     }
     public override void Update()
     {
         if (enemyController.playerController.IsDead) enemyController.SwitchToRunState(enemyController.enemyIdle);
+        // Stop execution if grabbed
+        if (enemyController.isGrabbed)
+        {
+            return;
+        }
         if (!GamePlayManager.Instance.isCheckUlti)
             if (enemyController.state != EnemyController.State.Hit)
                 enemyController.Movement();
-        AnimatorStateInfo state = enemyController.animator.GetCurrentAnimatorStateInfo(0);
-        if (!state.IsName("Run")&& !enemyController.isStopping)
-            enemyController.animator.Play("Run");
+
+        //var current = enemyController.skeletonAnimation.AnimationState.GetCurrent(0);
+
+        //if (!enemyController.isStopping)
+        //{
+        //    if (current == null || current.Animation.Name != "Run")
+        //    {
+        //        enemyController.PlayAnim("Run", true);
+        //    }
+        //}
     }
     public override void Exit()
     {

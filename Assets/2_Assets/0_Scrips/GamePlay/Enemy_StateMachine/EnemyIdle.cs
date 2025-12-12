@@ -9,9 +9,13 @@ public class EnemyIdle : EnemyStateMachine
     Coroutine _coroutine;
     public override void Enter()
     {
-        enemyController.animator.Play("Idle");
+        //enemyController.animator.Play("Idle");
+        enemyController.PlayAnim("Idle", true);
         enemyController.state = EnemyController.State.Idle;
         enemyController.rb.linearVelocity = Vector2.zero;
+        // Skip attack logic if grabbed
+        if (enemyController.isGrabbed) return;
+        
         if (!enemyController.isAttack)
         {
             if (_isActiveRun
@@ -30,6 +34,13 @@ public class EnemyIdle : EnemyStateMachine
     {
         if (enemyController.playerController.IsDead) return;
         if (GamePlayManager.Instance.isCheckUlti) return;
+        // Stop all logic if grabbed
+        if (enemyController.isGrabbed)
+        {
+            Debug.LogWarning($"[EnemyIdle.Update] ?? Attempted Update while isGrabbed=true. Returning early.");
+            return;
+        }
+
         if (!enemyController.isAttack)
         {
             if (!_isActiveRun && Vector2.Distance(enemyController.transform.position, enemyController.player.position) <= 2.5f)

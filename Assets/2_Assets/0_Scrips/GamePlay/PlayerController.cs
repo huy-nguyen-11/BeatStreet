@@ -119,7 +119,8 @@ public class PlayerController : PlayerCharacter
 {
     "Attack_1", "Attack_1_2", "Attack_1_3" // Điều chỉnh tên animation
 };
-
+    private float grabCooldown = 2;
+    public bool canGrab = false;
     #endregion
 
     private void Awake()
@@ -150,6 +151,7 @@ public class PlayerController : PlayerCharacter
     }
     void Start()
     {
+        canGrab = false;
         Char = transform.parent;
         rb = transform.parent.GetComponent<Rigidbody2D>();
 
@@ -264,6 +266,17 @@ public class PlayerController : PlayerCharacter
     }
     void Update()
     {
+        //update timmer grab cooldown
+        if (!canGrab)
+        {
+            grabCooldown -= Time.deltaTime;
+            if (grabCooldown <= 0)
+            {
+                canGrab = true;
+                grabCooldown = 2;
+            }
+        }
+
         stateManager.Update();
         if (IsDead
             || state == State.Dead
@@ -385,7 +398,7 @@ public class PlayerController : PlayerCharacter
                     GetJoy();
 
                     //grab enemy
-                    if ((state == State.Walk || state == State.Run) && playerGrab.CanGrab())
+                    if ((state == State.Walk || state == State.Run) && canGrab)
                     {
                         // Check grab condition
                         var (enemy, distance) = GetNearestEnemy();
@@ -403,7 +416,6 @@ public class PlayerController : PlayerCharacter
                                 if (enemyInFront && enemy.enemyController.state != EnemyCharacter.State.Dead &&
                                     enemy.enemyController.state != EnemyCharacter.State.Fall)
                                 {
-                                    playerGrab.StartGrabCooldown();
                                     SwitchToRunState(playerGrab);
                                 }
                             }
@@ -444,6 +456,13 @@ public class PlayerController : PlayerCharacter
                         float tapThresholdPixels = 40f;
                         if (Vector2.Distance(startPosition, endPosition) <= tapThresholdPixels) // tap threshold in pixels
                         {
+                            //grab attack enemy
+                            if (playerGrab != null && playerGrab.IsGrabActive())
+                            {
+                                // queue a grab-attack (will play Grab_Attack on spine track 1 and queue taps while previous anim runs)
+                                playerGrab.QueueGrabAttack();
+                            }
+
                             if (state == State.Change)
                             {
                                 if(holdTime> 0.3)
@@ -508,16 +527,21 @@ public class PlayerController : PlayerCharacter
                         {
                             if (Time.time - touchStartTimes[touchId] > 0.1f && Time.time - touchStartTimes[touchId] <= swipeTimeLimit)
                             {
+                                //grab throw enemy
+                                if (playerGrab.IsGrabActive() && Mathf.Abs(delta.x) > 40f)
+                                {
+                                    float throwDir = delta.x > 0 ? 1f : -1f;
+                                    playerGrab.StartThrow(throwDir);
+                                }
+
                                 if (delta.magnitude > swipeThreshold)
                                 {
-
                                     if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y) /*&& (state == State.Run || state == State.Walk)*/ && !isJumping)
                                     {
                                         bool isMovingInput = joystick != null && joystick.RawMagnitude > 0.2f;
                                         if (state == State.Run || state == State.Walk || isMovingInput)
                                         {
                                             SpeedupDirection = delta.x > 0;
-                                            Debug.Log("SpeedupDirection: " + SpeedupDirection);
                                             SwitchToRunState(playerSpeedUp);
                                         }
                                         else
@@ -642,9 +666,11 @@ public class PlayerController : PlayerCharacter
     }
     public void SwitchToRunState(PlayerStateManager player)
     {
-        //string from = stateManager != null ? stateManager.GetType().Name : "null";
-        //string to = player != null ? player.GetType().Name : "null";
-        //Debug.Log($"SwitchToRunState: {from} -> {to} at {Time.time}");
+        // Prevent leaving Grab state while grab is active
+        if (stateManager == playerGrab && playerGrab != null && playerGrab.IsGrabActive())
+        {
+            return;
+        }
 
         if (stateManager != null)
             stateManager.Exit();
@@ -812,7 +838,7 @@ public class PlayerController : PlayerCharacter
             if (!isFall)
             {
                 PerformHit();
-                if (state != State.Jump && state != State.Skill1 && state != State.Skill2)
+                if (state != State.Jump && state != State.Skill1 && state != State.Skill2 && state != State.Change)
                 {
                     if (isCheckSkill2)
                         isCheckSkill2 = false;

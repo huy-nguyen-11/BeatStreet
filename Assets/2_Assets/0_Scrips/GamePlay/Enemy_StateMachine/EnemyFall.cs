@@ -7,7 +7,7 @@ public class EnemyFall : EnemyStateMachine
     Coroutine coroutine;
     public override void Enter()
     {
-        enemyController.animator.Play("Fall");
+        enemyController.PlayAnim("Dead", false);
         enemyController.state = EnemyController.State.Fall;
         enemyController.velocity = 8;
         if (coroutine != null)

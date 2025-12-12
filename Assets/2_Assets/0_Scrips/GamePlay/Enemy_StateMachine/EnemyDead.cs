@@ -5,7 +5,7 @@ public class EnemyDead : EnemyStateMachine
     public EnemyDead(EnemyController enemy) : base(enemy) { }
     public override void Enter()
     {
-        enemyController.animator.Play("Dead");
+        enemyController.PlayAnim("Dead" , false);
         AudioBase.Instance.AudioPlayerAtkHit();
         enemyController.state = EnemyController.State.Dead;
     }
