@@ -9,8 +9,7 @@ public class EnemyIdle : EnemyStateMachine
     Coroutine _coroutine;
     public override void Enter()
     {
-        //enemyController.animator.Play("Idle");
-        enemyController.PlayAnim("Idle", true);
+        //enemyController.PlayAnim("Idle", true);
         enemyController.state = EnemyController.State.Idle;
         enemyController.rb.linearVelocity = Vector2.zero;
         // Skip attack logic if grabbed

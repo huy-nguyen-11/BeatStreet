@@ -48,7 +48,13 @@ public class EnemyController : EnemyCharacter
 
     // Enemy AI
     public float patrolRadius = 3f;
-    public float moveSpeed = 2f;
+    public float moveSpeed = 2.5f;
+
+    public float moveSpeedRun = 2.6f;
+    public float moveSpeedWalk = 1.2f;
+    public float moveSpeedRunBack = 2.2f;
+    public float moveSpeedWalkBack = 0.9f;
+
     public float attackRadius = 1.5f;
     public float attackCooldown = 2f;
     public bool isWall;
@@ -66,20 +72,25 @@ public class EnemyController : EnemyCharacter
     public float patrolTimer = 0f; 
     public float stopTimer = 0f; 
     public bool isStopping = false;
+    // Flag to indicate a tween/throw is active — prevents Movement from overriding tween
+    public bool isBeingThrown = false;
     //private float stopDuration = 1.25f;
 
     // --- Movement animation helpers ---
     // animation names (adjust to your Spine/Animator naming)
     private const string ANIM_RUN = "Run";
-    private const string ANIM_WALK = "Move";
+    private const string ANIM_WALK = "Walk";
     private const string ANIM_RUN_BACK = "Run"; // adjust if your project uses different naming
-    private const string ANIM_WALK_BACK = "Move_Back"; // adjust if your project uses different naming
-    private const string ANIM_IDLE = "Idle";
+    private const string ANIM_WALK_BACK = "Run_Back"; // adjust if your project uses different naming
+    private const string ANIM_IDLE = "Idle"; // minimal: ensure Idle exists
 
     // thresholds (tweak to taste)
     public float runThreshold = 1.0f;
     public float walkThreshold = 0.25f;
-    public float animationHysteresis = 0.15f;
+    // small threshold used to decide "already at target" -> Idle
+    public float idleThreshold = 0.05f;
+    // hysteresis to avoid flicker between idle and move
+    public float animationHysteresis = 0.08f;
 
     private string currentMoveAnim = null;
 
@@ -151,6 +162,8 @@ public class EnemyController : EnemyCharacter
 
     private void SeparateFromOtherEnemies()
     {
+        // Guard: don't modify position while being thrown
+        if (isBeingThrown) return;
         float minDist = 1f; // Khoảng cách tối thiểu giữa các enemy
         Vector3 separation = Vector3.zero;
         int count = 0;
@@ -161,7 +174,6 @@ public class EnemyController : EnemyCharacter
             float dist = Vector3.Distance(Char.position, enemy.Char.position);
             if (dist < minDist && dist > 0.01f)
             {
-                // Đẩy enemy này ra xa enemy khác
                 separation += (Char.position - enemy.Char.position).normalized * (minDist - dist);
                 count++;
             }
@@ -174,21 +186,32 @@ public class EnemyController : EnemyCharacter
     }
 
     // Helper: pick move animation based on next target
-    private void SetMoveAnimationByTarget(Vector3 nextTarget)
+    private float SetMoveAnimationByTarget(Vector3 nextTarget)
     {
         // Safety checks
-        if (isGrabbed) return;
-        if (Char == null || player == null) return;
-        if (state == State.Dead || state == State.Attack || state == State.Hit || state == State.Fall) return;
+        if (isGrabbed || isBeingThrown) return 0f;
+        if (Char == null || player == null) return moveSpeed;
+        if (state == State.Dead || state == State.Attack || state == State.Hit || state == State.Fall) return moveSpeed;
 
         Vector3 toTarget = nextTarget - Char.position;
+        float dist = toTarget.magnitude;
         float absDistX = Mathf.Abs(toTarget.x);
 
-        // If nearly zero horizontal movement -> idle
-        if (absDistX <= 0.01f)
+        // If essentially at target -> Idle
+        if (dist <= idleThreshold)
         {
-            TryPlayMoveAnim(ANIM_IDLE);
-            return;
+            // Only force Idle when we're actually in Idle state or explicitly stopping to avoid
+            // interrupts where movement speed was already chosen (prevents run_back + Idle mismatch).
+            if (state == State.Idle || isStopping)
+            {
+                if (currentMoveAnim != ANIM_IDLE)
+                {
+                    currentMoveAnim = ANIM_IDLE;
+                    PlayAnim(ANIM_IDLE, true);
+                }
+                return 0f;
+            }
+            // otherwise don't force Idle here; continue to select walk/run so animation stays consistent
         }
 
         // Determine forward/backward relative to facing
@@ -196,43 +219,40 @@ public class EnemyController : EnemyCharacter
         int moveDirX = (int)Mathf.Sign(toTarget.x);
         bool movingForward = (moveDirX == (facingRight ? 1 : -1));
 
-        string targetAnim;
-        if (absDistX <= walkThreshold)
-            targetAnim = ANIM_WALK;
-        else if (absDistX <= runThreshold)
-            targetAnim = ANIM_WALK;
-        else
-            targetAnim = ANIM_RUN;
+        string targetAnim = (absDistX <= walkThreshold) ? ANIM_WALK : ANIM_RUN;
 
         // choose back variants if moving backwards
         if (!movingForward)
         {
-            if (targetAnim == ANIM_RUN)
-                targetAnim = ANIM_RUN_BACK;
-            else if (targetAnim == ANIM_WALK)
-                targetAnim = ANIM_WALK_BACK;
+            if (targetAnim == ANIM_RUN) targetAnim = ANIM_RUN_BACK;
+            else targetAnim = ANIM_WALK_BACK;
         }
 
-        TryPlayMoveAnim(targetAnim);
+        if (currentMoveAnim != targetAnim)
+        {
+            currentMoveAnim = targetAnim;
+            PlayAnim(targetAnim, true);
+        }
+
+        if (targetAnim == ANIM_RUN) return moveSpeedRun;
+        if (targetAnim == ANIM_WALK) return moveSpeedWalk;
+        if (targetAnim == ANIM_RUN_BACK) return moveSpeedRunBack;
+        if (targetAnim == ANIM_WALK_BACK) return moveSpeedWalkBack;
+        return moveSpeed;
     }
 
-    // Helper: only change animation when necessary (avoid restarting same anim)
-    private void TryPlayMoveAnim(string anim)
-    {
-        if (string.IsNullOrEmpty(anim)) return;
-        if (currentMoveAnim == anim) return;
-        currentMoveAnim = anim;
-        // Use EnemyCharacter.PlayAnim wrapper
-        PlayAnim(anim, true);
-    }
-
+    // --------------------------------------------------
+    // Movement entrypoint: ensure facing is up-to-date before decision
     public void Movement()
     {
-        // If grabbed, stop all movement immediately
-        if (isGrabbed)
+        // If grabbed or being thrown, stop all movement immediately
+        if (isGrabbed || isBeingThrown)
         {
             return;
         }
+
+        // Keep facing consistent for animation decision
+        UpdateEnemyRotation();
 
         //UpdateEnemyRotation(); 
         if (player == null) return;
@@ -298,6 +318,7 @@ public class EnemyController : EnemyCharacter
 
     private void MoveToPlayer()
     {
+        if (isBeingThrown) return;
         float targetOffset = 0.5f;
         Vector3 leftTarget = player.position + Vector3.left * targetOffset;
         Vector3 rightTarget = player.position + Vector3.right * targetOffset;
@@ -325,12 +346,11 @@ public class EnemyController : EnemyCharacter
             return;
         }
 
-        // set animation based on where we're heading
-        SetMoveAnimationByTarget(targetPos);
+        float speed = SetMoveAnimationByTarget(targetPos);
 
         Vector3 direction = (targetPos - Char.position).normalized;
         lastDirection = direction;
-        Char.position += direction * moveSpeed * Time.deltaTime;
+        Char.position += direction * speed * Time.deltaTime;
 
         // Nếu đã đến target, giữ vị trí đó
         if (Vector3.Distance(Char.position, targetPos) < 0.2f)
@@ -349,13 +369,14 @@ public class EnemyController : EnemyCharacter
 
     void PatrolRandomly()
     {
+        if (isBeingThrown) return;
         Vector3 direction = (randomTarget - Char.position).normalized;
         lastDirection = direction;
 
         // set animation based on random target
-        SetMoveAnimationByTarget(randomTarget);
+        float speed = SetMoveAnimationByTarget(randomTarget);
 
-        Char.position += direction * moveSpeed * Time.deltaTime;
+        Char.position += direction * speed * Time.deltaTime;
 
         if (Vector3.Distance(Char.position, randomTarget) < 0.2f || IsTargetOccupiedByOtherEnemy(randomTarget, this))
         {
@@ -371,20 +392,9 @@ public class EnemyController : EnemyCharacter
         }
     }
 
-    private bool IsTargetOccupiedByOtherEnemy(Vector3 target, EnemyController ignore = null)
-    {
-        float minDist = 1f;
-        foreach (var enemy in FindObjectsOfType<EnemyController>())
-        {
-            if (enemy == this || enemy == ignore || enemy.state == State.Dead) continue;
-            if (Vector3.Distance(enemy.Char.position, target) < minDist)
-                return true;
-        }
-        return false;
-    }
-
     public Vector3 GetRandomPositionInRect(float minX, float maxX, float minY, float maxY, float z = 0f)
     {
+        if (isBeingThrown) return Char.position; // don't pick new targets while thrown
         float x = Random.Range(minX, maxX);
         float y = Random.Range(minY, maxY);
         return new Vector3(x, y, z);
@@ -492,6 +502,7 @@ public class EnemyController : EnemyCharacter
 
     IEnumerator CheckPlayerCollisionRoutine()
     {
+        if (isBeingThrown) yield break;
         yield return new WaitForSeconds(0.5f);
         Vector3 targetPosition = new Vector3(
         player.position.x + (Char.position.x > player.position.x ? 1f : -1f),
@@ -499,10 +510,10 @@ public class EnemyController : EnemyCharacter
         Char.position.z);
 
         // set animation for this micro-move
-        SetMoveAnimationByTarget(targetPosition);
+        float speed = SetMoveAnimationByTarget(targetPosition);
 
         Vector3 direction = (targetPosition - Char.position).normalized;
-        Char.position += direction * moveSpeed / 1.3f * Time.deltaTime;
+        Char.position += direction * (speed / 1.3f) * Time.deltaTime;
 
         if (Vector3.Distance(Char.position, targetPosition) <= 0.1f)
         {
@@ -511,50 +522,9 @@ public class EnemyController : EnemyCharacter
         isCheckingPlayer = false;
     }
 
-    bool CheckWallCollision()
-    {
-        Vector3 startPos = Char.position + Vector3.up * 0.3f;
-        return Physics2D.OverlapCircle(startPos, 0.5f, wallLayer) != null;
-    }
-
-    float gravity = -29f;
-    public float velocity = 0;
-    public bool isCheckGravity;
-
-    IEnumerator CheckWallCollisionRoutine()
-    {
-        yield return new WaitForSeconds(0.5f);
-        canCheckWall = false;
-    }
-
-
-    private void UpdateEnemyRotation()
-    {
-        float yRotation = player.position.x > Char.position.x ? 0 : 180;
-        transform.rotation = Quaternion.Euler(0, yRotation, 0);
-    }
-
-    public void ProcessGravity()
-    {
-        isCheckGravity = transform.localPosition.y < 0;
-        if (isCheckGravity && (velocity < 0 || transform.localPosition.y > 3))
-        {
-            velocity = -2f;
-        }
-        else
-        {
-            velocity += gravity * Time.deltaTime;
-            transform.localPosition += velocity * Time.deltaTime * Vector3.up;
-        }
-    }
-    public void SetYPosition(float y)
-    {
-        Vector3 pos = transform.position;
-        pos.y = y;
-        transform.position = pos;
-    }
     public void CheckAttack()
     {
+        if (isBeingThrown) return;
         float distanceX = Mathf.Abs(Char.position.x - player.position.x);
         float distanceY = Mathf.Abs(Char.position.y - player.position.y);
 
@@ -570,7 +540,8 @@ public class EnemyController : EnemyCharacter
             {
                 // Di chuyển đến vị trí tấn công lý tưởng
                 Vector3 direction = (myTarget - Char.position).normalized;
-                Char.position += direction * moveSpeed * Time.deltaTime;
+                float speed = SetMoveAnimationByTarget(myTarget);
+                Char.position += direction * speed * Time.deltaTime;
             }
             else
             {
@@ -646,16 +617,41 @@ public class EnemyController : EnemyCharacter
     public void SetDead()
     {
         DropCoin();
-        SwitchToRunState(enemyDead);
+        // Force state to Dead and enter EnemyDead state immediately to stop AI
+        if (stateManager != null)
+            stateManager.Exit();
+        state = State.Dead;
+        stateManager = enemyDead;
+        stateManager.Enter();
+
         GamePlayManager.Instance.CheckEnemyDead();
         Vector2 upwardDirection = new Vector2(0, 0.5f);
         Vector3 jumpDirection = player.transform.right;
         float horizontalDirection = player.transform.rotation.y != 0 ? -1 : 1;
         Vector2 moveDirection = new Vector2(horizontalDirection, upwardDirection.y).normalized;
         Vector2 targetPosition = (Vector2)transform.parent.position + moveDirection * 5;
+
+        // prevent Movement() and other AI from modifying position while the tween runs
+        isBeingThrown = true;
+
+        // stop physics to avoid physics pushing back
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            rb.simulated = false; // disable physics simulation for the duration
+        }
+
         transform.parent.DOMove(targetPosition, 1f).SetEase(Ease.OutQuad)
             .OnComplete(() =>
                  {
+                     // mark thrown finished and deactivate
+                     isBeingThrown = false;
+                     // keep physics disabled since deactivating
+                     if (rb != null)
+                     {
+                         rb.simulated = false;
+                     }
                      Char.gameObject.SetActive(false);
                  });
     }
@@ -742,7 +738,7 @@ public class EnemyController : EnemyCharacter
     //    Debug.Log("enemy is catched");
     //}
 
-    // Forcefully set Grabed state immediately (atomic) to avoid races
+    // Forcefully set Grabbed state immediately (atomic) to avoid races
     public void ForceEnterGrabbed()
     {
         // Exit current state safely
@@ -768,4 +764,40 @@ public class EnemyController : EnemyCharacter
 
        
     }
+
+    // Helper: check if a target position is occupied by another alive enemy
+    private bool IsTargetOccupiedByOtherEnemy(Vector3 target, EnemyController ignore = null)
+    {
+        float minDist = 1f;
+        foreach (var enemy in FindObjectsOfType<EnemyController>())
+        {
+            if (enemy == this || enemy == ignore || enemy.state == State.Dead) continue;
+            if (Vector3.Distance(enemy.Char.position, target) < minDist)
+                return true;
+        }
+        return false;
+    }
+
+    // Wall collision helpers
+    private bool CheckWallCollision()
+    {
+        if (Char == null) return false;
+        Vector3 startPos = Char.position + Vector3.up * 0.3f;
+        return Physics2D.OverlapCircle(startPos, 0.5f, wallLayer) != null;
+    }
+
+    IEnumerator CheckWallCollisionRoutine()
+    {
+        yield return new WaitForSeconds(0.5f);
+        canCheckWall = false;
+    }
+
+    // Ensure facing is correct based on player position
+    private void UpdateEnemyRotation()
+    {
+        if (player == null || Char == null) return;
+        float yRotation = player.position.x > Char.position.x ? 0f : 180f;
+        transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
+    }
+
 }

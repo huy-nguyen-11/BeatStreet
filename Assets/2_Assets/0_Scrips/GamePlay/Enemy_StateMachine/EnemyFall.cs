@@ -9,7 +9,6 @@ public class EnemyFall : EnemyStateMachine
     {
         enemyController.PlayAnim("Dead", false);
         enemyController.state = EnemyController.State.Fall;
-        enemyController.velocity = 8;
         if (coroutine != null)
             enemyController.StopCoroutine(coroutine);
         coroutine = enemyController.StartCoroutine(JumpCoroutine());
@@ -21,7 +20,6 @@ public class EnemyFall : EnemyStateMachine
     }
     public override void FixedUpdate()
     {
-        enemyController.ProcessGravity();
         SetJump();
     }
     private void SetJump()
