@@ -5,8 +5,10 @@ public class PlayerStandUp : PlayerStateManager
     public PlayerStandUp(PlayerController player) : base(player) { }
     public override void Enter()
     {
+        playerController.state = PlayerController.State.StandUp;
         playerController.PlayAnim2("Wakeup");
         playerController.StartCoroutine(playerController.SetImmortalHitBox());
+
     }
     public override void Update()
     {

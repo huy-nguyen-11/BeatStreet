@@ -12,8 +12,10 @@ public class AttackArea : MonoBehaviour
     public LayerMask layerMaskPlayer;
     public LayerMask layerMaskEnemy;
     public bool isSkill;
+    private bool isMaxHit = false; 
     private void Update()
     {
+
         if (collisionQueue.Count > 0)
         {
             if (!isCheckTrigger)
@@ -22,10 +24,11 @@ public class AttackArea : MonoBehaviour
                 isCheckTrigger = true;
             }
             Collider2D currentCollision = collisionQueue.Dequeue();
-            if (!isSkill)
-                HandleCollision(currentCollision);
-            else
-                HandleCollisionSkill(currentCollision);
+            //if (!isSkill)
+            //    HandleCollision(currentCollision);
+            //else
+            //    HandleCollisionSkill(currentCollision);
+            HandleCollision(currentCollision);
         }
         else
         {
@@ -60,7 +63,10 @@ public class AttackArea : MonoBehaviour
         // Use PlayerController API to set facing so internal flag and visual rotation stay in sync
         if (PlayerController.Instance != null)
         {
-            PlayerController.Instance.SetFacingDirection(Direction);
+            if (!PlayerController.Instance.isSpeedUpAttack)
+            {
+                PlayerController.Instance.SetFacingDirection(Direction);
+            }
         }
         else
         {
@@ -94,7 +100,10 @@ public class AttackArea : MonoBehaviour
         // Use PlayerController API to set facing so internal flag and visual rotation stay in sync
         if (PlayerController.Instance != null)
         {
-            PlayerController.Instance.SetFacingDirection(Direction);
+            if (!PlayerController.Instance.isSpeedUpAttack)
+            {
+                PlayerController.Instance.SetFacingDirection(Direction);
+            }
         }
         else
         {
@@ -166,7 +175,11 @@ public class AttackArea : MonoBehaviour
             && Mathf.Abs(PlayerController.Instance.Char.position.y - enemy.transform.position.y) <= 0.25f)
         {
             PlayerController.Instance.CountCombo();
-            enemy.enemyController.SetHit(Dame);
+            enemy.enemyController.SetHit(Dame, isMaxHit);
+            if (isMaxHit)
+            {
+                isMaxHit = false;
+            }
             if (!isCheckMission)
             {
                 isCheckMission = true;
@@ -181,7 +194,13 @@ public class AttackArea : MonoBehaviour
         if (enemy != null)
         {
             PlayerController.Instance.CountCombo();
-            enemy.enemyController.SetHit(Dame);
+            // Truyền thông tin max_hit vào SetHit
+            enemy.enemyController.SetHit(Dame, isMaxHit);
+            // Reset flag sau khi sử dụng
+            if (isMaxHit)
+            {
+                isMaxHit = false;
+            }
             if (!isCheckMission)
             {
                 isCheckMission = true;
@@ -189,6 +208,12 @@ public class AttackArea : MonoBehaviour
             }
         }
     }
+
+    public void SetMaxHit(bool value)
+    {
+        isMaxHit = value;
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;

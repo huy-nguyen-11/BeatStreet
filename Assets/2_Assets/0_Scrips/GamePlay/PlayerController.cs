@@ -121,6 +121,7 @@ public class PlayerController : PlayerCharacter
 };
     private float grabCooldown = 2;
     public bool canGrab = false;
+    public bool isSpeedUpAttack = false;
     #endregion
 
     private void Awake()
@@ -172,6 +173,7 @@ public class PlayerController : PlayerCharacter
         {
             skeletonAnimation.AnimationState.Event += HandleAttackEvent;
         }
+        isSpeedUpAttack = false;
     }
     
     private void OnDestroy()
@@ -492,6 +494,7 @@ public class PlayerController : PlayerCharacter
                             }
                             else if (state == State.SpeedUp)
                             {
+                                isSpeedUpAttack = true;
                                 if (fillBar.mana >= 7)
                                 {
                                     SetMana(-7);
@@ -664,6 +667,7 @@ public class PlayerController : PlayerCharacter
     {
         stateManager.FixedUpdate();
     }
+
     public void SwitchToRunState(PlayerStateManager player)
     {
         // Prevent leaving Grab state while grab is active
@@ -683,6 +687,14 @@ public class PlayerController : PlayerCharacter
         if (e.Data.Name == "Hit")
         {
             SetAttack(id);
+        }
+        else if (e.Data.Name == "max_hit" || e.Data.Name == "Hit_Max")
+        {
+            if (attackArea != null)
+            {
+                SetAttack(id);
+                attackArea.SetMaxHit(true);
+            }
         }
     }
 
@@ -914,7 +926,13 @@ public class PlayerController : PlayerCharacter
     }
     public void ResetStatus()
     {
+        //isJumping = false;
+        //SwitchToRunState(playerIdle);
         isJumping = false;
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+        }
         SwitchToRunState(playerIdle);
     }
     //public IEnumerator CheckAnimationAndTriggerEvent(string name)
@@ -959,6 +977,6 @@ public class PlayerController : PlayerCharacter
     void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, detectionRange);
+        //Gizmos.DrawWireSphere(transform.position, detectionRange);
     }
 }

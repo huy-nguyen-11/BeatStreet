@@ -5,10 +5,13 @@ public class EnemyFall : EnemyStateMachine
 {
     public EnemyFall(EnemyController enemy) : base(enemy) { }
     Coroutine coroutine;
+    private bool isWakingUp = false; // Flag to prevent SetJump() during wakeup sequence
+    
     public override void Enter()
     {
         enemyController.PlayAnim("Dead", false);
         enemyController.state = EnemyController.State.Fall;
+        isWakingUp = false; // Reset flag
         if (coroutine != null)
             enemyController.StopCoroutine(coroutine);
         coroutine = enemyController.StartCoroutine(JumpCoroutine());
@@ -20,11 +23,16 @@ public class EnemyFall : EnemyStateMachine
     }
     public override void FixedUpdate()
     {
-        SetJump();
+        // Only set jump velocity if not waking up (to prevent movement during wakeup)
+        if (!isWakingUp)
+        {
+            SetJump();
+        }
     }
     private void SetJump()
     {
-        bool Direction = enemyController.player.position.x > enemyController.Char.position.x ? false : true;
+        //bool Direction = enemyController.player.position.x > enemyController.Char.position.x ? false : true;
+        bool Direction = enemyController.playerController.isFacingRight ? true : false;
         if (!Direction)
             enemyController.rb.linearVelocity = -Vector2.right * 5f;
         else
@@ -37,11 +45,43 @@ public class EnemyFall : EnemyStateMachine
         {
             yield return null;
         }
+        
+        // Stop SetJump() from running during wakeup
+        isWakingUp = true;
+        
+        // Clear velocity before wakeup to prevent drifting
+        if (enemyController.rb != null)
+        {
+            enemyController.rb.linearVelocity = Vector2.zero;
+        }
+        
+        enemyController.PlayAnim(enemyController.wakeUpAnim, false);
+        yield return new WaitForSeconds(0.2f);
         enemyController.SwitchToRunState(enemyController.enemyIdle);
     }
     public override void Exit()
     {
+        // Stop the coroutine to prevent state switching
+        if (coroutine != null)
+        {
+            enemyController.StopCoroutine(coroutine);
+            coroutine = null;
+        }
+        
+        // Clear velocity to stop any movement from SetJump()
+        if (enemyController.rb != null)
+        {
+            enemyController.rb.linearVelocity = Vector2.zero;
+        }
+        
+        // Reset position
         enemyController.transform.position = new Vector3(enemyController.transform.position.x, enemyController.Char.transform.GetChild(3).position.y);
+        
+        // Reset move animation to ensure new animation is set when transitioning to Idle/Run
+        enemyController.ResetMoveAnimation();
+        
+        // Ensure isGrabbed is cleared (in case it wasn't cleared properly)
+        enemyController.isGrabbed = false;
     }
     public override void OnCollisionEnter2D(Collision2D collision)
     {

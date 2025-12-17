@@ -9,7 +9,7 @@ public class EnemyIdle : EnemyStateMachine
     Coroutine _coroutine;
     public override void Enter()
     {
-        //enemyController.PlayAnim("Idle", true);
+        enemyController.PlayAnim("Idle", true);
         enemyController.state = EnemyController.State.Idle;
         enemyController.rb.linearVelocity = Vector2.zero;
         // Skip attack logic if grabbed
@@ -36,7 +36,6 @@ public class EnemyIdle : EnemyStateMachine
         // Stop all logic if grabbed
         if (enemyController.isGrabbed)
         {
-            Debug.LogWarning($"[EnemyIdle.Update] ?? Attempted Update while isGrabbed=true. Returning early.");
             return;
         }
 

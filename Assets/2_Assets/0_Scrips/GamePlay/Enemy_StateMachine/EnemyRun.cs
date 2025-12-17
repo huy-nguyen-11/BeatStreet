@@ -5,13 +5,11 @@ public class EnemyRun : EnemyStateMachine
     public EnemyRun(EnemyController enemy) : base(enemy) { }
     public override void Enter()
     {
-        //if (!enemyController.isStopping)
-        //{
-        //    enemyController.PlayAnim("Run", true);
-
-        //    enemyController.state = EnemyController.State.Run;
-        //}
         enemyController.state = EnemyController.State.Run;
+        
+        // Reset move animation to ensure proper animation is set when entering Run state
+        // This is especially important when transitioning from Fall/Idle states
+        enemyController.ResetMoveAnimation();
     }
     public override void Update()
     {

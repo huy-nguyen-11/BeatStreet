@@ -24,6 +24,7 @@ public class PlayerSkill2 : PlayerStateManager
         //{
         //    moveTimer = 0;
         //    PlayerDirection = playerController.transform.rotation.y == 0 ? Vector3.right : Vector3.left;
+
         //    isCheckRunSkillTurn = true;
         //    playerController.SetRunSkill2();
         //}

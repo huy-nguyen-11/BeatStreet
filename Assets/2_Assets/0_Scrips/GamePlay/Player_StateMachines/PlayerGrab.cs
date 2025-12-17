@@ -267,12 +267,6 @@ public class PlayerGrab : PlayerStateManager
         // Switch enemy to Fall state
         grabbedEnemyController.SwitchToRunState(grabbedEnemyController.enemyFall);
 
-        float throwForce = 5f;
-        if (grabbedEnemyController.rb != null)
-        {
-            grabbedEnemyController.rb.linearVelocity = new Vector2(direction * throwForce, 2f);
-        }
-
         // Clear grabbed references (player remains in this state until animation completes)
         isGrabActive = false;
         grabbedEnemy = null;
@@ -474,7 +468,7 @@ public class PlayerGrab : PlayerStateManager
         // Safety: if somehow we exit grab state while still holding enemy, release it
         if (grabbedEnemyController != null && grabbedEnemyController.isGrabbed)
         {
-            grabbedEnemyController.isGrabbed = false;
+            //grabbedEnemyController.isGrabbed = false;
             grabbedEnemyController.SwitchToRunState(grabbedEnemyController.enemyIdle);
         }
 

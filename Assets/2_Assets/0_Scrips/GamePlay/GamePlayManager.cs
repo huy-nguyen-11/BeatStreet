@@ -55,6 +55,9 @@ public class GamePlayManager : MonoBehaviour
     public Dictionary<int, bool> isEnemyOnRight = new Dictionary<int, bool>();
     public float minPosX , maxPosX , maxPosY , minPosY;
 
+    //ulti
+    [SerializeField] public GameObject backUlti;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -91,6 +94,8 @@ public class GamePlayManager : MonoBehaviour
         SpawnMap();
         CheckAudio();
         SetItem();
+
+        backUlti.SetActive(false);
     }
 
     private void Update()
@@ -125,12 +130,18 @@ public class GamePlayManager : MonoBehaviour
                 {
                     if (Mathf.Abs(EnemyPos.x - PlayerPos.x) <= 2f)
                     {
+                        backUlti.SetActive(true);
                         isCheckUlti = true;
                         _BtnGamePlays[0].SetActive(false);
                         SetMission(8, 1);
                         _Player.SetMana(-100);
                         _Enemy = enemy.transform.GetChild(0).GetComponent<EnemyController>();
                         bool isEnemyOnRight = enemy.transform.position.x > _Player.transform.position.x;
+                        SetCharsToCharSortingLayer();
+                        _Player.Char.transform.position = new Vector3(_CameraFollow.transform.position.x - 0.5f ,_CameraFollow.transform.position.y - 1 , 0);
+                        _Player.SetFacingDirection(true);
+                        _Enemy.Char.transform.position = new Vector3(_CameraFollow.transform.position.x + 0.3f, _CameraFollow.transform.position.y -1 , 0);
+                        _Enemy.transform.rotation = Quaternion.Euler(0, 180, 0);
                         _Enemy.SetUltiPlayer();
                         _Player.SetUltiPlayer();
                     }
@@ -138,6 +149,31 @@ public class GamePlayManager : MonoBehaviour
             }
         }
     }
+
+    public void SetCharsToCharSortingLayer()
+    {
+        SetSortingForTransform(_Player?.Char, "Canvas", 2);
+        SetSortingForTransform(_Enemy?.Char, "Canvas", 2);
+    }
+
+    public void SetPlayerToDefaultSortingLayer()
+    {
+        SetSortingForTransform(_Player?.Char, "Default", 5);
+    }
+
+    private void SetSortingForTransform(Transform root, string layerName, int order)
+    {
+        if (root == null) return;
+        // Set for all Renderer components under the character (covers Spine SkeletonRenderer / MeshRenderer)
+        var renderers = root.GetComponentsInChildren<Renderer>(true);
+        foreach (var r in renderers)
+        {
+            r.sortingLayerName = layerName;
+            r.sortingOrder = order;
+        }
+    }
+
+
     public void SetAnimCombo(int count)
     {
         foreach (var txt in txtCombos)

@@ -9,6 +9,7 @@ public class PlayerSkill1 : PlayerStateManager
     public override void Enter()
     {
         //playerController.animator.Play("Skill1");
+        bool wasRunning = (playerController.state == PlayerController.State.Run);
         playerController.PlayAnimAttack("Attack_1_4");
         playerController.rb.linearVelocity = Vector3.zero;
         playerController.state = PlayerController.State.Skill1;
@@ -35,6 +36,7 @@ public class PlayerSkill1 : PlayerStateManager
     public override void Exit()
     {
         //playerController.StopCoroutine(coroutine);
+        playerController.isSpeedUpAttack = false;
     }
 
     public override void FixedUpdate()

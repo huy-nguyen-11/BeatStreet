@@ -35,9 +35,7 @@ public class PlayerDead : PlayerStateManager
         isFall = false;
         playerController.rb.linearVelocity = Vector2.zero;
     }
-    public void SetSwithJump()
-    {
-    }
+
     public override void Exit()
     {
     }

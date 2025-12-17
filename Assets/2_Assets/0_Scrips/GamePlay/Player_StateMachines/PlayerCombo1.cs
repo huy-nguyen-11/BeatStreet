@@ -6,8 +6,10 @@ public class PlayerCombo1 : PlayerStateManager
     Coroutine coroutine;
     public override void Enter()
     {
+        Debug.Log($"PlayerCombo1.Enter previousState={playerController.state}");
         playerController.state = PlayerController.State.Attack;
         //playerController.animator.Play("Combo1");
+        bool wasRunning = (playerController.state == PlayerController.State.Run);
         playerController.PlayAnimAttack("Attack_1_5");
         playerController.rb.linearVelocity = Vector3.zero;
         AudioBase.Instance.AudioPlayer(0);
@@ -24,6 +26,7 @@ public class PlayerCombo1 : PlayerStateManager
     }
     public override void Exit()
     {
+        playerController.isSpeedUpAttack = false;
     }
 
     public override void FixedUpdate()

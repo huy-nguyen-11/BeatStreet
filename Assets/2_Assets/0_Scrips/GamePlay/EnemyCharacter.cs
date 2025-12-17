@@ -20,6 +20,7 @@ public class EnemyCharacter : MonoBehaviour
     public FillBarEnemy fillBar;
     [SerializeField] public Animator animator;
     [SerializeField] public SkeletonAnimation skeletonAnimation;
+    [SerializeField] public string wakeUpAnim;
 
     public void PlayAnim(string animName, bool loop = true)
     {

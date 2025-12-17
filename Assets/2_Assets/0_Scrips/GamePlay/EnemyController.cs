@@ -82,7 +82,7 @@ public class EnemyController : EnemyCharacter
     private const string ANIM_WALK = "Walk";
     private const string ANIM_RUN_BACK = "Run"; // adjust if your project uses different naming
     private const string ANIM_WALK_BACK = "Run_Back"; // adjust if your project uses different naming
-    private const string ANIM_IDLE = "Idle"; // minimal: ensure Idle exists
+   // private const string ANIM_IDLE = "Idle"; // minimal: ensure Idle exists
 
     // thresholds (tweak to taste)
     public float runThreshold = 1.0f;
@@ -93,6 +93,12 @@ public class EnemyController : EnemyCharacter
     public float animationHysteresis = 0.08f;
 
     private string currentMoveAnim = null;
+    
+    // Public method to reset move animation (useful when transitioning from states like Fall)
+    public void ResetMoveAnimation()
+    {
+        currentMoveAnim = null;
+    }
 
     private void Awake()
     {
@@ -197,22 +203,22 @@ public class EnemyController : EnemyCharacter
         float dist = toTarget.magnitude;
         float absDistX = Mathf.Abs(toTarget.x);
 
-        // If essentially at target -> Idle
-        if (dist <= idleThreshold)
-        {
-            // Only force Idle when we're actually in Idle state or explicitly stopping to avoid
-            // interrupts where movement speed was already chosen (prevents run_back + Idle mismatch).
-            if (state == State.Idle || isStopping)
-            {
-                if (currentMoveAnim != ANIM_IDLE)
-                {
-                    currentMoveAnim = ANIM_IDLE;
-                    PlayAnim(ANIM_IDLE, true);
-                }
-                return 0f;
-            }
-            // otherwise don't force Idle here; continue to select walk/run so animation stays consistent
-        }
+        //// If essentially at target -> Idle
+        //if (dist <= idleThreshold)
+        //{
+        //    // Only force Idle when we're actually in Idle state or explicitly stopping to avoid
+        //    // interrupts where movement speed was already chosen (prevents run_back + Idle mismatch).
+        //    if (state == State.Idle || isStopping)
+        //    {
+        //        //if (currentMoveAnim != ANIM_IDLE)
+        //        //{
+        //        //    currentMoveAnim = ANIM_IDLE;
+        //        //    PlayAnim(ANIM_IDLE, true);
+        //        //}
+        //        return 0f;
+        //    }
+        //    // otherwise don't force Idle here; continue to select walk/run so animation stays consistent
+        //}
 
         // Determine forward/backward relative to facing
         bool facingRight = player.position.x > Char.position.x; // matches UpdateEnemyRotation
@@ -318,7 +324,7 @@ public class EnemyController : EnemyCharacter
 
     private void MoveToPlayer()
     {
-        if (isBeingThrown) return;
+        if (isBeingThrown || isGrabbed) return;
         float targetOffset = 0.5f;
         Vector3 leftTarget = player.position + Vector3.left * targetOffset;
         Vector3 rightTarget = player.position + Vector3.right * targetOffset;
@@ -369,7 +375,7 @@ public class EnemyController : EnemyCharacter
 
     void PatrolRandomly()
     {
-        if (isBeingThrown) return;
+        if (isBeingThrown || isGrabbed) return;
         Vector3 direction = (randomTarget - Char.position).normalized;
         lastDirection = direction;
 
@@ -502,7 +508,7 @@ public class EnemyController : EnemyCharacter
 
     IEnumerator CheckPlayerCollisionRoutine()
     {
-        if (isBeingThrown) yield break;
+        if (isBeingThrown || isGrabbed) yield break;
         yield return new WaitForSeconds(0.5f);
         Vector3 targetPosition = new Vector3(
         player.position.x + (Char.position.x > player.position.x ? 1f : -1f),
@@ -589,7 +595,7 @@ public class EnemyController : EnemyCharacter
         yield return new WaitForSeconds(HitTimeout);
         currentHitIndex = 0;
     }
-    public void SetHit(float dameHit)
+    public void SetHit(float dameHit, bool isMaxHit = false)
     {
         if (state == State.Dead)
             return;
@@ -598,12 +604,38 @@ public class EnemyController : EnemyCharacter
         if (hp <= 0)
             SetDead();
         currentHitIndex++;
-        if (state != State.Fall)
-            SwitchToRunState(enemyHit);
+        
+        if (isMaxHit)
+        {
+            ApplyMaxHitKnockback();
+        }
+        else
+        {
+            if (state != State.Fall)
+                SwitchToRunState(enemyHit);
+        }
+        
         if (coroutine == null)
             coroutine = StartCoroutine(SetTimeHit());
         Hp = hp;
         fillBar.SetNewHp(Hp);
+    }
+    
+    private void ApplyMaxHitKnockback()
+    {
+        if (state == State.Dead || isGrabbed || rb == null)
+            return;
+
+        //bool playerOnRight = player.position.x > Char.position.x;
+        //float knockbackDirection = playerOnRight ? 1f : -1f;
+        
+        //Vector2 knockbackForce = new Vector2(knockbackDirection * 8f, 3f);
+        //rb.linearVelocity = knockbackForce;
+        
+        if (state != State.Fall)
+        {
+            SwitchToRunState(enemyFall);
+        }
     }
     public void SpawnTxtHit(float dame)
     {
