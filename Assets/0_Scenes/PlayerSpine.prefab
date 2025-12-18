@@ -68,7 +68,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: bc6883538302c4d498428953597fc05e, type: 2}
+  - {fileID: 2100000, guid: 1a27aa4c2e1e9a74eb09b97954c8d7ee, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -103,7 +103,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: spine-unity::Spine.Unity.SkeletonAnimation
-  skeletonDataAsset: {fileID: 11400000, guid: cb891287ea84c0c43b95ea5a32215c19, type: 2}
+  skeletonDataAsset: {fileID: 11400000, guid: 04870010938a85f42ba9614b4dc8ee1c, type: 2}
   initialSkinName: 
   fixPrefabOverrideViaMeshFilter: 2
   initialFlipX: 0
@@ -230,6 +230,7 @@ MonoBehaviour:
   speedUpThreshold: 100
   changeHoldTime: 0.3
   idTounchRun: 0
+  isFacingRight: 1
   comboIndex: 0
   isAttackingCombo: 0
   queuedComboAttack: 0
@@ -237,5 +238,7 @@ MonoBehaviour:
   - Attack_1
   - Attack_1_2
   - Attack_1_3
+  canGrab: 0
+  isSpeedUpAttack: 0
   velocity: 0
   isCheckGravity: 0

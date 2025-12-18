@@ -96,7 +96,6 @@ public class PlayerCharacter : MonoBehaviour
                             if (e.Data.Name == "Attack_end" || e.Data.Name == "End_attack")
                             {
                                 onEventFired?.Invoke(entry);
-                                // Unsubscribe sau khi fire
                                 skeletonAnimation.AnimationState.Event -= handler;
                             }
                         }

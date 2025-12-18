@@ -24,7 +24,7 @@ public class PlayerUlti : PlayerStateManager
     IEnumerator WaitForResetSkin()
     {
         playerController.PlayAnim("Skill_1" , false);
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(1.97f);
         GamePlayManager.Instance.SetStopFollowCamera();
         GamePlayManager.Instance.isCheckUlti = false;
         //GamePlayManager.Instance._Enemy.SetDead();
@@ -39,7 +39,7 @@ public class PlayerUlti : PlayerStateManager
         {
             GamePlayManager.Instance._Enemy.PlayAnim("Hit", true);
         }
-        else if(e.Data.Name == "Hit_Max")
+        else if(e.Data.Name == "End_attack")
         {
             GamePlayManager.Instance._Enemy.SetDead();
         }

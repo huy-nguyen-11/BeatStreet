@@ -158,7 +158,7 @@ public class GamePlayManager : MonoBehaviour
 
     public void SetPlayerToDefaultSortingLayer()
     {
-        SetSortingForTransform(_Player?.Char, "Default", 5);
+        SetSortingForTransform(_Player?.Char, "Default", 6);
     }
 
     private void SetSortingForTransform(Transform root, string layerName, int order)

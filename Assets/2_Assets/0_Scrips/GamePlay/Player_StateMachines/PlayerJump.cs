@@ -14,6 +14,7 @@ public class PlayerJump : PlayerStateManager
     public override void Enter()
     {
         if (playerController.fillBar == null) return;
+        playerController.isJumping = true;
         playerController.state = PlayerController.State.Jump;
         jumpDistance = playerController.fillBar.mana >= 20 ? 2f : 1.65f;
         jumpDuration = playerController.fillBar.mana >= 20 ? 0.5f : 0.65f;

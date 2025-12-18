@@ -122,6 +122,8 @@ public class PlayerController : PlayerCharacter
     private float grabCooldown = 2;
     public bool canGrab = false;
     public bool isSpeedUpAttack = false;
+    private bool isResettingFromJump = false;
+    private PlayerStateManager pendingStateAfterReset = null;
     #endregion
 
     private void Awake()
@@ -319,6 +321,7 @@ public class PlayerController : PlayerCharacter
             {
                 if (state != State.Run)
                 {
+                    Debug.Log("run" + Time.time + "is jumping:" + isJumping);
                     SwitchToRunState(playerRun);
                 }
 
@@ -560,7 +563,6 @@ public class PlayerController : PlayerCharacter
                                     }
                                     else if (delta.y > 0 && state != State.Jump && (state == State.Run || state == State.Walk))
                                     {
-                                        isJumping = true;
                                         SwitchToRunState(playerJump);
                                     }
                                     else
@@ -675,6 +677,25 @@ public class PlayerController : PlayerCharacter
         {
             return;
         }
+
+        // Allow some critical states to interrupt jump/reset immediately
+        if (player == playerDead || player == playerHit || player == playerUlti)
+        {
+            if (stateManager != null) stateManager.Exit();
+            stateManager = player;
+            stateManager.Enter();
+            return;
+        }
+
+        // If currently resetting from jump, queue the requested state instead of switching immediately
+        if (isJumping || isResettingFromJump)
+        {
+            Debug.Log($"[SwitchToRunState] Queuing transition to {player?.GetType().Name} because isJumping={isJumping}," +
+                $"isResettingFromJump={isResettingFromJump}");
+            pendingStateAfterReset = player;
+            return;
+        }
+
 
         if (stateManager != null)
             stateManager.Exit();
@@ -928,13 +949,78 @@ public class PlayerController : PlayerCharacter
     {
         //isJumping = false;
         //SwitchToRunState(playerIdle);
+
+        //isJumping = false;
+        //if (rb != null)
+        //{
+        //    rb.linearVelocity = Vector2.zero;
+        //}
+        //SwitchToRunState(playerIdle);
+        // Start coroutine only if not already running
+        Debug.Log("Reset Status" + Time.time);
+
+        // If already resetting, ignore duplicate calls
+        if (isResettingFromJump)
+        {
+            Debug.Log("[ResetStatus] already resetting, ignoring.");
+            return;
+        }
+
+        // Set flags immediately to avoid race with other callers in same frame
+        isResettingFromJump = true;
         isJumping = false;
+
+        // stop horizontal movement immediately to avoid sliding / race with later state
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
         }
-        SwitchToRunState(playerIdle);
+
+        // Start coroutine to wait for ground and then finalize reset
+        StartCoroutine(DoResetStatus());
     }
+
+    private IEnumerator DoResetStatus()
+    {
+        isResettingFromJump = true;
+
+        // mark jump ended for input logic immediately
+        isJumping = false;
+
+        // stop horizontal movement to avoid sliding
+        if (rb != null)
+            rb.linearVelocity = Vector2.zero;
+
+        // wait one frame so any in-flight state changes or animation events settle
+        yield return null;
+
+        // wait until grounded or a short timeout (avoid infinite wait)
+        float timeout = 0.5f;
+        float start = Time.time;
+        while (!isCheckGravity && Time.time - start < timeout)
+        {
+            yield return null;
+        }
+
+        // default landing -> Idle
+        if (stateManager != null)
+            stateManager.Exit();
+        stateManager = playerIdle;
+        stateManager.Enter();
+
+        isResettingFromJump = false;
+
+        // apply any queued state requested while we were resetting
+        if (pendingStateAfterReset != null)
+        {
+            var toApply = pendingStateAfterReset;
+            pendingStateAfterReset = null;
+            // this will run SwitchToRunState again (isResettingFromJump == false now)
+            SwitchToRunState(toApply);
+
+        }
+    }
+
     //public IEnumerator CheckAnimationAndTriggerEvent(string name)
     //{
     //    AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
