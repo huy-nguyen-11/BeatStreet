@@ -57,47 +57,47 @@ public class DemoTouch : MonoBehaviour
         //HandleJoystickMovement();
     }
 
-    void HandleJoystickMovement()
-    {
-        if (joystick == null || rb == null) return;
+    //void HandleJoystickMovement()
+    //{
+    //    if (joystick == null || rb == null) return;
 
-        Vector2 dir = joystick.SmoothedDirection;
-        float mag = joystick.SmoothedMagnitude;
+    //    Vector2 dir = joystick.SmoothedDirection;
+    //    float mag = joystick.SmoothedMagnitude;
 
-        // 1. Không chạm → idle
-        if (mag <= 0.01f)
-        {
-            if (isJoystickMoving)
-            {
-                anim.SetAnimation(0, "Idle", true);
-                isJoystickMoving = false;
-            }
+    //    // 1. Không chạm → idle
+    //    if (mag <= 0.01f)
+    //    {
+    //        if (isJoystickMoving)
+    //        {
+    //            anim.SetAnimation(0, "Idle", true);
+    //            isJoystickMoving = false;
+    //        }
 
-            rb.linearVelocity = Vector2.zero;
-            return;
-        }
+    //        rb.linearVelocity = Vector2.zero;
+    //        return;
+    //    }
 
-        // 2. Không cho di chuyển nếu đang: combo, charge, heavy, swipe, jump
-        if (isAttacking || isHolding || strengthPlayed)
-        {
-            rb.linearVelocity = Vector2.zero;
-            return;
-        }
+    //    // 2. Không cho di chuyển nếu đang: combo, charge, heavy, swipe, jump
+    //    if (isAttacking || isHolding || strengthPlayed)
+    //    {
+    //        rb.linearVelocity = Vector2.zero;
+    //        return;
+    //    }
 
-        // 3. Chọn tốc độ run/walk
-        float speed = (mag >= 0.7f) ? runSpeed : walkSpeed;
+    //    // 3. Chọn tốc độ run/walk
+    //    float speed = (mag >= 0.7f) ? runSpeed : walkSpeed;
 
-        rb.linearVelocity = dir * speed;
+    //    rb.linearVelocity = dir * speed;
 
-        // 4. Animation tương ứng
-        if (!isJoystickMoving)
-            isJoystickMoving = true;
+    //    // 4. Animation tương ứng
+    //    if (!isJoystickMoving)
+    //        isJoystickMoving = true;
 
-        if (mag >= 0.7f)
-            anim.SetAnimation(0, "Run", true);
-        else
-            anim.SetAnimation(0, "Walk", true);
-    }
+    //    if (mag >= 0.7f)
+    //        anim.SetAnimation(0, "Run", true);
+    //    else
+    //        anim.SetAnimation(0, "Walk", true);
+    //}
 
 
     // ============================================================

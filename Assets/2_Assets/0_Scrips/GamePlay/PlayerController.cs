@@ -190,7 +190,7 @@ public class PlayerController : PlayerCharacter
     
     private void OnJoystickDirectionChanged(Vector2 direction, float magnitude)
     {
-        UpdateAnimationStateFromJoystick();
+        //UpdateAnimationStateFromJoystick();
     }
     
     private void UpdateAnimationStateFromJoystick()
@@ -315,13 +315,17 @@ public class PlayerController : PlayerCharacter
 
         bool canMoveState = (state == State.Idle || state == State.SpeedUp || state == State.Change || state == State.Walk || state == State.Run);
 
+        //Debug.Log(joystick.RawDirection + "rawMag");
+        //Debug.Log(joystick.RawDirection + "rawInput");
+        //Debug.Log(joystick.SmoothedDirection + "rawSmooth");
+
         if (!isJumping && canMoveState)
         {
             if (smoothMag >= runThreshold)
             {
                 if (state != State.Run)
                 {
-                    Debug.Log("run" + Time.time + "is jumping:" + isJumping);
+                    Debug.Log("run" + Time.time + "is jumping:" + isJumping + "with mag:" + smoothMag);
                     SwitchToRunState(playerRun);
                 }
 
@@ -340,7 +344,7 @@ public class PlayerController : PlayerCharacter
     }
 
     //todo wlak or running
-    public void SetMovePlayer()
+    public void SetMovePlayer(float speed)
     {
         if (IsDead) return;
         //Vector2 smoothDir = joystick != null ? joystick.SmoothedDirection : Vector2.zero;
@@ -353,15 +357,12 @@ public class PlayerController : PlayerCharacter
 
         float walkSpeed = 1.2f;
         float runSpeed = 3f;
-        //float baseSpeed = smoothMag >= runThreshold ? runSpeed : walkSpeed;
+
         float baseSpeed = rawMag >= runThreshold ? runSpeed : walkSpeed;
+        //float baseSpeed = speed;
 
-        Vector2 movement = rawDir.sqrMagnitude > 0f
-    ? rawDir.normalized * baseSpeed
-    : Vector2.zero;
-
+        Vector2 movement = rawDir.sqrMagnitude > 0f ? rawDir.normalized * baseSpeed : Vector2.zero;
         rb.linearVelocity = movement;
-
 
         if (Mathf.Abs(rawDir.x) > 0.1f)
         {
@@ -380,7 +381,6 @@ public class PlayerController : PlayerCharacter
 
     private void CheckTouchInput()
     {
-        Vector2 direction = joystick != null ? joystick.SmoothedDirection : Vector2.zero;
         for (int i = 0; i < Input.touchCount; i++)
         {
             Touch touch = Input.GetTouch(i);
@@ -435,6 +435,7 @@ public class PlayerController : PlayerCharacter
                     if (touchStartPositions.ContainsKey(touchId))
                     {
                         holdTimer += Time.deltaTime;
+                        Debug.Log("jjoy snooth hrer" + joystick.SmoothedDirection);
                         if ((Mathf.Abs(joystick.SmoothedDirection.x) <= 0.3f || Mathf.Abs(joystick.SmoothedDirection.y) <= 0.3f)
                             && holdTimer > changeHoldTime && state != State.Change
                             && (state == State.Idle || state == State.Attack) && !isGetJoy)

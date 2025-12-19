@@ -24,6 +24,7 @@ public class AttackArea : MonoBehaviour
                 isCheckTrigger = true;
             }
             Collider2D currentCollision = collisionQueue.Dequeue();
+            Debug.Log($"[AttackArea] Processing collision with {currentCollision?.name}");
             //if (!isSkill)
             //    HandleCollision(currentCollision);
             //else
@@ -76,9 +77,8 @@ public class AttackArea : MonoBehaviour
         foreach (var hit in hits)
         {
             float distanceX = GamePlayManager.Instance._Player.transform.position.x - hit.transform.position.x;
-            if (distanceX < 0 && Direction)
-                collisionQueue.Enqueue(hit);
-            else if (distanceX >= 0 && !Direction)
+            bool willEnqueue = (distanceX < 0 && Direction) || (distanceX >= 0 && !Direction);
+            if (willEnqueue)
                 collisionQueue.Enqueue(hit);
         }
     }
@@ -88,6 +88,7 @@ public class AttackArea : MonoBehaviour
         if (hits.Length == 0) return;
         foreach (var hit in hits)
         {
+            
             collisionQueue.Enqueue(hit);
         }
     }
@@ -114,9 +115,9 @@ public class AttackArea : MonoBehaviour
         {
             hit.GetComponent<EnemyChar>().enemyController.currentHitIndex = 4;
             float distanceX = GamePlayManager.Instance._Player.transform.position.x - hit.transform.position.x;
-            if (distanceX < 0 && Direction)
-                collisionQueue.Enqueue(hit);
-            else if (distanceX >= 0 && !Direction)
+            bool willEnqueue = (distanceX < 0 && Direction) || (distanceX >= 0 && !Direction);
+          
+            if (willEnqueue)
                 collisionQueue.Enqueue(hit);
         }
     }
@@ -170,10 +171,9 @@ public class AttackArea : MonoBehaviour
     {
         bool isCheckMission = false;
         EnemyChar enemy = collision.gameObject.GetComponent<EnemyChar>();
-        if (enemy != null
-            && Mathf.Abs(PlayerController.Instance.Char.position.x - enemy.transform.position.x) <= 0.75f
-            && Mathf.Abs(PlayerController.Instance.Char.position.y - enemy.transform.position.y) <= 0.25f)
+        if (enemy != null)
         {
+            bool playerOnRight = PlayerController.Instance.Char.position.x > enemy.transform.position.x;
             PlayerController.Instance.CountCombo();
             enemy.enemyController.SetHit(Dame, isMaxHit);
             if (isMaxHit)
@@ -221,4 +221,3 @@ public class AttackArea : MonoBehaviour
         Gizmos.DrawWireCube(Vector3.zero, boxSize);
     }
 }
- 

@@ -12,7 +12,7 @@ public class PlayerWalk : PlayerStateManager
     }
     public override void Update()
     {
-        playerController.SetMovePlayer();
+        playerController.SetMovePlayer(1.2f);
     }
     public override void Exit()
     {

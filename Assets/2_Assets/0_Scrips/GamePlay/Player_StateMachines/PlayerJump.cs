@@ -18,9 +18,9 @@ public class PlayerJump : PlayerStateManager
         playerController.state = PlayerController.State.Jump;
         jumpDistance = playerController.fillBar.mana >= 20 ? 2f : 1.65f;
         jumpDuration = playerController.fillBar.mana >= 20 ? 0.5f : 0.65f;
-        if (playerController.fillBar.mana >= 5)
+        if (playerController.fillBar.mana >= 0)
         {
-            playerController.velocity = 5;
+            playerController.velocity = 4;
             GamePlayManager.Instance.SetMission(6, 1);
             playerController.SetMana(-5);
             playerController.PlayAnim2("Jump_Attack");
@@ -35,15 +35,15 @@ public class PlayerJump : PlayerStateManager
         //_coroutine = playerController.StartCoroutine(playerController.JumpCoroutine());
     }
 
-    private IEnumerator JumpCoroutine()
-    {
-        while (!playerController.isCheckGravity ||
-            (playerController.velocity > 0 && playerController.isCheckGravity))
-        {
-            yield return null;
-        }
-        playerController.ResetStatus();
-    }
+    //private IEnumerator JumpCoroutine()
+    //{
+    //    while (!playerController.isCheckGravity ||
+    //        (playerController.velocity > 0 && playerController.isCheckGravity))
+    //    {
+    //        yield return null;
+    //    }
+    //    playerController.ResetStatus();
+    //}
 
     public override void Update()
     {
@@ -53,11 +53,12 @@ public class PlayerJump : PlayerStateManager
 
     private void SetJump()
     {
-        bool Direction = playerController.transform.rotation.y != 0 ? false : true;
+        //bool Direction = playerController.transform.rotation.y != 0 ? false : true;
+        bool Direction = playerController.isFacingRight;
         if (!Direction)
-            playerController.rb.linearVelocity = -Vector2.right * 5f;
+            playerController.rb.linearVelocity = -Vector2.right * 6f;
         else
-            playerController.rb.linearVelocity = Vector2.right * 5f;
+            playerController.rb.linearVelocity = Vector2.right * 6f;
     }
     public override void Exit()
     {

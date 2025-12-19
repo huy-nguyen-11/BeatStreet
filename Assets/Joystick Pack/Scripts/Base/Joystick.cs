@@ -50,8 +50,8 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     private Vector2 input = Vector2.zero;
 
     // Smoothing fields
-    private float handleSmoothTime = 0.05f;
-    private float directionSmoothTime = 0.05f;
+    private float handleSmoothTime = 0.15f;
+    private float directionSmoothTime = 0.1f;
 
     private Vector2 handleTargetPosition = Vector2.zero;
     private Vector2 handleVelocity = Vector2.zero;
@@ -63,10 +63,9 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     private Vector2 rawInput = Vector2.zero;
 
     // Expose raw (immediate) input and magnitudes
-    public Vector2 Direction { get { return input; } }
     public Vector2 RawDirection { get { return rawInput; } }
     public float RawMagnitude { get { return rawInput.magnitude; } }
-    public float SmoothedMagnitude { get { return smoothedInput.magnitude; } }
+
     // Expose smoothed direction vector
     public Vector2 SmoothedDirection { get { return smoothedInput; } }
 

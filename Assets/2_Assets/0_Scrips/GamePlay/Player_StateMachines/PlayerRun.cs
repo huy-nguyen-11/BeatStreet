@@ -12,7 +12,7 @@ public class PlayerRun : PlayerStateManager
     }
     public override void Update()
     {
-        playerController.SetMovePlayer();
+        playerController.SetMovePlayer(3f);
     }
     public override void Exit()
     {
