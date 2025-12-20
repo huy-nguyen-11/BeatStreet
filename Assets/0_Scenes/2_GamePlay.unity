@@ -21190,7 +21190,7 @@ MonoBehaviour:
   Dame: 0
   keyAnim: []
   joystick: {fileID: 4895289207271944840}
-  speedThreshold: 0.9
+  speedThreshold: 0.8
   Char: {fileID: 0}
   _attributesPet:
   - 0
@@ -21499,7 +21499,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   handleRange: 1
-  deadZone: 0.2
+  deadZone: 0.3
   axisOptions: 0
   snapX: 0
   snapY: 0
@@ -21508,7 +21508,7 @@ MonoBehaviour:
   followTarget: {fileID: 339951806}
   useInitialTouchAsCenter: 1
   magnitudeChangeThreshold: 0.05
-  moveThreshold: 0.9
+  moveThreshold: 1
   joystickType: 2
 --- !u!114 &4895289207271944841
 MonoBehaviour:
@@ -21620,7 +21620,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

@@ -50,8 +50,8 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     private Vector2 input = Vector2.zero;
 
     // Smoothing fields
-    private float handleSmoothTime = 0.15f;
-    private float directionSmoothTime = 0.1f;
+    private float handleSmoothTime = 0.1f;
+    private float directionSmoothTime = 0.025f;
 
     private Vector2 handleTargetPosition = Vector2.zero;
     private Vector2 handleVelocity = Vector2.zero;
@@ -64,7 +64,8 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
 
     // Expose raw (immediate) input and magnitudes
     public Vector2 RawDirection { get { return rawInput; } }
-    public float RawMagnitude { get { return rawInput.magnitude; } }
+    //public float RawMagnitude { get { return rawInput.magnitude; } }
+    public float RawMagnitude { get { return Mathf.Min(rawInput.magnitude, 1f); } }
 
     // Expose smoothed direction vector
     public Vector2 SmoothedDirection { get { return smoothedInput; } }
@@ -76,6 +77,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     private float previousSmoothedMagnitude = 0f;
     [SerializeField, Tooltip("Threshold for detecting significant magnitude changes (0.05 = 5% change)")]
     private float magnitudeChangeThreshold = 0.05f;
+
 
     protected virtual void Start()
     {
@@ -118,6 +120,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
 
     protected virtual void Update()
     {
+
         // If follow target specified, update background position to follow the world transform each frame
         if (followTarget != null && canvasRect != null)
         {
@@ -336,6 +339,22 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
                 return -1;
         }
         return 0;
+    }
+    public float HandleNormalizedMagnitude
+    {
+        get
+        {
+            if (background == null || handle == null)
+                return 0f;
+
+            // Dùng bán kính nhỏ nhất của background để hỗ trợ hình chữ nhật; nhân với handleRange
+            float radius = Mathf.Min(background.sizeDelta.x, background.sizeDelta.y) * 0.5f * handleRange;
+            if (radius <= 0f)
+                return 0f;
+
+            // anchoredPosition là vị trí thực tế của handle (đã được smoothing)
+            return Mathf.Clamp01(handle.anchoredPosition.magnitude / radius);
+        }
     }
 }
 

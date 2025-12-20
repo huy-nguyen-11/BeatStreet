@@ -306,8 +306,10 @@ public class PlayerController : PlayerCharacter
       && state != State.Skill2) return;
 
         // Use both raw and smoothed magnitude
-        Vector2 smoothDir = joystick != null ? joystick.RawDirection : Vector2.zero;
-        float smoothMag = smoothDir.magnitude;
+        //Vector2 smoothDir = joystick != null ? joystick.RawDirection : Vector2.zero;
+        //float smoothMag = smoothDir.magnitude;
+        //float smoothMag = joystick != null ? joystick.RawMagnitude : 0f;
+        float smoothMag = joystick != null ? joystick.HandleNormalizedMagnitude : 0f;
 
         // Configure thresholds (walkThreshold < speedThreshold)
         float walkThreshold = 0.2f;
@@ -315,17 +317,12 @@ public class PlayerController : PlayerCharacter
 
         bool canMoveState = (state == State.Idle || state == State.SpeedUp || state == State.Change || state == State.Walk || state == State.Run);
 
-        //Debug.Log(joystick.RawDirection + "rawMag");
-        //Debug.Log(joystick.RawDirection + "rawInput");
-        //Debug.Log(joystick.SmoothedDirection + "rawSmooth");
-
         if (!isJumping && canMoveState)
         {
             if (smoothMag >= runThreshold)
             {
                 if (state != State.Run)
                 {
-                    Debug.Log("run" + Time.time + "is jumping:" + isJumping + "with mag:" + smoothMag);
                     SwitchToRunState(playerRun);
                 }
 
@@ -349,17 +346,17 @@ public class PlayerController : PlayerCharacter
         if (IsDead) return;
         //Vector2 smoothDir = joystick != null ? joystick.SmoothedDirection : Vector2.zero;
         Vector2 rawDir = joystick != null ? joystick.RawDirection : Vector2.zero;
-        float rawMag = joystick.RawMagnitude;
+        //float rawMag = joystick.RawMagnitude;
 
         // Use smoothed magnitude for speed calculation
         //float smoothMag = Mathf.Clamp01(smoothDir.magnitude);
-        float runThreshold = Mathf.Clamp(speedThreshold, 0f, 1f);
+        //float runThreshold = Mathf.Clamp(speedThreshold, 0f, 1f);
 
-        float walkSpeed = 1.2f;
-        float runSpeed = 3f;
+        //float walkSpeed = 1.2f;
+        //float runSpeed = 3f;
 
-        float baseSpeed = rawMag >= runThreshold ? runSpeed : walkSpeed;
-        //float baseSpeed = speed;
+        //float baseSpeed = rawMag >= runThreshold ? runSpeed : walkSpeed;
+        float baseSpeed = speed;
 
         Vector2 movement = rawDir.sqrMagnitude > 0f ? rawDir.normalized * baseSpeed : Vector2.zero;
         rb.linearVelocity = movement;
@@ -435,8 +432,7 @@ public class PlayerController : PlayerCharacter
                     if (touchStartPositions.ContainsKey(touchId))
                     {
                         holdTimer += Time.deltaTime;
-                        Debug.Log("jjoy snooth hrer" + joystick.SmoothedDirection);
-                        if ((Mathf.Abs(joystick.SmoothedDirection.x) <= 0.3f || Mathf.Abs(joystick.SmoothedDirection.y) <= 0.3f)
+                        if (/*(Mathf.Abs(joystick.SmoothedDirection.x) <= 0.3f || Mathf.Abs(joystick.SmoothedDirection.y) <= 0.3f*/joystick.HandleNormalizedMagnitude <= 0.3f
                             && holdTimer > changeHoldTime && state != State.Change
                             && (state == State.Idle || state == State.Attack) && !isGetJoy)
                         {
@@ -545,7 +541,7 @@ public class PlayerController : PlayerCharacter
                                 {
                                     if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y) /*&& (state == State.Run || state == State.Walk)*/ && !isJumping)
                                     {
-                                        bool isMovingInput = joystick != null && joystick.RawMagnitude > 0.2f;
+                                        bool isMovingInput = joystick != null && joystick.HandleNormalizedMagnitude > 0.3f;
                                         if (state == State.Run || state == State.Walk || isMovingInput)
                                         {
                                             SpeedupDirection = delta.x > 0;
