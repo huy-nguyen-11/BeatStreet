@@ -6,9 +6,13 @@ public class PlayerIdle : PlayerStateManager
     private float holdThreshold = 0.15f;
     public override void Enter()
     {
+       
         playerController.state = PlayerController.State.Idle;
-        playerController.rb.linearVelocity = Vector2.zero;
-
+        
+        if (playerController.rb != null && !playerController.isResettingFromJump)
+        {
+            playerController.rb.linearVelocity = Vector2.zero;
+        }
         playerController.PlayAnim("Idle", true);
     }
     public override void Update()

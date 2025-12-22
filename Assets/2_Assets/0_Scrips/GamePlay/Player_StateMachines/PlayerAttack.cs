@@ -36,7 +36,7 @@ public class PlayerAttack : PlayerStateManager
 
         // Apply velocity using isFacingRight (reliable, not rotation.y)
         float lunge = playerController.isFacingRight ? 0.1f : -0.1f;
-        playerController.rb.linearVelocity = Vector2.left * lunge;
+        playerController.rb.linearVelocity = Vector2.right * lunge;
     }
 
     /// <summary>

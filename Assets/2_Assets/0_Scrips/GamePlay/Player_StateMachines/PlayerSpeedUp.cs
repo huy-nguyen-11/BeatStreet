@@ -5,7 +5,6 @@ public class PlayerSpeedUp : PlayerStateManager
     public PlayerSpeedUp(PlayerController player) : base(player) { }
     public override void Enter()
     {
-        Debug.Log("Enter Speed Up State");
         playerController.PlayAnim("Speed_Run", true);
         playerController.state = PlayerController.State.SpeedUp;
         AudioBase.Instance.AudioPlayer(2);
@@ -44,5 +43,6 @@ public class PlayerSpeedUp : PlayerStateManager
 
     public override void OnTriggerStay(Collider2D collision)
     {
+
     }
 }

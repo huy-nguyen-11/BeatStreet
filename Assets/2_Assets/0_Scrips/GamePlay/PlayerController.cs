@@ -18,7 +18,7 @@ public class PlayerController : PlayerCharacter
     public float speedThreshold;
     public Transform Char;
     private bool isGetJoy = false;
-    private bool allowAnimationUpdateFromEvent = true; // Flag để kiểm soát việc cập nhật animation từ event
+
     // Attribute
     public List<float> _attributesPet = new List<float>();
     public List<float> _attributesItem = new List<float>();
@@ -122,8 +122,9 @@ public class PlayerController : PlayerCharacter
     private float grabCooldown = 2;
     public bool canGrab = false;
     public bool isSpeedUpAttack = false;
-    private bool isResettingFromJump = false;
+    public bool isResettingFromJump = false;
     private PlayerStateManager pendingStateAfterReset = null;
+    [SerializeField] private float joystickMoveThreshold = 12f;
     #endregion
 
     private void Awake()
@@ -195,7 +196,7 @@ public class PlayerController : PlayerCharacter
     
     private void UpdateAnimationStateFromJoystick()
     {
-        if (!allowAnimationUpdateFromEvent) return;
+        //if (!allowAnimationUpdateFromEvent) return;
         
         if (GamePlayManager.Instance.isCheckUlti
             && state != State.Skill1
@@ -317,6 +318,7 @@ public class PlayerController : PlayerCharacter
 
         bool canMoveState = (state == State.Idle || state == State.SpeedUp || state == State.Change || state == State.Walk || state == State.Run);
 
+
         if (!isJumping && canMoveState)
         {
             if (smoothMag >= runThreshold)
@@ -330,12 +332,16 @@ public class PlayerController : PlayerCharacter
             else if (smoothMag >= walkThreshold && smoothMag < runThreshold)
             {
                 if (state != State.Walk)
+                {
                     SwitchToRunState(playerWalk);
+                }
             }
             else
             {
-                //if (state != State.Idle && state != State.Change && state != State.SpeedUp)
-                //    SwitchToRunState(playerIdle);
+                if (state != State.Idle && state != State.Change && state != State.SpeedUp)
+                {
+                    SwitchToRunState(playerIdle);
+                }
             }
         }
     }
@@ -343,7 +349,11 @@ public class PlayerController : PlayerCharacter
     //todo wlak or running
     public void SetMovePlayer(float speed)
     {
-        if (IsDead) return;
+        if (IsDead)
+        {
+            return;
+        }
+        
         //Vector2 smoothDir = joystick != null ? joystick.SmoothedDirection : Vector2.zero;
         Vector2 rawDir = joystick != null ? joystick.RawDirection : Vector2.zero;
         //float rawMag = joystick.RawMagnitude;
@@ -359,7 +369,12 @@ public class PlayerController : PlayerCharacter
         float baseSpeed = speed;
 
         Vector2 movement = rawDir.sqrMagnitude > 0f ? rawDir.normalized * baseSpeed : Vector2.zero;
-        rb.linearVelocity = movement;
+        
+        if (rb != null)
+        {
+            Vector2 velocityBefore = rb.linearVelocity;
+            rb.linearVelocity = movement;
+        }
 
         if (Mathf.Abs(rawDir.x) > 0.1f)
         {
@@ -378,6 +393,7 @@ public class PlayerController : PlayerCharacter
 
     private void CheckTouchInput()
     {
+
         for (int i = 0; i < Input.touchCount; i++)
         {
             Touch touch = Input.GetTouch(i);
@@ -388,15 +404,20 @@ public class PlayerController : PlayerCharacter
                     if (isJumping)
                         return;
 
-                    allowAnimationUpdateFromEvent = false;
                     touchStartPositions[touchId] = touch.position;
                     touchStartTimes[touchId] = Time.time;
                     holdTimer = 0f;
+
+
                     break;
                 case TouchPhase.Moved:
                     if (isJumping)
+                    {
                         return;
-                    allowAnimationUpdateFromEvent = false;
+                    }
+
+                    if (!touchStartTimes.ContainsKey(touchId))
+                        return;
                     GetJoy();
 
                     //grab enemy
@@ -423,12 +444,12 @@ public class PlayerController : PlayerCharacter
                             }
                         }
                     }
-
                     isGetJoy = true;
                     break;
                 case TouchPhase.Stationary:
                     if (isJumping)
                         return;
+
                     if (touchStartPositions.ContainsKey(touchId))
                     {
                         holdTimer += Time.deltaTime;
@@ -448,7 +469,6 @@ public class PlayerController : PlayerCharacter
                     if (touchStartPositions.ContainsKey(touchId))
                     {
                         isGetJoy = false;
-                        allowAnimationUpdateFromEvent = true;
                         Vector2 startPosition = touchStartPositions[touchId];
                         Vector2 endPosition = touch.position;
                         Vector2 delta = endPosition - startPosition;
@@ -542,6 +562,7 @@ public class PlayerController : PlayerCharacter
                                     if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y) /*&& (state == State.Run || state == State.Walk)*/ && !isJumping)
                                     {
                                         bool isMovingInput = joystick != null && joystick.HandleNormalizedMagnitude > 0.3f;
+   
                                         if (state == State.Run || state == State.Walk || isMovingInput)
                                         {
                                             SpeedupDirection = delta.x > 0;
@@ -555,10 +576,8 @@ public class PlayerController : PlayerCharacter
                                                 && state != State.Skill2)
                                                 SwitchToRunState(playerIdle);
                                         }
-                                        //SpeedupDirection = delta.x > 0 ? true : false;
-                                        //SwitchToRunState(playerSpeedUp);
                                     }
-                                    else if (delta.y > 0 && state != State.Jump && (state == State.Run || state == State.Walk))
+                                    else if (delta.y > 0 && state != State.Jump /*&& (state == State.Run || state == State.Walk)*/)
                                     {
                                         SwitchToRunState(playerJump);
                                     }
@@ -687,8 +706,6 @@ public class PlayerController : PlayerCharacter
         // If currently resetting from jump, queue the requested state instead of switching immediately
         if (isJumping || isResettingFromJump)
         {
-            Debug.Log($"[SwitchToRunState] Queuing transition to {player?.GetType().Name} because isJumping={isJumping}," +
-                $"isResettingFromJump={isResettingFromJump}");
             pendingStateAfterReset = player;
             return;
         }
@@ -954,19 +971,15 @@ public class PlayerController : PlayerCharacter
         //}
         //SwitchToRunState(playerIdle);
         // Start coroutine only if not already running
-        Debug.Log("Reset Status" + Time.time);
 
         // If already resetting, ignore duplicate calls
         if (isResettingFromJump)
         {
-            Debug.Log("[ResetStatus] already resetting, ignoring.");
             return;
         }
 
-        // Set flags immediately to avoid race with other callers in same frame
+        // Set flag to prevent duplicate calls
         isResettingFromJump = true;
-        isJumping = false;
-
         // stop horizontal movement immediately to avoid sliding / race with later state
         if (rb != null)
         {
@@ -979,14 +992,11 @@ public class PlayerController : PlayerCharacter
 
     private IEnumerator DoResetStatus()
     {
-        isResettingFromJump = true;
-
-        // mark jump ended for input logic immediately
-        isJumping = false;
-
         // stop horizontal movement to avoid sliding
         if (rb != null)
+        {
             rb.linearVelocity = Vector2.zero;
+        }
 
         // wait one frame so any in-flight state changes or animation events settle
         yield return null;
@@ -994,10 +1004,8 @@ public class PlayerController : PlayerCharacter
         // wait until grounded or a short timeout (avoid infinite wait)
         float timeout = 0.5f;
         float start = Time.time;
-        while (!isCheckGravity && Time.time - start < timeout)
-        {
-            yield return null;
-        }
+        int waitCount = 0;
+
 
         // default landing -> Idle
         if (stateManager != null)
@@ -1005,6 +1013,8 @@ public class PlayerController : PlayerCharacter
         stateManager = playerIdle;
         stateManager.Enter();
 
+        // CHỈ reset isJumping SAU KHI đã chuyển state xong
+        isJumping = false;
         isResettingFromJump = false;
 
         // apply any queued state requested while we were resetting
@@ -1014,7 +1024,6 @@ public class PlayerController : PlayerCharacter
             pendingStateAfterReset = null;
             // this will run SwitchToRunState again (isResettingFromJump == false now)
             SwitchToRunState(toApply);
-
         }
     }
 

@@ -6,9 +6,20 @@ public class PlayerRun : PlayerStateManager
     private float holdThreshold = 0.15f;
     public override void Enter()
     {
-
         playerController.PlayAnim("Run", true);
         playerController.state = PlayerController.State.Run;
+        
+        // Set velocity ngay khi Enter để đảm bảo player bắt đầu di chuyển ngay lập tức
+        // Đặc biệt quan trọng khi chuyển từ Idle (sau reset) sang Run
+        if (playerController.joystick != null && playerController.rb != null)
+        {
+            Vector2 rawDir = playerController.joystick.RawDirection;
+            if (rawDir.sqrMagnitude > 0f)
+            {
+                Vector2 movement = rawDir.normalized * 3f;
+                playerController.rb.linearVelocity = movement;
+            }
+        }
     }
     public override void Update()
     {

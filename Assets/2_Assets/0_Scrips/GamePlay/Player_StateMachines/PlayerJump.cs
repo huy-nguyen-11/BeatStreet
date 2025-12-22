@@ -18,41 +18,36 @@ public class PlayerJump : PlayerStateManager
         playerController.state = PlayerController.State.Jump;
         jumpDistance = playerController.fillBar.mana >= 20 ? 2f : 1.65f;
         jumpDuration = playerController.fillBar.mana >= 20 ? 0.5f : 0.65f;
-        if (playerController.fillBar.mana >= 0)
+        if (playerController.fillBar.mana >= 5)
         {
             playerController.velocity = 4;
             GamePlayManager.Instance.SetMission(6, 1);
             playerController.SetMana(-5);
             playerController.PlayAnim2("Jump_Attack");
-            /*if (playerController.id != 0)
-                playerController.SetRunSkill2();*/
+
         }
         else
         {
             playerController.velocity = 4;
             playerController.PlayAnim2("Jump");
         }
-        //_coroutine = playerController.StartCoroutine(playerController.JumpCoroutine());
     }
-
-    //private IEnumerator JumpCoroutine()
-    //{
-    //    while (!playerController.isCheckGravity ||
-    //        (playerController.velocity > 0 && playerController.isCheckGravity))
-    //    {
-    //        yield return null;
-    //    }
-    //    playerController.ResetStatus();
-    //}
 
     public override void Update()
     {
         playerController.ProcessGravity();
+
         SetJump();
     }
 
     private void SetJump()
     {
+
+        if (playerController.isResettingFromJump)
+        {
+            return;
+        }
+        
         //bool Direction = playerController.transform.rotation.y != 0 ? false : true;
         bool Direction = playerController.isFacingRight;
         if (!Direction)
@@ -70,7 +65,7 @@ public class PlayerJump : PlayerStateManager
         //playerController.ClearFxTrack();
     }
     public override void FixedUpdate()
-    {
+    {  
     }
     public override void OnCollisionEnter2D(Collision2D collision)
     {

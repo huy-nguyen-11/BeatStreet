@@ -34,6 +34,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     [SerializeField] protected RectTransform background = null;
     [SerializeField] private RectTransform handle = null;
     [SerializeField] public Transform followTarget = null;
+    [SerializeField] public GameObject playerController= null;
     [Header("Input Options")]
     [SerializeField, Tooltip("When true, the joystick will use the initial touch position as the input center while dragging.")]
     private bool useInitialTouchAsCenter = true;
@@ -50,7 +51,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     private Vector2 input = Vector2.zero;
 
     // Smoothing fields
-    private float handleSmoothTime = 0.1f;
+    private float handleSmoothTime = 0.05f;
     private float directionSmoothTime = 0.025f;
 
     private Vector2 handleTargetPosition = Vector2.zero;
@@ -177,6 +178,8 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
             previousSmoothedMagnitude = currentMagnitude;
             OnSmoothedDirectionChanged?.Invoke(smoothedInput, currentMagnitude);
         }
+
+       
     }
 
     public virtual void OnPointerDown(PointerEventData eventData)
@@ -184,13 +187,17 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         // Record initial touch position; do not calculate input yet. Input will be handled during OnDrag.
         isDragging = true;
         dragStartScreenPosition = eventData.position;
+
+
         // Show handle if starting a drag
         if (handle != null && !handle.gameObject.activeSelf)
             handle.gameObject.SetActive(true);
+
     }
 
     public void OnDrag(PointerEventData eventData)
     {
+
         cam = null;
         if (canvas.renderMode == RenderMode.ScreenSpaceCamera)
             cam = canvas.worldCamera;
@@ -217,7 +224,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         // rawInput in -1..1 range relative to the background rect
         Vector2 calculatedRawInput = (localPoint - localCenter) / radius;
         float calculatedMagnitude = calculatedRawInput.magnitude;
-        
+
         // Chỉ tính input khi vượt qua deadZone
         if (calculatedMagnitude > deadZone)
         {
@@ -252,6 +259,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
                     handle.gameObject.SetActive(true);
             }
         }
+
     }
 
     public virtual void OnPointerUp(PointerEventData eventData)
@@ -267,14 +275,16 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
 
         // reset drag state
         isDragging = false;
+
         dragStartScreenPosition = Vector2.zero;
-        
+
         // Fire event when joystick is released (magnitude becomes 0)
         if (previousSmoothedMagnitude > 0.01f)
         {
             previousSmoothedMagnitude = 0f;
             OnSmoothedDirectionChanged?.Invoke(Vector2.zero, 0f);
         }
+
     }
 
     protected Vector2 ScreenPointToAnchoredPosition(Vector2 screenPosition)
@@ -340,6 +350,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         }
         return 0;
     }
+
     public float HandleNormalizedMagnitude
     {
         get
@@ -347,12 +358,10 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
             if (background == null || handle == null)
                 return 0f;
 
-            // Dùng bán kính nhỏ nhất của background để hỗ trợ hình chữ nhật; nhân với handleRange
             float radius = Mathf.Min(background.sizeDelta.x, background.sizeDelta.y) * 0.5f * handleRange;
             if (radius <= 0f)
                 return 0f;
 
-            // anchoredPosition là vị trí thực tế của handle (đã được smoothing)
             return Mathf.Clamp01(handle.anchoredPosition.magnitude / radius);
         }
     }

@@ -21270,6 +21270,7 @@ MonoBehaviour:
   - Attack_1_3
   canGrab: 0
   isSpeedUpAttack: 0
+  isResettingFromJump: 0
   velocity: 0
   isCheckGravity: 0
 --- !u!1 &2639524356923837404
@@ -21372,7 +21373,7 @@ MeshRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 6
+  m_SortingOrder: 5
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &3519241261690405905
 MonoBehaviour:
@@ -21506,6 +21507,7 @@ MonoBehaviour:
   background: {fileID: 4895289207537135344}
   handle: {fileID: 4895289207768730865}
   followTarget: {fileID: 339951806}
+  playerController: {fileID: 2791055837238566180}
   useInitialTouchAsCenter: 1
   magnitudeChangeThreshold: 0.05
   moveThreshold: 1

@@ -16,6 +16,7 @@ public class JoystickEditor : Editor
 
     // New properties added to Joystick
     private SerializedProperty followTargetProp;
+    private SerializedProperty playerController1;
 
 
     protected Vector2 center = new Vector2(0.5f, 0.5f);
@@ -32,6 +33,7 @@ public class JoystickEditor : Editor
 
         // Find new properties if they exist in the Joystick class
         followTargetProp = serializedObject.FindProperty("followTarget");
+        playerController1 = serializedObject.FindProperty("playerController");
     }
 
     public override void OnInspectorGUI()
@@ -78,6 +80,12 @@ public class JoystickEditor : Editor
             if (followTargetProp != null)
             {
                 EditorGUILayout.PropertyField(followTargetProp, new GUIContent("Follow Target", "World transform the joystick background will follow on screen."));
+            }
+
+            // Draw player controller field if present on Joystick
+            if (playerController1 != null)
+            {
+                EditorGUILayout.PropertyField(playerController1, new GUIContent("Player Controller", "Assign the PlayerController GameObject (drag & drop)."));
             }
         }
     }

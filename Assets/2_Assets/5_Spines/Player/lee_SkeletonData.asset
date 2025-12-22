@@ -26,8 +26,11 @@ MonoBehaviour:
     - pageName: lee.png
       material: {fileID: 2100000, guid: 537b1ef04b8d600438993123c7c8f3d8, type: 2}
   skeletonDataModifiers: []
-  fromAnimation: []
-  toAnimation: []
-  duration: []
+  fromAnimation:
+  - Idle
+  toAnimation:
+  - Walk
+  duration:
+  - 0.2
   defaultMix: 0
   controller: {fileID: 0}
