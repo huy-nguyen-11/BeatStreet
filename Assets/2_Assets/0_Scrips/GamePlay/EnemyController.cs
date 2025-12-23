@@ -72,6 +72,8 @@ public class EnemyController : EnemyCharacter
     public float patrolTimer = 0f; 
     public float stopTimer = 0f; 
     public bool isStopping = false;
+    // Duration to stay idle when stopping
+    public float stopDuration = 1f;
     // Flag to indicate a tween/throw is active — prevents Movement from overriding tween
     public bool isBeingThrown = false;
     //private float stopDuration = 1.25f;
@@ -140,7 +142,7 @@ public class EnemyController : EnemyCharacter
         {
             if (state != State.Grabed)
             {
-                Debug.LogWarning($"[EnemyController.Update] ⚠️ State mismatch! isGrabbed=true but state={state}. Should be Grabed!");
+              
             }
             return;
         }
@@ -203,23 +205,6 @@ public class EnemyController : EnemyCharacter
         float dist = toTarget.magnitude;
         float absDistX = Mathf.Abs(toTarget.x);
 
-        //// If essentially at target -> Idle
-        //if (dist <= idleThreshold)
-        //{
-        //    // Only force Idle when we're actually in Idle state or explicitly stopping to avoid
-        //    // interrupts where movement speed was already chosen (prevents run_back + Idle mismatch).
-        //    if (state == State.Idle || isStopping)
-        //    {
-        //        //if (currentMoveAnim != ANIM_IDLE)
-        //        //{
-        //        //    currentMoveAnim = ANIM_IDLE;
-        //        //    PlayAnim(ANIM_IDLE, true);
-        //        //}
-        //        return 0f;
-        //    }
-        //    // otherwise don't force Idle here; continue to select walk/run so animation stays consistent
-        //}
-
         // Determine forward/backward relative to facing
         bool facingRight = player.position.x > Char.position.x; // matches UpdateEnemyRotation
         int moveDirX = (int)Mathf.Sign(toTarget.x);
@@ -260,29 +245,25 @@ public class EnemyController : EnemyCharacter
         // Keep facing consistent for animation decision
         UpdateEnemyRotation();
 
-        //UpdateEnemyRotation(); 
         if (player == null) return;
 
+        // Tick stop timer even while in Movement state; if still stopping, stay in Idle
         if (isStopping)
         {
-            stopTimer += Time.deltaTime;
-            float _stopDuration = 1f;
-            if (stopTimer >= _stopDuration)
+            TickStopTimer();
+            if (isStopping)
             {
-                isStopping = false;
-                stopTimer = 0f;
-                isPatrolling = Random.value < 0.5f; //random 50% patrol, 50% move to player
-                isAvoidingPlayer = false;
-                if (isPatrolling)
-                    SetRandomPatrolTarget();
+                if (stateManager != enemyIdle)
+                {
+                    SwitchToRunState(enemyIdle);
+                }
+                UpdateEnemyRotation();
+                SeparateFromOtherEnemies();
+                return;
             }
-            SwitchToRunState(enemyIdle);
-            // set idle when stopping
-            SetMoveAnimationByTarget(Char.position);
         }
         else
         {
-            // Nếu enemy đang tránh player thì ưu tiên tránh
             if (isAvoidingPlayer)
             {
                 PatrolRandomly(); // dùng randomTarget đã được AvoidPlayer() set
@@ -322,10 +303,27 @@ public class EnemyController : EnemyCharacter
         SeparateFromOtherEnemies();
     }
 
+    // Handle stop timer so Idle can advance even when state machine isn't running Movement
+    public void TickStopTimer()
+    {
+        if (!isStopping) return;
+
+        stopTimer += Time.deltaTime;
+        if (stopTimer >= stopDuration)
+        {
+            isStopping = false;
+            stopTimer = 0f;
+            isPatrolling = Random.value < 0.3f; //random 30% patrol, 70% move to player
+            isAvoidingPlayer = false;
+            if (isPatrolling)
+                SetRandomPatrolTarget();
+        }
+    }
+
     private void MoveToPlayer()
     {
         if (isBeingThrown || isGrabbed) return;
-        float targetOffset = 0.5f;
+        float targetOffset = 1f;
         Vector3 leftTarget = player.position + Vector3.left * targetOffset;
         Vector3 rightTarget = player.position + Vector3.right * targetOffset;
 
@@ -442,24 +440,6 @@ public class EnemyController : EnemyCharacter
 
     public void AvoidPlayer()
     {
-        //Debug.Log("ne player");
-        //int attempts = 10;
-        //for (int i = 0; i < attempts; i++)
-        //{
-        //    float directionMultiplier = Char.position.x > player.position.x ? 1 : -1;
-
-        //    Vector3 randomDirection = Random.insideUnitSphere * 3;
-        //    randomDirection.z = 0;
-        //    randomDirection.y = -randomDirection.y;
-        //    randomDirection.x = Mathf.Abs(randomDirection.x) * directionMultiplier;
-        //    Vector3 newTarget = Char.position + randomDirection;
-
-        //    if (Physics.OverlapSphere(newTarget, 1.2f, playerLayer).Length == 0)
-        //    {
-        //        randomTarget = newTarget;
-        //        return;
-        //    }
-        //}
         float rand = Random.value;
         if (rand < 0.7f)
         {
@@ -536,8 +516,8 @@ public class EnemyController : EnemyCharacter
 
         // Xác định vị trí tấn công lý tưởng của enemy này (bên trái hoặc phải player)
         Vector3 myTarget = Char.position.x < player.position.x
-            ? player.position + Vector3.left * 0.5f
-            : player.position + Vector3.right * 0.5f;
+            ? player.position + Vector3.left * 1f
+            : player.position + Vector3.right * 1f;
 
         // Nếu enemy đã ở rất gần player (<= 0.15f) nhưng vị trí tấn công chưa bị chiếm, hãy di chuyển đến vị trí tấn công
         if (distanceX <= 0.15f && distanceY <= 0.2f)
@@ -562,19 +542,34 @@ public class EnemyController : EnemyCharacter
         }
 
         // Điều kiện tấn công
-        if (distanceX <= 0.75f && distanceY <= 0.2f)
+        if (distanceX <= 1f && distanceY <= 0.2f)
         {
-            // Nếu enemy này là người chiếm vị trí tấn công (hoặc vị trí chưa bị chiếm)
-            if (!IsTargetOccupiedByOtherEnemy(myTarget, this) ||
-                Vector3.Distance(Char.position, myTarget) < 0.2f)
+            bool slotFree = !IsTargetOccupiedByOtherEnemy(myTarget, this) ||
+                            Vector3.Distance(Char.position, myTarget) < 0.2f;
+
+            if (slotFree)
             {
-                if (state != State.Idle)
+                if (!isAttack)
                 {
                     isAttack = true;
                     SwitchToRunState(enemyIdle);
                 }
             }
-        } 
+        }
+
+        //if (distanceX <= 1f && distanceY <= 0.2f)
+        //{
+        //    // Nếu enemy này là người chiếm vị trí tấn công (hoặc vị trí chưa bị chiếm)
+        //    if (!IsTargetOccupiedByOtherEnemy(myTarget, this) ||
+        //        Vector3.Distance(Char.position, myTarget) < 0.2f)
+        //    {
+        //        if (state != State.Idle)
+        //        {
+        //            isAttack = true;
+        //            SwitchToRunState(enemyIdle);
+        //        }
+        //    }
+        //} 
     }
 
     void HandleAttackEvent(TrackEntry trackEntry, Spine.Event e)
@@ -703,11 +698,12 @@ public class EnemyController : EnemyCharacter
     public void SwitchToRunState(EnemyStateMachine enemy)
     {
         if (state == State.Dead) return;
-        
-        string fromState = stateManager?.GetType().Name ?? "null";
-        string toState = enemy?.GetType().Name ?? "null";
-        string enemyName = gameObject.name;
+        if (stateManager == enemy)
+        {
+            return;
+        }
 
+        Debug.Log($"[StateChange] {state} -> {enemy.GetType().Name}");
         // If we're switching INTO Grabed, set isGrabbed immediately to block other callers
         if (enemy == enemyGrabed)
         {
@@ -717,9 +713,6 @@ public class EnemyController : EnemyCharacter
             }
         }
 
-        // Log caller stack for every transition to help debug
-        var stack = new System.Diagnostics.StackTrace();
-    
 
         // Prevent other systems from overwriting Grabed state while enemy is grabbed
         if (isGrabbed)
@@ -730,14 +723,6 @@ public class EnemyController : EnemyCharacter
                
                 return;
             }
-            else
-            {
-               
-            }
-        }
-        else
-        {
-           
         }
         
         if (stateManager != null)

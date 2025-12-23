@@ -1,20 +1,24 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 public class EnemyIdle : EnemyStateMachine
 {
     public EnemyIdle(EnemyController enemy) : base(enemy) { }
     private bool _isActiveRun = false;
-    private bool _isCheck = false;
+
     Coroutine _coroutine;
     public override void Enter()
     {
+        Debug.Log("[EnemyIdle] Enter");
         enemyController.PlayAnim("Idle", true);
         enemyController.state = EnemyController.State.Idle;
         enemyController.rb.linearVelocity = Vector2.zero;
         // Skip attack logic if grabbed
         if (enemyController.isGrabbed) return;
-        
+        if (enemyController.isStopping)
+        {
+            return;
+        }
         if (!enemyController.isAttack)
         {
             if (_isActiveRun
@@ -26,7 +30,10 @@ public class EnemyIdle : EnemyStateMachine
         }
         else
         {
-            _coroutine = enemyController.StartCoroutine(DelayAttack());
+            if (_coroutine == null)
+            {
+                _coroutine = enemyController.StartCoroutine(DelayAttack());
+            }
         }
     }
     public override void Update()
@@ -39,20 +46,35 @@ public class EnemyIdle : EnemyStateMachine
             return;
         }
 
+        // If đang trong pha dừng, chỉ đếm thời gian và thoát
+        if (enemyController.isStopping)
+        {
+            enemyController.TickStopTimer();
+            // Khi hết dừng, rời Idle để quay lại Run
+            if (!enemyController.isStopping)
+            {
+                enemyController.SetRun();
+            }
+            return;
+        }
+
         if (!enemyController.isAttack)
         {
             if (!_isActiveRun && Vector2.Distance(enemyController.transform.position, enemyController.player.position) <= 2.5f)
             {
                 enemyController.SetRandomPatrolTarget();
+                Debug.Log("[EnemyIdle] Setting Run state in Update (first time):");
                 enemyController.SetRun();
                 _isActiveRun = true;
             }
-            if (_isActiveRun
-               && !enemyController.playerController.IsDead
-               && !GamePlayManager.Instance.isCheckUlti)
-            {
-                enemyController.SetRun(); 
-            }
+
+            //if (_isActiveRun
+            //   && !enemyController.playerController.IsDead
+            //   && !GamePlayManager.Instance.isCheckUlti)
+            //{
+            //    Debug.Log("[EnemyIdle] Setting Run state in Update: {0}");
+            //    enemyController.SetRun();
+            //}
         }
     }
     IEnumerator DelayAttack()
@@ -83,7 +105,10 @@ public class EnemyIdle : EnemyStateMachine
     public override void Exit()
     {
         if (_coroutine != null)
+        {
             enemyController.StopCoroutine(_coroutine);
+            _coroutine = null;
+        }
         enemyController.isAttack = false;
     }
 

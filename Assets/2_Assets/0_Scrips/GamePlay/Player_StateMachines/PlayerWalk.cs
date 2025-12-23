@@ -10,8 +10,7 @@ public class PlayerWalk : PlayerStateManager
         playerController.PlayAnim("Walk", true);
         playerController.state = PlayerController.State.Walk;
         
-        // Set velocity ngay khi Enter để đảm bảo player bắt đầu di chuyển ngay lập tức
-        // Đặc biệt quan trọng khi chuyển từ Idle (sau reset) sang Walk
+
         if (playerController.joystick != null && playerController.rb != null)
         {
             Vector2 rawDir = playerController.joystick.RawDirection;

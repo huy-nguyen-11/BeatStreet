@@ -23,15 +23,6 @@ public class EnemyRun : EnemyStateMachine
             if (enemyController.state != EnemyController.State.Hit)
                 enemyController.Movement();
 
-        //var current = enemyController.skeletonAnimation.AnimationState.GetCurrent(0);
-
-        //if (!enemyController.isStopping)
-        //{
-        //    if (current == null || current.Animation.Name != "Run")
-        //    {
-        //        enemyController.PlayAnim("Run", true);
-        //    }
-        //}
     }
     public override void Exit()
     {

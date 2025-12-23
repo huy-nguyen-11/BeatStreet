@@ -130,8 +130,8 @@ public class AttackArea : MonoBehaviour
             PlayerChar player = hit.gameObject.GetComponent<PlayerChar>();
             Transform enemy = transform.parent.parent;
             if (!player.playerController.isImmortal
-                && Mathf.Abs(player.transform.position.x - enemy.position.x) <= 0.75f
-                && Mathf.Abs(player.transform.position.y - enemy.transform.position.y) <= 0.25f)
+                && Mathf.Abs(player.transform.position.x - enemy.position.x) <= 1f
+                && Mathf.Abs(player.transform.position.y - enemy.transform.position.y) <= 0.2f)
             {
                 AudioBase.Instance.AudioEnemy(1);
                 bool direction = transform.parent.rotation.y == 0 ? true : false;

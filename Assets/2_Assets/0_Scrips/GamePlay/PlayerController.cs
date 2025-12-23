@@ -828,12 +828,12 @@ public class PlayerController : PlayerCharacter
     public IEnumerator SetImmortalHitBox()
     {
         isFall = false;
-        transform.GetComponent<SpriteRenderer>().DOFade(0, 0.05f).SetLoops(-1, LoopType.Yoyo);
+        //transform.GetComponent<SpriteRenderer>().DOFade(0, 0.05f).SetLoops(-1, LoopType.Yoyo);
         isImmortal = true;
-        yield return new WaitForSeconds(_attributesPet[16]);
+        yield return new WaitForSeconds(/*_attributesPet[16]*/0f);
         isImmortal = false;
-        transform.GetComponent<SpriteRenderer>().DOKill();
-        transform.GetComponent<SpriteRenderer>().DOFade(1, 0);
+        //transform.GetComponent<SpriteRenderer>().DOKill();
+        //transform.GetComponent<SpriteRenderer>().DOFade(1, 0);
     }
     public (EnemyChar enemy, float distance) GetNearestEnemy()
     {
