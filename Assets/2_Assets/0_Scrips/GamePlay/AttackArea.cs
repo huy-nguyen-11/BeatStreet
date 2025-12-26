@@ -24,7 +24,6 @@ public class AttackArea : MonoBehaviour
                 isCheckTrigger = true;
             }
             Collider2D currentCollision = collisionQueue.Dequeue();
-            Debug.Log($"[AttackArea] Processing collision with {currentCollision?.name}");
             //if (!isSkill)
             //    HandleCollision(currentCollision);
             //else
@@ -42,10 +41,11 @@ public class AttackArea : MonoBehaviour
         Dame = dame;
         if (isCheckCharacter)
         {
-            if (id == 3)
-                PlayerAttack();
-            else
-                PlayerAttackDirection();
+            //if (id == 3)
+            //    PlayerAttack();
+            //else
+            //    PlayerAttackDirection();
+            PlayerAttackDirection();
         }
         else
             EnemyAttack();
@@ -57,27 +57,49 @@ public class AttackArea : MonoBehaviour
     }
     public void PlayerAttackDirection()
     {
+        //Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
+        //if (hits.Length == 0) return;
+        //bool Direction = CheckDirection(hits);
+        ////GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
+        //// Use PlayerController API to set facing so internal flag and visual rotation stay in sync
+        //if (PlayerController.Instance != null)
+        //{
+        //    if (!PlayerController.Instance.isSpeedUpAttack)
+        //    {
+        //        PlayerController.Instance.SetFacingDirection(Direction);
+        //    }
+        //}
+        //else
+        //{
+        //    // fallback: keep previous behavior if instance missing
+        //    GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
+        //}
+        //foreach (var hit in hits)
+        //{
+        //    float distanceX = GamePlayManager.Instance._Player.transform.position.x - hit.transform.position.x;
+        //    bool willEnqueue = (distanceX < 0 && Direction) || (distanceX >= 0 && !Direction);
+        //    if (willEnqueue)
+        //        collisionQueue.Enqueue(hit);
+        //}
         Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
         if (hits.Length == 0) return;
-        bool Direction = CheckDirection(hits);
-        //GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
-        // Use PlayerController API to set facing so internal flag and visual rotation stay in sync
+
+        // Dùng hướng hiện tại của Player (đã được aim từ TriggerAttack)
+        bool direction = true; // true: đánh sang phải, false: đánh sang trái
         if (PlayerController.Instance != null)
         {
-            if (!PlayerController.Instance.isSpeedUpAttack)
-            {
-                PlayerController.Instance.SetFacingDirection(Direction);
-            }
+            direction = PlayerController.Instance.isFacingRight;
         }
-        else
-        {
-            // fallback: keep previous behavior if instance missing
-            GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
-        }
+
         foreach (var hit in hits)
         {
             float distanceX = GamePlayManager.Instance._Player.transform.position.x - hit.transform.position.x;
-            bool willEnqueue = (distanceX < 0 && Direction) || (distanceX >= 0 && !Direction);
+
+            // Enemy chỉ bị trúng nếu nằm phía trước mặt Player
+            bool willEnqueue =
+                (distanceX < 0 && direction) ||    
+                (distanceX >= 0 && !direction);   
+
             if (willEnqueue)
                 collisionQueue.Enqueue(hit);
         }
@@ -92,35 +114,35 @@ public class AttackArea : MonoBehaviour
             collisionQueue.Enqueue(hit);
         }
     }
-    public void PlayerAttack()
-    {
-        Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
-        if (hits.Length == 0) return;
-        bool Direction = CheckDirection(hits);
-        //GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
-        // Use PlayerController API to set facing so internal flag and visual rotation stay in sync
-        if (PlayerController.Instance != null)
-        {
-            if (!PlayerController.Instance.isSpeedUpAttack)
-            {
-                PlayerController.Instance.SetFacingDirection(Direction);
-            }
-        }
-        else
-        {
-            // fallback
-            GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
-        }
-        foreach (var hit in hits)
-        {
-            hit.GetComponent<EnemyChar>().enemyController.currentHitIndex = 4;
-            float distanceX = GamePlayManager.Instance._Player.transform.position.x - hit.transform.position.x;
-            bool willEnqueue = (distanceX < 0 && Direction) || (distanceX >= 0 && !Direction);
+    //public void PlayerAttack()
+    //{
+    //    Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
+    //    if (hits.Length == 0) return;
+    //    bool Direction = CheckDirection(hits);
+    //    //GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
+    //    // Use PlayerController API to set facing so internal flag and visual rotation stay in sync
+    //    if (PlayerController.Instance != null)
+    //    {
+    //        if (!PlayerController.Instance.isSpeedUpAttack)
+    //        {
+    //            PlayerController.Instance.SetFacingDirection(Direction);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        // fallback
+    //        GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
+    //    }
+    //    foreach (var hit in hits)
+    //    {
+    //        hit.GetComponent<EnemyChar>().enemyController.currentHitIndex = 4;
+    //        float distanceX = GamePlayManager.Instance._Player.transform.position.x - hit.transform.position.x;
+    //        bool willEnqueue = (distanceX < 0 && Direction) || (distanceX >= 0 && !Direction);
           
-            if (willEnqueue)
-                collisionQueue.Enqueue(hit);
-        }
-    }
+    //        if (willEnqueue)
+    //            collisionQueue.Enqueue(hit);
+    //    }
+    //}
     public void EnemyAttack()
     {
         Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskPlayer);
@@ -154,8 +176,10 @@ public class AttackArea : MonoBehaviour
             }
         }
         float yRotation = nearestDistanceX < 0f ? -180 : 0;
+        
         return nearestDistanceX < 0f;
     }
+
     public IEnumerator SetAttackSkill2Player(float dame)
     {
         Dame = dame;

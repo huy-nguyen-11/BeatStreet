@@ -43,7 +43,7 @@ public class PlayerController : PlayerCharacter
     private bool isProcessingAttack = false;
 
     // Ulti
-    [SerializeField] private float detectionRange = 4f;
+    [SerializeField] private float detectionRange;
     [SerializeField] private LayerMask enemyLayer;
     [SerializeField] public LayerMask obstacleLayer;
     [SerializeField] private GameObject EnemyDistance;
@@ -425,7 +425,7 @@ public class PlayerController : PlayerCharacter
                     {
                         // Check grab condition
                         var (enemy, distance) = GetNearestEnemy();
-                        if (enemy != null)
+                        if (enemy != null && enemy.enemyController.typeOfEnemy != TypeOfEnemy.Boss)
                         {
                             Vector2 playerPos = transform.position;
                             Vector2 enemyPos = enemy.transform.position;
@@ -565,7 +565,8 @@ public class PlayerController : PlayerCharacter
    
                                         if (state == State.Run || state == State.Walk || isMovingInput)
                                         {
-                                            SpeedupDirection = delta.x > 0;
+                                            //SpeedupDirection = delta.x > 0;
+                                            isFacingRight = delta.x > 0;
                                             SwitchToRunState(playerSpeedUp);
                                         }
                                         else
@@ -623,6 +624,9 @@ public class PlayerController : PlayerCharacter
 
         comboAttack = 0; // Reset combo
         queuedComboAttack = false;
+
+        AimToNearestEnemyOnAttack();
+
         SwitchToRunState(playerAttack);
     }
 
@@ -665,6 +669,7 @@ public class PlayerController : PlayerCharacter
         IsDead = false;
         transform.localPosition = new Vector2(transform.localRotation.x, 0);
     }
+
     float gravity = -18f;
     public float velocity = 0;
     public bool isCheckGravity;
@@ -689,7 +694,7 @@ public class PlayerController : PlayerCharacter
     public void SwitchToRunState(PlayerStateManager player)
     {
         // Prevent leaving Grab state while grab is active
-        if (stateManager == playerGrab && playerGrab != null && playerGrab.IsGrabActive())
+        if ((stateManager == playerGrab && playerGrab != null && playerGrab.IsGrabActive()) && !(player == playerDead))
         {
             return;
         }
@@ -719,11 +724,11 @@ public class PlayerController : PlayerCharacter
 
     void HandleAttackEvent(TrackEntry trackEntry , Spine.Event e)
     {
-        if (e.Data.Name == "Hit")
+        if (e.Data.Name == "Hit" )
         {
             SetAttack(id);
         }
-        else if (e.Data.Name == "max_hit" || e.Data.Name == "Hit_Max")
+        else if (e.Data.Name == "max_hit" || e.Data.Name == "Hit_Max" || e.Data.Name == "Hit_Jump")
         {
             if (attackArea != null)
             {
@@ -735,22 +740,24 @@ public class PlayerController : PlayerCharacter
 
     public void SetAttack(int id)
     {
-        if (id != 4)
-        {
-            if (id == 3)
-            {
-                attackArea.SetAttack(Dame * SetFatal(13), id);
-            }
-            else
-                attackArea.SetAttack(Dame, id);
-        }
-        else
-        {
-            if (transform.rotation.y < 0)
-                attackJumKickL.SetAttackSkill(Dame * (state == State.Jump ? SetFatal(11) : SetFatal(10)), id);
-            else
-                attackJumKickR.SetAttackSkill(Dame * (state == State.Jump ? SetFatal(11) : SetFatal(10)), id);
-        }
+        //if (id != 4)
+        //{
+        //    if (id == 3)
+        //    {
+        //        attackArea.SetAttack(Dame * SetFatal(13), id);
+        //    }
+        //    else
+        //        attackArea.SetAttack(Dame, id);
+        //}
+        //else
+        //{
+        //    if (transform.rotation.y < 0)
+        //        attackJumKickL.SetAttackSkill(Dame * (state == State.Jump ? SetFatal(11) : SetFatal(10)), id);
+        //    else
+        //        attackJumKickR.SetAttackSkill(Dame * (state == State.Jump ? SetFatal(11) : SetFatal(10)), id);
+        //}
+
+        attackArea.SetAttack(Dame, id);
     }
 
     public float SetFatal(int id)
@@ -835,6 +842,7 @@ public class PlayerController : PlayerCharacter
         //transform.GetComponent<SpriteRenderer>().DOKill();
         //transform.GetComponent<SpriteRenderer>().DOFade(1, 0);
     }
+
     public (EnemyChar enemy, float distance) GetNearestEnemy()
     {
         float nearestDistance = float.MaxValue;
@@ -856,6 +864,17 @@ public class PlayerController : PlayerCharacter
         }
         return (nearestEnemy, nearestDistance == float.MaxValue ? -1 : nearestDistance);
     }
+
+    public void AimToNearestEnemyOnAttack()
+    {
+        var (enemy, distance) = GetNearestEnemy();
+        if (enemy == null || distance < 0)
+            return;
+
+        bool facingRight = enemy.transform.position.x > transform.position.x;
+        SetFacingDirection(facingRight);
+    }
+
     public void SetHit(float dameHit)
     {
         if (IsDead) return;
@@ -1069,6 +1088,6 @@ public class PlayerController : PlayerCharacter
     void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
-        //Gizmos.DrawWireSphere(transform.position, detectionRange);
+        Gizmos.DrawWireSphere(transform.position, detectionRange);
     }
 }

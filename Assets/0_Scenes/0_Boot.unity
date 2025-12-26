@@ -982,11 +982,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4151237337700418745, guid: 929afc1056b56e646acfe13ba0ef2d88, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 10.31
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4151237337700418745, guid: 929afc1056b56e646acfe13ba0ef2d88, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -8.16
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4151237337700418745, guid: 929afc1056b56e646acfe13ba0ef2d88, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1035,7 +1035,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2877654346773221637, guid: 929afc1056b56e646acfe13ba0ef2d88, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 929afc1056b56e646acfe13ba0ef2d88, type: 3}
 --- !u!1 &759062570
 GameObject:
@@ -2050,6 +2053,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   skeletonAnimation: {fileID: 7531265631273391615}
   wakeUpAnim: Wake_up
+  typeOfEnemy: 0
   player: {fileID: 0}
   playerController: {fileID: 0}
   txtLevel: {fileID: 2015365583934581933}
@@ -2067,6 +2071,7 @@ MonoBehaviour:
     m_Bits: 64
   prfCoin: {fileID: 1077053216685021442, guid: e8453c02a51ac6241a74824dab520851, type: 3}
   isGrabbed: 0
+  isActiveRun: 0
   _pointTxtHit: {fileID: 0}
   _prfTxtHit: {fileID: 6439387997438382723, guid: 7cf720018a5883e41a50fdde81d17a36, type: 3}
   currentHitIndex: 0
@@ -2090,9 +2095,11 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   randomTarget: {x: 0, y: 0, z: 0}
+  isCheckingPlayer: 0
   patrolTimer: 0
   stopTimer: 0
   isStopping: 0
+  stopDuration: 1
   isBeingThrown: 0
   runThreshold: 1
   walkThreshold: 0.25
@@ -3735,6 +3742,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   skeletonAnimation: {fileID: 997648353536659323}
   wakeUpAnim: Wake_up
+  typeOfEnemy: 0
   player: {fileID: 0}
   playerController: {fileID: 0}
   txtLevel: {fileID: 9125473197168342569}
@@ -3752,6 +3760,7 @@ MonoBehaviour:
     m_Bits: 64
   prfCoin: {fileID: 1077053216685021442, guid: e8453c02a51ac6241a74824dab520851, type: 3}
   isGrabbed: 0
+  isActiveRun: 0
   _pointTxtHit: {fileID: 0}
   _prfTxtHit: {fileID: 6439387997438382723, guid: 7cf720018a5883e41a50fdde81d17a36, type: 3}
   currentHitIndex: 0
@@ -3775,9 +3784,11 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   randomTarget: {x: 0, y: 0, z: 0}
+  isCheckingPlayer: 0
   patrolTimer: 0
   stopTimer: 0
   isStopping: 0
+  stopDuration: 1
   isBeingThrown: 0
   runThreshold: 1
   walkThreshold: 0.25

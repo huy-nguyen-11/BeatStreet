@@ -6,15 +6,17 @@ public class EnemyFall : EnemyStateMachine
     public EnemyFall(EnemyController enemy) : base(enemy) { }
     Coroutine coroutine;
     private bool isWakingUp = false; // Flag to prevent SetJump() during wakeup sequence
-    
+    bool _direction;
+
     public override void Enter()
     {
         enemyController.PlayAnim("Dead", false);
         enemyController.state = EnemyController.State.Fall;
+        _direction = enemyController.playerController.isFacingRight ? true : false;
         isWakingUp = false; // Reset flag
         if (coroutine != null)
             enemyController.StopCoroutine(coroutine);
-        coroutine = enemyController.StartCoroutine(JumpCoroutine());
+        coroutine = enemyController.StartCoroutine(WakeUpCoroutine());
         enemyController.currentHitIndex = 0;
     }
     public override void Update()
@@ -26,19 +28,19 @@ public class EnemyFall : EnemyStateMachine
         // Only set jump velocity if not waking up (to prevent movement during wakeup)
         if (!isWakingUp)
         {
-            SetJump();
+            SetFall();
         }
     }
-    private void SetJump()
+    private void SetFall()
     {
         //bool Direction = enemyController.player.position.x > enemyController.Char.position.x ? false : true;
-        bool Direction = enemyController.playerController.isFacingRight ? true : false;
-        if (!Direction)
+        //bool Direction = enemyController.playerController.isFacingRight ? true : false;
+        if (!_direction)
             enemyController.rb.linearVelocity = -Vector2.right * 5f;
         else
             enemyController.rb.linearVelocity = Vector2.right * 5f;
     }
-    private IEnumerator JumpCoroutine()
+    private IEnumerator WakeUpCoroutine()
     {
         yield return new WaitForSeconds(0.75f);
         while (enemyController.transform.localPosition.y > 0)

@@ -6,7 +6,7 @@ public class PlayerJump : PlayerStateManager
     public PlayerJump(PlayerController player) : base(player) { }
     [SerializeField] private float jumpHeight = 1f;
     [SerializeField] private float jumpDistance = 1.65f;
-    [SerializeField] private float jumpDuration = 1f;
+    //[SerializeField] private float jumpDuration = 1f;
     [SerializeField] private int jumpCount = 1;
 
     private Coroutine _coroutine;
@@ -16,11 +16,11 @@ public class PlayerJump : PlayerStateManager
         if (playerController.fillBar == null) return;
         playerController.isJumping = true;
         playerController.state = PlayerController.State.Jump;
-        jumpDistance = playerController.fillBar.mana >= 20 ? 2f : 1.65f;
-        jumpDuration = playerController.fillBar.mana >= 20 ? 0.5f : 0.65f;
+        jumpDistance = playerController.fillBar.mana >= 5 ? 3f : 6f;
+        //jumpDuration = playerController.fillBar.mana >= 20 ? 0.5f : 0.65f;
         if (playerController.fillBar.mana >= 5)
         {
-            playerController.velocity = 4;
+            playerController.velocity = 3;
             GamePlayManager.Instance.SetMission(6, 1);
             playerController.SetMana(-5);
             playerController.PlayAnim2("Jump_Attack");
@@ -28,7 +28,7 @@ public class PlayerJump : PlayerStateManager
         }
         else
         {
-            playerController.velocity = 4;
+            playerController.velocity = 5;
             playerController.PlayAnim2("Jump");
         }
     }
@@ -51,9 +51,9 @@ public class PlayerJump : PlayerStateManager
         //bool Direction = playerController.transform.rotation.y != 0 ? false : true;
         bool Direction = playerController.isFacingRight;
         if (!Direction)
-            playerController.rb.linearVelocity = -Vector2.right * 6f;
+            playerController.rb.linearVelocity = -Vector2.right * jumpDistance;
         else
-            playerController.rb.linearVelocity = Vector2.right * 6f;
+            playerController.rb.linearVelocity = Vector2.right * jumpDistance;
     }
     public override void Exit()
     {

@@ -1,5 +1,6 @@
 ﻿using Spine;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class EnemyAttack : EnemyStateMachine
@@ -13,7 +14,6 @@ public class EnemyAttack : EnemyStateMachine
 
         // Play Attack animation with Spine
         attackEntry = enemyController.skeletonAnimation.AnimationState.SetAnimation(0, "Attack", false);
-
         attackEntry.Complete += OnAttackComplete;
     }
 
@@ -23,6 +23,7 @@ public class EnemyAttack : EnemyStateMachine
 
         enemyController.ResetState();
     }
+
 
     public override void Update()
     {

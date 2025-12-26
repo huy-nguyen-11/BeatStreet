@@ -3,10 +3,13 @@ using UnityEngine;
 public class PlayerSpeedUp : PlayerStateManager
 {
     public PlayerSpeedUp(PlayerController player) : base(player) { }
+    bool _direction;
     public override void Enter()
     {
         playerController.PlayAnim("Speed_Run", true);
         playerController.state = PlayerController.State.SpeedUp;
+        _direction = playerController.isFacingRight ? true : false;
+        playerController.SetFacingDirection(_direction);
         AudioBase.Instance.AudioPlayer(2);
 
         //var entry = playerController.skeletonAnimation != null ? playerController.skeletonAnimation.AnimationState.GetCurrent(0) : null;
@@ -18,8 +21,8 @@ public class PlayerSpeedUp : PlayerStateManager
     }
     public void SetSpeedUp()
     {
-        playerController.rb.linearVelocity = Vector2.right * (!playerController.SpeedupDirection ? -6f : 6);
-        playerController.transform.rotation = Quaternion.Euler(new Vector3(0, playerController.SpeedupDirection ? 0 : -180, 0));
+        playerController.rb.linearVelocity = Vector2.right * (!_direction ? -6f : 6);
+        //playerController.transform.rotation = Quaternion.Euler(new Vector3(0, _direction ? 0 : -180, 0));
     }
     public override void Exit()
     {

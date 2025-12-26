@@ -3,10 +3,18 @@ using Spine;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+
+public enum TypeOfEnemy
+{
+    Enemy,
+    Boss,
+}
 
 public class EnemyController : EnemyCharacter
 {
+    public TypeOfEnemy typeOfEnemy;
     public Transform player;
     public PlayerController playerController;
     DataManager dataManager;
@@ -19,10 +27,6 @@ public class EnemyController : EnemyCharacter
     public int idEnemy;
     public float Hp = 3;
     public float dame = 3;
-    private Vector3 directionToPlayer;
-    private float zigZagAmplitude;
-    private float zigZagFrequency;
-    private float nextChangeTime;
     public float raycastDistance = 0.25f;
     public LayerMask playerLayer;
     public EnemyStateMachine stateManager;
@@ -36,6 +40,7 @@ public class EnemyController : EnemyCharacter
     public GameObject prfCoin;
     // NEW: Flag to indicate grabbed state - prevents all movement and state changes
     public bool isGrabbed = false;
+    public bool isActiveRun = false;
     // Hit
     [SerializeField] Transform _pointTxtHit;
     [SerializeField] GameObject _prfTxtHit;
@@ -66,9 +71,9 @@ public class EnemyController : EnemyCharacter
     public Vector3 randomTarget;
     private Vector3 lastRandomTarget;
     private bool isTooClosePlayer = false;
-    private bool isCheckingPlayer = false;
+    public bool isCheckingPlayer = false;
 
-    private float patrolDuration = 1.5f;
+    //private float patrolDuration = 1.5f;
     public float patrolTimer = 0f; 
     public float stopTimer = 0f; 
     public bool isStopping = false;
@@ -116,6 +121,7 @@ public class EnemyController : EnemyCharacter
     }
     void Start()
     {
+        isActiveRun = false;
         dataManager = DataManager.Instance;
         Char = transform.parent.GetComponent<Transform>();
         rb = transform.parent.GetComponent<Rigidbody2D>();
@@ -219,17 +225,34 @@ public class EnemyController : EnemyCharacter
             else targetAnim = ANIM_WALK_BACK;
         }
 
-        if (currentMoveAnim != targetAnim)
+        if(typeOfEnemy == TypeOfEnemy.Boss)
         {
-            currentMoveAnim = targetAnim;
-            PlayAnim(targetAnim, true);
+            if (currentMoveAnim != ANIM_RUN)
+            {
+                currentMoveAnim = ANIM_RUN;
+                PlayAnim(ANIM_RUN, true);
+            }
         }
-
-        if (targetAnim == ANIM_RUN) return moveSpeedRun;
-        if (targetAnim == ANIM_WALK) return moveSpeedWalk;
-        if (targetAnim == ANIM_RUN_BACK) return moveSpeedRunBack;
-        if (targetAnim == ANIM_WALK_BACK) return moveSpeedWalkBack;
-        return moveSpeed;
+        else
+        {
+            if (currentMoveAnim != targetAnim)
+            {
+                currentMoveAnim = targetAnim;
+                PlayAnim(targetAnim, true);
+            }
+        }
+        if(typeOfEnemy == TypeOfEnemy.Boss)
+        {
+            return 0.5f;
+        }
+        else
+        {
+            if (targetAnim == ANIM_RUN) return moveSpeedRun;
+            if (targetAnim == ANIM_WALK) return moveSpeedWalk;
+            if (targetAnim == ANIM_RUN_BACK) return moveSpeedRunBack;
+            if (targetAnim == ANIM_WALK_BACK) return moveSpeedWalkBack;
+            return moveSpeed;
+        }
     }
 
     // --------------------------------------------------
@@ -245,6 +268,15 @@ public class EnemyController : EnemyCharacter
         // Keep facing consistent for animation decision
         UpdateEnemyRotation();
 
+        //// Is BOSS: Allway target
+        //if (typeOfEnemy == TypeOfEnemy.Boss)
+        //{
+        //    MoveToPlayer();
+        //    UpdateEnemyRotation();
+        //    //SeparateFromOtherEnemies();
+        //    return;
+        //}
+
         if (player == null) return;
 
         // Tick stop timer even while in Movement state; if still stopping, stay in Idle
@@ -255,6 +287,7 @@ public class EnemyController : EnemyCharacter
             {
                 if (stateManager != enemyIdle)
                 {
+                    Debug.Log("set idle here!");
                     SwitchToRunState(enemyIdle);
                 }
                 UpdateEnemyRotation();
@@ -291,12 +324,39 @@ public class EnemyController : EnemyCharacter
                 }
             }
 
-            patrolTimer += Time.deltaTime;
-            if (patrolTimer >= patrolDuration)
+            // FIX: Only increment patrol timer if we're actually moving
+            // Check if we have a valid target and are moving towards it
+            Vector3 currentTarget = isPatrolling ? randomTarget :
+                (Char.position.x < player.position.x ?
+                    player.position + Vector3.left * 0.5f :
+                    player.position + Vector3.right * 0.5f);
+
+            float distanceToTarget = Vector3.Distance(Char.position, currentTarget);
+
+            // Only increment timer if we're not already at target
+            if (distanceToTarget > 0.2f)
             {
-                isStopping = true;
+                float patrolDuration = typeOfEnemy == TypeOfEnemy.Boss ? 2.5f : 1.5f;
+
+                patrolTimer += Time.deltaTime;
+                if (patrolTimer >= patrolDuration)
+                {
+                    isStopping = true;
+                    patrolTimer = 0f;
+                }
+            }
+            else
+            {
+                // FIX: Reset timer if we're at target, don't let it accumulate
                 patrolTimer = 0f;
             }
+
+            //patrolTimer += Time.deltaTime;
+            //if (patrolTimer >= patrolDuration)
+            //{
+            //    isStopping = true;
+            //    patrolTimer = 0f;
+            //}
         }
 
         UpdateEnemyRotation();
@@ -306,6 +366,8 @@ public class EnemyController : EnemyCharacter
     // Handle stop timer so Idle can advance even when state machine isn't running Movement
     public void TickStopTimer()
     {
+        //if (typeOfEnemy == TypeOfEnemy.Boss) return;
+
         if (!isStopping) return;
 
         stopTimer += Time.deltaTime;
@@ -313,17 +375,39 @@ public class EnemyController : EnemyCharacter
         {
             isStopping = false;
             stopTimer = 0f;
-            isPatrolling = Random.value < 0.3f; //random 30% patrol, 70% move to player
+            float num = typeOfEnemy == TypeOfEnemy.Boss ? 0f : 0.45f;
+            isPatrolling = Random.value < num; //random 45% patrol, 55% move to player
             isAvoidingPlayer = false;
-            if (isPatrolling)
-                SetRandomPatrolTarget();
+            if (isPatrolling && typeOfEnemy == TypeOfEnemy.Enemy)
+             SetRandomPatrolTarget();
         }
     }
 
     private void MoveToPlayer()
     {
+        // BOSS
+        //if (typeOfEnemy == TypeOfEnemy.Boss)
+        //{
+        //    Vector3 _targetPos = player.position;
+        //    float _speed = SetMoveAnimationByTarget(_targetPos);
+        //    Vector3 _direction = (_targetPos - Char.position).normalized;
+        //    lastDirection = _direction;
+        //    Char.position += _direction * _speed * Time.deltaTime;
+
+        //    // Check wall collision
+        //    //if (!canCheckWall && CheckWallCollision())
+        //    //{
+        //    //    Debug.Log("avoid wall boss");
+        //    //    AvoidWall();
+        //    //    canCheckWall = true;
+        //    //    StartCoroutine(CheckWallCollisionRoutine());
+        //    //}
+        //    return;
+        //}
+
         if (isBeingThrown || isGrabbed) return;
-        float targetOffset = 1f;
+
+        float targetOffset = 0.5f;
         Vector3 leftTarget = player.position + Vector3.left * targetOffset;
         Vector3 rightTarget = player.position + Vector3.right * targetOffset;
 
@@ -511,8 +595,24 @@ public class EnemyController : EnemyCharacter
     public void CheckAttack()
     {
         if (isBeingThrown) return;
+
         float distanceX = Mathf.Abs(Char.position.x - player.position.x);
         float distanceY = Mathf.Abs(Char.position.y - player.position.y);
+
+        ////is boss
+        //if (typeOfEnemy == TypeOfEnemy.Boss)
+        //{
+        //    if (distanceX <= 1f && distanceY <= 0.2f)
+        //    {
+        //        if (!isAttack)
+        //        {
+        //            Debug.Log("attack");
+        //            isAttack = true;
+        //            SwitchToRunState(enemyIdle);
+        //        }
+        //    }
+        //    return;
+        //}
 
         // Xác định vị trí tấn công lý tưởng của enemy này (bên trái hoặc phải player)
         Vector3 myTarget = Char.position.x < player.position.x
@@ -552,24 +652,13 @@ public class EnemyController : EnemyCharacter
                 if (!isAttack)
                 {
                     isAttack = true;
-                    SwitchToRunState(enemyIdle);
+                    if (state != State.Idle)
+                    {
+                        SwitchToRunState(enemyIdle);
+                    }
                 }
             }
         }
-
-        //if (distanceX <= 1f && distanceY <= 0.2f)
-        //{
-        //    // Nếu enemy này là người chiếm vị trí tấn công (hoặc vị trí chưa bị chiếm)
-        //    if (!IsTargetOccupiedByOtherEnemy(myTarget, this) ||
-        //        Vector3.Distance(Char.position, myTarget) < 0.2f)
-        //    {
-        //        if (state != State.Idle)
-        //        {
-        //            isAttack = true;
-        //            SwitchToRunState(enemyIdle);
-        //        }
-        //    }
-        //} 
     }
 
     void HandleAttackEvent(TrackEntry trackEntry, Spine.Event e)
@@ -695,6 +784,7 @@ public class EnemyController : EnemyCharacter
         SwitchToRunState(enemyIdle);
     }
 
+
     public void SwitchToRunState(EnemyStateMachine enemy)
     {
         if (state == State.Dead) return;
@@ -703,7 +793,6 @@ public class EnemyController : EnemyCharacter
             return;
         }
 
-        Debug.Log($"[StateChange] {state} -> {enemy.GetType().Name}");
         // If we're switching INTO Grabed, set isGrabbed immediately to block other callers
         if (enemy == enemyGrabed)
         {
@@ -720,15 +809,16 @@ public class EnemyController : EnemyCharacter
             // allow transition only to states that release the grab (Fall/Dead) or keep Grabed
             if (enemy != enemyGrabed && enemy != enemyFall && enemy != enemyDead)
             {
-               
+
                 return;
             }
         }
-        
+
         if (stateManager != null)
             stateManager.Exit();
         stateManager = enemy;
         stateManager.Enter();
+
     }
     void OnDrawGizmos()
     {
@@ -742,11 +832,11 @@ public class EnemyController : EnemyCharacter
         Gizmos.DrawRay(startPos, direction * patrolRadius);
 
         // Vẽ đường tròn hiển thị phạm vi check va chạm
-        Gizmos.color = Color.blue;
+        Gizmos.color = Color.white;
         Gizmos.DrawWireSphere(startPos, 0.5f);
 
         // Vẽ điểm target
-        Gizmos.color = Color.red;
+        Gizmos.color = Color.greenYellow;
         Gizmos.DrawWireSphere(randomTarget, 0.5f);
     }
 
@@ -778,8 +868,6 @@ public class EnemyController : EnemyCharacter
         stateManager = enemyGrabed;
         if (stateManager != null)
             stateManager.Enter();
-
-       
     }
 
     // Helper: check if a target position is occupied by another alive enemy

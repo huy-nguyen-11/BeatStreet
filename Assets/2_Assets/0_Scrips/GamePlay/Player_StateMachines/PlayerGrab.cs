@@ -108,7 +108,7 @@ public class PlayerGrab : PlayerStateManager
             return;
 
         // If grabbed enemy died or controller lost, cancel grab immediately
-        if (grabbedEnemyController == null || grabbedEnemyController.state == EnemyCharacter.State.Dead)
+        if (grabbedEnemyController == null || grabbedEnemyController.state == EnemyCharacter.State.Dead || playerController.state == PlayerController.State.Dead)
         {
             CancelGrabAndIdle();
             return;

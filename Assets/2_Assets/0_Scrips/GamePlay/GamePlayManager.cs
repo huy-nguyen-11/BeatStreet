@@ -396,6 +396,72 @@ public class GamePlayManager : MonoBehaviour
     public void SetPlayerRevive()
     {
         _Player.SetRevive();
+        ResetAllEnemiesToIdle();
+    }
+
+    // Reset all alive enemies to idle state when player revives
+    private void ResetAllEnemiesToIdle()
+    {
+        // Find all enemy controllers in the scene
+        EnemyController[] allEnemies = FindObjectsOfType<EnemyController>();
+
+        foreach (EnemyController enemy in allEnemies)
+        {
+            // Skip dead enemies
+            if (enemy.state == EnemyController.State.Dead)
+                continue;
+
+            // Exit current state first to properly clean up (especially for Grabed state)
+            //if (enemy.stateManager != null)
+            //{
+            //    try
+            //    {
+            //        enemy.stateManager.Exit();
+            //    }
+            //    catch (System.Exception)
+            //    {
+            //        // Ignore errors during exit
+            //    }
+            //}
+
+            //// Reset all flags that might prevent enemy from moving/attacking
+            //enemy.isGrabbed = false;
+            //enemy.isStopping = false;
+            //enemy.stopTimer = 0f;
+            //enemy.patrolTimer = 0f;
+            //enemy.isAttack = false;
+            //enemy.isCheckingPlayer = false;
+            //enemy.isBeingThrown = false;
+            ////enemy.isAvoidingPlayer = false;
+
+            //// Stop all coroutines that might interfere
+            //if (enemy.coroutine != null)
+            //{
+            //    enemy.StopCoroutine(enemy.coroutine);
+            //    enemy.coroutine = null;
+            //}
+            //enemy.StopAllCoroutines();
+
+            //// Reset rigidbody velocity and ensure physics is enabled
+            //if (enemy.rb != null)
+            //{
+            //    enemy.rb.linearVelocity = Vector2.zero;
+            //    enemy.rb.angularVelocity = 0f;
+            //    if (enemy.rb.simulated == false)
+            //    {
+            //        enemy.rb.simulated = true;
+            //    }
+            //}
+
+            // Force switch to idle state (now that isGrabbed is false, this will work)
+            if(enemy.isActiveRun)
+                enemy.SwitchToRunState(enemy.enemyRun);
+            if(enemy.state == EnemyController.State.Grabed)
+                enemy.SwitchToRunState(enemy.enemyIdle);
+            enemy.isGrabbed = false;
+            enemy.SwitchToRunState(enemy.enemyIdle);
+            enemy.StopAllCoroutines();
+        }
     }
     // Pause
     public void BtnPause()

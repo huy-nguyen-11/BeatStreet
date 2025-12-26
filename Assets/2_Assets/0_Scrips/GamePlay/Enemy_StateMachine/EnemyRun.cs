@@ -10,6 +10,18 @@ public class EnemyRun : EnemyStateMachine
         // Reset move animation to ensure proper animation is set when entering Run state
         // This is especially important when transitioning from Fall/Idle states
         enemyController.ResetMoveAnimation();
+
+        enemyController.patrolTimer = 0f;
+
+        // FIX: Ensure isStopping is false when entering Run state
+        // Only set to false if we're not in a forced stop situation
+        if (enemyController.isStopping && enemyController.stopTimer < enemyController.stopDuration * 0.5f)
+        {
+            // If we just started stopping, allow it to complete
+            // But if we're transitioning to Run, we should clear the stop flag
+            enemyController.isStopping = false;
+            enemyController.stopTimer = 0f;
+        }
     }
     public override void Update()
     {
