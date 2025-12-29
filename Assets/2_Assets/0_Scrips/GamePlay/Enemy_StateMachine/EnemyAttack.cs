@@ -7,13 +7,29 @@ public class EnemyAttack : EnemyStateMachine
 {
     public EnemyAttack(EnemyController enemy) : base(enemy) { }
     private TrackEntry attackEntry;
+    private string attackAnimationName;
 
     public override void Enter()
     {
         enemyController.state = EnemyController.State.Attack;
-
+        if(enemyController.typeOfEnemy == TypeOfEnemy.Boss && enemyController.idEnemy == 1)
+        {
+            float randomValue = Random.Range(0f, 1f);
+            if (randomValue <= 0.5f)
+            {
+                attackAnimationName = "Attack1";
+            }
+            else
+            {
+                attackAnimationName = "Attack2";
+            }
+        }
+        else
+        {
+            attackAnimationName = "Attack";
+        }
         // Play Attack animation with Spine
-        attackEntry = enemyController.skeletonAnimation.AnimationState.SetAnimation(0, "Attack", false);
+        attackEntry = enemyController.skeletonAnimation.AnimationState.SetAnimation(0, attackAnimationName, false);
         attackEntry.Complete += OnAttackComplete;
     }
 

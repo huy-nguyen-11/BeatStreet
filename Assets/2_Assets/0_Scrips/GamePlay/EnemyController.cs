@@ -100,7 +100,7 @@ public class EnemyController : EnemyCharacter
     public float animationHysteresis = 0.08f;
 
     private string currentMoveAnim = null;
-    
+    public Transform posBullet;
     // Public method to reset move animation (useful when transitioning from states like Fall)
     public void ResetMoveAnimation()
     {
@@ -287,7 +287,6 @@ public class EnemyController : EnemyCharacter
             {
                 if (stateManager != enemyIdle)
                 {
-                    Debug.Log("set idle here!");
                     SwitchToRunState(enemyIdle);
                 }
                 UpdateEnemyRotation();
@@ -599,20 +598,19 @@ public class EnemyController : EnemyCharacter
         float distanceX = Mathf.Abs(Char.position.x - player.position.x);
         float distanceY = Mathf.Abs(Char.position.y - player.position.y);
 
-        ////is boss
-        //if (typeOfEnemy == TypeOfEnemy.Boss)
-        //{
-        //    if (distanceX <= 1f && distanceY <= 0.2f)
-        //    {
-        //        if (!isAttack)
-        //        {
-        //            Debug.Log("attack");
-        //            isAttack = true;
-        //            SwitchToRunState(enemyIdle);
-        //        }
-        //    }
-        //    return;
-        //}
+        //is boss
+        if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 0)
+        {
+            if (distanceX <= 3.75f && distanceY <= 0.8f)
+            {
+                if (!isAttack)
+                {
+                    isAttack = true;
+                    SwitchToRunState(enemyIdle);
+                }
+            }
+            return;
+        }
 
         // Xác định vị trí tấn công lý tưởng của enemy này (bên trái hoặc phải player)
         Vector3 myTarget = Char.position.x < player.position.x
@@ -663,9 +661,29 @@ public class EnemyController : EnemyCharacter
 
     void HandleAttackEvent(TrackEntry trackEntry, Spine.Event e)
     {
-        if (e.Data.Name == "Hit")
+        if(typeOfEnemy == TypeOfEnemy.Boss)
         {
-            SetAttack(idEnemy);
+            if(idEnemy == 0)
+            {
+                if (e.Data.Name == "hit")
+                {
+                    ObjectPooler.Instance.SpawnFromPool("Bullet", posBullet.position,transform.rotation);
+                }
+            }
+            else
+            {
+                if (e.Data.Name == "hit")
+                {
+                    SetAttack(idEnemy);
+                }
+            }
+        }
+        else
+        {
+            if (e.Data.Name == "Hit")
+            {
+                SetAttack(idEnemy);
+            }
         }
     }
 
@@ -689,7 +707,7 @@ public class EnemyController : EnemyCharacter
             SetDead();
         currentHitIndex++;
         
-        if (isMaxHit)
+        if (isMaxHit && typeOfEnemy != TypeOfEnemy.Boss)
         {
             ApplyMaxHitKnockback();
         }
@@ -757,19 +775,25 @@ public class EnemyController : EnemyCharacter
             rb.angularVelocity = 0f;
             rb.simulated = false; // disable physics simulation for the duration
         }
-
-        transform.parent.DOMove(targetPosition, 1f).SetEase(Ease.OutQuad)
-            .OnComplete(() =>
-                 {
-                     // mark thrown finished and deactivate
-                     isBeingThrown = false;
-                     // keep physics disabled since deactivating
-                     if (rb != null)
-                     {
-                         rb.simulated = false;
-                     }
-                     Char.gameObject.SetActive(false);
-                 });
+        if(typeOfEnemy == TypeOfEnemy.Boss)
+        {
+            //to do handle boss dead : effect, sound ...
+        }
+        else
+        {
+            transform.parent.DOMove(targetPosition, 1f).SetEase(Ease.OutQuad)
+           .OnComplete(() =>
+           {
+               // mark thrown finished and deactivate
+               isBeingThrown = false;
+               // keep physics disabled since deactivating
+               if (rb != null)
+               {
+                   rb.simulated = false;
+               }
+               Char.gameObject.SetActive(false);
+           });
+        }
     }
     public void DropCoin()
     {

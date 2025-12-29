@@ -7,10 +7,14 @@ public class EnemyFall : EnemyStateMachine
     Coroutine coroutine;
     private bool isWakingUp = false; // Flag to prevent SetJump() during wakeup sequence
     bool _direction;
+    private string fallAnim;
+    float numFall;
 
     public override void Enter()
     {
-        enemyController.PlayAnim("Dead", false);
+        fallAnim = enemyController.typeOfEnemy == TypeOfEnemy.Boss ? "Death" : "Dead";
+        numFall = enemyController.typeOfEnemy == TypeOfEnemy.Boss ? 1.5f : 5f;
+        enemyController.PlayAnim(fallAnim, false);
         enemyController.state = EnemyController.State.Fall;
         _direction = enemyController.playerController.isFacingRight ? true : false;
         isWakingUp = false; // Reset flag
@@ -36,9 +40,9 @@ public class EnemyFall : EnemyStateMachine
         //bool Direction = enemyController.player.position.x > enemyController.Char.position.x ? false : true;
         //bool Direction = enemyController.playerController.isFacingRight ? true : false;
         if (!_direction)
-            enemyController.rb.linearVelocity = -Vector2.right * 5f;
+            enemyController.rb.linearVelocity = -Vector2.right * numFall;
         else
-            enemyController.rb.linearVelocity = Vector2.right * 5f;
+            enemyController.rb.linearVelocity = Vector2.right * numFall;
     }
     private IEnumerator WakeUpCoroutine()
     {

@@ -5,10 +5,12 @@ public class EnemyHit : EnemyStateMachine
 {
     public EnemyHit(EnemyController enemy) : base(enemy) { }
     Coroutine coroutine;
+    private string hitAnim;
     public override void Enter()
     {
         enemyController.state = EnemyController.State.Hit;
         AudioBase.Instance.AudioPlayerAtkHit();
+        hitAnim = enemyController.typeOfEnemy == TypeOfEnemy.Boss ? "Damaged" : "Hit";
         SetAnimHit();
     }
     public override void Update()
@@ -17,29 +19,39 @@ public class EnemyHit : EnemyStateMachine
     }
     public void SetAnimHit()
     {
-        if (enemyController.currentHitIndex >= 0 && enemyController.currentHitIndex <= 2)
+        if(enemyController.typeOfEnemy == TypeOfEnemy.Boss)
         {
             SetHitbox();
-            enemyController.PlayAnim("Hit", false);
-            if (coroutine != null)
-                enemyController.StopCoroutine(coroutine);
-            coroutine = enemyController.StartCoroutine(SetStateIdle());
-        }
-        else if (enemyController.currentHitIndex >= 3 && enemyController.currentHitIndex <= 4)
-        {
-            SetHitbox();
-            //enemyController.animator.Play("Hurt2");
-            enemyController.PlayAnim("Hit", false);
+            enemyController.PlayAnim(hitAnim, false);
             if (coroutine != null)
                 enemyController.StopCoroutine(coroutine);
             coroutine = enemyController.StartCoroutine(SetStateIdle());
         }
         else
         {
-            if (coroutine != null)
-                enemyController.StopCoroutine(coroutine);
-            if (enemyController.state != EnemyController.State.Fall)
-                enemyController.SwitchToRunState(enemyController.enemyFall);
+            if (enemyController.currentHitIndex >= 0 && enemyController.currentHitIndex <= 2)
+            {
+                SetHitbox();
+                enemyController.PlayAnim(hitAnim, false);
+                if (coroutine != null)
+                    enemyController.StopCoroutine(coroutine);
+                coroutine = enemyController.StartCoroutine(SetStateIdle());
+            }
+            else if (enemyController.currentHitIndex >= 3 && enemyController.currentHitIndex <= 4)
+            {
+                SetHitbox();
+                enemyController.PlayAnim(hitAnim, false);
+                if (coroutine != null)
+                    enemyController.StopCoroutine(coroutine);
+                coroutine = enemyController.StartCoroutine(SetStateIdle());
+            }
+            else
+            {
+                if (coroutine != null)
+                    enemyController.StopCoroutine(coroutine);
+                if (enemyController.state != EnemyController.State.Fall)
+                    enemyController.SwitchToRunState(enemyController.enemyFall);
+            }
         }
     }
     private void SetHitbox()

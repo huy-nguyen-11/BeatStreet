@@ -3,9 +3,11 @@ using UnityEngine;
 public class EnemyDead : EnemyStateMachine
 {
     public EnemyDead(EnemyController enemy) : base(enemy) { }
+    private string deadAnim;
     public override void Enter()
     {
-        enemyController.PlayAnim("Dead" , false);
+        deadAnim = enemyController.typeOfEnemy == TypeOfEnemy.Boss ? "Death" : "Dead";
+        enemyController.PlayAnim(deadAnim , false);
         AudioBase.Instance.AudioPlayerAtkHit();
         enemyController.state = EnemyController.State.Dead;
     }

@@ -8,7 +8,6 @@ public class EnemyIdle : EnemyStateMachine
     Coroutine _coroutine;
     public override void Enter()
     {
-        Debug.Log("[EnemyIdle] Entering Idle State" + " at time" + Time.time);
         enemyController.PlayAnim("Idle", true);
         enemyController.state = EnemyController.State.Idle;
         enemyController.rb.linearVelocity = Vector2.zero;
@@ -52,7 +51,6 @@ public class EnemyIdle : EnemyStateMachine
 
             if (!enemyController.isStopping)
             {
-                Debug.Log("set run here!");
                 enemyController.SetRun();
             }
             return;
@@ -71,13 +69,9 @@ public class EnemyIdle : EnemyStateMachine
     }
     IEnumerator DelayAttack()
     {
-        Debug.Log("[EnemyIdle] Starting DelayAttack coroutine");
         yield return new WaitForSeconds(0.5f);
-        if (Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) <= 1f
-           && Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) >= 0.15f
-           && Mathf.Abs(enemyController.Char.position.y - enemyController.player.position.y) <= 0.3f)
+        if(enemyController.typeOfEnemy == TypeOfEnemy.Boss && enemyController.idEnemy == 0)
         {
-            Debug.Log("[EnemyIdle] Switching to Attack state from DelayAttack coroutine");  
             int idEnemy = enemyController.Char.GetComponent<EnemyChar>().idEnemy;
 
             if (enemyController.Char.position.x <= enemyController.player.position.x)
@@ -93,8 +87,28 @@ public class EnemyIdle : EnemyStateMachine
         }
         else
         {
-            Debug.Log("[EnemyIdle] Switching to Run state from DelayAttack coroutine");
-            enemyController.SwitchToRunState(enemyController.enemyRun);
+
+            if (Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) <= 1f
+               && Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) >= 0.15f
+               && Mathf.Abs(enemyController.Char.position.y - enemyController.player.position.y) <= 0.3f)
+            {
+                int idEnemy = enemyController.Char.GetComponent<EnemyChar>().idEnemy;
+
+                if (enemyController.Char.position.x <= enemyController.player.position.x)
+                {
+                    GamePlayManager.Instance.isEnemyOnLeft[idEnemy] = true;
+                }
+                else
+                {
+                    GamePlayManager.Instance.isEnemyOnRight[idEnemy] = true;
+                }
+
+                enemyController.SwitchToRunState(enemyController.enemyAttack);
+            }
+            else
+            {
+                enemyController.SwitchToRunState(enemyController.enemyRun);
+            }
         }
     }
     public override void Exit()
