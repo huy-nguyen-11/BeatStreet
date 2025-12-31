@@ -18,7 +18,6 @@ public class EnemyCharacter : MonoBehaviour
     }
     public State state = State.Idle;
     public FillBarEnemy fillBar;
-    [SerializeField] public Animator animator;
     [SerializeField] public SkeletonAnimation skeletonAnimation;
     [SerializeField] public string wakeUpAnim;
 

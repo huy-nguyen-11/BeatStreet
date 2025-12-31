@@ -291,9 +291,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   fillBar: {fileID: 8928571343474702127}
-  animator: {fileID: 0}
   skeletonAnimation: {fileID: 8434712630087698112}
   wakeUpAnim: Wakeup
+  typeOfEnemy: 0
   player: {fileID: 0}
   playerController: {fileID: 0}
   txtLevel: {fileID: 6596227052847625990}
@@ -311,6 +311,7 @@ MonoBehaviour:
     m_Bits: 64
   prfCoin: {fileID: 1077053216685021442, guid: e8453c02a51ac6241a74824dab520851, type: 3}
   isGrabbed: 0
+  isActiveRun: 0
   _pointTxtHit: {fileID: 2237946411857599310}
   _prfTxtHit: {fileID: 6439387997438382723, guid: 7cf720018a5883e41a50fdde81d17a36, type: 3}
   currentHitIndex: 0
@@ -334,14 +335,17 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   randomTarget: {x: 0, y: 0, z: 0}
+  isCheckingPlayer: 0
   patrolTimer: 0
   stopTimer: 0
   isStopping: 0
+  stopDuration: 1
   isBeingThrown: 0
   runThreshold: 1
   walkThreshold: 0.25
   idleThreshold: 0.05
   animationHysteresis: 0.08
+  posBullet: {fileID: 0}
 --- !u!1 &4391662136905093740
 GameObject:
   m_ObjectHideFlags: 0

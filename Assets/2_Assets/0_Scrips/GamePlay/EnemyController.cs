@@ -135,6 +135,13 @@ public class EnemyController : EnemyCharacter
 
         skeletonAnimation.AnimationState.Event += HandleAttackEvent;
     }
+
+    public void InitializeEnemy()
+    {
+        Char = transform.parent.GetComponent<Transform>();
+        rb = transform.parent.GetComponent<Rigidbody2D>();
+    }
+
     void Update()
     {
         stateManager.Update();

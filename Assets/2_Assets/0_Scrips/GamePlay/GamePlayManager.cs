@@ -321,6 +321,9 @@ public class GamePlayManager : MonoBehaviour
     // Data Game
     public void CheckEnemyDead()
     {
+        // wake up enemy in turn
+        _levelMap.WakeUpEnemyInTurn();
+        
         int count = 0;
         for (int i = 0; i < _levelMap.listTurnEnemy.GetChild(_levelMap.TurnEnemy).childCount; i++)
             if (_levelMap.listTurnEnemy.GetChild(_levelMap.TurnEnemy)
