@@ -24,9 +24,8 @@ public class PlayerController : PlayerCharacter
     public List<float> _attributesItem = new List<float>();
     public Rigidbody2D rb;
     public AttackArea attackArea;
-    public AttackArea attackSkill2;
-    public AttackArea attackJumKickL;
-    public AttackArea attackJumKickR;
+    public List<AttackArea> attackAreas = new List<AttackArea>();
+    public int idAttackArea = 0;
     public int countCancelDamage;
     // Combo
     [SerializeField] Transform _pointSpawnTxtHit;
@@ -247,7 +246,7 @@ public class PlayerController : PlayerCharacter
         countCancelDamage = (int)_attributesPet[17];
         Hp = DataManager.Instance.playerData[id].Hp + (DataManager.Instance.playerData[id].Hp * _attributesPet[0]);
         Mana = _attributesPet[8] > 100 * (_attributesPet[8] / 100) ? 1 : 0;
-        Dame = DataManager.Instance.playerData[id].Dame + (DataManager.Instance.playerData[id].Dame * _attributesPet[1]);
+        Dame = DataManager.Instance.playerData[id].Dame + (DataManager.Instance.playerData[id].Dame * _attributesPet[1]); // demo test
         fillBar.OnInit(Hp, Mana);
     }
     private void SetAttributePet()
@@ -390,6 +389,30 @@ public class PlayerController : PlayerCharacter
             }
         }
     }
+    
+    public void CheckGrabEnemy()
+    {
+        // Check grab condition
+        var (enemy, distance) = GetNearestEnemy();
+        if (enemy != null && enemy.enemyController.typeOfEnemy != TypeOfEnemy.Boss)
+        {
+            Vector2 playerPos = transform.position;
+            Vector2 enemyPos = enemy.transform.position;
+
+            float distX = Mathf.Abs(enemyPos.x - playerPos.x);
+            float distY = Mathf.Abs(enemyPos.y - playerPos.y);
+
+            if (distX < 0.75f && distY < 0.5f)
+            {
+                bool enemyInFront = isFacingRight ? enemyPos.x > playerPos.x : enemyPos.x < playerPos.x;
+                if (enemyInFront && enemy.enemyController.state != EnemyCharacter.State.Dead &&
+                    enemy.enemyController.state != EnemyCharacter.State.Fall && state != State.Grab)
+                {
+                    SwitchToRunState(playerGrab);
+                }
+            }
+        }
+    }
 
     private void CheckTouchInput()
     {
@@ -419,30 +442,30 @@ public class PlayerController : PlayerCharacter
                     if (!touchStartTimes.ContainsKey(touchId))
                         return;
                     GetJoy();
-
                     //grab enemy
                     if ((state == State.Walk || state == State.Run) && canGrab)
                     {
-                        // Check grab condition
-                        var (enemy, distance) = GetNearestEnemy();
-                        if (enemy != null && enemy.enemyController.typeOfEnemy != TypeOfEnemy.Boss)
-                        {
-                            Vector2 playerPos = transform.position;
-                            Vector2 enemyPos = enemy.transform.position;
+                        //// Check grab condition
+                        //var (enemy, distance) = GetNearestEnemy();
+                        //if (enemy != null && enemy.enemyController.typeOfEnemy != TypeOfEnemy.Boss)
+                        //{
+                        //    Vector2 playerPos = transform.position;
+                        //    Vector2 enemyPos = enemy.transform.position;
 
-                            float distX = Mathf.Abs(enemyPos.x - playerPos.x);
-                            float distY = Mathf.Abs(enemyPos.y - playerPos.y);
+                        //    float distX = Mathf.Abs(enemyPos.x - playerPos.x);
+                        //    float distY = Mathf.Abs(enemyPos.y - playerPos.y);
 
-                            if (distX < 0.75f && distY < 0.5f)
-                            {
-                                bool enemyInFront = isFacingRight ? enemyPos.x > playerPos.x : enemyPos.x < playerPos.x;
-                                if (enemyInFront && enemy.enemyController.state != EnemyCharacter.State.Dead &&
-                                    enemy.enemyController.state != EnemyCharacter.State.Fall)
-                                {
-                                    SwitchToRunState(playerGrab);
-                                }
-                            }
-                        }
+                        //    if (distX < 0.75f && distY < 0.5f)
+                        //    {
+                        //        bool enemyInFront = isFacingRight ? enemyPos.x > playerPos.x : enemyPos.x < playerPos.x;
+                        //        if (enemyInFront && enemy.enemyController.state != EnemyCharacter.State.Dead &&
+                        //            enemy.enemyController.state != EnemyCharacter.State.Fall)
+                        //        {
+                        //            SwitchToRunState(playerGrab);
+                        //        }
+                        //    }
+                        //}
+                        CheckGrabEnemy();
                     }
                     isGetJoy = true;
                     break;
@@ -638,7 +661,6 @@ public class PlayerController : PlayerCharacter
         int attack = attackQueue.Dequeue();
 
         //attack
-        Debug.Log("Attack 3");
         SwitchToRunState(playerAttack);
 
         StartCoroutine(WaitAndProcessNextAttack());
@@ -730,34 +752,44 @@ public class PlayerController : PlayerCharacter
         }
         else if (e.Data.Name == "max_hit" || e.Data.Name == "Hit_Max" || e.Data.Name == "Hit_Jump")
         {
-            if (attackArea != null)
+            //if (attackArea != null)
+            //{
+            //    SetAttack(id);
+            //    attackArea.SetMaxHit(true);
+            //}
+            AttackArea currentAttackArea = GetAttackAreaByComboIndex();
+            if (currentAttackArea != null)
             {
-                SetAttack(id);
-                attackArea.SetMaxHit(true);
+                SetAttack(id, currentAttackArea);
+                currentAttackArea.SetMaxHit(true);
             }
         }
     }
 
     public void SetAttack(int id)
     {
-        //if (id != 4)
-        //{
-        //    if (id == 3)
-        //    {
-        //        attackArea.SetAttack(Dame * SetFatal(13), id);
-        //    }
-        //    else
-        //        attackArea.SetAttack(Dame, id);
-        //}
-        //else
-        //{
-        //    if (transform.rotation.y < 0)
-        //        attackJumKickL.SetAttackSkill(Dame * (state == State.Jump ? SetFatal(11) : SetFatal(10)), id);
-        //    else
-        //        attackJumKickR.SetAttackSkill(Dame * (state == State.Jump ? SetFatal(11) : SetFatal(10)), id);
-        //}
+        AttackArea currentAttackArea = GetAttackAreaByComboIndex();
+        if (currentAttackArea != null)
+        {
+            SetAttack(id, currentAttackArea);
+        }
+    }
 
-        attackArea.SetAttack(Dame, id);
+    public void SetAttack(int id, AttackArea attackArea)
+    {
+        if (attackArea != null)
+        {
+            attackArea.SetAttack(Dame, id);
+        }
+    }
+
+    private AttackArea GetAttackAreaByComboIndex()
+    {
+        if (attackAreas == null || attackAreas.Count == 0)
+            return null;
+
+        int index = idAttackArea;
+        return attackAreas[index];
     }
 
     public float SetFatal(int id)
@@ -766,6 +798,7 @@ public class PlayerController : PlayerCharacter
         float check = Random.Range(0f, 1f);
         return check <= Fatal ? 2 : 1;
     }
+
     private void ResetCombo()
     {
         SetManaCountCombo();
@@ -812,10 +845,10 @@ public class PlayerController : PlayerCharacter
     {
         isCheckSkill2 = true;
     }
-    public void SetRunSkill2()
-    {
-        StartCoroutine(attackSkill2.SetAttackSkill2Player(Dame * SetFatal(12)));
-    }
+    //public void SetRunSkill2()
+    //{
+    //    StartCoroutine(attackSkill2.SetAttackSkill2Player(Dame * SetFatal(12)));
+    //}
     public void SetUltiPlayer()
     {
         SwitchToRunState(playerUlti);

@@ -9,6 +9,8 @@ public class PlayerCombo3 : PlayerStateManager
         playerController.state = PlayerController.State.Attack;
         //playerController.PlayAnim("Strength_Attack" , false);
         playerController.PlayAnimAttack("Strength_Attack");
+
+        playerController.idAttackArea = 1;// set id attack area == 0
         AudioBase.Instance.AudioPlayer(0);
         //if (coroutine != null)
         //    playerController.StopCoroutine(coroutine);

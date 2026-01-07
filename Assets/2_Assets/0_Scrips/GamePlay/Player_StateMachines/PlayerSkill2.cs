@@ -18,6 +18,8 @@ public class PlayerSkill2 : PlayerStateManager
     {
         lastXPosition = playerController.Char.position.x;
         playerController.PlayAnimAttack("Strength_Attack_Max");
+
+        playerController.idAttackArea = 5;// set id attack area == 5
         playerController.state = PlayerController.State.Skill2;
         GamePlayManager.Instance.SetMission(6, 1);
         //if (playerController.id == 0)

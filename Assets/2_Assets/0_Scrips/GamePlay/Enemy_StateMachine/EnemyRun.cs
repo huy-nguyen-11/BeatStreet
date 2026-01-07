@@ -6,7 +6,6 @@ public class EnemyRun : EnemyStateMachine
     public override void Enter()
     {
         enemyController.state = EnemyController.State.Run;
-        
         // Reset move animation to ensure proper animation is set when entering Run state
         // This is especially important when transitioning from Fall/Idle states
         enemyController.ResetMoveAnimation();

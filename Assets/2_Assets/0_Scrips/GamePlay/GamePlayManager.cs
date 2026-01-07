@@ -16,6 +16,7 @@ public class GamePlayManager : MonoBehaviour
     public PlayerController _Player;
     public EnemyController _Enemy;
     public bool isCheckUlti = false;
+    private List<EnemyController> listEnemyBeforeUlti = new List<EnemyController>();
     public CameraFollow2D _CameraFollow;
     public GameObject _IconNextTurn;
     public GameObject _Pause;
@@ -134,6 +135,7 @@ public class GamePlayManager : MonoBehaviour
                         isCheckUlti = true;
                         _BtnGamePlays[0].SetActive(false);
                         SetMission(8, 1);
+                        GetEnemyBeforeUlti();// get enemy who is alive before ulti
                         _Player.SetMana(-100);
                         _Enemy = enemy.transform.GetChild(0).GetComponent<EnemyController>();
                         bool isEnemyOnRight = enemy.transform.position.x > _Player.transform.position.x;
@@ -145,6 +147,21 @@ public class GamePlayManager : MonoBehaviour
                         _Enemy.SetUltiPlayer();
                         _Player.SetUltiPlayer();
                     }
+                }
+            }
+        }
+    }
+
+    private void GetEnemyBeforeUlti()
+    {
+        for (int i = 0; i < _levelMap.listTurnEnemy.GetChild(_levelMap.TurnEnemy).childCount; i++)
+        {
+            if (_levelMap.listTurnEnemy.GetChild(_levelMap.TurnEnemy).GetChild(i).gameObject.activeSelf)
+            {
+                EnemyChar enemyChar = _levelMap.listTurnEnemy.GetChild(_levelMap.TurnEnemy).GetChild(i).GetComponent<EnemyChar>();
+                if (enemyChar.enemyController.state != EnemyController.State.Dead)
+                {
+                    listEnemyBeforeUlti.Add(enemyChar.enemyController);
                 }
             }
         }
@@ -318,7 +335,7 @@ public class GamePlayManager : MonoBehaviour
         yield return new WaitForSeconds(_Player._attributesPet[2]);
         _Player.Dame -= dameItem;
     }
-    // Data Game
+    // for level game
     public void CheckEnemyDead()
     {
         // wake up enemy in turn
@@ -345,6 +362,20 @@ public class GamePlayManager : MonoBehaviour
             }
         }
     }
+
+    //for reset affter ulti
+    // only reset enemy who is alive before ulti
+    public void ResetAfterUlti()
+    {
+        foreach (var enemy in listEnemyBeforeUlti)
+        {
+            if (enemy.state != EnemyController.State.Dead)
+            {
+                enemy.SetRun();
+            }
+        }
+    }
+
     public void SetNextTurn()
     {
         _DarkScene.SetActive(false);
@@ -413,48 +444,6 @@ public class GamePlayManager : MonoBehaviour
             // Skip dead enemies
             if (enemy.state == EnemyController.State.Dead)
                 continue;
-
-            // Exit current state first to properly clean up (especially for Grabed state)
-            //if (enemy.stateManager != null)
-            //{
-            //    try
-            //    {
-            //        enemy.stateManager.Exit();
-            //    }
-            //    catch (System.Exception)
-            //    {
-            //        // Ignore errors during exit
-            //    }
-            //}
-
-            //// Reset all flags that might prevent enemy from moving/attacking
-            //enemy.isGrabbed = false;
-            //enemy.isStopping = false;
-            //enemy.stopTimer = 0f;
-            //enemy.patrolTimer = 0f;
-            //enemy.isAttack = false;
-            //enemy.isCheckingPlayer = false;
-            //enemy.isBeingThrown = false;
-            ////enemy.isAvoidingPlayer = false;
-
-            //// Stop all coroutines that might interfere
-            //if (enemy.coroutine != null)
-            //{
-            //    enemy.StopCoroutine(enemy.coroutine);
-            //    enemy.coroutine = null;
-            //}
-            //enemy.StopAllCoroutines();
-
-            //// Reset rigidbody velocity and ensure physics is enabled
-            //if (enemy.rb != null)
-            //{
-            //    enemy.rb.linearVelocity = Vector2.zero;
-            //    enemy.rb.angularVelocity = 0f;
-            //    if (enemy.rb.simulated == false)
-            //    {
-            //        enemy.rb.simulated = true;
-            //    }
-            //}
 
             // Force switch to idle state (now that isGrabbed is false, this will work)
             if(enemy.isActiveRun)
@@ -536,5 +525,11 @@ public class GamePlayManager : MonoBehaviour
              SceneManager.LoadSceneAsync("2_GamePlay");
          else*/
         SceneManager.LoadSceneAsync("1_Main");
+    }
+
+    public void ButtonRestar()
+    {
+        Time.timeScale = 1;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

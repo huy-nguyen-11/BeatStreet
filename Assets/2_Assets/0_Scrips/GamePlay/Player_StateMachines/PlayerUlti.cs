@@ -24,10 +24,13 @@ public class PlayerUlti : PlayerStateManager
     IEnumerator WaitForResetSkin()
     {
         playerController.PlayAnim("Skill_1" , false);
+
+        playerController.idAttackArea = 1;// set id attack area == 0
         yield return new WaitForSeconds(1.97f);
         GamePlayManager.Instance.SetStopFollowCamera();
         GamePlayManager.Instance.isCheckUlti = false;
         //GamePlayManager.Instance._Enemy.SetDead();
+        GamePlayManager.Instance.ResetAfterUlti();
         playerController.SwitchToRunState(playerController.playerIdle);
         GamePlayManager.Instance.SetFollowCamera();
 

@@ -24,6 +24,11 @@ public class PlayerWalk : PlayerStateManager
     public override void Update()
     {
         playerController.SetMovePlayer(1.2f);
+
+        if (playerController.canGrab)
+        {
+            playerController.CheckGrabEnemy();
+        }
     }
     public override void Exit()
     {

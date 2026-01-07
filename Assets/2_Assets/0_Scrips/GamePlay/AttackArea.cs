@@ -50,37 +50,13 @@ public class AttackArea : MonoBehaviour
         else
             EnemyAttack();
     }
-    public void SetAttackSkill(float dame, int id)
-    {
-        Dame = dame;
-        PlayerAttackJump();
-    }
+    //public void SetAttackSkill(float dame, int id)
+    //{
+    //    Dame = dame;
+    //    PlayerAttackJump();
+    //}
     public void PlayerAttackDirection()
     {
-        //Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
-        //if (hits.Length == 0) return;
-        //bool Direction = CheckDirection(hits);
-        ////GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
-        //// Use PlayerController API to set facing so internal flag and visual rotation stay in sync
-        //if (PlayerController.Instance != null)
-        //{
-        //    if (!PlayerController.Instance.isSpeedUpAttack)
-        //    {
-        //        PlayerController.Instance.SetFacingDirection(Direction);
-        //    }
-        //}
-        //else
-        //{
-        //    // fallback: keep previous behavior if instance missing
-        //    GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
-        //}
-        //foreach (var hit in hits)
-        //{
-        //    float distanceX = GamePlayManager.Instance._Player.transform.position.x - hit.transform.position.x;
-        //    bool willEnqueue = (distanceX < 0 && Direction) || (distanceX >= 0 && !Direction);
-        //    if (willEnqueue)
-        //        collisionQueue.Enqueue(hit);
-        //}
         Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
         if (hits.Length == 0) return;
 
@@ -104,16 +80,16 @@ public class AttackArea : MonoBehaviour
                 collisionQueue.Enqueue(hit);
         }
     }
-    public void PlayerAttackJump()
-    {
-        Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
-        if (hits.Length == 0) return;
-        foreach (var hit in hits)
-        {
+    //public void PlayerAttackJump()
+    //{
+    //    Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
+    //    if (hits.Length == 0) return;
+    //    foreach (var hit in hits)
+    //    {
             
-            collisionQueue.Enqueue(hit);
-        }
-    }
+    //        collisionQueue.Enqueue(hit);
+    //    }
+    //}
     //public void PlayerAttack()
     //{
     //    Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
@@ -180,17 +156,17 @@ public class AttackArea : MonoBehaviour
         return nearestDistanceX < 0f;
     }
 
-    public IEnumerator SetAttackSkill2Player(float dame)
-    {
-        Dame = dame;
-        PlayerAttackJump();
-        yield return new WaitForSeconds(0.2f);
-        PlayerAttackJump();
-        yield return new WaitForSeconds(0.2f);
-        PlayerAttackJump();
-        yield return new WaitForSeconds(0.2f);
-        PlayerAttackJump();
-    }
+    //public IEnumerator SetAttackSkill2Player(float dame)
+    //{
+    //    Dame = dame;
+    //    PlayerAttackJump();
+    //    yield return new WaitForSeconds(0.2f);
+    //    PlayerAttackJump();
+    //    yield return new WaitForSeconds(0.2f);
+    //    PlayerAttackJump();
+    //    yield return new WaitForSeconds(0.2f);
+    //    PlayerAttackJump();
+    //}
     private void HandleCollision(Collider2D collision)
     {
         bool isCheckMission = false;

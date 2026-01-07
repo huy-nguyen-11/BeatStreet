@@ -37,10 +37,12 @@ public class EnemyController : EnemyCharacter
     public EnemyDead enemyDead;
     public EnemyFall enemyFall;
     public EnemyGrabed enemyGrabed;
+    public EnemySpawn enemySpawn;
     public GameObject prfCoin;
     // NEW: Flag to indicate grabbed state - prevents all movement and state changes
     public bool isGrabbed = false;
     public bool isActiveRun = false;
+    public bool isSpawned = false; // Flag to indicate if enemy was spawned (setactive true)
     // Hit
     [SerializeField] Transform _pointTxtHit;
     [SerializeField] GameObject _prfTxtHit;
@@ -118,6 +120,7 @@ public class EnemyController : EnemyCharacter
         enemyAttack = new EnemyAttack(this);
         enemyDead = new EnemyDead(this);
         enemyGrabed = new EnemyGrabed(this);
+        enemySpawn = new EnemySpawn(this);
     }
     void Start()
     {
@@ -125,8 +128,11 @@ public class EnemyController : EnemyCharacter
         dataManager = DataManager.Instance;
         Char = transform.parent.GetComponent<Transform>();
         rb = transform.parent.GetComponent<Rigidbody2D>();
-        stateManager = enemyIdle;
-        stateManager.Enter();
+        if (!isSpawned)
+        {
+            stateManager = enemyIdle;
+            stateManager.Enter();
+        }
         Level = dataManager.dataBase.listModeLevelEnemyMaps[dataManager.LevelSelect].Mode[dataManager.LevelMode];
         Hp = dataManager.dataBase.listLevelEnemyUpgrades[idEnemy].HP[Level] * (isBoss ? 2f : 1f);
         dame = dataManager.dataBase.listLevelEnemyUpgrades[idEnemy].Dame[Level] * (isBoss ? 1.5f : 1f);
@@ -382,7 +388,7 @@ public class EnemyController : EnemyCharacter
             isStopping = false;
             stopTimer = 0f;
             float num = typeOfEnemy == TypeOfEnemy.Boss ? 0f : 0.45f;
-            isPatrolling = Random.value < num; //random 45% patrol, 55% move to player
+            isPatrolling = Random.value < 1; //random 45% patrol, 55% move to player
             isAvoidingPlayer = false;
             if (isPatrolling && typeOfEnemy == TypeOfEnemy.Enemy)
              SetRandomPatrolTarget();
@@ -513,6 +519,7 @@ public class EnemyController : EnemyCharacter
     public void AvoidWall() // random target when hit wall
     {
         int attempts = 10;
+
         for (int i = 0; i < attempts; i++)
         {
             Vector3 randomDirection = GetRandomPositionInRect(GamePlayManager.Instance.minPosX, GamePlayManager.Instance.maxPosX, -2.8f, 1.4f, 0);

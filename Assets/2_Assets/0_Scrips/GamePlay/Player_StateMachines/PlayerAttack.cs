@@ -32,6 +32,11 @@ public class PlayerAttack : PlayerStateManager
         int idx = playerController.comboIndex % playerController.comboAttackAnims.Count;
         string animName = playerController.comboAttackAnims[idx];
 
+        playerController.idAttackArea = playerController.comboIndex;// set id attack area == index combo
+        //if(playerController.idAttackArea == 0)
+        //{//set default id attack area == 1
+        //    playerController.idAttackArea = 1;
+        //}
         playerController.PlayAnimWithEventHandler(animName, false, OnAttackEventFired);
 
         // Apply velocity using isFacingRight (reliable, not rotation.y)

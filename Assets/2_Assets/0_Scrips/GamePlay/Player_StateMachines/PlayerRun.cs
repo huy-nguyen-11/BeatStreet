@@ -22,6 +22,11 @@ public class PlayerRun : PlayerStateManager
     public override void Update()
     {
         playerController.SetMovePlayer(3f);
+
+        if (playerController.canGrab)
+        {
+            playerController.CheckGrabEnemy();
+        }
     }
     public override void Exit()
     {

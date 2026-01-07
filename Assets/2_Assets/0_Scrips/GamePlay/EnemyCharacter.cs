@@ -14,7 +14,8 @@ public class EnemyCharacter : MonoBehaviour
         Punch,
         Fall,
         Ulti,
-        Grabed
+        Grabed,
+        Spawn
     }
     public State state = State.Idle;
     public FillBarEnemy fillBar;

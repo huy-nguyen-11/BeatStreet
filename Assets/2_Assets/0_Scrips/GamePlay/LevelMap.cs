@@ -158,8 +158,9 @@ public class LevelMap : MonoBehaviour
 
                 enemyChar.enemyController.InitializeEnemy();
                 
-                enemyChar.enemyController.isActiveRun = true;
-                enemyChar.enemyController.SwitchToRunState(enemyChar.enemyController.enemyRun);
+                // Mark enemy as spawned and switch to Spawn state instead of Run
+                enemyChar.enemyController.isSpawned = true;
+                enemyChar.enemyController.SwitchToRunState(enemyChar.enemyController.enemySpawn);
                 
                 return;
             }
