@@ -49,7 +49,7 @@ public class EnemyController : EnemyCharacter
     public int currentHitIndex = 0;
     public float HitTimeout = 5.0f;
     public bool isCheckAnimAttack = false;
-
+    public bool isGetHitStrengthMax = false;
     public Coroutine coroutine;
     //public Coroutine coroutineAttack;
 
@@ -387,8 +387,8 @@ public class EnemyController : EnemyCharacter
         {
             isStopping = false;
             stopTimer = 0f;
-            float num = typeOfEnemy == TypeOfEnemy.Boss ? 0f : 0.45f;
-            isPatrolling = Random.value < 1; //random 45% patrol, 55% move to player
+            float num = typeOfEnemy == TypeOfEnemy.Boss ? 0f : 0.2f;
+            isPatrolling = Random.value < num; //random 20% patrol, 80% move to player
             isAvoidingPlayer = false;
             if (isPatrolling && typeOfEnemy == TypeOfEnemy.Enemy)
              SetRandomPatrolTarget();
@@ -514,6 +514,39 @@ public class EnemyController : EnemyCharacter
                 return;
             }
         }
+        //int attempts = 10;
+        //Transform player = PlayerController.Instance.transform;
+
+        //bool enemyOnLeft = transform.position.x < player.position.x;
+
+        //float minX = GamePlayManager.Instance.minPosX;
+        //float maxX = GamePlayManager.Instance.maxPosX;
+
+        ////  Giới hạn theo phía player
+        //if (enemyOnLeft)
+        //    maxX = player.position.x;
+        //else
+        //    minX = player.position.x;
+
+        //for (int i = 0; i < attempts; i++)
+        //{
+        //    Vector3 noise = GetRandomPositionInRect(
+        //        minX,
+        //        maxX,
+        //        GamePlayManager.Instance.minPosY,
+        //        GamePlayManager.Instance.maxPosY,
+        //        0
+        //    );
+
+        //    noise.z = 0;
+
+        //    if (Vector3.Distance(noise, lastRandomTarget) > 1f &&
+        //        !IsTargetOccupiedByOtherEnemy(noise))
+        //    {
+        //        randomTarget = noise;
+        //        return;
+        //    }
+        //}
     }
 
     public void AvoidWall() // random target when hit wall

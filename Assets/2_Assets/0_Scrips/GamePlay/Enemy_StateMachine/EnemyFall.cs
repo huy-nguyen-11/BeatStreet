@@ -16,7 +16,15 @@ public class EnemyFall : EnemyStateMachine
         numFall = enemyController.typeOfEnemy == TypeOfEnemy.Boss ? 1.5f : 5f;
         enemyController.PlayAnim(fallAnim, false);
         enemyController.state = EnemyController.State.Fall;
-        _direction = enemyController.playerController.isFacingRight ? true : false;
+        if (enemyController.isGetHitStrengthMax)
+        {
+            _direction = enemyController.Char.position.x < enemyController.player.position.x ? false : true;
+        }
+        else
+        {
+            _direction = enemyController.playerController.isFacingRight ? true : false;
+        }
+
         isWakingUp = false; // Reset flag
         if (coroutine != null)
             enemyController.StopCoroutine(coroutine);
@@ -88,6 +96,7 @@ public class EnemyFall : EnemyStateMachine
         
         // Ensure isGrabbed is cleared (in case it wasn't cleared properly)
         enemyController.isGrabbed = false;
+        enemyController.isGetHitStrengthMax = false;
     }
     public override void OnCollisionEnter2D(Collision2D collision)
     {

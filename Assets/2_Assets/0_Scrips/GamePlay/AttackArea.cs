@@ -11,7 +11,7 @@ public class AttackArea : MonoBehaviour
     private bool isCheckTrigger = false;
     public LayerMask layerMaskPlayer;
     public LayerMask layerMaskEnemy;
-    public bool isSkill;
+    private bool isSkillStrength = false;
     private bool isMaxHit = false; 
     private void Update()
     {
@@ -41,27 +41,26 @@ public class AttackArea : MonoBehaviour
         Dame = dame;
         if (isCheckCharacter)
         {
-            //if (id == 3)
-            //    PlayerAttack();
-            //else
-            //    PlayerAttackDirection();
             PlayerAttackDirection();
         }
         else
             EnemyAttack();
     }
-    //public void SetAttackSkill(float dame, int id)
-    //{
-    //    Dame = dame;
-    //    PlayerAttackJump();
-    //}
+
+    public void SetAttackSkill(float dame, int id)
+    {
+        isSkillStrength = true;
+        Dame = dame;
+        PlayerAttackSkillStrengthMax();
+    }
+
     public void PlayerAttackDirection()
     {
         Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
         if (hits.Length == 0) return;
-
-        // Dùng hướng hiện tại của Player (đã được aim từ TriggerAttack)
-        bool direction = true; // true: đánh sang phải, false: đánh sang trái
+        Debug.Log("name attack arena: " + gameObject.name);
+        Debug.Log("hits.Length: " + hits.Length);
+        bool direction = true;
         if (PlayerController.Instance != null)
         {
             direction = PlayerController.Instance.isFacingRight;
@@ -71,7 +70,7 @@ public class AttackArea : MonoBehaviour
         {
             float distanceX = GamePlayManager.Instance._Player.transform.position.x - hit.transform.position.x;
 
-            // Enemy chỉ bị trúng nếu nằm phía trước mặt Player
+            // attack enemy only in facing direction
             bool willEnqueue =
                 (distanceX < 0 && direction) ||    
                 (distanceX >= 0 && !direction);   
@@ -80,16 +79,28 @@ public class AttackArea : MonoBehaviour
                 collisionQueue.Enqueue(hit);
         }
     }
+
+    public void PlayerAttackSkillStrengthMax()
+    {
+        Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
+        if (hits.Length == 0) return;
+        foreach (var hit in hits)
+        {
+            collisionQueue.Enqueue(hit);
+        }
+    }
+
     //public void PlayerAttackJump()
     //{
     //    Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
     //    if (hits.Length == 0) return;
     //    foreach (var hit in hits)
     //    {
-            
+
     //        collisionQueue.Enqueue(hit);
     //    }
     //}
+
     //public void PlayerAttack()
     //{
     //    Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
@@ -114,7 +125,7 @@ public class AttackArea : MonoBehaviour
     //        hit.GetComponent<EnemyChar>().enemyController.currentHitIndex = 4;
     //        float distanceX = GamePlayManager.Instance._Player.transform.position.x - hit.transform.position.x;
     //        bool willEnqueue = (distanceX < 0 && Direction) || (distanceX >= 0 && !Direction);
-          
+
     //        if (willEnqueue)
     //            collisionQueue.Enqueue(hit);
     //    }
@@ -176,9 +187,13 @@ public class AttackArea : MonoBehaviour
             bool playerOnRight = PlayerController.Instance.Char.position.x > enemy.transform.position.x;
             PlayerController.Instance.CountCombo();
             enemy.enemyController.SetHit(Dame, isMaxHit);
+            Debug.Log("isMaxHit: " + isMaxHit);
+            enemy.enemyController.isGetHitStrengthMax = isSkillStrength;
             if (isMaxHit)
             {
-                isMaxHit = false;
+                Debug.Log("here!");
+                //isMaxHit = false;
+                StartCoroutine(ResetMaxHitFlag());
             }
             if (!isCheckMission)
             {
@@ -187,27 +202,35 @@ public class AttackArea : MonoBehaviour
             }
         }
     }
-    private void HandleCollisionSkill(Collider2D collision)
+
+    private IEnumerator ResetMaxHitFlag()
     {
-        bool isCheckMission = false;
-        EnemyChar enemy = collision.gameObject.GetComponent<EnemyChar>();
-        if (enemy != null)
-        {
-            PlayerController.Instance.CountCombo();
-            // Truyền thông tin max_hit vào SetHit
-            enemy.enemyController.SetHit(Dame, isMaxHit);
-            // Reset flag sau khi sử dụng
-            if (isMaxHit)
-            {
-                isMaxHit = false;
-            }
-            if (!isCheckMission)
-            {
-                isCheckMission = true;
-                GamePlayManager.Instance.SetMission(7, 1);
-            }
-        }
+        yield return new WaitForSeconds(1);
+        isMaxHit = false; 
+        isSkillStrength = false;
     }
+
+    //private void HandleCollisionSkill(Collider2D collision)
+    //{
+    //    bool isCheckMission = false;
+    //    EnemyChar enemy = collision.gameObject.GetComponent<EnemyChar>();
+    //    if (enemy != null)
+    //    {
+    //        PlayerController.Instance.CountCombo();
+    //        // Truyền thông tin max_hit vào SetHit
+    //        enemy.enemyController.SetHit(Dame, isMaxHit);
+    //        // Reset flag sau khi sử dụng
+    //        if (isMaxHit)
+    //        {
+    //            isMaxHit = false;
+    //        }
+    //        if (!isCheckMission)
+    //        {
+    //            isCheckMission = true;
+    //            GamePlayManager.Instance.SetMission(7, 1);
+    //        }
+    //    }
+    //}
 
     public void SetMaxHit(bool value)
     {

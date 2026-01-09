@@ -479,24 +479,36 @@ public class PlayerUpgrade : MonoBehaviour
     public void BtnUpgrade(int id, int status)
     {
         AudioBase.Instance.SetAudioUI(0);
+        Debug.Log("Upgrade Button Clicked: id=" + id + ", status=" + status);
         if (status == 0)
         {
             string keyPrice = !isStatusUpgrade ? "Coin" : "Diamont";
             int price = !isStatusUpgrade ? priceCoin : priceDiamont;
-            if (!isStatusUpgrade && _dataManager.warehouse.CountPiecePlayerLevelUp[id] < pieceUpgradeLevelUp) return;
-            if (isStatusUpgrade && _dataManager.warehouse.CountPiecePlayerEvolve[id] < pieceUpgradeLevelEvolve) return;
-            if (PlayerPrefs.GetInt(keyPrice) >= price)
-            {
-                AudioBase.Instance.SetAudioUI(4);
-                if (keyPrice == "Diamont") MainManager.Instance.SetMission(0, price);
-                else MainManager.Instance.SetMission(1, price);
-                MainManager.Instance.SetMission(2, 1);
-                PlayerPrefs.SetInt(keyPrice, PlayerPrefs.GetInt(keyPrice) - price);
-                SetAttribute(id);
-                BtnInformation(id);
-                _dataManager.SaveFile();
-                MainManager.Instance.SetTopBar();
-            }
+            //if (!isStatusUpgrade && _dataManager.warehouse.CountPiecePlayerLevelUp[id] < pieceUpgradeLevelUp) return;
+            //if (isStatusUpgrade && _dataManager.warehouse.CountPiecePlayerEvolve[id] < pieceUpgradeLevelEvolve) return;
+            //if (PlayerPrefs.GetInt(keyPrice) >= price)
+            //{
+            //    Debug.Log("here!");
+            //    AudioBase.Instance.SetAudioUI(4);
+            //    if (keyPrice == "Diamont") MainManager.Instance.SetMission(0, price);
+            //    else MainManager.Instance.SetMission(1, price);
+            //    MainManager.Instance.SetMission(2, 1);
+            //    PlayerPrefs.SetInt(keyPrice, PlayerPrefs.GetInt(keyPrice) - price);
+            //    SetAttribute(id);
+            //    BtnInformation(id);
+            //    _dataManager.SaveFile();
+            //    MainManager.Instance.SetTopBar();
+            //}
+            Debug.Log("here!");
+            AudioBase.Instance.SetAudioUI(4);
+            if (keyPrice == "Diamont") MainManager.Instance.SetMission(0, price);
+            else MainManager.Instance.SetMission(1, price);
+            MainManager.Instance.SetMission(2, 1);
+            PlayerPrefs.SetInt(keyPrice, PlayerPrefs.GetInt(keyPrice) - price);
+            SetAttribute(id);
+            BtnInformation(id);
+            _dataManager.SaveFile();
+            MainManager.Instance.SetTopBar();
         }
         else if (status == 1)
         {

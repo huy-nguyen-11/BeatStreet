@@ -318,17 +318,19 @@ MonoBehaviour:
   prfCoin: {fileID: 1077053216685021442, guid: e8453c02a51ac6241a74824dab520851, type: 3}
   isGrabbed: 0
   isActiveRun: 0
+  isSpawned: 0
   _pointTxtHit: {fileID: 0}
   _prfTxtHit: {fileID: 6439387997438382723, guid: 7cf720018a5883e41a50fdde81d17a36, type: 3}
   currentHitIndex: 0
   HitTimeout: 5
   isCheckAnimAttack: 0
+  isGetHitStrengthMax: 0
   patrolRadius: 0.75
-  moveSpeed: 2.5
-  moveSpeedRun: 2.6
-  moveSpeedWalk: 1.2
-  moveSpeedRunBack: 2.2
-  moveSpeedWalkBack: 0.9
+  moveSpeed: 0
+  moveSpeedRun: 1.3
+  moveSpeedWalk: 0.5
+  moveSpeedRunBack: 0.8
+  moveSpeedWalkBack: 0.4
   attackRadius: 1.5
   attackCooldown: 2
   isWall: 0
@@ -465,7 +467,6 @@ MonoBehaviour:
   layerMaskEnemy:
     serializedVersion: 2
     m_Bits: 128
-  isSkill: 0
 --- !u!50 &2769539222485243246
 Rigidbody2D:
   serializedVersion: 5

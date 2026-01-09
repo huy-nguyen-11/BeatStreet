@@ -777,10 +777,21 @@ public class PlayerController : PlayerCharacter
 
     public void SetAttack(int id, AttackArea attackArea)
     {
-        if (attackArea != null)
+        if(idAttackArea != 5)
         {
-            attackArea.SetAttack(Dame, id);
+            if (attackArea != null)
+            {
+                attackArea.SetAttack(Dame, id);
+            }
         }
+        else
+        {
+            if (attackArea != null)
+            {
+                attackArea.SetAttackSkill(Dame, id);
+            }
+        }
+
     }
 
     private AttackArea GetAttackAreaByComboIndex()
@@ -1118,9 +1129,9 @@ public class PlayerController : PlayerCharacter
     {
         stateManager.OnCollisionEnter2D(collision);
     }
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, detectionRange);
-    }
+    //void OnDrawGizmos()
+    //{
+    //    Gizmos.color = Color.green;
+    //    Gizmos.DrawWireSphere(transform.position, detectionRange);
+    //}
 }
