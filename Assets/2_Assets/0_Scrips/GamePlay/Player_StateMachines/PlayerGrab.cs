@@ -10,7 +10,7 @@ public class PlayerGrab : PlayerStateManager
     private float grabTimer = 0f;
     private float cooldownTimer = 0f;
     private bool isGrabActive = false;
-    private Vector3 grabOffset = new Vector3(0.5f, 0f, 0f); // offset to position enemy relative to player
+    private Vector3 grabOffset = new Vector3(0.63f, 0f, 0f); // offset to position enemy relative to player
                                                             // Add fields near top of class
     private float _pendingThrowDirection = 1f;
     private Spine.AnimationState.TrackEntryEventDelegate _spineThrowHandler;
@@ -92,6 +92,19 @@ public class PlayerGrab : PlayerStateManager
 
             // Force enter grabbed state atomically to avoid races
             grabbedEnemyController.ForceEnterGrabbed();
+
+            // Ensure grabbed enemy faces the player (so it never shows its back to player)
+            try
+            {
+                Transform enemyCharT = grabbedEnemyController.Char != null ? grabbedEnemyController.Char : grabbedEnemyController.transform;
+                float yRot = playerController.transform.position.x > enemyCharT.position.x ? 0f : 180f;
+                Vector3 eAngles = enemyCharT.localEulerAngles;
+                eAngles.y = yRot;
+                enemyCharT.localEulerAngles = eAngles;
+                // keep root transform consistent
+                grabbedEnemyController.transform.rotation = Quaternion.Euler(0f, yRot, 0f);
+            }
+            catch { }
         }
 
         // Play grab animation
@@ -131,16 +144,38 @@ public class PlayerGrab : PlayerStateManager
     {
         if (isGrabActive && grabbedEnemyController != null)
         {
+            //// Keep enemy root (Char) attached to player during grab so it visually follows
+            //if (grabbedEnemyController.Char != null && playerController.Char != null)
+            //{
+            //    float dirOffset = playerController.isFacingRight ? 1f : -1f;
+            //    Vector3 offset = new Vector3(dirOffset * grabOffset.x, grabOffset.y, grabOffset.z);
+            //    grabbedEnemyController.Char.position = playerController.Char.position + offset;
+
+            //    // match facing with player
+            //    float currentY = grabbedEnemyController.transform.localEulerAngles.y;
+            //    bool enemyFacingRight = (currentY == 0f);
+            //    if(enemyFacingRight == playerController.isFacingRight)
+            //    {
+            //        float yRot = playerController.isFacingRight ? 180f : 0f;
+            //        Vector3 angles = grabbedEnemyController.transform.localEulerAngles;
+            //        angles.y = yRot;
+            //        grabbedEnemyController.transform.localEulerAngles = angles;
+            //    }
+            //}
             // Keep enemy root (Char) attached to player during grab so it visually follows
             if (grabbedEnemyController.Char != null && playerController.Char != null)
             {
                 float dirOffset = playerController.isFacingRight ? 1f : -1f;
-                grabbedEnemyController.Char.position = playerController.Char.position + dirOffset*grabOffset;
-                // match facing with player
-                float yRot = playerController.isFacingRight ? 0f : 180f;
+                Vector3 offset = new Vector3(dirOffset * grabOffset.x, grabOffset.y, grabOffset.z);
+                grabbedEnemyController.Char.position = playerController.Char.position + offset;
+
+                // Ensure enemy always faces the player (use world positions so "behind" grab is handled)
+                float yRot = playerController.Char.position.x > grabbedEnemyController.Char.position.x ? 0f : 180f;
                 Vector3 angles = grabbedEnemyController.Char.localEulerAngles;
                 angles.y = yRot;
                 grabbedEnemyController.Char.localEulerAngles = angles;
+                // keep root transform consistent as well
+                grabbedEnemyController.transform.rotation = Quaternion.Euler(0f, yRot, 0f);
             }
         }
     }

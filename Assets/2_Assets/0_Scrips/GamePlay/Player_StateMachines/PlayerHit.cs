@@ -3,10 +3,10 @@ using UnityEngine;
 public class PlayerHit : PlayerStateManager
 {
     public PlayerHit(PlayerController player) : base(player) { }
-    [SerializeField] private float jumpHeight = 1f;
-    [SerializeField] private float jumpDistance = 1.65f;
-    [SerializeField] private float jumpDuration = 1f;
-    [SerializeField] private int jumpCount = 1;
+    //[SerializeField] private float jumpHeight = 1f;
+    //[SerializeField] private float jumpDistance = 1.65f;
+    //[SerializeField] private float jumpDuration = 1f;
+    //[SerializeField] private int jumpCount = 1;
     bool isFall;
     Coroutine _coroutine;
     public override void Enter()

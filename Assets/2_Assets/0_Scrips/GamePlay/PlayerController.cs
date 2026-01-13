@@ -1,9 +1,10 @@
 ﻿using DG.Tweening;
 using PinePie.SimpleJoystick;
+using Spine;
+using Spine.Unity;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Spine;
 
 // Ensure PlayerController updates early so touch is processed promptly (before other scripts like DemoTouch)
 [DefaultExecutionOrder(-1000)]
@@ -695,6 +696,7 @@ public class PlayerController : PlayerCharacter
     float gravity = -18f;
     public float velocity = 0;
     public bool isCheckGravity;
+
     public void ProcessGravity()
     {
         isCheckGravity = transform.localPosition.y <= 0;
@@ -708,6 +710,7 @@ public class PlayerController : PlayerCharacter
             transform.position += velocity * Time.deltaTime * Vector3.up;
         }
     }
+
     private void FixedUpdate()
     {
         stateManager.FixedUpdate();
@@ -977,6 +980,7 @@ public class PlayerController : PlayerCharacter
         {
             yield return null;
         }
+        yield return new WaitForSeconds(0.5f);
         SwitchToRunState(playerStandUp);
     }
     public IEnumerator JumpCoroutine()
@@ -991,10 +995,10 @@ public class PlayerController : PlayerCharacter
     public void SetFall()
     {
         bool Direction = transform.rotation.y != 0 ? false : true;
-        if (!Direction)
-            rb.linearVelocity = -Vector2.right * 5f;
+        if (Direction)
+            rb.linearVelocity = -Vector2.right * 3.5f;
         else
-            rb.linearVelocity = Vector2.right * 5f;
+            rb.linearVelocity = Vector2.right * 3.5f;
     }
 
     // Public helper to set facing consistently (updates flag + visual rotation)

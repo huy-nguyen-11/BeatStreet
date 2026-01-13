@@ -1,5 +1,7 @@
 ﻿using System.Collections;
+using Unity.Android.Gradle.Manifest;
 using UnityEngine;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class EnemyFall : EnemyStateMachine
 {
@@ -13,7 +15,8 @@ public class EnemyFall : EnemyStateMachine
     public override void Enter()
     {
         fallAnim = enemyController.typeOfEnemy == TypeOfEnemy.Boss ? "Death" : "Dead";
-        numFall = enemyController.typeOfEnemy == TypeOfEnemy.Boss ? 1.5f : 5f;
+        numFall = enemyController.typeOfEnemy == TypeOfEnemy.Boss ? 1.2f : 2.5f;
+        enemyController.velocity = 8f;
         enemyController.PlayAnim(fallAnim, false);
         enemyController.state = EnemyController.State.Fall;
         if (enemyController.isGetHitStrengthMax)
@@ -30,6 +33,7 @@ public class EnemyFall : EnemyStateMachine
             enemyController.StopCoroutine(coroutine);
         coroutine = enemyController.StartCoroutine(WakeUpCoroutine());
         enemyController.currentHitIndex = 0;
+
     }
     public override void Update()
     {
@@ -37,63 +41,67 @@ public class EnemyFall : EnemyStateMachine
     }
     public override void FixedUpdate()
     {
-        // Only set jump velocity if not waking up (to prevent movement during wakeup)
+        //// Only set jump velocity if not waking up (to prevent movement during wakeup)
         if (!isWakingUp)
         {
+            // fallback: move horizontally using old approach when no Rigidbody present
             SetFall();
         }
+        enemyController.ProcessGravity();
     }
+
     private void SetFall()
     {
-        //bool Direction = enemyController.player.position.x > enemyController.Char.position.x ? false : true;
-        //bool Direction = enemyController.playerController.isFacingRight ? true : false;
         if (!_direction)
             enemyController.rb.linearVelocity = -Vector2.right * numFall;
         else
             enemyController.rb.linearVelocity = Vector2.right * numFall;
     }
+
+
     private IEnumerator WakeUpCoroutine()
     {
-        yield return new WaitForSeconds(0.75f);
-        while (enemyController.transform.localPosition.y > 0)
+        yield return new WaitForSeconds(1f);
+        while (enemyController.rb.linearVelocity.y > 0)
         {
             yield return null;
         }
-        
         // Stop SetJump() from running during wakeup
         isWakingUp = true;
-        
+
         // Clear velocity before wakeup to prevent drifting
         if (enemyController.rb != null)
         {
             enemyController.rb.linearVelocity = Vector2.zero;
         }
-        
+
+        yield return new WaitForSeconds(0.5f);
         enemyController.PlayAnim(enemyController.wakeUpAnim, false);
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.5f);
         enemyController.SwitchToRunState(enemyController.enemyIdle);
+
     }
     public override void Exit()
     {
-        // Stop the coroutine to prevent state switching
+        //// Stop the coroutine to prevent state switching
         if (coroutine != null)
         {
             enemyController.StopCoroutine(coroutine);
             coroutine = null;
         }
-        
+
         // Clear velocity to stop any movement from SetJump()
         if (enemyController.rb != null)
         {
             enemyController.rb.linearVelocity = Vector2.zero;
         }
-        
+
         // Reset position
         enemyController.transform.position = new Vector3(enemyController.transform.position.x, enemyController.Char.transform.GetChild(3).position.y);
-        
+
         // Reset move animation to ensure new animation is set when transitioning to Idle/Run
         enemyController.ResetMoveAnimation();
-        
+
         // Ensure isGrabbed is cleared (in case it wasn't cleared properly)
         enemyController.isGrabbed = false;
         enemyController.isGetHitStrengthMax = false;
@@ -113,4 +121,6 @@ public class EnemyFall : EnemyStateMachine
     public override void OnTriggerStay(Collider2D collision)
     {
     }
+
+
 }

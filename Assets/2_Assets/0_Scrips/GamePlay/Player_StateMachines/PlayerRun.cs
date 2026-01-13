@@ -21,7 +21,7 @@ public class PlayerRun : PlayerStateManager
     }
     public override void Update()
     {
-        playerController.SetMovePlayer(3f);
+        playerController.SetMovePlayer(2.5f);
 
         if (playerController.canGrab)
         {

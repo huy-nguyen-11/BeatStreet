@@ -21,7 +21,7 @@ public class PlayerSpeedUp : PlayerStateManager
     }
     public void SetSpeedUp()
     {
-        playerController.rb.linearVelocity = Vector2.right * (!_direction ? -6f : 6);
+        playerController.rb.linearVelocity = Vector2.right * (!_direction ? -4.5f : 4.5f);
         //playerController.transform.rotation = Quaternion.Euler(new Vector3(0, _direction ? 0 : -180, 0));
     }
     public override void Exit()

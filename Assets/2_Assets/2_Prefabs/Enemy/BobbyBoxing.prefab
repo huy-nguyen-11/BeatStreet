@@ -265,7 +265,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5889908020455433842}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -409,7 +409,7 @@ MonoBehaviour:
   isGrabbed: 0
   isActiveRun: 0
   isSpawned: 0
-  _pointTxtHit: {fileID: 0}
+  _pointTxtHit: {fileID: 7120957424271024805}
   _prfTxtHit: {fileID: 6439387997438382723, guid: 7cf720018a5883e41a50fdde81d17a36, type: 3}
   currentHitIndex: 0
   HitTimeout: 5
@@ -444,6 +444,8 @@ MonoBehaviour:
   idleThreshold: 0.05
   animationHysteresis: 0.08
   posBullet: {fileID: 0}
+  velocity: 0
+  isCheckGravity: 0
 --- !u!1 &7098880718826157174
 GameObject:
   m_ObjectHideFlags: 0

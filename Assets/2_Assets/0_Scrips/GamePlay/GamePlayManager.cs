@@ -388,11 +388,11 @@ public class GamePlayManager : MonoBehaviour
     }
     public void SetStopFollowCamera()
     {
-        _CameraFollow.isFollow = true;
+        _CameraFollow.isFollow = false;
     }
     public void SetFollowCamera()
     {
-        _CameraFollow.isFollow = false;
+        _CameraFollow.isFollow = true;
     }
     public void AddCoin()
     {

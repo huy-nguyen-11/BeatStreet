@@ -744,7 +744,7 @@ MonoBehaviour:
   isGrabbed: 0
   isActiveRun: 0
   isSpawned: 0
-  _pointTxtHit: {fileID: 0}
+  _pointTxtHit: {fileID: 1435589720366661044}
   _prfTxtHit: {fileID: 6439387997438382723, guid: 7cf720018a5883e41a50fdde81d17a36, type: 3}
   currentHitIndex: 0
   HitTimeout: 5
@@ -779,6 +779,8 @@ MonoBehaviour:
   idleThreshold: 0.05
   animationHysteresis: 0.08
   posBullet: {fileID: 0}
+  velocity: 0
+  isCheckGravity: 0
 --- !u!1 &6616405798596117308
 GameObject:
   m_ObjectHideFlags: 0

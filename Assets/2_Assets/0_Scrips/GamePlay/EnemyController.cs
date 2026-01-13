@@ -3,6 +3,7 @@ using Spine;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Android.Gradle.Manifest;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -971,9 +972,27 @@ public class EnemyController : EnemyCharacter
     // Ensure facing is correct based on player position
     private void UpdateEnemyRotation()
     {
-        if (player == null || Char == null) return;
+        if (player == null || Char == null || state == State.Grabed) return;
         float yRotation = player.position.x > Char.position.x ? 0f : 180f;
         transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
+    }
+
+    float gravity = -22f;
+    public float velocity = 0;
+    public bool isCheckGravity;
+
+    public void ProcessGravity()
+    {
+        isCheckGravity = transform.localPosition.y <= 0;
+        if (isCheckGravity && velocity < 0)
+        {
+            velocity = -2f;
+        }
+        else
+        {
+            velocity += gravity * Time.deltaTime;
+            transform.position += velocity * Time.deltaTime * Vector3.up;
+        }
     }
 
 }
