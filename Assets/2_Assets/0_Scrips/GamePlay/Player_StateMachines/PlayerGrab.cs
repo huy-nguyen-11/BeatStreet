@@ -384,7 +384,7 @@ public class PlayerGrab : PlayerStateManager
         if (playerController.skeletonAnimation != null && playerController.skeletonAnimation.AnimationState != null)
         {
             _grabAttackEntry = playerController.skeletonAnimation.AnimationState.SetAnimation(0, "Grab_Attack", false);
-            playerController.idAttackArea = 2;// set id attack area == 2
+            playerController.idAttackArea = 6;// set id attack area == 2
             if (_grabAttackEntry != null)
             {
                 _grabAttackCompleteHandler = (entry) =>

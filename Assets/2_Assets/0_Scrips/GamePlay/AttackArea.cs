@@ -54,29 +54,79 @@ public class AttackArea : MonoBehaviour
         PlayerAttackSkillStrengthMax();
     }
 
+    public void SetAttackSkillSpeedUp(float dame, int id)
+    {
+        Dame = dame;
+        PlayerAttackBothSides();
+    }
+
+    public void SetAttackSkillJump(float dame, int id)
+    {
+        Dame = dame;
+        PlayerAttackJump();
+    }
+
     public void PlayerAttackDirection()
     {
-        Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
+        //Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
+        //if (hits.Length == 0) return;
+        //Debug.Log("name attack arena: " + gameObject.name);
+        //Debug.Log("hits.Length: " + hits.Length);
+        //bool direction = true;
+        //if (PlayerController.Instance != null)
+        //{
+        //    direction = PlayerController.Instance.isFacingRight;
+        //}
+
+        //foreach (var hit in hits)
+        //{
+        //    float distanceX = GamePlayManager.Instance._Player.transform.position.x - hit.transform.position.x;
+
+        //    // attack enemy only in facing direction    
+        //    bool willEnqueue =
+        //        (distanceX < 0 && direction) ||    
+        //        (distanceX >= 0 && !direction);   
+
+        //    if (willEnqueue)
+        //        collisionQueue.Enqueue(hit);
+        //}
+        Collider2D[] hits = Physics2D.OverlapBoxAll(
+       transform.position,
+       boxSize,
+       0,
+       layerMaskEnemy
+   );
+
         if (hits.Length == 0) return;
-        Debug.Log("name attack arena: " + gameObject.name);
-        Debug.Log("hits.Length: " + hits.Length);
-        bool direction = true;
+
+        bool isFacingRight = true;
         if (PlayerController.Instance != null)
-        {
-            direction = PlayerController.Instance.isFacingRight;
-        }
+            isFacingRight = PlayerController.Instance.isFacingRight;
+
+        Vector2 playerPos = GamePlayManager.Instance._Player.transform.position;
+
+        float laneTolerance = 0.3f;     // cho phép lệch trục Y (tùy chỉnh)
+        float minAttackX = 0.05f;       // tránh enemy đứng trùng tâm player
 
         foreach (var hit in hits)
         {
-            float distanceX = GamePlayManager.Instance._Player.transform.position.x - hit.transform.position.x;
+            Vector2 enemyPos = hit.transform.position;
 
-            // attack enemy only in facing direction
-            bool willEnqueue =
-                (distanceX < 0 && direction) ||    
-                (distanceX >= 0 && !direction);   
+            float deltaX = enemyPos.x - playerPos.x;
+            float deltaY = Mathf.Abs(enemyPos.y - playerPos.y);
 
-            if (willEnqueue)
+            // 1. cùng lane (chiều sâu)
+            bool sameLane = deltaY <= laneTolerance;
+
+            // 2. phía trước mặt
+            bool inFront = 
+                (deltaX > minAttackX && isFacingRight) ||
+                (deltaX < -minAttackX && !isFacingRight);
+
+            if (sameLane && inFront)
+            {
                 collisionQueue.Enqueue(hit);
+            }
         }
     }
 
@@ -90,46 +140,54 @@ public class AttackArea : MonoBehaviour
         }
     }
 
-    //public void PlayerAttackJump()
-    //{
-    //    Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
-    //    if (hits.Length == 0) return;
-    //    foreach (var hit in hits)
-    //    {
+    public void PlayerAttackJump()
+    {
+        Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
+        if (hits.Length == 0) return;
+        foreach (var hit in hits)
+        {
 
-    //        collisionQueue.Enqueue(hit);
-    //    }
-    //}
+            collisionQueue.Enqueue(hit);
+        }
+    }
 
-    //public void PlayerAttack()
-    //{
-    //    Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskEnemy);
-    //    if (hits.Length == 0) return;
-    //    bool Direction = CheckDirection(hits);
-    //    //GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
-    //    // Use PlayerController API to set facing so internal flag and visual rotation stay in sync
-    //    if (PlayerController.Instance != null)
-    //    {
-    //        if (!PlayerController.Instance.isSpeedUpAttack)
-    //        {
-    //            PlayerController.Instance.SetFacingDirection(Direction);
-    //        }
-    //    }
-    //    else
-    //    {
-    //        // fallback
-    //        GamePlayManager.Instance._Player.transform.rotation = Quaternion.Euler(new Vector3(0, !Direction ? -180 : 0, 0));
-    //    }
-    //    foreach (var hit in hits)
-    //    {
-    //        hit.GetComponent<EnemyChar>().enemyController.currentHitIndex = 4;
-    //        float distanceX = GamePlayManager.Instance._Player.transform.position.x - hit.transform.position.x;
-    //        bool willEnqueue = (distanceX < 0 && Direction) || (distanceX >= 0 && !Direction);
+    public void PlayerAttackBothSides()
+    {
+        Collider2D[] hits = Physics2D.OverlapBoxAll(
+            transform.position,
+            boxSize,
+            0,
+            layerMaskEnemy
+        );
 
-    //        if (willEnqueue)
-    //            collisionQueue.Enqueue(hit);
-    //    }
-    //}
+        if (hits.Length == 0) return;
+
+        Vector2 playerPos = GamePlayManager.Instance._Player.transform.position;
+
+        float laneTolerance = 0.5f;   // giữ nguyên điều kiện lane
+        float minAttackX = 0.05f;     // tránh trùng tâm player
+
+        foreach (var hit in hits)
+        {
+            Vector2 enemyPos = hit.transform.position;
+
+            float deltaX = Mathf.Abs(enemyPos.x - playerPos.x);
+            float deltaY = Mathf.Abs(enemyPos.y - playerPos.y);
+
+            // cùng lane theo trục Y
+            bool sameLane = deltaY <= laneTolerance;
+
+            // có khoảng cách theo trục X (trước hoặc sau đều được)
+            bool validX = deltaX > minAttackX;
+
+            if (sameLane && validX)
+            {
+                collisionQueue.Enqueue(hit);
+            }
+        }
+    }
+
+
     public void EnemyAttack()
     {
         Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskPlayer);
@@ -187,12 +245,9 @@ public class AttackArea : MonoBehaviour
             bool playerOnRight = PlayerController.Instance.Char.position.x > enemy.transform.position.x;
             PlayerController.Instance.CountCombo();
             enemy.enemyController.SetHit(Dame, isMaxHit);
-            Debug.Log("isMaxHit: " + isMaxHit);
             enemy.enemyController.isGetHitStrengthMax = isSkillStrength;
             if (isMaxHit)
             {
-                Debug.Log("here!");
-                //isMaxHit = false;
                 StartCoroutine(ResetMaxHitFlag());
             }
             if (!isCheckMission)

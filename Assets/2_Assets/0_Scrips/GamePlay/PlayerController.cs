@@ -780,18 +780,32 @@ public class PlayerController : PlayerCharacter
 
     public void SetAttack(int id, AttackArea attackArea)
     {
-        if(idAttackArea != 5)
+        if(idAttackArea == 5)
         {
             if (attackArea != null)
             {
-                attackArea.SetAttack(Dame, id);
+                attackArea.SetAttackSkill(Dame, id); // attack all around player
+            }
+        }
+        else if(idAttackArea == 4)
+        {
+            if (attackArea != null)
+            {
+                attackArea.SetAttackSkillSpeedUp(Dame, id); // attack speed up limmit lane y , allow attack back player
+            }
+        }
+        else if(idAttackArea == 2)
+        {
+            if (attackArea != null)
+            {
+                attackArea.SetAttackSkillJump(Dame, id); // attack jump area
             }
         }
         else
         {
             if (attackArea != null)
             {
-                attackArea.SetAttackSkill(Dame, id);
+                attackArea.SetAttack(Dame, id); // normal attack : online attack font of player and limmit lane y
             }
         }
 

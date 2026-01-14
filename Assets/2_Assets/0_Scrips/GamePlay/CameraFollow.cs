@@ -139,16 +139,7 @@ public class CameraFollow2D : MonoBehaviour
     [SerializeField] private int defaultVibrato = 20;
     [SerializeField] private float defaultRandomness = 90f;
 
-    [Header("Directional")]
-    [SerializeField] private float directionalPushRatio = 0.6f;
-
-    private Vector3 originalLocalPos;
     private Tween shakeTween;
-
-    private void Awake()
-    {
-        originalLocalPos = transform.localPosition;
-    }
 
     #region BASIC SHAKE
     public void Shake()
@@ -156,83 +147,16 @@ public class CameraFollow2D : MonoBehaviour
         Shake(defaultDuration, defaultStrength, defaultVibrato, defaultRandomness);
     }
 
-    public void Shake(float duration, float strength, int vibrato = 20, float randomness = 90f)
+    public void Shake(float duration, float strength, int vibrato = 15, float randomness = 0f)
     {
         KillShake();
-
-        transform.localPosition = originalLocalPos;
-
         shakeTween = transform.DOShakePosition(
             duration,
             strength,
             vibrato,
             randomness,
             fadeOut: true
-        ).OnComplete(ResetPosition);
-    }
-    #endregion
-
-    #region DIRECTIONAL SHAKE (CORE)
-    /// <summary>
-    /// Rung theo hướng (direction = hướng tác động vào player)
-    /// </summary>
-    public void ShakeDirectional(
-        Vector2 direction,
-        float duration = -1f,
-        float strength = -1f,
-        int vibrato = -1,
-        float randomness = -1f
-    )
-    {
-        if (direction == Vector2.zero)
-            direction = Random.insideUnitCircle.normalized;
-
-        duration = duration > 0 ? duration : defaultDuration;
-        strength = strength > 0 ? strength : defaultStrength;
-        vibrato = vibrato > 0 ? vibrato : defaultVibrato;
-        randomness = randomness > 0 ? randomness : defaultRandomness;
-
-        KillShake();
-        transform.localPosition = originalLocalPos;
-
-        Vector3 dir = direction.normalized;
-
-        // 1️⃣ Push nhanh theo hướng bị đánh
-        Sequence seq = DOTween.Sequence();
-
-        seq.Append(
-            transform.DOLocalMove(
-                originalLocalPos + dir * strength * directionalPushRatio,
-                duration * 0.2f
-            ).SetEase(Ease.OutQuad)
         );
-
-        // 2️⃣ Rung ngược lại + ngẫu nhiên
-        seq.Append(
-            transform.DOShakePosition(
-                duration * 0.8f,
-                strength,
-                vibrato,
-                randomness,
-                fadeOut: true
-            )
-        );
-
-        seq.OnComplete(ResetPosition);
-        shakeTween = seq;
-    }
-    #endregion
-
-    #region HIT SHAKE (THEO LỰC)
-    /// <summary>
-    /// Rung theo lực đánh (damage / knockback)
-    /// </summary>
-    public void ShakeByForce(Vector2 direction, float force)
-    {
-        float strength = Mathf.Clamp(force * 0.02f, 0.15f, 1.2f);
-        float duration = Mathf.Clamp(force * 0.01f, 0.1f, 0.4f);
-
-        ShakeDirectional(direction, duration, strength);
     }
     #endregion
 
@@ -243,9 +167,5 @@ public class CameraFollow2D : MonoBehaviour
             shakeTween.Kill();
     }
 
-    private void ResetPosition()
-    {
-        transform.localPosition = originalLocalPos;
-    }
     #endregion
 }

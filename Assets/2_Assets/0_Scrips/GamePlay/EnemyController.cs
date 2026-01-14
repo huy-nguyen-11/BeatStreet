@@ -829,7 +829,7 @@ public class EnemyController : EnemyCharacter
         }
         else
         {
-            transform.parent.DOMove(targetPosition, 1f).SetEase(Ease.OutQuad)
+            transform.parent.DOMove(targetPosition, 0.3f).SetEase(Ease.OutQuad)
            .OnComplete(() =>
            {
                // mark thrown finished and deactivate
@@ -839,6 +839,8 @@ public class EnemyController : EnemyCharacter
                {
                    rb.simulated = false;
                }
+
+               GamePlayManager.Instance._CameraFollow.Shake();
                Char.gameObject.SetActive(false);
            });
         }

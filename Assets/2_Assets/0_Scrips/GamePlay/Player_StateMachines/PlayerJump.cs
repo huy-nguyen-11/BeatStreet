@@ -16,10 +16,10 @@ public class PlayerJump : PlayerStateManager
         if (playerController.fillBar == null) return;
         playerController.isJumping = true;
         playerController.state = PlayerController.State.Jump;
-        jumpDistance = playerController.fillBar.mana >= 5 ? 2f : 4.6f;
-        if (playerController.fillBar.mana >= 5)
+        jumpDistance = playerController.fillBar.mana >= 5 ? 4f : 4.6f;
+        if (playerController.fillBar.mana >= 0)
         {
-            playerController.velocity = 3;
+            playerController.velocity = 4;
             GamePlayManager.Instance.SetMission(6, 1);
             playerController.SetMana(-5);
             playerController.PlayAnim2("Jump_Attack");
