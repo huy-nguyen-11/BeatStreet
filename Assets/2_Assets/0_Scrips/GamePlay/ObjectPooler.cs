@@ -20,7 +20,7 @@ public class ObjectPooler : MonoBehaviour
 
     public List<Pool> pools;
     public Dictionary<string, Queue<GameObject>> poolDictionary;
-    public Transform bulletTF/* , missileTF , boomerangTF , sawTF , shotgunTF , bulletTurretTF, coinTF , plasmaTF , textTF , hommingTF*/;
+    public Transform bulletTF , effectTF /* , boomerangTF , sawTF , shotgunTF , bulletTurretTF, coinTF , plasmaTF , textTF , hommingTF*/;
 
     // Start is called before the first frame update
     void Start()
@@ -103,14 +103,14 @@ public class ObjectPooler : MonoBehaviour
                 {
                     obj.transform.parent = bulletTF;
                 }
+                else if (obj.tag == "Effect")
+                {
+                    obj.transform.parent = effectTF;
+                }
                 else
                 {
                     obj.transform.parent = transform;
                 }
-                //else if (obj.tag == "missile")
-                //{   
-                //    obj.transform.parent = missileTF;
-                //}
                 //else if(obj.tag == "shotgun")
                 //{
                 //    obj.transform.parent = shotgunTF;
@@ -147,7 +147,7 @@ public class ObjectPooler : MonoBehaviour
                 //{
                 //    obj.transform.parent = transform;
                 //}
-               
+
                 obj.SetActive(false);
                 objectPool.Enqueue(obj);
             }

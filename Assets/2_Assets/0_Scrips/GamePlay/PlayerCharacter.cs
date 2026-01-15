@@ -58,6 +58,27 @@ public class PlayerCharacter : MonoBehaviour
         }
     }
 
+    public void PlayAnimHaveEffect(string animName, bool loop = true, string fxAnim = null)
+    {
+        if (skeletonAnimation == null) return;
+
+        var state = skeletonAnimation.AnimationState;
+        if (state == null)
+        {
+            skeletonAnimation.AnimationName = animName;
+            return;
+        }
+
+        state.SetAnimation(0, animName, loop);
+
+        if (!string.IsNullOrEmpty(fxAnim))
+        {
+            var fxEntry = state.SetAnimation(1, fxAnim, false);
+            fxEntry.MixDuration = 0;
+            fxEntry.Complete += _ => state.ClearTrack(1);
+        }
+    }
+
     public void PlayAnimAttack(string animName)
     {
         var entry = skeletonAnimation.AnimationState.SetAnimation(0,animName, false);

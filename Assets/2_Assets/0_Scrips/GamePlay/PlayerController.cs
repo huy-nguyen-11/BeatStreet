@@ -1,4 +1,4 @@
-﻿using DG.Tweening;
+using DG.Tweening;
 using PinePie.SimpleJoystick;
 using Spine;
 using Spine.Unity;
@@ -38,6 +38,10 @@ public class PlayerController : PlayerCharacter
     public float HitTimer = 0f;
     public float comboResetTime = 0.65f;
     public float HitResetTime = 1f;
+    //for effect fx
+    public GameObject fxStrength;
+    public Transform posFxJump, posFxFootStep, posFxFall;
+
     //for attack
     private Queue<int> attackQueue = new Queue<int>();
     private bool isProcessingAttack = false;
@@ -125,6 +129,10 @@ public class PlayerController : PlayerCharacter
     public bool isResettingFromJump = false;
     private PlayerStateManager pendingStateAfterReset = null;
     [SerializeField] private float joystickMoveThreshold = 12f;
+    
+    // Foot step effect
+    private float footStepEffectTimer = 0f;
+    [SerializeField] private float footStepEffectInterval = 0.3f; // Thời gian giữa các lần spawn effect
     #endregion
 
     private void Awake()
@@ -177,6 +185,8 @@ public class PlayerController : PlayerCharacter
             skeletonAnimation.AnimationState.Event += HandleAttackEvent;
         }
         isSpeedUpAttack = false;
+
+        fxStrength.SetActive(false);
     }
     
     private void OnDestroy()
@@ -389,6 +399,46 @@ public class PlayerController : PlayerCharacter
                 target.localEulerAngles = angles;
             }
         }
+        
+        // Spawn foot step effect when player is moving
+        if (movement.sqrMagnitude > 0.1f && (state == State.Run))
+        {
+            // Adjust interval based on speed (run faster = spawn more frequently)
+            float currentInterval = state == State.Run ? footStepEffectInterval * 0.7f : footStepEffectInterval;
+            
+            footStepEffectTimer += Time.deltaTime;
+            if (footStepEffectTimer >= currentInterval)
+            {
+                SpawnFootStepEffect();
+                footStepEffectTimer = 0f;
+            }
+        }
+        else
+        {
+            footStepEffectTimer = 0f; // Reset timer when not moving
+        }
+    }
+    
+    private void SpawnFootStepEffect()
+    {
+        if (posFxFootStep != null && ObjectPooler.Instance != null)
+        {
+            GameObject fx = ObjectPooler.Instance.SpawnFromPool("FxFoot_Step", posFxFootStep.position, Quaternion.identity);
+            if (fx != null)
+            {
+                // Play animation if it's a SkeletonAnimation
+                SkeletonAnimation skeletonAnim = fx.GetComponent<SkeletonAnimation>();
+                if (skeletonAnim != null)
+                {
+                    skeletonAnim.AnimationState.SetAnimation(0, "smoke", false);
+                }
+            }
+        }
+    }
+    
+    public void ResetFootStepTimer()
+    {
+        footStepEffectTimer = 0f;
     }
     
     public void CheckGrabEnemy()
@@ -403,7 +453,7 @@ public class PlayerController : PlayerCharacter
             float distX = Mathf.Abs(enemyPos.x - playerPos.x);
             float distY = Mathf.Abs(enemyPos.y - playerPos.y);
 
-            if (distX < 0.75f && distY < 0.5f)
+            if (distX < 0.75f && distY < 0.25f)
             {
                 bool enemyInFront = isFacingRight ? enemyPos.x > playerPos.x : enemyPos.x < playerPos.x;
                 if (enemyInFront && enemy.enemyController.state != EnemyCharacter.State.Dead &&
@@ -994,7 +1044,10 @@ public class PlayerController : PlayerCharacter
         {
             yield return null;
         }
-        yield return new WaitForSeconds(0.5f);
+        GameObject fx = ObjectPooler.Instance.SpawnFromPool("Fx_Fall", posFxFall.position, Quaternion.identity);
+        fx.GetComponent<SkeletonAnimation>().AnimationState.SetAnimation(0, "fall", false);
+        yield return new WaitForSeconds(0.12f);
+        fx.SetActive(false);
         SwitchToRunState(playerStandUp);
     }
     public IEnumerator JumpCoroutine()

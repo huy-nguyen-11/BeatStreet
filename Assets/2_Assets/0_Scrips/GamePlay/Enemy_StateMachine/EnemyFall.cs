@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 using static UnityEngine.RuleTile.TilingRuleOutput;
 

@@ -169,25 +169,25 @@ public class GamePlayManager : MonoBehaviour
 
     public void SetCharsToCharSortingLayer()
     {
-        SetSortingForTransform(_Player?.Char, "Canvas", 2);
-        SetSortingForTransform(_Enemy?.Char, "Canvas", 2);
+        SetSortingForTransform(_Player.transform, "Canvas", 2);
+        SetSortingForTransform(_Player.transform.GetChild(1), "Canvas", 2);
+        SetSortingForTransform(_Player.transform.GetChild(2), "Canvas", 2);
+        SetSortingForTransform(_Enemy.transform, "Canvas", 2);
     }
 
     public void SetPlayerToDefaultSortingLayer()
     {
-        SetSortingForTransform(_Player?.Char, "Default", 6);
+        SetSortingForTransform(_Player.transform, "Default", 5);
+        SetSortingForTransform(_Player.transform.GetChild(1), "Default", 5);
+        SetSortingForTransform(_Player.transform.GetChild(2), "Default", 7);
     }
 
     private void SetSortingForTransform(Transform root, string layerName, int order)
     {
         if (root == null) return;
-        // Set for all Renderer components under the character (covers Spine SkeletonRenderer / MeshRenderer)
-        var renderers = root.GetComponentsInChildren<Renderer>(true);
-        foreach (var r in renderers)
-        {
-            r.sortingLayerName = layerName;
-            r.sortingOrder = order;
-        }
+
+        root.GetComponent<Renderer>().sortingLayerName = layerName;
+        root.GetComponent<Renderer>().sortingOrder = order;
     }
 
 

@@ -1,10 +1,7 @@
 ﻿using DG.Tweening;
 using Spine;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
-using Unity.Android.Gradle.Manifest;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public enum TypeOfEnemy
@@ -174,6 +171,24 @@ public class EnemyController : EnemyCharacter
     {
         fillBar.transform.rotation = Quaternion.Euler(new Vector3(0, transform.position.y, 0));
         stateManager.FixedUpdate();
+    }
+
+    private void LateUpdate()
+    {
+        //update sorting order
+        if(state == State.Dead) return;
+        if(state == State.Grabed) return;
+        float posY = Char.position.y;
+        float posYPlayer = player.position.y;
+        float yTolerance = 0.05f;
+        if (posY > posYPlayer + yTolerance )
+        {
+            skeletonAnimation.GetComponent<MeshRenderer>().sortingOrder = 4;
+        }
+        else if( posY < posYPlayer - yTolerance)
+        {
+            skeletonAnimation.GetComponent<MeshRenderer>().sortingOrder = 10;
+        }
     }
 
     private void SetLevel()
@@ -649,7 +664,7 @@ public class EnemyController : EnemyCharacter
         //is boss
         if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 0)
         {
-            if (distanceX <= 3.75f && distanceY <= 0.8f)
+            if (distanceX <= 3.75f && distanceY <= 0.15f)
             {
                 if (!isAttack)
                 {
@@ -811,7 +826,7 @@ public class EnemyController : EnemyCharacter
         Vector3 jumpDirection = player.transform.right;
         float horizontalDirection = player.transform.rotation.y != 0 ? -1 : 1;
         Vector2 moveDirection = new Vector2(horizontalDirection, upwardDirection.y).normalized;
-        Vector2 targetPosition = (Vector2)transform.parent.position + moveDirection * 5;
+        Vector2 targetPosition = (Vector2)transform.parent.position + moveDirection * 1.75f;
 
         // prevent Movement() and other AI from modifying position while the tween runs
         isBeingThrown = true;
@@ -829,7 +844,7 @@ public class EnemyController : EnemyCharacter
         }
         else
         {
-            transform.parent.DOMove(targetPosition, 0.3f).SetEase(Ease.OutQuad)
+            transform.parent.DOMove(targetPosition, 0.4f).SetEase(Ease.Linear)
            .OnComplete(() =>
            {
                // mark thrown finished and deactivate

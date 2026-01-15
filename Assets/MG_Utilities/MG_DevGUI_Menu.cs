@@ -26,6 +26,7 @@ public class MG_DevGUI_Menu : MonoBehaviour
     public Vector2 btnDevPos;
     public Vector2 popupDevPos;
 
+    public LevelControllerMain LevelControllerMain;
 
     // TODO: Rect For Landscape Screen
     private Rect btnDevRect = new Rect(0, 100, 80, 80);
@@ -199,9 +200,10 @@ public class MG_DevGUI_Menu : MonoBehaviour
             // TODO: Add coin to DB
         }
 
-        if (GUI.Button(btnPopupRect_22, "Add Gem"))
+        if (GUI.Button(btnPopupRect_22, "Unlock"))
         {
             // TODO: Add Gem is Here
+            SetUnlockAllLevel();
         }
 
         // TODO: ADD more Function for Dev mode
@@ -380,7 +382,10 @@ public class MG_DevGUI_Menu : MonoBehaviour
 #endif
     }
 
-
+    private void SetUnlockAllLevel()
+    {
+        LevelControllerMain.UnlockAllLevelsForTest();
+    }
 
     #endregion
 

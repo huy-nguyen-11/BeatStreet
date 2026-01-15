@@ -12,7 +12,10 @@ public class AttackArea : MonoBehaviour
     public LayerMask layerMaskPlayer;
     public LayerMask layerMaskEnemy;
     private bool isSkillStrength = false;
-    private bool isMaxHit = false; 
+    private bool isMaxHit = false;
+
+    public bool isNormalAttack = false;
+
     private void Update()
     {
 
@@ -246,6 +249,14 @@ public class AttackArea : MonoBehaviour
             PlayerController.Instance.CountCombo();
             enemy.enemyController.SetHit(Dame, isMaxHit);
             enemy.enemyController.isGetHitStrengthMax = isSkillStrength;
+            if(isNormalAttack)
+            {
+                ObjectPooler.Instance.SpawnFromPool("Hit", new Vector3(collision.transform.position.x , collision.transform.position.y + 0.5f , 0f), Quaternion.Euler(0, 0, 0));
+            }
+            else
+            {
+                ObjectPooler.Instance.SpawnFromPool("Hit", transform.position, Quaternion.Euler(0, 0, 0));
+            }
             if (isMaxHit)
             {
                 StartCoroutine(ResetMaxHitFlag());

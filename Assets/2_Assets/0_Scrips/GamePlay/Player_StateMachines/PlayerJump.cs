@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Spine.Unity;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerJump : PlayerStateManager
@@ -8,6 +9,7 @@ public class PlayerJump : PlayerStateManager
     [SerializeField] private float jumpDistance = 1.65f;
     //[SerializeField] private float jumpDuration = 1f;
     [SerializeField] private int jumpCount = 1;
+    private GameObject fx;
 
     private Coroutine _coroutine;
 
@@ -17,20 +19,22 @@ public class PlayerJump : PlayerStateManager
         playerController.isJumping = true;
         playerController.state = PlayerController.State.Jump;
         jumpDistance = playerController.fillBar.mana >= 5 ? 4f : 4.6f;
-        if (playerController.fillBar.mana >= 0)
+        if (playerController.fillBar.mana >= 5)
         {
             playerController.velocity = 4;
             GamePlayManager.Instance.SetMission(6, 1);
             playerController.SetMana(-5);
             playerController.PlayAnim2("Jump_Attack");
-
             playerController.idAttackArea = 2;// set id attack area == 2
-
+            fx = ObjectPooler.Instance.SpawnFromPool("FxJump_Attack", playerController.posFxJump.position,Quaternion.identity);
+            fx.GetComponent<SkeletonAnimation>().AnimationState.SetAnimation(0, "jump_Attack_Fx", false);
         }
         else
         {
             playerController.velocity = 5;
             playerController.PlayAnim2("Jump");
+            fx =ObjectPooler.Instance.SpawnFromPool("FxJump", playerController.posFxJump.position, Quaternion.identity);
+            fx.GetComponent<SkeletonAnimation>().AnimationState.SetAnimation(0, "jump", false);
         }
     }
 
@@ -62,7 +66,7 @@ public class PlayerJump : PlayerStateManager
         {
             //playerController.StopCoroutine(_coroutine);
         }
-
+        fx.SetActive(false);
         //playerController.ClearFxTrack();
     }
     public override void FixedUpdate()

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -736,5 +736,19 @@ public class LevelControllerMain : MonoBehaviour
             MainManager.Instance.SetTopBar();
             _popups[3].gameObject.SetActive(false);
         }
+    }
+
+    /// <summary>
+    /// Unlock toàn bộ level để phục vụ test.
+    /// Gọi hàm này từ nút debug / editor button.
+    /// </summary>
+    public void UnlockAllLevelsForTest()
+    {
+        // Mở khóa tất cả level tương ứng với số nút level đang có
+        dataManager.LevelCurren = _btnLevels.Length;
+
+        // Lưu lại dữ liệu và cập nhật lại UI nút level
+        dataManager.SaveFile();
+        SetListBtn();
     }
 }
