@@ -180,6 +180,7 @@ public class GamePlayManager : MonoBehaviour
         SetSortingForTransform(_Player.transform, "Default", 5);
         SetSortingForTransform(_Player.transform.GetChild(1), "Default", 5);
         SetSortingForTransform(_Player.transform.GetChild(2), "Default", 7);
+        SetSortingForTransform(_Enemy.transform, "Default", 6);
     }
 
     private void SetSortingForTransform(Transform root, string layerName, int order)

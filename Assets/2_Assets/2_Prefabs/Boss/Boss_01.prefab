@@ -1622,7 +1622,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   fillBar: {fileID: 7128003950181121426}
-  animator: {fileID: 0}
   skeletonAnimation: {fileID: 2015480620868701672}
   wakeUpAnim: Idle
   typeOfEnemy: 1
@@ -1632,7 +1631,7 @@ MonoBehaviour:
   Char: {fileID: 0}
   rb: {fileID: 0}
   attackArea: {fileID: 7333607643073479456}
-  isBoss: 0
+  isBoss: 1
   Level: 0
   idEnemy: 0
   Hp: 3
@@ -1644,11 +1643,13 @@ MonoBehaviour:
   prfCoin: {fileID: 1077053216685021442, guid: e8453c02a51ac6241a74824dab520851, type: 3}
   isGrabbed: 0
   isActiveRun: 0
+  isSpawned: 0
   _pointTxtHit: {fileID: 5257396205590556632}
   _prfTxtHit: {fileID: 6439387997438382723, guid: 7cf720018a5883e41a50fdde81d17a36, type: 3}
   currentHitIndex: 0
   HitTimeout: 5
   isCheckAnimAttack: 0
+  isGetHitStrengthMax: 0
   patrolRadius: 0.75
   moveSpeed: 2.5
   moveSpeedRun: 2.6
@@ -1678,6 +1679,8 @@ MonoBehaviour:
   idleThreshold: 0.05
   animationHysteresis: 0.08
   posBullet: {fileID: 392872544716511242}
+  velocity: 0
+  isCheckGravity: 0
 --- !u!114 &6676198972385863334
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2184,7 +2187,7 @@ MonoBehaviour:
   layerMaskEnemy:
     serializedVersion: 2
     m_Bits: 128
-  isSkill: 0
+  isNormalAttack: 0
 --- !u!50 &6700856737897938143
 Rigidbody2D:
   serializedVersion: 5

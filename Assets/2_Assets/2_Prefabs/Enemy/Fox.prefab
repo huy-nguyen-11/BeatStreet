@@ -328,7 +328,7 @@ Transform:
   m_GameObject: {fileID: 2298520873434241408}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.614, y: 0.48, z: 0}
+  m_LocalPosition: {x: 0.636, y: 0.48, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -413,6 +413,7 @@ MonoBehaviour:
   layerMaskEnemy:
     serializedVersion: 2
     m_Bits: 128
+  isNormalAttack: 0
 --- !u!50 &1391360343582091771
 Rigidbody2D:
   serializedVersion: 5
@@ -763,6 +764,8 @@ MonoBehaviour:
   idleThreshold: 0.05
   animationHysteresis: 0.08
   posBullet: {fileID: 0}
+  velocity: 0
+  isCheckGravity: 0
 --- !u!1 &8022733915792855782
 GameObject:
   m_ObjectHideFlags: 0

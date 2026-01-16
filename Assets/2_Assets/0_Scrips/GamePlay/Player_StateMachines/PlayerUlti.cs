@@ -40,7 +40,15 @@ public class PlayerUlti : PlayerStateManager
     {
         if (e.Data.Name == "Hit")
         {
-            GamePlayManager.Instance._Enemy.PlayAnim("Hit", true);
+            if (GamePlayManager.Instance._Enemy.isBoss)
+            {
+                GamePlayManager.Instance._Enemy.PlayAnim("Damaged", true);
+            }
+            else
+            {
+                GamePlayManager.Instance._Enemy.PlayAnim("Hit", true);
+            }
+           
         }
         else if(e.Data.Name == "End_attack")
         {

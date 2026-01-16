@@ -356,8 +356,8 @@ public class EnemyController : EnemyCharacter
             // Check if we have a valid target and are moving towards it
             Vector3 currentTarget = isPatrolling ? randomTarget :
                 (Char.position.x < player.position.x ?
-                    player.position + Vector3.left * 0.5f :
-                    player.position + Vector3.right * 0.5f);
+                    player.position + Vector3.left * 1f :
+                    player.position + Vector3.right * 1f);
 
             float distanceToTarget = Vector3.Distance(Char.position, currentTarget);
 
@@ -435,7 +435,8 @@ public class EnemyController : EnemyCharacter
 
         if (isBeingThrown || isGrabbed) return;
 
-        float targetOffset = 0.5f;
+        //float targetOffset = 0.5f;
+        float targetOffset = 1f;
         Vector3 leftTarget = player.position + Vector3.left * targetOffset;
         Vector3 rightTarget = player.position + Vector3.right * targetOffset;
 
@@ -629,7 +630,7 @@ public class EnemyController : EnemyCharacter
     {
         float distanceX = Mathf.Abs(Char.position.x - player.position.x);
         float distanceY = Mathf.Abs(Char.position.y - player.position.y);
-        return distanceX <= 0.6f && distanceY <= 1.1f;
+        return distanceX <= 0.6f && distanceY <= 0.2f;
     }
 
     IEnumerator CheckPlayerCollisionRoutine()
@@ -703,7 +704,7 @@ public class EnemyController : EnemyCharacter
         }
 
         // Điều kiện tấn công
-        if (distanceX <= 1f && distanceY <= 0.2f)
+        if (distanceX <= 1.2f && distanceY <= 0.2f)
         {
             bool slotFree = !IsTargetOccupiedByOtherEnemy(myTarget, this) ||
                             Vector3.Distance(Char.position, myTarget) < 0.2f;
