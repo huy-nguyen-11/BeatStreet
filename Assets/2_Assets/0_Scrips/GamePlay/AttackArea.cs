@@ -207,6 +207,7 @@ public class AttackArea : MonoBehaviour
                 bool direction = transform.parent.rotation.y == 0 ? true : false;
                 player.playerController.HitDirection = direction;
                 player.playerController.SetHit(Dame);
+                ObjectPooler.Instance.SpawnFromPool("Hit", transform.position, Quaternion.Euler(0, 0, 0));
             }
         }
     }

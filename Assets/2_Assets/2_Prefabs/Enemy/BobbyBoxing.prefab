@@ -396,12 +396,12 @@ MonoBehaviour:
   Char: {fileID: 0}
   rb: {fileID: 0}
   attackArea: {fileID: 9080141781258743320}
+  rangeAttack: 0.65
   isBoss: 0
   Level: 0
   idEnemy: 1
   Hp: 3
   dame: 3
-  raycastDistance: 0.5
   playerLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -559,6 +559,7 @@ MonoBehaviour:
   layerMaskEnemy:
     serializedVersion: 2
     m_Bits: 128
+  isNormalAttack: 0
 --- !u!50 &261897808418069454
 Rigidbody2D:
   serializedVersion: 5

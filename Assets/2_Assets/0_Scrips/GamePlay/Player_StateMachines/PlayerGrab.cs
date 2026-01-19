@@ -133,7 +133,8 @@ public class PlayerGrab : PlayerStateManager
         if (grabTimer >= grabDuration)
         {
           
-            ReleaseGrab();
+            //ReleaseGrab();
+            CancelGrab();
         }
 
         // cooldown update (optional)
@@ -180,33 +181,33 @@ public class PlayerGrab : PlayerStateManager
         }
     }
 
-    private void ReleaseGrab()
-    {
-        isGrabActive = false;
+    //private void ReleaseGrab()
+    //{
+    //    isGrabActive = false;
 
-        if (grabbedEnemyController != null)
-        {
-            // Switch to Fall state and apply throw velocity
-            grabbedEnemyController.SwitchToRunState(grabbedEnemyController.enemyFall);
+    //    if (grabbedEnemyController != null)
+    //    {
+    //        // Switch to Fall state and apply throw velocity
+    //        grabbedEnemyController.SwitchToRunState(grabbedEnemyController.enemyFall);
 
-            // Apply throw force
-            bool isThrowRight = playerController.isFacingRight;
-            float throwForce = 5f;
-            if (grabbedEnemyController.rb != null)
-            {
-                grabbedEnemyController.rb.linearVelocity = new Vector2(
-                    isThrowRight ? throwForce : -throwForce,
-                    2f
-                );
-            }
-        }
+    //        // Apply throw force
+    //        bool isThrowRight = playerController.isFacingRight;
+    //        float throwForce = 5f;
+    //        if (grabbedEnemyController.rb != null)
+    //        {
+    //            grabbedEnemyController.rb.linearVelocity = new Vector2(
+    //                isThrowRight ? throwForce : -throwForce,
+    //                2f
+    //            );
+    //        }
+    //    }
 
-        grabbedEnemy = null;
-        grabbedEnemyController = null;
+    //    grabbedEnemy = null;
+    //    grabbedEnemyController = null;
 
-        // Return to idle
-        playerController.SwitchToRunState(playerController.playerIdle);
-    }
+    //    // Return to idle
+    //    playerController.SwitchToRunState(playerController.playerIdle);
+    //}
 
     // Call this from PlayerController when detecting swipe while grabbing
     public void StartThrow(float direction)
@@ -533,5 +534,10 @@ public class PlayerGrab : PlayerStateManager
     public bool IsGrabActive()
     {
         return isGrabActive;
+    }
+
+    public void CancelGrab()
+    {
+        CancelGrabAndIdle();
     }
 }

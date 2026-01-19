@@ -59,6 +59,8 @@ public class GamePlayManager : MonoBehaviour
     //ulti
     [SerializeField] public GameObject backUlti;
 
+    [SerializeField] private GameObject _showFightBoss;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -97,6 +99,7 @@ public class GamePlayManager : MonoBehaviour
         SetItem();
 
         backUlti.SetActive(false);
+        _showFightBoss.SetActive(false);
     }
 
     private void Update()
@@ -532,5 +535,17 @@ public class GamePlayManager : MonoBehaviour
     {
         Time.timeScale = 1;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void ShowFightBoss()
+    {
+        _showFightBoss.SetActive(true);
+        StartCoroutine(WaitingForOff());
+    }
+
+    IEnumerator WaitingForOff()
+    {
+        yield return new WaitForSeconds(1.2f);
+        _showFightBoss.SetActive(false);
     }
 }

@@ -20,12 +20,12 @@ public class EnemyController : EnemyCharacter
     public Transform Char;
     public Rigidbody2D rb;
     public AttackArea attackArea;
+    public float rangeAttack = 1f;
     public bool isBoss;
     public int Level;
     public int idEnemy;
     public float Hp = 3;
     public float dame = 3;
-    public float raycastDistance = 0.25f;
     public LayerMask playerLayer;
     public EnemyStateMachine stateManager;
     public EnemyRun enemyRun;
@@ -356,8 +356,8 @@ public class EnemyController : EnemyCharacter
             // Check if we have a valid target and are moving towards it
             Vector3 currentTarget = isPatrolling ? randomTarget :
                 (Char.position.x < player.position.x ?
-                    player.position + Vector3.left * 1f :
-                    player.position + Vector3.right * 1f);
+                    player.position + Vector3.left * rangeAttack :
+                    player.position + Vector3.right * rangeAttack);
 
             float distanceToTarget = Vector3.Distance(Char.position, currentTarget);
 
@@ -436,7 +436,7 @@ public class EnemyController : EnemyCharacter
         if (isBeingThrown || isGrabbed) return;
 
         //float targetOffset = 0.5f;
-        float targetOffset = 1f;
+        float targetOffset = rangeAttack;
         Vector3 leftTarget = player.position + Vector3.left * targetOffset;
         Vector3 rightTarget = player.position + Vector3.right * targetOffset;
 
@@ -678,8 +678,8 @@ public class EnemyController : EnemyCharacter
 
         // Xác định vị trí tấn công lý tưởng của enemy này (bên trái hoặc phải player)
         Vector3 myTarget = Char.position.x < player.position.x
-            ? player.position + Vector3.left * 1f
-            : player.position + Vector3.right * 1f;
+            ? player.position + Vector3.left * rangeAttack
+            : player.position + Vector3.right * rangeAttack;
 
         // Nếu enemy đã ở rất gần player (<= 0.15f) nhưng vị trí tấn công chưa bị chiếm, hãy di chuyển đến vị trí tấn công
         if (distanceX <= 0.15f && distanceY <= 0.2f)
@@ -704,7 +704,7 @@ public class EnemyController : EnemyCharacter
         }
 
         // Điều kiện tấn công
-        if (distanceX <= 1.2f && distanceY <= 0.2f)
+        if (distanceX <= (rangeAttack+ 0.2f) && distanceY <= 0.2f)
         {
             bool slotFree = !IsTargetOccupiedByOtherEnemy(myTarget, this) ||
                             Vector3.Distance(Char.position, myTarget) < 0.2f;

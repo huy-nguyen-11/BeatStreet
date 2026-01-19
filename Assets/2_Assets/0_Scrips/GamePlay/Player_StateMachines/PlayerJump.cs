@@ -18,22 +18,22 @@ public class PlayerJump : PlayerStateManager
         if (playerController.fillBar == null) return;
         playerController.isJumping = true;
         playerController.state = PlayerController.State.Jump;
-        jumpDistance = playerController.fillBar.mana >= 5 ? 4f : 4.6f;
+        jumpDistance = playerController.fillBar.mana >= 5? 6.3f : 4.6f;
         if (playerController.fillBar.mana >= 5)
         {
-            playerController.velocity = 4;
+            playerController.velocity = 4.3f;
             GamePlayManager.Instance.SetMission(6, 1);
             playerController.SetMana(-5);
             playerController.PlayAnim2("Jump_Attack");
             playerController.idAttackArea = 2;// set id attack area == 2
-            fx = ObjectPooler.Instance.SpawnFromPool("FxJump_Attack", playerController.posFxJump.position,Quaternion.identity);
+            fx = ObjectPooler.Instance.SpawnFromPool("FxJump_Attack", playerController.posFxJump.position, Quaternion.identity);
             fx.GetComponent<SkeletonAnimation>().AnimationState.SetAnimation(0, "jump_Attack_Fx", false);
         }
         else
         {
             playerController.velocity = 5;
             playerController.PlayAnim2("Jump");
-            fx =ObjectPooler.Instance.SpawnFromPool("FxJump", playerController.posFxJump.position, Quaternion.identity);
+            fx = ObjectPooler.Instance.SpawnFromPool("FxJump", playerController.posFxJump.position, Quaternion.identity);
             fx.GetComponent<SkeletonAnimation>().AnimationState.SetAnimation(0, "jump", false);
         }
     }

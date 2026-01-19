@@ -1015,10 +1015,14 @@ public class PlayerController : PlayerCharacter
             if (!isFall)
             {
                 PerformHit();
-                if (state != State.Jump && state != State.Skill1 && state != State.Skill2 && state != State.Change)
+                if (state != State.Jump && state != State.Skill1 && state != State.Skill2 /*&& state != State.Change*/)
                 {
-                    if (isCheckSkill2)
-                        isCheckSkill2 = false;
+                    //if (isCheckSkill2)
+                    //    isCheckSkill2 = false;
+                    if (playerGrab != null && playerGrab.IsGrabActive())
+                    {
+                        playerGrab.CancelGrab();
+                    }
                     SwitchToRunState(playerHit);
                 }
             }
@@ -1026,6 +1030,10 @@ public class PlayerController : PlayerCharacter
         else
         {
             Hp = 0;
+            if (playerGrab != null && playerGrab.IsGrabActive())
+            {
+                playerGrab.CancelGrab();
+            }
             SwitchToRunState(playerDead);
             IsDead = true;
             StartCoroutine(GamePlayManager.Instance.OpenPopupGameOver(2));
