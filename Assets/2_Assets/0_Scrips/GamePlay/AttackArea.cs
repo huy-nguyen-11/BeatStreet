@@ -16,8 +16,38 @@ public class AttackArea : MonoBehaviour
 
     public bool isNormalAttack = false;
 
+    //for skill jump 
+    private bool isJumpHitActive = false;
+    private HashSet<Collider2D> hitEnemies = new HashSet<Collider2D>();
+
+
     private void Update()
     {
+
+        //if (collisionQueue.Count > 0)
+        //{
+        //    if (!isCheckTrigger)
+        //    {
+        //        PlayerController.Instance.PerformAttack();
+        //        isCheckTrigger = true;
+        //    }
+        //    Collider2D currentCollision = collisionQueue.Dequeue();
+        //    //if (!isSkill)
+        //    //    HandleCollision(currentCollision);
+        //    //else
+        //    //    HandleCollisionSkill(currentCollision);
+        //    HandleCollision(currentCollision);
+        //}
+        //else
+        //{
+        //    if (isCheckTrigger)
+        //        isCheckTrigger = false;
+        //}
+        // ===== Jump skill continuous hit =====
+        if (isJumpHitActive)
+        {
+            CheckJumpHitEnemies();
+        }
 
         if (collisionQueue.Count > 0)
         {
@@ -26,11 +56,8 @@ public class AttackArea : MonoBehaviour
                 PlayerController.Instance.PerformAttack();
                 isCheckTrigger = true;
             }
+
             Collider2D currentCollision = collisionQueue.Dequeue();
-            //if (!isSkill)
-            //    HandleCollision(currentCollision);
-            //else
-            //    HandleCollisionSkill(currentCollision);
             HandleCollision(currentCollision);
         }
         else
@@ -39,6 +66,7 @@ public class AttackArea : MonoBehaviour
                 isCheckTrigger = false;
         }
     }
+
     public void SetAttack(float dame, int id)
     {
         Dame = dame;
@@ -68,6 +96,39 @@ public class AttackArea : MonoBehaviour
         Dame = dame;
         PlayerAttackJump();
     }
+
+    public void StartHitJump(float dame)
+    {
+        Dame = dame;
+        isJumpHitActive = true;
+        hitEnemies.Clear();
+    }
+
+    public void EndHitJump()
+    {
+        isJumpHitActive = false;
+    }
+
+    private void CheckJumpHitEnemies()
+    {
+        Collider2D[] hits = Physics2D.OverlapBoxAll(
+            transform.position,
+            boxSize,
+            0,
+            layerMaskEnemy
+        );
+
+        foreach (var hit in hits)
+        {
+            if (hitEnemies.Contains(hit))
+                continue; // enemy này đã bị xử lý rồi
+
+            hitEnemies.Add(hit);
+            collisionQueue.Enqueue(hit);
+        }
+    }
+
+
 
     public void PlayerAttackDirection()
     {

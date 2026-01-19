@@ -805,16 +805,18 @@ public class PlayerController : PlayerCharacter
         }
         else if (e.Data.Name == "max_hit" || e.Data.Name == "Hit_Max" || e.Data.Name == "Hit_Jump")
         {
-            //if (attackArea != null)
-            //{
-            //    SetAttack(id);
-            //    attackArea.SetMaxHit(true);
-            //}
             AttackArea currentAttackArea = GetAttackAreaByComboIndex();
             if (currentAttackArea != null)
             {
                 SetAttack(id, currentAttackArea);
                 currentAttackArea.SetMaxHit(true);
+            }
+        }else if(e.Data.Name == "End_Hit")
+        {
+            AttackArea currentAttackArea = attackAreas[2];// for skill jump attack
+            if (currentAttackArea != null)
+            {
+                currentAttackArea.EndHitJump();
             }
         }
     }
@@ -848,7 +850,8 @@ public class PlayerController : PlayerCharacter
         {
             if (attackArea != null)
             {
-                attackArea.SetAttackSkillJump(Dame, id); // attack jump area
+                //attackArea.SetAttackSkillJump(Dame, id); // attack jump area
+                attackArea.StartHitJump(Dame);
             }
         }
         else
