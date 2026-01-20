@@ -76,7 +76,7 @@ public class EnemyFall : EnemyStateMachine
 
         yield return new WaitForSeconds(0.5f);
         enemyController.PlayAnim(enemyController.wakeUpAnim, false);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1.135f);
         enemyController.SwitchToRunState(enemyController.enemyIdle);
 
     }

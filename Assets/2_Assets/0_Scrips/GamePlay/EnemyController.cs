@@ -391,7 +391,7 @@ public class EnemyController : EnemyCharacter
         SeparateFromOtherEnemies();
     }
 
-    // Handle stop timer so Idle can advance even when state machine isn't running Movement
+    //// Handle stop timer so Idle can advance even when state machine isn't running Movement
     public void TickStopTimer()
     {
         //if (typeOfEnemy == TypeOfEnemy.Boss) return;
@@ -407,10 +407,10 @@ public class EnemyController : EnemyCharacter
             isPatrolling = Random.value < num; //random 20% patrol, 80% move to player
             isAvoidingPlayer = false;
             if (isPatrolling && typeOfEnemy == TypeOfEnemy.Enemy)
-             SetRandomPatrolTarget();
+                SetRandomPatrolTarget();
         }
     }
-
+  
     private void MoveToPlayer()
     {
         // BOSS
@@ -665,7 +665,7 @@ public class EnemyController : EnemyCharacter
         //is boss
         if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 0)
         {
-            if (distanceX <= 3.75f && distanceY <= 0.15f)
+            if (distanceX <= 3.75f && distanceY <= 0.2f)
             {
                 if (!isAttack)
                 {
@@ -805,7 +805,8 @@ public class EnemyController : EnemyCharacter
     }
     public void SpawnTxtHit(float dame)
     {
-        GameObject txt = Instantiate(_prfTxtHit, _pointTxtHit.transform.position, Quaternion.identity);
+        //GameObject txt = Instantiate(_prfTxtHit, _pointTxtHit.transform.position, Quaternion.identity);
+        GameObject txt = ObjectPooler.Instance.SpawnFromPool("Text", _pointTxtHit.transform.position, Quaternion.identity);
         txt.GetComponent<TxtHit>().SetTxt(dame, true);
     }
     public void SetUltiPlayer()
@@ -908,7 +909,6 @@ public class EnemyController : EnemyCharacter
             stateManager.Exit();
         stateManager = enemy;
         stateManager.Enter();
-
     }
     void OnDrawGizmos()
     {

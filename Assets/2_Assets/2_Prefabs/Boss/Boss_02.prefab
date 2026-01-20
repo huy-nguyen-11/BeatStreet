@@ -106,7 +106,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8581847554588044706}
@@ -235,12 +235,12 @@ MonoBehaviour:
   Char: {fileID: 0}
   rb: {fileID: 0}
   attackArea: {fileID: 4105619480821737580}
+  rangeAttack: 1
   isBoss: 1
   Level: 0
   idEnemy: 1
   Hp: 3
   dame: 3
-  raycastDistance: 0.5
   playerLayer:
     serializedVersion: 2
     m_Bits: 64

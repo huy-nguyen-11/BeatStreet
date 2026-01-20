@@ -9,6 +9,7 @@ public class LevelMap : MonoBehaviour
     public Transform listTurnEnemy;
     public Transform PointPlayer;
     public Transform listWallTurn;
+    public Transform pointBoss;
     // Bounds
     [SerializeField] public float minX = -10f;
     [SerializeField] public float maxX = 10f;

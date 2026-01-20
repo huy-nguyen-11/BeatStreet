@@ -7,7 +7,7 @@ public class EnemyIdle : EnemyStateMachine
 
     Coroutine _coroutine;
     Coroutine _spawnedEnemyCoroutine;
-    
+
     public override void Enter()
     {
         enemyController.PlayAnim("Idle", true);
@@ -26,11 +26,17 @@ public class EnemyIdle : EnemyStateMachine
             }
             return;
         }
-        
+
+        //if (enemyController.isStopping)
+        //{
+        //    return;
+        //}
+        // Allow attack preparation to proceed even when isStopping is true.
         if (enemyController.isStopping)
         {
             return;
         }
+
         if (!enemyController.isAttack)
         {
             if (enemyController.isActiveRun
@@ -83,6 +89,7 @@ public class EnemyIdle : EnemyStateMachine
             return;
         }
 
+
         if (enemyController.isStopping)
         {
             enemyController.TickStopTimer();
@@ -125,7 +132,6 @@ public class EnemyIdle : EnemyStateMachine
         }
         else
         {
-
             if (Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) <= (enemyController.rangeAttack + 0.2f)
                && Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) >= 0.15f
                && Mathf.Abs(enemyController.Char.position.y - enemyController.player.position.y) <= 0.2f)

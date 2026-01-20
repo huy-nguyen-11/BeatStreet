@@ -20,6 +20,9 @@ public class PlayerController : PlayerCharacter
     public Transform Char;
     private bool isGetJoy = false;
 
+    //jump distance kick
+    public float jumpKickDistance;
+
     // Attribute
     public List<float> _attributesPet = new List<float>();
     public List<float> _attributesItem = new List<float>();
@@ -133,6 +136,9 @@ public class PlayerController : PlayerCharacter
     // Foot step effect
     private float footStepEffectTimer = 0f;
     [SerializeField] private float footStepEffectInterval = 0.3f; // Thời gian giữa các lần spawn effect
+
+    // near other public fields
+    [HideInInspector] public bool isInputBlocked = false;
     #endregion
 
     private void Awake()
@@ -281,6 +287,9 @@ public class PlayerController : PlayerCharacter
     }
     void Update()
     {
+        if (isInputBlocked || (GamePlayManager.Instance != null && GamePlayManager.Instance.isShowingBoss))
+            return;
+
         //update timmer grab cooldown
         if (!canGrab)
         {
@@ -299,6 +308,7 @@ public class PlayerController : PlayerCharacter
             || state == State.Ulti
             || GamePlayManager.Instance.isCheckUlti
             ) return;
+
         if (state == State.Hit) return;
 
         CheckTouchInput();
@@ -467,6 +477,12 @@ public class PlayerController : PlayerCharacter
 
     private void CheckTouchInput()
     {
+        if (isInputBlocked || (GamePlayManager.Instance != null && GamePlayManager.Instance.isShowingBoss))
+        {
+            // clear any in-progress touch state so no leftover inputs
+            ClearTouch();
+            return;
+        }
 
         for (int i = 0; i < Input.touchCount; i++)
         {
@@ -1045,7 +1061,8 @@ public class PlayerController : PlayerCharacter
     }
     public void SpawnTxtHit(float dame)
     {
-        GameObject txt = Instantiate(_prfTxtHit, _pointSpawnTxtHit.transform.position, Quaternion.identity);
+        //GameObject txt = Instantiate(_prfTxtHit, _pointSpawnTxtHit.transform.position, Quaternion.identity);
+        GameObject txt = ObjectPooler.Instance.SpawnFromPool("Text", _pointSpawnTxtHit.transform.position, Quaternion.identity);
         txt.GetComponent<TxtHit>().SetTxt(dame, false);
     }
     public IEnumerator FallCoroutine()

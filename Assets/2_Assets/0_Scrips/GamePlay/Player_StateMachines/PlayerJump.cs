@@ -18,7 +18,7 @@ public class PlayerJump : PlayerStateManager
         if (playerController.fillBar == null) return;
         playerController.isJumping = true;
         playerController.state = PlayerController.State.Jump;
-        jumpDistance = playerController.fillBar.mana >= 5? 6.3f : 4.6f;
+        jumpDistance = playerController.fillBar.mana >= 5? playerController.jumpKickDistance : 4.6f;
         if (playerController.fillBar.mana >= 5)
         {
             playerController.velocity = 4.3f;

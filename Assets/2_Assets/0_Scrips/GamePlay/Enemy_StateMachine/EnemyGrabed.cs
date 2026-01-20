@@ -1,10 +1,11 @@
+using Spine;
 using System.Collections;
 using UnityEngine;
 
 public class EnemyGrabed : EnemyStateMachine
 {
     private Collider2D[] grabbedColliders;
-
+    private bool isSubscribedToPlayerEvents = false;
     public EnemyGrabed(EnemyController enemy) : base(enemy) { }
 
     public override void Enter()
@@ -59,8 +60,36 @@ public class EnemyGrabed : EnemyStateMachine
             }
         }
 
+        // Subscribe to player's animation events so we can react to hits while grabbed
+        try
+        {
+            var pc = enemyController.playerController;
+            if (pc != null && pc.skeletonAnimation != null && !isSubscribedToPlayerEvents)
+            {
+                pc.skeletonAnimation.AnimationState.Event += OnPlayerAnimationEvent;
+                isSubscribedToPlayerEvents = true;
+            }
+        }
+        catch
+        {
+            // swallow - non-critical
+        }
+
         // Play grab animation
         enemyController.PlayAnim("Grab", false);
+    }
+
+    private void OnPlayerAnimationEvent(TrackEntry trackEntry, Spine.Event e)
+    {
+        if (e == null || e.Data == null) return;
+        string evt = e.Data.Name;
+        // match common hit event names used by PlayerController
+        if (evt == "Hit")
+        {
+            // Play a special grabbed-hit animation on the enemy
+            //enemyController.PlayAnim("Grab_Hit", false);
+            enemyController.PlayAnimOnTrack("Grab_Hit", 1, false);
+        }
     }
 
     public override void Update()
@@ -82,6 +111,23 @@ public class EnemyGrabed : EnemyStateMachine
         enemyController.skeletonAnimation.GetComponent<MeshRenderer>().sortingOrder = 4;
         // Clear grabbed flag to resume normal AI
         enemyController.isGrabbed = false;
+
+
+        // Unsubscribe from player events
+        try
+        {
+            var pc = enemyController.playerController;
+            if (pc != null && pc.skeletonAnimation != null && isSubscribedToPlayerEvents)
+            {
+                pc.skeletonAnimation.AnimationState.Event -= OnPlayerAnimationEvent;
+                isSubscribedToPlayerEvents = false;
+            }
+        }
+        catch
+        {
+            // swallow
+        }
+
 
         // Restore colliders to normal
         if (grabbedColliders != null)

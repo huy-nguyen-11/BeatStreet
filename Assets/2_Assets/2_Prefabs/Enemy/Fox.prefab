@@ -708,7 +708,7 @@ MonoBehaviour:
   state: 0
   fillBar: {fileID: 1493920290490572878}
   skeletonAnimation: {fileID: 452695406114702926}
-  wakeUpAnim: Weakup
+  wakeUpAnim: Wake_up
   typeOfEnemy: 0
   player: {fileID: 0}
   playerController: {fileID: 0}
@@ -716,12 +716,12 @@ MonoBehaviour:
   Char: {fileID: 0}
   rb: {fileID: 0}
   attackArea: {fileID: 3449557149905419187}
+  rangeAttack: 1
   isBoss: 0
   Level: 0
   idEnemy: 0
   Hp: 3
   dame: 3
-  raycastDistance: 0.25
   playerLayer:
     serializedVersion: 2
     m_Bits: 64

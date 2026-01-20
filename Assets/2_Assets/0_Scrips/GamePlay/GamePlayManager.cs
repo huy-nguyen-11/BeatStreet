@@ -363,6 +363,7 @@ public class GamePlayManager : MonoBehaviour
                 // Next Turn
                 _IconNextTurn.SetActive(true);
                 _levelMap.TurnEnemy++;
+
             }
         }
     }
@@ -389,6 +390,10 @@ public class GamePlayManager : MonoBehaviour
     public void SetOffDarkScene()
     {
         _DarkScene.SetActive(false);
+        if (_levelMap.TurnEnemy == 3 && _levelMap._pointMaxXs.Length == 4)
+        {
+            ShowFightBoss();
+        }
     }
     public void SetStopFollowCamera()
     {
@@ -537,10 +542,53 @@ public class GamePlayManager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
+    // Add near other serialized fields
+    [SerializeField] private float showBossDuration = 1.2f;
+    [SerializeField] private float cameraMoveDuration = 0.6f;
+    public bool isShowingBoss = false;
+
+    // Replace or modify existing ShowFightBoss() to start coroutine:
     public void ShowFightBoss()
     {
+        if (_levelMap == null || _levelMap.pointBoss == null)
+        {
+            _showFightBoss.SetActive(true);
+            StartCoroutine(WaitingForOff());
+            return;
+        }
+        StartCoroutine(ShowFightBossCoroutine());
+    }
+
+    // Add this coroutine
+    private IEnumerator ShowFightBossCoroutine()
+    {
+        isShowingBoss = true;
+
+        // Block player input via flag on PlayerController (see PlayerController changes below)
+        if (_Player != null) _Player.isInputBlocked = true;
+
+        // Stop camera follow and tween camera to boss point
+        bool prevFollow = _CameraFollow != null ? _CameraFollow.isFollow : true;
+        if (_CameraFollow != null) _CameraFollow.isFollow = false;
+
+        Vector3 bossCamPos = new Vector3(_levelMap.pointBoss.position.x, _CameraFollow.transform.position.y, _CameraFollow.transform.position.z);
+        yield return _CameraFollow.transform.DOMove(bossCamPos, cameraMoveDuration).SetEase(Ease.OutCubic).WaitForCompletion();
+
+        // show fight boss UI
         _showFightBoss.SetActive(true);
-        StartCoroutine(WaitingForOff());
+        yield return new WaitForSeconds(showBossDuration);
+        _showFightBoss.SetActive(false);
+
+        // return camera to player (center on player Char position)
+        Vector3 playerCamPos = _Player != null && _Player.Char != null
+            ? new Vector3(_Player.Char.position.x, _CameraFollow.transform.position.y, _CameraFollow.transform.position.z)
+            : bossCamPos;
+        yield return _CameraFollow.transform.DOMove(playerCamPos, cameraMoveDuration).SetEase(Ease.OutCubic).WaitForCompletion();
+
+        // restore camera follow, UI and input
+        if (_CameraFollow != null) _CameraFollow.isFollow = prevFollow;
+        if (_Player != null) _Player.isInputBlocked = false;
+        isShowingBoss = false;
     }
 
     IEnumerator WaitingForOff()
