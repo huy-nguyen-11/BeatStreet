@@ -139,12 +139,17 @@ public class CameraFollow2D : MonoBehaviour
     [SerializeField] private int defaultVibrato = 20;
     [SerializeField] private float defaultRandomness = 90f;
 
-    private Tween shakeTween;
+    private Tween shakeTween ,shakeTween2;
 
-    #region BASIC SHAKE
+
     public void Shake()
     {
         Shake(defaultDuration, defaultStrength, defaultVibrato, defaultRandomness);
+    }
+
+    public void Shake2()
+    {
+        Shake2(0.12f, 0.05f,45,0);
     }
 
     public void Shake(float duration, float strength, int vibrato = 15, float randomness = 0f)
@@ -158,14 +163,29 @@ public class CameraFollow2D : MonoBehaviour
             fadeOut: true
         );
     }
-    #endregion
 
-    #region UTIL
+    public void Shake2(float duration, float strength, int vibrato = 15, float randomness = 0f)
+    {
+        KillShake2();
+        shakeTween2 = transform.DOShakePosition(
+            duration,
+            strength,
+            vibrato,
+            randomness,
+            fadeOut: true
+        );
+    }
+
     private void KillShake()
     {
         if (shakeTween != null && shakeTween.IsActive())
             shakeTween.Kill();
     }
 
-    #endregion
+    private void KillShake2()
+    {
+        if (shakeTween2 != null && shakeTween2.IsActive())
+            shakeTween2.Kill();
+    }
+
 }

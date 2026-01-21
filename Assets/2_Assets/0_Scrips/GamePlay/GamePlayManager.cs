@@ -146,7 +146,7 @@ public class GamePlayManager : MonoBehaviour
                         _Player.Char.transform.position = new Vector3(_CameraFollow.transform.position.x - 0.5f ,_CameraFollow.transform.position.y - 1 , 0);
                         _Player.SetFacingDirection(true);
                         _Enemy.Char.transform.position = new Vector3(_CameraFollow.transform.position.x + 0.3f, _CameraFollow.transform.position.y -1 , 0);
-                        _Enemy.transform.rotation = Quaternion.Euler(0, 180, 0);
+                        _Enemy.Char.rotation = Quaternion.Euler(0, 180, 0);
                         _Enemy.SetUltiPlayer();
                         _Player.SetUltiPlayer();
                     }

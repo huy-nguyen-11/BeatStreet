@@ -148,7 +148,6 @@ public class CollectItemUICtrl : /*Singleton<CollectItemUICtrl>*/MonoBehaviour
 	
 	private IEnumerator TimerPoolItemCoin(Vector3 posSpawn, int _currentCoins , int newCoin)
 	{
-		Debug.Log("show reward");
 		counter = 0;
 		panelAddItemEffGO.SetActive(true);
 		

@@ -114,9 +114,10 @@ public class EnemyIdle : EnemyStateMachine
     }
     IEnumerator DelayAttack()
     {
-        yield return new WaitForSeconds(0.3f);
+    
         if(enemyController.typeOfEnemy == TypeOfEnemy.Boss && enemyController.idEnemy == 0)
         {
+            yield return new WaitForSeconds(0.5f);
             int idEnemy = enemyController.Char.GetComponent<EnemyChar>().idEnemy;
 
             if (enemyController.Char.position.x <= enemyController.player.position.x)
@@ -132,6 +133,7 @@ public class EnemyIdle : EnemyStateMachine
         }
         else
         {
+            yield return new WaitForSeconds(0.75f);
             if (Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) <= (enemyController.rangeAttack + 0.2f)
                && Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) >= 0.15f
                && Mathf.Abs(enemyController.Char.position.y - enemyController.player.position.y) <= 0.2f)

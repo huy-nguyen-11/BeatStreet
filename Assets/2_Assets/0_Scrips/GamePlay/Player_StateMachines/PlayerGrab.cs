@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using Spine;
 
@@ -25,6 +25,8 @@ public class PlayerGrab : PlayerStateManager
     private int _grabAttackQueue = 0;
     private Spine.TrackEntry _grabAttackEntry;
     private Spine.AnimationState.TrackEntryDelegate _grabAttackCompleteHandler;
+    private int _grabAttackCount = 0; // Đếm số lần tấn công Grab_Attack
+    private int _maxGrabAttacks = 0; // Số lần tấn công tối đa (random 3-6)
 
     public PlayerGrab(PlayerController player) : base(player) { }
 
@@ -102,7 +104,7 @@ public class PlayerGrab : PlayerStateManager
                 eAngles.y = yRot;
                 enemyCharT.localEulerAngles = eAngles;
                 // keep root transform consistent
-                grabbedEnemyController.transform.rotation = Quaternion.Euler(0f, yRot, 0f);
+                grabbedEnemyController.Char.transform.rotation = Quaternion.Euler(0f, yRot, 0f);
             }
             catch { }
         }
@@ -110,6 +112,9 @@ public class PlayerGrab : PlayerStateManager
         // Play grab animation
         playerController.PlayAnim("Grab", true);
         AudioBase.Instance.AudioPlayer(2);
+
+        _grabAttackCount = 0;
+        _maxGrabAttacks = Random.Range(2, 5);
 
         isGrabActive = true;
         grabTimer = 0f;
@@ -176,7 +181,7 @@ public class PlayerGrab : PlayerStateManager
                 angles.y = yRot;
                 grabbedEnemyController.Char.localEulerAngles = angles;
                 // keep root transform consistent as well
-                grabbedEnemyController.transform.rotation = Quaternion.Euler(0f, yRot, 0f);
+                grabbedEnemyController.Char.transform.rotation = Quaternion.Euler(0f, yRot, 0f);
             }
         }
     }
@@ -237,7 +242,7 @@ public class PlayerGrab : PlayerStateManager
             eAngles.y = enemyY;
             grabbedEnemyController.Char.localEulerAngles = eAngles;
             // Also set root rotation to keep consistency
-            grabbedEnemyController.transform.rotation = Quaternion.Euler(0f, enemyY, 0f);
+            grabbedEnemyController.Char.transform.rotation = Quaternion.Euler(0f, enemyY, 0f);
         }
 
         // unsubscribe existing (safety)
@@ -430,6 +435,18 @@ public class PlayerGrab : PlayerStateManager
         _grabAttackCompleteHandler = null;
         _grabAttackBusy = false;
 
+        // Tăng biến đếm sau mỗi lần tấn công
+        _grabAttackCount++;
+
+        // Kiểm tra nếu số lần tấn công vượt quá ngưỡng, tự động ném enemy
+        if (_grabAttackCount > _maxGrabAttacks && isGrabActive && grabbedEnemyController != null)
+        {
+            // Ném enemy theo hướng player đang quay mặt
+            float throwDirection = playerController.isFacingRight ? 1f : -1f;
+            StartThrow(throwDirection);
+            return;
+        }
+
         // if queued taps exist, play next
         if (_grabAttackQueue > 0)
         {
@@ -454,6 +471,8 @@ public class PlayerGrab : PlayerStateManager
         _grabAttackCompleteHandler = null;
         _grabAttackBusy = false;
         _grabAttackQueue = 0;
+        _grabAttackCount = 0; // Reset biến đếm
+        _maxGrabAttacks = 0; // Reset ngưỡng
 
         // If enemy controller still exists, clear its grabbed flag and set idle
         if (grabbedEnemyController != null)
@@ -490,6 +509,8 @@ public class PlayerGrab : PlayerStateManager
         _grabAttackCompleteHandler = null;
         _grabAttackBusy = false;
         _grabAttackQueue = 0;
+        _grabAttackCount = 0; // Reset biến đếm
+        _maxGrabAttacks = 0; // Reset ngưỡng
 
         UnsubscribeThrowEvent();
 

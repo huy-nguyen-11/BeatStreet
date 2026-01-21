@@ -77,7 +77,7 @@ public class EnemySpawn : EnemyStateMachine
         {
             Vector2 directionToPlayer = (enemyController.player.position - enemyController.Char.position).normalized;
             float yRotation = enemyController.player.position.x > enemyController.Char.position.x ? 0f : 180f;
-            enemyController.transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
+            enemyController.Char.rotation = Quaternion.Euler(0f, yRotation, 0f);
             // Jump up with magnitude = 2 (vertical)
             float jumpUpMagnitude = 2f;
             // Jump forward with distance = 3 (horizontal towards player)

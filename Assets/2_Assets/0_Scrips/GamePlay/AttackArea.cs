@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -307,10 +307,16 @@ public class AttackArea : MonoBehaviour
         EnemyChar enemy = collision.gameObject.GetComponent<EnemyChar>();
         if (enemy != null)
         {
+            if (enemy.enemyController.state == EnemyController.State.Fall)
+                return;
+
             bool playerOnRight = PlayerController.Instance.Char.position.x > enemy.transform.position.x;
             PlayerController.Instance.CountCombo();
-            enemy.enemyController.SetHit(Dame, isMaxHit);
+            // IMPORTANT: set this flag BEFORE calling SetHit().
+            // EnemyController.SetHit(...) may immediately switch to EnemyFall (max hit),
+            // and EnemyFall.Enter() reads isGetHitStrengthMax to decide knockback direction.
             enemy.enemyController.isGetHitStrengthMax = isSkillStrength;
+            enemy.enemyController.SetHit(Dame, isMaxHit);
             if(isNormalAttack)
             {
                 ObjectPooler.Instance.SpawnFromPool("Hit", new Vector3(collision.transform.position.x , collision.transform.position.y + 0.5f , 0f), Quaternion.Euler(0, 0, 0));

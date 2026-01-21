@@ -132,7 +132,7 @@ public class GameOver : MonoBehaviour
     }
     private void SetGetBonus()
     {
-        _popupStatus[0].transform.GetChild(1).GetChild(0).GetChild(0).GetComponent<Image>().sprite = GetSprLoot();
+        //_popupStatus[0].transform.GetChild(1).GetChild(0).GetChild(0).GetComponent<Image>().sprite = GetSprLoot();
         _popupStatus[0].transform.GetChild(1).GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text = GetCoinBonus().ToString();
         PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + GetCoinBonus());
         //SetTopBar();

@@ -1,4 +1,4 @@
-﻿using DG.Tweening;
+using DG.Tweening;
 using Spine;
 using System.Collections;
 using TMPro;
@@ -768,11 +768,15 @@ public class EnemyController : EnemyCharacter
         float hp = Hp - dameHit < 0 ? 0 : Hp - dameHit;
         SpawnTxtHit(dameHit);
         if (hp <= 0)
+        {
             SetDead();
+            return;
+        }
         currentHitIndex++;
         
         if (isMaxHit && typeOfEnemy != TypeOfEnemy.Boss)
         {
+            GamePlayManager.Instance._CameraFollow.Shake2();
             ApplyMaxHitKnockback();
         }
         else
@@ -822,13 +826,23 @@ public class EnemyController : EnemyCharacter
         state = State.Dead;
         stateManager = enemyDead;
         stateManager.Enter();
-
+        GamePlayManager.Instance._CameraFollow.Shake2();
         GamePlayManager.Instance.CheckEnemyDead();
-        Vector2 upwardDirection = new Vector2(0, 0.5f);
+        Vector2 upwardDirection = new Vector2(0, 0.85f);
         Vector3 jumpDirection = player.transform.right;
-        float horizontalDirection = player.transform.rotation.y != 0 ? -1 : 1;
+        float horizontalDirection0 = player.transform.rotation.y != 0 ? -1 : 1;
+        float horizontalDirection1 = player.transform.position.x > Char.transform.position.x ? -1 : 1;
+        float horizontalDirection = 0;
+        if (isGetHitStrengthMax)
+        {
+            horizontalDirection = horizontalDirection1;
+        }
+        else
+        {
+            horizontalDirection = horizontalDirection0;
+        }
         Vector2 moveDirection = new Vector2(horizontalDirection, upwardDirection.y).normalized;
-        Vector2 targetPosition = (Vector2)transform.parent.position + moveDirection * 1.75f;
+        Vector2 targetPosition = (Vector2)transform.parent.position + moveDirection * 3f;
 
         // prevent Movement() and other AI from modifying position while the tween runs
         isBeingThrown = true;
@@ -846,7 +860,7 @@ public class EnemyController : EnemyCharacter
         }
         else
         {
-            transform.parent.DOMove(targetPosition, 0.4f).SetEase(Ease.Linear)
+            transform.parent.DOMove(targetPosition, 0.6f).SetEase(Ease.Linear)
            .OnComplete(() =>
            {
                // mark thrown finished and deactivate
@@ -992,7 +1006,7 @@ public class EnemyController : EnemyCharacter
     {
         if (player == null || Char == null || state == State.Grabed) return;
         float yRotation = player.position.x > Char.position.x ? 0f : 180f;
-        transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
+        Char.rotation = Quaternion.Euler(0f, yRotation, 0f);
     }
 
     float gravity = -22f;

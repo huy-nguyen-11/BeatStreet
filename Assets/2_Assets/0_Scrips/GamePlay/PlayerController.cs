@@ -81,7 +81,7 @@ public class PlayerController : PlayerCharacter
     public Vector2 startTouchPosition; // Vị trí bắt đầu chạm
     public Vector2 endTouchPosition;   // Vị trí kết thúc chạm
     private Vector2 endTouchPositionChange;   // Vị trí kết thúc chạm
-    private float swipeThreshold = 70f;
+    public float swipeThreshold = 50f;
     public float swipeTimeLimit = 0.3f;
     public float swipeStartTime;
 
@@ -108,10 +108,13 @@ public class PlayerController : PlayerCharacter
     private float maxTapTime = 0.2f;
     public float changeHoldTime = 0.3f;
     private Dictionary<int, Vector2> touchStartPositions = new Dictionary<int, Vector2>();
+    private Dictionary<int, Vector2> touchLastPositions = new Dictionary<int, Vector2>();
     private Vector2 touchStartPositionsRun;
     private Dictionary<int, float> touchStartTimes = new Dictionary<int, float>();
     public int idTounchRun;
     private float holdTimer;
+    [SerializeField] private float holdMoveTolerancePixels = 25f; // cho phép ngón tay rung nhẹ
+    [SerializeField] private float holdJoystickTolerance = 0.5f;  // giảm độ khắt khe của joystick khi giữ
 
     // Facing state to avoid repeated flips/snapping
     public bool isFacingRight = true;
@@ -309,7 +312,7 @@ public class PlayerController : PlayerCharacter
             || GamePlayManager.Instance.isCheckUlti
             ) return;
 
-        if (state == State.Hit) return;
+        //if (state == State.Hit) return;
 
         CheckTouchInput();
 
@@ -358,6 +361,7 @@ public class PlayerController : PlayerCharacter
             }
             else
             {
+
                 if (state != State.Idle && state != State.Change && state != State.SpeedUp)
                 {
                     SwitchToRunState(playerIdle);
@@ -492,9 +496,10 @@ public class PlayerController : PlayerCharacter
             {
                 case TouchPhase.Began:
                     if (isJumping)
-                        return;
+                        continue;
 
                     touchStartPositions[touchId] = touch.position;
+                    touchLastPositions[touchId] = touch.position;
                     touchStartTimes[touchId] = Time.time;
                     holdTimer = 0f;
 
@@ -508,30 +513,28 @@ public class PlayerController : PlayerCharacter
 
                     if (!touchStartTimes.ContainsKey(touchId))
                         return;
+                    // tích lũy thời gian giữ nếu ngón tay chỉ rung nhẹ
+                    Vector2 lastPos = touchLastPositions.TryGetValue(touchId, out var lp) ? lp : touch.position;
+                    float frameMove = Vector2.Distance(touch.position, lastPos);
+                    touchLastPositions[touchId] = touch.position;
+                    bool nearlyStationary = frameMove <= holdMoveTolerancePixels;
+                    if (nearlyStationary && joystick.HandleNormalizedMagnitude <= 0.3f && state != State.Change && state != State.SpeedUp && state != State.Hit)
+                    {
+                        holdTimer += Time.deltaTime;
+                        if (holdTimer > changeHoldTime && !isGetJoy)
+                        {
+                            holdTimer = 0f;
+                            SwitchToRunState(playerChange);
+                        }
+                    }
+                    else
+                    {
+                        holdTimer = 0f;
+                    }
                     GetJoy();
                     //grab enemy
                     if ((state == State.Walk || state == State.Run) && canGrab)
                     {
-                        //// Check grab condition
-                        //var (enemy, distance) = GetNearestEnemy();
-                        //if (enemy != null && enemy.enemyController.typeOfEnemy != TypeOfEnemy.Boss)
-                        //{
-                        //    Vector2 playerPos = transform.position;
-                        //    Vector2 enemyPos = enemy.transform.position;
-
-                        //    float distX = Mathf.Abs(enemyPos.x - playerPos.x);
-                        //    float distY = Mathf.Abs(enemyPos.y - playerPos.y);
-
-                        //    if (distX < 0.75f && distY < 0.5f)
-                        //    {
-                        //        bool enemyInFront = isFacingRight ? enemyPos.x > playerPos.x : enemyPos.x < playerPos.x;
-                        //        if (enemyInFront && enemy.enemyController.state != EnemyCharacter.State.Dead &&
-                        //            enemy.enemyController.state != EnemyCharacter.State.Fall)
-                        //        {
-                        //            SwitchToRunState(playerGrab);
-                        //        }
-                        //    }
-                        //}
                         CheckGrabEnemy();
                     }
                     isGetJoy = true;
@@ -543,9 +546,8 @@ public class PlayerController : PlayerCharacter
                     if (touchStartPositions.ContainsKey(touchId))
                     {
                         holdTimer += Time.deltaTime;
-                        if (/*(Mathf.Abs(joystick.SmoothedDirection.x) <= 0.3f || Mathf.Abs(joystick.SmoothedDirection.y) <= 0.3f*/joystick.HandleNormalizedMagnitude <= 0.3f
-                            && holdTimer > changeHoldTime && state != State.Change
-                            && (state == State.Idle || state == State.Attack) && !isGetJoy)
+           
+                        if ((joystick.HandleNormalizedMagnitude <= 0.3f) && holdTimer > changeHoldTime && state != State.Change && state != State.SpeedUp && state != State.Hit)
                         {
                             holdTimer = 0f;
                             SwitchToRunState(playerChange);
@@ -579,7 +581,7 @@ public class PlayerController : PlayerCharacter
                             {
                                 if(holdTime> 0.3)
                                 {
-                                    if (fillBar.mana >= 20)
+                                    if (fillBar.mana >= 20) 
                                     {
                                         SetMana(-20);
                                         SwitchToRunState(playerSkill2);
@@ -698,6 +700,7 @@ public class PlayerController : PlayerCharacter
                         }
                         touchStartPositions.Remove(touchId);
                         touchStartTimes.Remove(touchId);
+                        touchLastPositions.Remove(touchId);
                     }
                     break;
             }
@@ -924,6 +927,7 @@ public class PlayerController : PlayerCharacter
     {
         HitTimer = 0f;
         HitCount++;
+        Debug.Log("count hit: " + HitCount);
         if (HitCount > 3)
         {
             HitCount = 0;
@@ -1034,10 +1038,8 @@ public class PlayerController : PlayerCharacter
             if (!isFall)
             {
                 PerformHit();
-                if (state != State.Jump && state != State.Skill1 && state != State.Skill2 /*&& state != State.Change*/)
+                if (state != State.Jump && state != State.Skill1 && state != State.Skill2)
                 {
-                    //if (isCheckSkill2)
-                    //    isCheckSkill2 = false;
                     if (playerGrab != null && playerGrab.IsGrabActive())
                     {
                         playerGrab.CancelGrab();
@@ -1162,12 +1164,6 @@ public class PlayerController : PlayerCharacter
 
         // wait one frame so any in-flight state changes or animation events settle
         yield return null;
-
-        // wait until grounded or a short timeout (avoid infinite wait)
-        float timeout = 0.5f;
-        float start = Time.time;
-        int waitCount = 0;
-
 
         // default landing -> Idle
         if (stateManager != null)
