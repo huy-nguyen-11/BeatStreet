@@ -15,7 +15,7 @@ public class PlayerUpgrade : MonoBehaviour
     [SerializeField] Sprite[] _sprLock;
     [SerializeField] Sprite[] _sprStatusUpgrade;
     [SerializeField] Sprite[] _sprPrice;
-    [SerializeField] ScrollSnapPagination scrollSnap;
+    //[SerializeField] ScrollSnapPagination scrollSnap;
     [SerializeField] GameObject _buttonUpgrade , _buttonSwitch , _buttonIncrease , _buttonDeacrease , _progressTicket , playerChar;
     DataManager _dataManager;
     int idPlayer;
@@ -37,8 +37,8 @@ public class PlayerUpgrade : MonoBehaviour
         isStatusUpgrade = false;
         SetOnClickBtn();
         OnInit();
-        if (scrollSnap != null)
-            Invoke(nameof(PagePlayerSellect), 0.01f);
+        //if (scrollSnap != null)
+        //    Invoke(nameof(PagePlayerSellect), 0.01f);
     }
     private void OnInit()
     {
@@ -46,17 +46,17 @@ public class PlayerUpgrade : MonoBehaviour
         SetBtnPlayer();
         BtnInformation(idPlayer);
     }
-    private void PagePlayerSellect()
-    {
-        if (idPlayer < 3)
-            scrollSnap.PagesSellect(0);
-        else if (idPlayer > 2 && idPlayer < 6)
-            scrollSnap.PagesSellect(1);
-        else if (idPlayer > 5 && idPlayer < 9)
-            scrollSnap.PagesSellect(2);
-        else
-            scrollSnap.PagesSellect(3);
-    }
+    //private void PagePlayerSellect()
+    //{
+    //    if (idPlayer < 3)
+    //        scrollSnap.PagesSellect(0);
+    //    else if (idPlayer > 2 && idPlayer < 6)
+    //        scrollSnap.PagesSellect(1);
+    //    else if (idPlayer > 5 && idPlayer < 9)
+    //        scrollSnap.PagesSellect(2);
+    //    else
+    //        scrollSnap.PagesSellect(3);
+    //}
     public void BtnActive() // butotn select
     {
         AudioBase.Instance.SetAudioUI(0);

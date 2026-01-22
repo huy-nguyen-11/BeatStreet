@@ -313,6 +313,7 @@ public class PlayerController : PlayerCharacter
             ) return;
 
         //if (state == State.Hit) return;
+        //if(isFall) return;
 
         CheckTouchInput();
 
@@ -342,7 +343,7 @@ public class PlayerController : PlayerCharacter
         bool canMoveState = (state == State.Idle || state == State.SpeedUp || state == State.Change || state == State.Walk || state == State.Run);
 
 
-        if (!isJumping && canMoveState)
+        if (!isJumping && canMoveState && !isFall)
         {
             if (smoothMag >= runThreshold)
             {
@@ -495,8 +496,8 @@ public class PlayerController : PlayerCharacter
             switch (touch.phase)
             {
                 case TouchPhase.Began:
-                    if (isJumping)
-                        continue;
+                    if (isJumping || isFall)
+                        return;
 
                     touchStartPositions[touchId] = touch.position;
                     touchLastPositions[touchId] = touch.position;
@@ -506,7 +507,7 @@ public class PlayerController : PlayerCharacter
 
                     break;
                 case TouchPhase.Moved:
-                    if (isJumping)
+                    if (isJumping || isFall)
                     {
                         return;
                     }
@@ -540,7 +541,7 @@ public class PlayerController : PlayerCharacter
                     isGetJoy = true;
                     break;
                 case TouchPhase.Stationary:
-                    if (isJumping)
+                    if (isJumping || isFall)
                         return;
 
                     if (touchStartPositions.ContainsKey(touchId))
@@ -556,7 +557,7 @@ public class PlayerController : PlayerCharacter
                     break;
 
                 case TouchPhase.Ended:
-                    if (isJumping)
+                    if (isJumping || isFall)
                         return;
                     if (touchStartPositions.ContainsKey(touchId))
                     {
@@ -927,7 +928,6 @@ public class PlayerController : PlayerCharacter
     {
         HitTimer = 0f;
         HitCount++;
-        Debug.Log("count hit: " + HitCount);
         if (HitCount > 3)
         {
             HitCount = 0;

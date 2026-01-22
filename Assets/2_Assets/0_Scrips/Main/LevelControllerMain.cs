@@ -707,18 +707,22 @@ public class LevelControllerMain : MonoBehaviour
     public void BtnPlay()
     {
         AudioBase.Instance.SetAudioUI(0);
-        if (PlayerPrefs.GetInt("Energy") >= 2)
-        {
-            PlayerPrefs.SetInt("Energy", PlayerPrefs.GetInt("Energy") - 2); 
-            // Play Game
-            dataManager.LevelSelect = level;
-            _popups[4].gameObject.SetActive(true);
-            Invoke(nameof(PlayGame), 0.5f);
-        }
-        else
-        {
-            _popups[3].gameObject.SetActive(true);
-        }
+        //if (PlayerPrefs.GetInt("Energy") >= 2)
+        //{
+        //    PlayerPrefs.SetInt("Energy", PlayerPrefs.GetInt("Energy") - 2); 
+        //    // Play Game
+        //    dataManager.LevelSelect = level;
+        //    _popups[4].gameObject.SetActive(true);
+        //    Invoke(nameof(PlayGame), 0.5f);
+        //}
+        //else
+        //{
+        //    _popups[3].gameObject.SetActive(true);
+        //}
+        // Play Game
+        dataManager.LevelSelect = level;
+        _popups[4].gameObject.SetActive(true);
+        Invoke(nameof(PlayGame), 0.5f);
     }
     private void PlayGame()
     {

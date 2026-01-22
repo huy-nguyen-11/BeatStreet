@@ -42,6 +42,7 @@ public class PlayerHit : PlayerStateManager
     public override void Exit()
     {
         isFall = false;
+        playerController.isFall = false;
         if (_coroutine != null)
         {
             playerController.StopCoroutine(_coroutine);
