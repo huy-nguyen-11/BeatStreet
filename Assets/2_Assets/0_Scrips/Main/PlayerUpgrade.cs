@@ -16,7 +16,7 @@ public class PlayerUpgrade : MonoBehaviour
     [SerializeField] Sprite[] _sprStatusUpgrade;
     [SerializeField] Sprite[] _sprPrice;
     //[SerializeField] ScrollSnapPagination scrollSnap;
-    [SerializeField] GameObject _buttonUpgrade , _buttonSwitch , _buttonIncrease , _buttonDeacrease , _progressTicket , playerChar;
+    [SerializeField] GameObject _buttonUpgrade , _buttonSwitch , _buttonIncrease , _buttonDeacrease , _progressTicket , playerChar , playerActiveChar;
     DataManager _dataManager;
     int idPlayer;
     int countUpGrade = 1;
@@ -101,13 +101,13 @@ public class PlayerUpgrade : MonoBehaviour
         {
             if (_dataManager.playerData[i].isUnlock)
             {
-                _btnPlayer[i].GetChild(0).GetComponent<Image>().sprite = _sprAvatarUnLock[i]; // icon char  
+                _btnPlayer[i].GetChild(0).GetChild(0).GetComponent<Image>().sprite = _sprAvatarUnLock[i]; // icon char  
                 _btnPlayer[i].GetChild(1).gameObject.SetActive(true); // text level
                 _btnPlayer[i].GetChild(3).gameObject.SetActive(false); // lock
             }
             else
             {
-                _btnPlayer[i].GetChild(0).GetComponent<Image>().sprite = _sprAvatarLock[i]; //icon char 
+                _btnPlayer[i].GetChild(0).GetChild(0).GetComponent<Image>().sprite = _sprAvatarLock[i]; //icon char 
                 _btnPlayer[i].GetChild(1).gameObject.SetActive(true); // text level
                 _btnPlayer[i].GetChild(3).gameObject.SetActive(true); // lock
                 if (_dataManager.warehouse.CountPiecePlayerLevelUp[i] >= _dataManager.playerData[i].pieceUnlock)
@@ -150,6 +150,20 @@ public class PlayerUpgrade : MonoBehaviour
                 _btnPlayer[i].transform.GetChild(2).gameObject.SetActive(true);
             else
                 _btnPlayer[i].transform.GetChild(2).gameObject.SetActive(false);
+
+            //for char image , dor player  comming soon
+            if (!_dataManager.playerData[id].isUnlock)
+            {
+                playerChar.SetActive(true);
+                playerActiveChar.SetActive(false);
+                playerChar.GetComponent<Image>().sprite = _sprAvatarLock[id];
+            }
+            else
+            {
+                playerChar.SetActive(false);
+                playerActiveChar.SetActive(true);
+            }
+           
         }
     }
     private void SetParameter(int id)
@@ -190,33 +204,36 @@ public class PlayerUpgrade : MonoBehaviour
         _buttonUpgrade.transform.GetChild(3).gameObject.SetActive(!isCheckUnLock); // text mission
         if (!isCheckUnLock)
         {
-            if (_dataManager.LevelCurren < _dataManager.playerData[id].LevelUnlockCharacter)
-            {
-                _buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text =
-                    "Clear\r\nmission " + _dataManager.playerData[id].LevelUnlockCharacter;
-                int idPlayer = id;
-                int idStatus = 2;
-                _buttonUpgrade.GetComponent<Button>().onClick.AddListener(delegate
-                {
-                    BtnUpgrade(idPlayer, idStatus);
-                });
-            }
-            else
-            {
-                int idPlayer = id;
-                int idStatus = 1;
-                _buttonUpgrade.GetComponent<Button>().onClick.AddListener(delegate
-                {
-                    BtnUpgrade(idPlayer, idStatus);
-                });
-                _buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Unlock";
-            }
+            //if (_dataManager.LevelCurren < _dataManager.playerData[id].LevelUnlockCharacter)
+            //{
+            //    _buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text =
+            //        "Clear\r\nmission " + _dataManager.playerData[id].LevelUnlockCharacter;
+            //    int idPlayer = id;
+            //    int idStatus = 2;
+            //    _buttonUpgrade.GetComponent<Button>().onClick.AddListener(delegate
+            //    {
+            //        BtnUpgrade(idPlayer, idStatus);
+            //    });
+            //}
+            //else
+            //{
+            //    int idPlayer = id;
+            //    int idStatus = 1;
+            //    _buttonUpgrade.GetComponent<Button>().onClick.AddListener(delegate
+            //    {
+            //        BtnUpgrade(idPlayer, idStatus);
+            //    });
+            //    _buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Unlock";
+            //}
+            _buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Comming soon";
+            _buttonUpgrade.transform.GetComponent<Button>().interactable = false;
         }
         else
         {
             if (isStatusUpgrade && _dataManager.playerData[id].LevelEvolve < 40
                 || !isStatusUpgrade && _dataManager.playerData[id].Level < _dataManager.playerData[id].LevelEvolve)
             {
+                _buttonUpgrade.transform.GetComponent<Button>().interactable = true;
                 _buttonUpgrade.transform.GetChild(0).gameObject.SetActive(true); // icon
                 _buttonUpgrade.transform.GetChild(1).gameObject.SetActive(true); // text
                 _buttonUpgrade.transform.GetChild(2).gameObject.SetActive(true); // text coin
@@ -479,36 +496,26 @@ public class PlayerUpgrade : MonoBehaviour
     public void BtnUpgrade(int id, int status)
     {
         AudioBase.Instance.SetAudioUI(0);
-        Debug.Log("Upgrade Button Clicked: id=" + id + ", status=" + status);
         if (status == 0)
         {
             string keyPrice = !isStatusUpgrade ? "Coin" : "Diamont";
             int price = !isStatusUpgrade ? priceCoin : priceDiamont;
+
             //if (!isStatusUpgrade && _dataManager.warehouse.CountPiecePlayerLevelUp[id] < pieceUpgradeLevelUp) return;
             //if (isStatusUpgrade && _dataManager.warehouse.CountPiecePlayerEvolve[id] < pieceUpgradeLevelEvolve) return;
-            //if (PlayerPrefs.GetInt(keyPrice) >= price)
-            //{
-            //    Debug.Log("here!");
-            //    AudioBase.Instance.SetAudioUI(4);
-            //    if (keyPrice == "Diamont") MainManager.Instance.SetMission(0, price);
-            //    else MainManager.Instance.SetMission(1, price);
-            //    MainManager.Instance.SetMission(2, 1);
-            //    PlayerPrefs.SetInt(keyPrice, PlayerPrefs.GetInt(keyPrice) - price);
-            //    SetAttribute(id);
-            //    BtnInformation(id);
-            //    _dataManager.SaveFile();
-            //    MainManager.Instance.SetTopBar();
-            //}
-            Debug.Log("here!");
-            AudioBase.Instance.SetAudioUI(4);
-            if (keyPrice == "Diamont") MainManager.Instance.SetMission(0, price);
-            else MainManager.Instance.SetMission(1, price);
-            MainManager.Instance.SetMission(2, 1);
-            PlayerPrefs.SetInt(keyPrice, PlayerPrefs.GetInt(keyPrice) - price);
-            SetAttribute(id);
-            BtnInformation(id);
-            _dataManager.SaveFile();
-            MainManager.Instance.SetTopBar();
+            if (PlayerPrefs.GetInt(keyPrice) >= price)
+            {
+                Debug.Log("here!");
+                AudioBase.Instance.SetAudioUI(4);
+                if (keyPrice == "Diamont") MainManager.Instance.SetMission(0, price);
+                else MainManager.Instance.SetMission(1, price);
+                MainManager.Instance.SetMission(2, 1);
+                PlayerPrefs.SetInt(keyPrice, PlayerPrefs.GetInt(keyPrice) - price);
+                SetAttribute(id);
+                BtnInformation(id);
+                _dataManager.SaveFile();
+                MainManager.Instance.SetTopBar();
+            }
         }
         else if (status == 1)
         {
