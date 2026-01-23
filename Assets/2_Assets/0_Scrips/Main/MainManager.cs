@@ -283,26 +283,26 @@ public class MainManager : MonoBehaviour
     private void SetAvtBtn()
     {
         int _levelEnableEquipEnemy = 0;
-        //_btnUpgrade[0].GetComponent<Image>().sprite = _sprAvtPlayer[dataManager.idPlayer];
-        _btnUpgrade[1].gameObject.SetActive(dataManager.LevelCurren >= _levelEnableEquipEnemy);
-        _btnUpgrade[2].gameObject.SetActive(dataManager.LevelCurren >= _levelEnableEquipEnemy);
-        if (dataManager.LevelCurren >= _levelEnableEquipEnemy)
-        {
-            if (dataManager.idPet1 != 99)
-            {
-                _btnUpgrade[1].GetChild(0).GetComponent<Image>().sprite = _sprAvtEnemy[dataManager.idPet1];
-                _btnUpgrade[1].GetChild(0).gameObject.SetActive(true);
-            }
-            else
-                _btnUpgrade[1].GetChild(0).gameObject.SetActive(false);
-            if (dataManager.idPet2 != 99)
-            {
-                _btnUpgrade[2].GetChild(0).GetComponent<Image>().sprite = _sprAvtEnemy[dataManager.idPet2];
-                _btnUpgrade[2].GetChild(0).gameObject.SetActive(true);
-            }
-            else
-                _btnUpgrade[2].GetChild(0).gameObject.SetActive(false);
-        }
+        ////_btnUpgrade[0].GetComponent<Image>().sprite = _sprAvtPlayer[dataManager.idPlayer];
+        //_btnUpgrade[1].gameObject.SetActive(dataManager.LevelCurren >= _levelEnableEquipEnemy);
+        //_btnUpgrade[2].gameObject.SetActive(dataManager.LevelCurren >= _levelEnableEquipEnemy);
+        //if (dataManager.LevelCurren >= _levelEnableEquipEnemy)
+        //{
+        //    if (dataManager.idPet1 != 99)
+        //    {
+        //        _btnUpgrade[1].GetChild(0).GetComponent<Image>().sprite = _sprAvtEnemy[dataManager.idPet1];
+        //        _btnUpgrade[1].GetChild(0).gameObject.SetActive(true);
+        //    }
+        //    else
+        //        _btnUpgrade[1].GetChild(0).gameObject.SetActive(false);
+        //    if (dataManager.idPet2 != 99)
+        //    {
+        //        _btnUpgrade[2].GetChild(0).GetComponent<Image>().sprite = _sprAvtEnemy[dataManager.idPet2];
+        //        _btnUpgrade[2].GetChild(0).gameObject.SetActive(true);
+        //    }
+        //    else
+        //        _btnUpgrade[2].GetChild(0).gameObject.SetActive(false);
+        //}
     }
     public void BtnOpenPlayerUpgrade()
     {

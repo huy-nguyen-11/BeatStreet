@@ -206,6 +206,7 @@ public class PlayerUpgrade : MonoBehaviour
         {
             //if (_dataManager.LevelCurren < _dataManager.playerData[id].LevelUnlockCharacter)
             //{
+            //    Debug.Log("lock");
             //    _buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text =
             //        "Clear\r\nmission " + _dataManager.playerData[id].LevelUnlockCharacter;
             //    int idPlayer = id;
@@ -223,21 +224,32 @@ public class PlayerUpgrade : MonoBehaviour
             //    {
             //        BtnUpgrade(idPlayer, idStatus);
             //    });
-            //    _buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Unlock";
+            //    _buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Comming soon";
+            //    //_buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Comming soon";
+            //    _buttonUpgrade.transform.GetComponent<Button>().interactable = false;
             //}
+            int idPlayer = id;
+            int idStatus = 1;
+            _buttonUpgrade.GetComponent<Button>().onClick.AddListener(delegate
+            {
+                BtnUpgrade(idPlayer, idStatus);
+            });
             _buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Comming soon";
             _buttonUpgrade.transform.GetComponent<Button>().interactable = false;
+            Debug.Log("lock");
         }
         else
         {
+            Debug.Log("unlock");
+            _buttonUpgrade.transform.GetComponent<Button>().interactable = true;
             if (isStatusUpgrade && _dataManager.playerData[id].LevelEvolve < 40
                 || !isStatusUpgrade && _dataManager.playerData[id].Level < _dataManager.playerData[id].LevelEvolve)
             {
-                _buttonUpgrade.transform.GetComponent<Button>().interactable = true;
                 _buttonUpgrade.transform.GetChild(0).gameObject.SetActive(true); // icon
                 _buttonUpgrade.transform.GetChild(1).gameObject.SetActive(true); // text
                 _buttonUpgrade.transform.GetChild(2).gameObject.SetActive(true); // text coin
                 _buttonUpgrade.transform.GetChild(3).gameObject.SetActive(false); // text mission
+                Debug.Log("upgrade");
                 int idPlayer = id;
                 int idStatus = 0;
                 _buttonUpgrade.GetComponent<Button>().onClick.AddListener(delegate
@@ -257,7 +269,7 @@ public class PlayerUpgrade : MonoBehaviour
                 _buttonUpgrade.transform.GetChild(1).gameObject.SetActive(false); // text
                 _buttonUpgrade.transform.GetChild(2).gameObject.SetActive(false); // text coin
                 _buttonUpgrade.transform.GetChild(3).gameObject.SetActive(true);
-                _buttonUpgrade.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text =
+                _buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text =
                  "Max Level";
                 int idPlayer = id;
                 int idStatus = 2;
@@ -500,12 +512,10 @@ public class PlayerUpgrade : MonoBehaviour
         {
             string keyPrice = !isStatusUpgrade ? "Coin" : "Diamont";
             int price = !isStatusUpgrade ? priceCoin : priceDiamont;
-
-            //if (!isStatusUpgrade && _dataManager.warehouse.CountPiecePlayerLevelUp[id] < pieceUpgradeLevelUp) return;
-            //if (isStatusUpgrade && _dataManager.warehouse.CountPiecePlayerEvolve[id] < pieceUpgradeLevelEvolve) return;
+            if (!isStatusUpgrade && _dataManager.warehouse.CountPiecePlayerLevelUp[id] < pieceUpgradeLevelUp) return;
+            if (isStatusUpgrade && _dataManager.warehouse.CountPiecePlayerEvolve[id] < pieceUpgradeLevelEvolve) return;
             if (PlayerPrefs.GetInt(keyPrice) >= price)
             {
-                Debug.Log("here!");
                 AudioBase.Instance.SetAudioUI(4);
                 if (keyPrice == "Diamont") MainManager.Instance.SetMission(0, price);
                 else MainManager.Instance.SetMission(1, price);
