@@ -198,7 +198,7 @@ public class ShopController : MonoBehaviour
         }
 
         CheckPlayerLevelUp();
-        CheckEnemy();
+        //CheckEnemy();
         CheckListPlayerEvolve();
         CheckListItem();
 

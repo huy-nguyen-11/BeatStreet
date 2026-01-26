@@ -669,6 +669,7 @@ public class EnemyController : EnemyCharacter
             {
                 if (!isAttack)
                 {
+                    Debug.Log("aaaaa"+ Time.time);
                     isAttack = true;
                     SwitchToRunState(enemyIdle);
                 }

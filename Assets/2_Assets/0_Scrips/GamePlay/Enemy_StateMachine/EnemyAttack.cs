@@ -11,6 +11,7 @@ public class EnemyAttack : EnemyStateMachine
 
     public override void Enter()
     {
+        Debug.Log("Enter Attack State"+ Time.time);
         enemyController.state = EnemyController.State.Attack;
         if(enemyController.typeOfEnemy == TypeOfEnemy.Boss && enemyController.idEnemy == 1)
         {

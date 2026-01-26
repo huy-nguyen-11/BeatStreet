@@ -311,8 +311,6 @@ public class LevelControllerMain : MonoBehaviour
             case 1:
                 return dataManager.dataBase.imgEquipItems.sprPiecePlayerEvolve[dataManager.levelDatas[level].idItem];
             case 2:
-                return dataManager.dataBase.imgEquipItems.sprPieceEnemy[dataManager.levelDatas[level].idItem];
-            case 3:
                 return dataManager.dataBase.imgEquipItems.sprItem[dataManager.levelDatas[level].idItem];
             default:
                 return dataManager.dataBase.imgEquipItems.sprPiecePlayerLevelUp[dataManager.levelDatas[level].idItem];

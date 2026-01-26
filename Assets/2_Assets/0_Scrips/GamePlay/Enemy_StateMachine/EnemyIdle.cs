@@ -32,7 +32,7 @@ public class EnemyIdle : EnemyStateMachine
         //    return;
         //}
         // Allow attack preparation to proceed even when isStopping is true.
-        if (enemyController.isStopping)
+        if (enemyController.isStopping && !enemyController.isAttack)
         {
             return;
         }
@@ -59,7 +59,6 @@ public class EnemyIdle : EnemyStateMachine
     IEnumerator SpawnedEnemyRunDelay()
     {
         yield return new WaitForSeconds(1f);
-        
         // After 1 second, switch to run state
         if (enemyController.state == EnemyController.State.Idle
             && !enemyController.playerController.IsDead
@@ -86,6 +85,17 @@ public class EnemyIdle : EnemyStateMachine
         // For spawned enemies, don't check for player distance - they will run after 1 second delay
         if (enemyController.isSpawned)
         {
+            return;
+        }
+
+
+        // If attack flag becomes true while already in Idle, ensure DelayAttack starts immediately.
+        if (enemyController.isAttack)
+        {
+            if (_coroutine == null)
+            {
+                _coroutine = enemyController.StartCoroutine(DelayAttack());
+            }
             return;
         }
 
@@ -117,7 +127,7 @@ public class EnemyIdle : EnemyStateMachine
     
         if(enemyController.typeOfEnemy == TypeOfEnemy.Boss && enemyController.idEnemy == 0)
         {
-            yield return new WaitForSeconds(0.3f);
+            yield return new WaitForSeconds(0.25f);
             int idEnemy = enemyController.Char.GetComponent<EnemyChar>().idEnemy;
 
             if (enemyController.Char.position.x <= enemyController.player.position.x)
@@ -133,7 +143,7 @@ public class EnemyIdle : EnemyStateMachine
         }
         else
         {
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.45f);
             if (Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) <= (enemyController.rangeAttack + 0.2f)
                && Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) >= 0.15f
                && Mathf.Abs(enemyController.Char.position.y - enemyController.player.position.y) <= 0.2f)
@@ -149,6 +159,7 @@ public class EnemyIdle : EnemyStateMachine
                     GamePlayManager.Instance.isEnemyOnRight[idEnemy] = true;
                 }
 
+ 
                 enemyController.SwitchToRunState(enemyController.enemyAttack);
             }
             else
