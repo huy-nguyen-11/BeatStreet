@@ -92,10 +92,11 @@ public class EnemyAttack : EnemyStateMachine
         enemyController.patrolTimer = 0f;
 
         // choose animation
-        if (enemyController.typeOfEnemy == TypeOfEnemy.Boss && enemyController.idEnemy == 1)
+        if (enemyController.typeOfEnemy == TypeOfEnemy.Boss)
         {
             float randomValue = Random.Range(0f, 1f);
-            attackAnimationName = (randomValue <= 0.5f) ? "Attack1" : "Attack2";
+            //attackAnimationName = (randomValue <= 0.5f) ? "Attack1" : "Attack2";
+            attackAnimationName =  "Attack1";
         }
         else
         {
@@ -122,7 +123,11 @@ public class EnemyAttack : EnemyStateMachine
             // play attack animation and wait for completion
             attackEntry = enemyController.skeletonAnimation.AnimationState.SetAnimation(0, attackAnimationName, false);
             bool isFacingRight = enemyController.Char.rotation.y < 0f;
-            enemyController.rb.linearVelocity = Vector2.right * (isFacingRight ? -0.2f : 0.2f);
+            if(enemyController.typeOfEnemy != TypeOfEnemy.Boss)
+            {
+                enemyController.rb.linearVelocity = Vector2.right * (isFacingRight ? -0.2f : 0.2f);
+            }
+
             Spine.AnimationState.TrackEntryDelegate handler = null;
             handler = (TrackEntry te) =>
             {

@@ -117,6 +117,7 @@ public class EnemyIdle : EnemyStateMachine
 
         if (!enemyController.isAttack)
         {
+            
             if (!enemyController.isActiveRun && Vector2.Distance(enemyController.transform.position, enemyController.player.position) <= 2.5f)
             {
                 enemyController.SetRandomPatrolTarget();

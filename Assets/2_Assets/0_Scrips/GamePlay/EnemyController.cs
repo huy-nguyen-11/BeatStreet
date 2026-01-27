@@ -745,14 +745,14 @@ public class EnemyController : EnemyCharacter
             {
                 if (!isAttack)
                 {
-                    //isStopping = false;
-                    //stopTimer = 0f;
-                    //patrolTimer = 0f;
-                    //isPatrolling = false;
+                    isStopping = false;
+                    stopTimer = 0f;
+                    patrolTimer = 0f;
+                    isPatrolling = false;
 
                     isAttack = true;
-                    SwitchToRunState(enemyIdle);
-                    //SwitchToRunState(enemyAttack);
+                    //SwitchToRunState(enemyIdle);
+                    SwitchToRunState(enemyAttack);
                 }
             }
             return;
