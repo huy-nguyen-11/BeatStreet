@@ -114,7 +114,8 @@ public class PlayerGrab : PlayerStateManager
         AudioBase.Instance.AudioPlayer(2);
 
         _grabAttackCount = 0;
-        _maxGrabAttacks = Random.Range(2, 5);
+        //_maxGrabAttacks = Random.Range(2, 4);
+        _maxGrabAttacks = 2;
 
         isGrabActive = true;
         grabTimer = 0f;
@@ -225,7 +226,6 @@ public class PlayerGrab : PlayerStateManager
             CancelGrabAndIdle();
             return;
         }
-
         _pendingThrowDirection = Mathf.Sign(direction);
         _throwAnimCompleted = false;
         _throwOccurred = false;
@@ -443,6 +443,8 @@ public class PlayerGrab : PlayerStateManager
         {
             // Ném enemy theo hướng player đang quay mặt
             float throwDirection = playerController.isFacingRight ? 1f : -1f;
+            Debug.Log("Auto throw after max grab attacks: " + _grabAttackCount);
+            playerController.isThrowEnemy = true;
             StartThrow(throwDirection);
             return;
         }
@@ -533,6 +535,7 @@ public class PlayerGrab : PlayerStateManager
         isGrabActive = false;
         grabTimer = 0f;
         playerController.canGrab = false;
+        playerController.isThrowEnemy = false;
     }
 
     public override void OnTriggerEnter(Collider2D collision)

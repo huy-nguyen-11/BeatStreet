@@ -142,6 +142,9 @@ public class PlayerController : PlayerCharacter
 
     // near other public fields
     [HideInInspector] public bool isInputBlocked = false;
+
+    //for attack grab enemy
+    public bool isThrowEnemy = false;
     #endregion
 
     private void Awake()
@@ -572,7 +575,7 @@ public class PlayerController : PlayerCharacter
                         if (Vector2.Distance(startPosition, endPosition) <= tapThresholdPixels) // tap threshold in pixels
                         {
                             //grab attack enemy
-                            if (playerGrab != null && playerGrab.IsGrabActive())
+                            if (playerGrab != null && playerGrab.IsGrabActive() && !isThrowEnemy)
                             {
                                 // queue a grab-attack (will play Grab_Attack on spine track 1 and queue taps while previous anim runs)
                                 playerGrab.QueueGrabAttack();

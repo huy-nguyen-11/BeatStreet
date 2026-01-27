@@ -11,6 +11,7 @@ public class EnemyIdle : EnemyStateMachine
     public override void Enter()
     {
         enemyController.PlayAnim("Idle", true);
+        enemyController.ResetMoveAnimation();
         enemyController.state = EnemyController.State.Idle;
         enemyController.rb.linearVelocity = Vector2.zero;
         
@@ -51,7 +52,9 @@ public class EnemyIdle : EnemyStateMachine
         {
             if (_coroutine == null)
             {
-                _coroutine = enemyController.StartCoroutine(DelayAttack());
+                enemyController.ResetMoveAnimation();
+  
+                //_coroutine = enemyController.StartCoroutine(DelayAttack());
             }
         }
     }
@@ -65,6 +68,7 @@ public class EnemyIdle : EnemyStateMachine
             && !GamePlayManager.Instance.isCheckUlti
             && !enemyController.isGrabbed)
         {
+            enemyController.ResetMoveAnimation();
             enemyController.isActiveRun = true;
             enemyController.isSpawned = false; // Reset spawned flag
             enemyController.SetRun();
@@ -94,7 +98,7 @@ public class EnemyIdle : EnemyStateMachine
         {
             if (_coroutine == null)
             {
-                _coroutine = enemyController.StartCoroutine(DelayAttack());
+                //_coroutine = enemyController.StartCoroutine(DelayAttack());
             }
             return;
         }
@@ -143,7 +147,7 @@ public class EnemyIdle : EnemyStateMachine
         }
         else
         {
-            yield return new WaitForSeconds(0.45f);
+            yield return new WaitForSeconds(1.45f);
             if (Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) <= (enemyController.rangeAttack + 0.2f)
                && Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) >= 0.15f
                && Mathf.Abs(enemyController.Char.position.y - enemyController.player.position.y) <= 0.2f)
@@ -159,11 +163,12 @@ public class EnemyIdle : EnemyStateMachine
                     GamePlayManager.Instance.isEnemyOnRight[idEnemy] = true;
                 }
 
- 
+                Debug.Log("Switch to Attack State"+ Time.time);
                 enemyController.SwitchToRunState(enemyController.enemyAttack);
             }
             else
             {
+                Debug.Log("Switch to Run State"+ Time.time);
                 enemyController.SwitchToRunState(enemyController.enemyRun);
             }
         }

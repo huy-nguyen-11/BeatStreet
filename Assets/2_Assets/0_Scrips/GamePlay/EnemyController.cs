@@ -65,6 +65,7 @@ public class EnemyController : EnemyCharacter
     public bool isWall;
     public bool canCheckWall;
     public bool isAttack;
+    public bool isAttacking = false;
     public LayerMask wallLayer;
     public LayerMask enemyLayer;
     private Vector3 lastDirection;
@@ -101,6 +102,8 @@ public class EnemyController : EnemyCharacter
 
     private string currentMoveAnim = null;
     public Transform posBullet;
+
+
     // Public method to reset move animation (useful when transitioning from states like Fall)
     public void ResetMoveAnimation()
     {
@@ -231,6 +234,57 @@ public class EnemyController : EnemyCharacter
     // Helper: pick move animation based on next target
     private float SetMoveAnimationByTarget(Vector3 nextTarget)
     {
+        //// Safety checks
+        //if (isGrabbed || isBeingThrown) return 0f;
+        //if (Char == null || player == null) return moveSpeed;
+        //if (state == State.Dead || state == State.Attack || state == State.Hit || state == State.Fall) return moveSpeed;
+
+        //Vector3 toTarget = nextTarget - Char.position;
+        //float dist = toTarget.magnitude;
+        //float absDistX = Mathf.Abs(toTarget.x);
+
+        //// Determine forward/backward relative to facing
+        //bool facingRight = player.position.x > Char.position.x; // matches UpdateEnemyRotation
+        //int moveDirX = (int)Mathf.Sign(toTarget.x);
+        //bool movingForward = (moveDirX == (facingRight ? 1 : -1));
+
+        //string targetAnim = (absDistX <= walkThreshold) ? ANIM_WALK : ANIM_RUN;
+
+        //// choose back variants if moving backwards
+        //if (!movingForward)
+        //{
+        //    if (targetAnim == ANIM_RUN) targetAnim = ANIM_RUN_BACK;
+        //    else targetAnim = ANIM_WALK_BACK;
+        //}
+
+        //if(typeOfEnemy == TypeOfEnemy.Boss)
+        //{
+        //    if (currentMoveAnim != ANIM_RUN)
+        //    {
+        //        currentMoveAnim = ANIM_RUN;
+        //        PlayAnim(ANIM_RUN, true);
+        //    }
+        //}
+        //else
+        //{
+        //    if (currentMoveAnim != targetAnim)
+        //    {
+        //        currentMoveAnim = targetAnim;
+        //        PlayAnim(targetAnim, true);
+        //    }
+        //}
+        //if(typeOfEnemy == TypeOfEnemy.Boss)
+        //{
+        //    return 0.5f;
+        //}
+        //else
+        //{
+        //    if (targetAnim == ANIM_RUN) return moveSpeedRun;
+        //    if (targetAnim == ANIM_WALK) return moveSpeedWalk;
+        //    if (targetAnim == ANIM_RUN_BACK) return moveSpeedRunBack;
+        //    if (targetAnim == ANIM_WALK_BACK) return moveSpeedWalkBack;
+        //    return moveSpeed;
+        //}
         // Safety checks
         if (isGrabbed || isBeingThrown) return 0f;
         if (Char == null || player == null) return moveSpeed;
@@ -240,48 +294,63 @@ public class EnemyController : EnemyCharacter
         float dist = toTarget.magnitude;
         float absDistX = Mathf.Abs(toTarget.x);
 
-        // Determine forward/backward relative to facing
-        bool facingRight = player.position.x > Char.position.x; // matches UpdateEnemyRotation
+        // If essentially at target, don't try to pick a move animation
+        if (dist <= idleThreshold) return 0f;
+
+        // Determine facing using Char's current rotation (avoid race with player movement)
+        bool facingRight = Mathf.Abs(Mathf.DeltaAngle(Char.localEulerAngles.y, 0f)) < 90f;
         int moveDirX = (int)Mathf.Sign(toTarget.x);
         bool movingForward = (moveDirX == (facingRight ? 1 : -1));
 
-        string targetAnim = (absDistX <= walkThreshold) ? ANIM_WALK : ANIM_RUN;
+        // Hysteresis band to avoid flicker around the walk/run threshold
+        float lower = Mathf.Max(0f, walkThreshold - animationHysteresis);
+        float upper = walkThreshold + animationHysteresis;
 
-        // choose back variants if moving backwards
-        if (!movingForward)
+        string chosenAnim;
+        if (absDistX <= lower)
         {
-            if (targetAnim == ANIM_RUN) targetAnim = ANIM_RUN_BACK;
-            else targetAnim = ANIM_WALK_BACK;
+            chosenAnim = ANIM_WALK;
+        }
+        else if (absDistX >= upper)
+        {
+            chosenAnim = ANIM_RUN;
+        }
+        else
+        {
+            // inside hysteresis band -> keep previous animation if exists, else pick based on threshold
+            chosenAnim = currentMoveAnim ?? (absDistX <= walkThreshold ? ANIM_WALK : ANIM_RUN);
         }
 
-        if(typeOfEnemy == TypeOfEnemy.Boss)
+        // Use back variants when moving backwards
+        if (!movingForward)
+        {
+            chosenAnim = (chosenAnim == ANIM_RUN) ? ANIM_RUN_BACK : ANIM_WALK_BACK;
+        }
+
+        // Boss special-case: force run
+        if (typeOfEnemy == TypeOfEnemy.Boss)
         {
             if (currentMoveAnim != ANIM_RUN)
             {
                 currentMoveAnim = ANIM_RUN;
                 PlayAnim(ANIM_RUN, true);
             }
-        }
-        else
-        {
-            if (currentMoveAnim != targetAnim)
-            {
-                currentMoveAnim = targetAnim;
-                PlayAnim(targetAnim, true);
-            }
-        }
-        if(typeOfEnemy == TypeOfEnemy.Boss)
-        {
             return 0.5f;
         }
-        else
+
+        // Only switch animation when it actually changes
+        if (currentMoveAnim != chosenAnim)
         {
-            if (targetAnim == ANIM_RUN) return moveSpeedRun;
-            if (targetAnim == ANIM_WALK) return moveSpeedWalk;
-            if (targetAnim == ANIM_RUN_BACK) return moveSpeedRunBack;
-            if (targetAnim == ANIM_WALK_BACK) return moveSpeedWalkBack;
-            return moveSpeed;
+            currentMoveAnim = chosenAnim;
+            PlayAnim(chosenAnim, true);
         }
+
+        // Return speed mapped to chosen anim
+        if (chosenAnim == ANIM_RUN) return moveSpeedRun;
+        if (chosenAnim == ANIM_WALK) return moveSpeedWalk;
+        if (chosenAnim == ANIM_RUN_BACK) return moveSpeedRunBack;
+        if (chosenAnim == ANIM_WALK_BACK) return moveSpeedWalkBack;
+        return moveSpeed;
     }
 
     // --------------------------------------------------
@@ -293,6 +362,8 @@ public class EnemyController : EnemyCharacter
         {
             return;
         }
+
+
 
         // Keep facing consistent for animation decision
         UpdateEnemyRotation();
@@ -403,7 +474,7 @@ public class EnemyController : EnemyCharacter
         {
             isStopping = false;
             stopTimer = 0f;
-            float num = typeOfEnemy == TypeOfEnemy.Boss ? 0f : 0.2f;
+            float num = typeOfEnemy == TypeOfEnemy.Boss ? 0f : 0.25f;
             isPatrolling = Random.value < num; //random 20% patrol, 80% move to player
             isAvoidingPlayer = false;
             if (isPatrolling && typeOfEnemy == TypeOfEnemy.Enemy)
@@ -432,11 +503,15 @@ public class EnemyController : EnemyCharacter
         //    //}
         //    return;
         //}
-
+        if (isAttacking)
+        {
+            return;
+        }
         if (isBeingThrown || isGrabbed) return;
-
-        //float targetOffset = 0.5f;
-        float targetOffset = rangeAttack;
+        // replace existing:
+        //float distanceX = Mathf.Abs(Char.position.x - player.position.x);
+        //float num = distanceX < 1.35f ? 0f : 1f;
+        float targetOffset = rangeAttack ;
         Vector3 leftTarget = player.position + Vector3.left * targetOffset;
         Vector3 rightTarget = player.position + Vector3.right * targetOffset;
 
@@ -444,7 +519,7 @@ public class EnemyController : EnemyCharacter
         bool rightOccupied = IsTargetOccupiedByOtherEnemy(rightTarget);
 
         Vector3 targetPos;
-
+        // replace existing Debug.Log("target");
         // Nếu enemy đang ở gần vị trí tấn công thì giữ vị trí đó, không chuyển sang tuần tra
         if (!leftOccupied && Char.position.x < player.position.x)
             targetPos = leftTarget;
@@ -658,6 +733,7 @@ public class EnemyController : EnemyCharacter
     public void CheckAttack()
     {
         if (isBeingThrown) return;
+        if (isAttack || isAttacking) return;
 
         float distanceX = Mathf.Abs(Char.position.x - player.position.x);
         float distanceY = Mathf.Abs(Char.position.y - player.position.y);
@@ -669,9 +745,14 @@ public class EnemyController : EnemyCharacter
             {
                 if (!isAttack)
                 {
-                    Debug.Log("aaaaa"+ Time.time);
+                    //isStopping = false;
+                    //stopTimer = 0f;
+                    //patrolTimer = 0f;
+                    //isPatrolling = false;
+
                     isAttack = true;
                     SwitchToRunState(enemyIdle);
+                    //SwitchToRunState(enemyAttack);
                 }
             }
             return;
@@ -714,10 +795,25 @@ public class EnemyController : EnemyCharacter
             {
                 if (!isAttack)
                 {
+                    isStopping = false;
+                    stopTimer = 0f;
+                    patrolTimer = 0f;
+                    isPatrolling = false;
+
                     isAttack = true;
                     if (state != State.Idle)
                     {
                         SwitchToRunState(enemyIdle);
+                    }
+                    if (state != State.Idle)
+                    {
+                        // immediately request attack state
+                        SwitchToRunState(enemyAttack);
+                    }
+                    else
+                    {
+                        // if already Idle, also start Attack immediately
+                        SwitchToRunState(enemyAttack);
                     }
                 }
             }
@@ -888,6 +984,18 @@ public class EnemyController : EnemyCharacter
     public void ResetState()
     {
         SwitchToRunState(enemyIdle);
+        //// Ensure all "stopping" timers/flags cleared so Run can proceed immediately
+        //isStopping = false;
+        //stopTimer = 0f;
+        //patrolTimer = 0f;
+        //isPatrolling = false;
+        //isCheckingPlayer = false;
+
+        //// Mark as active run so Idle won't steal control
+        //isActiveRun = true;
+
+        //// Switch to Run state so enemy resumes movement after finishing attack
+        //SwitchToRunState(enemyRun);
     }
 
 
@@ -899,6 +1007,15 @@ public class EnemyController : EnemyCharacter
             return;
         }
 
+        if (isAttacking)
+        {
+            if (enemy != enemyDead && enemy != enemyFall && enemy != enemyGrabed)
+            {
+                // block non-critical transitions while attacking
+                Debug.Log("aaaa");
+                return;
+            }
+        }
         // If we're switching INTO Grabed, set isGrabbed immediately to block other callers
         if (enemy == enemyGrabed)
         {
@@ -907,8 +1024,6 @@ public class EnemyController : EnemyCharacter
                 isGrabbed = true;
             }
         }
-
-
         // Prevent other systems from overwriting Grabed state while enemy is grabbed
         if (isGrabbed)
         {
@@ -1007,6 +1122,7 @@ public class EnemyController : EnemyCharacter
     {
         if (player == null || Char == null || state == State.Grabed) return;
         float yRotation = player.position.x > Char.position.x ? 0f : 180f;
+        //float yRotation = player.position.x > Char.position.x ? 0f : 180f;
         Char.rotation = Quaternion.Euler(0f, yRotation, 0f);
     }
 
