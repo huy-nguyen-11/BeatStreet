@@ -1047,7 +1047,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2262690780386768616}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.12220114, w: 0.9925054}
+  m_LocalRotation: {x: 0, y: 0, z: 0.12220098, w: 0.9925054}
   m_LocalPosition: {x: 0.5147029, y: -0.0031083678, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1680,6 +1680,8 @@ MonoBehaviour:
   idleThreshold: 0.05
   animationHysteresis: 0.08
   posBullet: {fileID: 392872544716511242}
+  posKnife: {fileID: 0}
+  posWave: {fileID: 0}
   velocity: 0
   isCheckGravity: 0
 --- !u!114 &6676198972385863334
@@ -1724,7 +1726,7 @@ Transform:
   m_GameObject: {fileID: 4514909804941721495}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0.22489744, y: -1.4936996, z: 0}
+  m_LocalPosition: {x: 0.22489744, y: -1.4936994, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2103,7 +2105,7 @@ Transform:
   m_GameObject: {fileID: 5725898449473545431}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.902, y: 0.718, z: 0}
+  m_LocalPosition: {x: 0.545, y: 0.686, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2180,7 +2182,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2e7ca66ef0b59647b3037b6a634c56a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boxSize: {x: 1, y: 0.78}
+  boxSize: {x: 2.3, y: 1.2}
   isCheckCharacter: 0
   layerMaskPlayer:
     serializedVersion: 2
@@ -2407,7 +2409,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6555135601435463834}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.0000000010276008, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: -2.2103917e-10, w: 1}
   m_LocalPosition: {x: 0.5423454, y: 0.3800958, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2673,7 +2675,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7289393808688140475}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.0000000010276008, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: -2.2103917e-10, w: 1}
   m_LocalPosition: {x: 0.40405157, y: -0.63092154, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

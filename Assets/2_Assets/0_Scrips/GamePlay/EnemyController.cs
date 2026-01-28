@@ -36,6 +36,7 @@ public class EnemyController : EnemyCharacter
     public EnemyFall enemyFall;
     public EnemyGrabed enemyGrabed;
     public EnemySpawn enemySpawn;
+    public EnemyChasePlayer enemyChasePlayer;
     public GameObject prfCoin;
     // NEW: Flag to indicate grabbed state - prevents all movement and state changes
     public bool isGrabbed = false;
@@ -101,7 +102,7 @@ public class EnemyController : EnemyCharacter
     public float animationHysteresis = 0.08f;
 
     private string currentMoveAnim = null;
-    public Transform posBullet;
+    public Transform posBullet , posKnife , posWave;
 
 
     // Public method to reset move animation (useful when transitioning from states like Fall)
@@ -122,6 +123,7 @@ public class EnemyController : EnemyCharacter
         enemyDead = new EnemyDead(this);
         enemyGrabed = new EnemyGrabed(this);
         enemySpawn = new EnemySpawn(this);
+        enemyChasePlayer = new EnemyChasePlayer(this);
     }
     void Start()
     {
@@ -485,24 +487,25 @@ public class EnemyController : EnemyCharacter
     private void MoveToPlayer()
     {
         // BOSS
-        //if (typeOfEnemy == TypeOfEnemy.Boss)
-        //{
-        //    Vector3 _targetPos = player.position;
-        //    float _speed = SetMoveAnimationByTarget(_targetPos);
-        //    Vector3 _direction = (_targetPos - Char.position).normalized;
-        //    lastDirection = _direction;
-        //    Char.position += _direction * _speed * Time.deltaTime;
+        if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 2)
+        {
+            Vector3 _targetPos = player.position;
+            float _speed = SetMoveAnimationByTarget(_targetPos);
+            Vector3 _direction = (_targetPos - Char.position).normalized;
+            lastDirection = _direction;
+            Char.position += _direction * _speed * Time.deltaTime;
 
-        //    // Check wall collision
-        //    //if (!canCheckWall && CheckWallCollision())
-        //    //{
-        //    //    Debug.Log("avoid wall boss");
-        //    //    AvoidWall();
-        //    //    canCheckWall = true;
-        //    //    StartCoroutine(CheckWallCollisionRoutine());
-        //    //}
-        //    return;
-        //}
+            // Check wall collision
+            if (!canCheckWall && CheckWallCollision())
+            {
+                Debug.Log("avoid wall boss");
+                AvoidWall();
+                canCheckWall = true;
+                StartCoroutine(CheckWallCollisionRoutine());
+            }
+            return;
+        }
+
         if (isAttacking)
         {
             return;
@@ -739,9 +742,9 @@ public class EnemyController : EnemyCharacter
         float distanceY = Mathf.Abs(Char.position.y - player.position.y);
 
         //is boss
-        if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 0)
+        if (typeOfEnemy == TypeOfEnemy.Boss &&( idEnemy == 0 || idEnemy == 1))
         {
-            if (distanceX <= 3.75f && distanceY <= 0.2f)
+            if (distanceX <= 3.75f && distanceY <= 0.2f && distanceX >= 1.5f)
             {
                 if (!isAttack)
                 {
@@ -752,9 +755,38 @@ public class EnemyController : EnemyCharacter
 
                     isAttack = true;
                     //SwitchToRunState(enemyIdle);
+                    enemyAttack.nameBossAttack = "Attack1";
                     SwitchToRunState(enemyAttack);
                 }
             }
+            else if(distanceX < 1.5f && distanceY <= 0.2f)
+            {
+                if (!isAttack)
+                {
+                    isStopping = false;
+                    stopTimer = 0f;
+                    patrolTimer = 0f;
+                    isPatrolling = false;
+                    isAttack = true;
+                    enemyAttack.nameBossAttack = "Attack2";
+                    SwitchToRunState(enemyAttack);
+                }
+            }
+            return;
+        }
+        else if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 2 && distanceX <= 1.5f && distanceY <= 0.2f)
+        {
+            if (!isAttack)
+            {
+                isStopping = false;
+                stopTimer = 0f;
+                patrolTimer = 0f;
+                isPatrolling = false;
+                isAttack = true;
+                enemyAttack.nameBossAttack = "Attack1";
+                SwitchToRunState(enemyAttack);
+            }
+
             return;
         }
 
@@ -822,28 +854,50 @@ public class EnemyController : EnemyCharacter
 
     void HandleAttackEvent(TrackEntry trackEntry, Spine.Event e)
     {
-        if(typeOfEnemy == TypeOfEnemy.Boss)
+        if (typeOfEnemy == TypeOfEnemy.Boss)
         {
-            if(idEnemy == 0)
+            if (idEnemy == 0)
             {
-                if (e.Data.Name == "hit")
+                if (e.Data.Name == "hit" && enemyAttack.nameBossAttack == "Attack1")
                 {
-                    ObjectPooler.Instance.SpawnFromPool("Bullet", posBullet.position,transform.rotation);
+                    ObjectPooler.Instance.SpawnFromPool("Bullet", posBullet.position, transform.rotation);
                 }
-            }
-            else
-            {
-                if (e.Data.Name == "hit")
+                else if (e.Data.Name == "hit" && enemyAttack.nameBossAttack == "Attack2")
                 {
                     SetAttack(idEnemy);
                 }
             }
-        }
-        else
-        {
-            if (e.Data.Name == "Hit")
+            else if(typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 1)
             {
-                SetAttack(idEnemy);
+                if (e.Data.Name == "hit" && enemyAttack.nameBossAttack == "Attack1")
+                {
+                    GameObject _knife = ObjectPooler.Instance.SpawnFromPool("Knife", posKnife.position, transform.rotation);
+                    _knife.GetComponent<KnifeBoss>().centerPos = Char.transform;
+                    _knife.GetComponent<KnifeBoss>().direction = Char.transform.rotation.y < 0 ? -1 : 1;
+                }
+                else if (e.Data.Name == "hit" && enemyAttack.nameBossAttack == "Attack2")
+                {
+                    SetAttack(idEnemy);
+                }
+            }
+            else if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 2)
+            {
+                if (e.Data.Name == "hit" && enemyAttack.nameBossAttack == "Attack1")
+                {
+                    int dir = Char.transform.rotation.y < 0 ? -1 : 1;
+                    GameObject go = ObjectPooler.Instance.SpawnFromPool("WaveBoss", posWave.transform.position, Quaternion.Euler(60, 0, -90 * dir));
+                    go.transform.position = new Vector3(go.transform.position.x, go.transform.position.y, 0);
+                    go.GetComponent<WaveBoss>().direction = dir;
+                }
+
+                //todo handle other attack event attack 2 of enemey id 2
+            }
+            else
+            {
+                if (e.Data.Name == "Hit"|| e.Data.Name == "hit")
+                {
+                    SetAttack(idEnemy);
+                }
             }
         }
     }

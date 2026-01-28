@@ -10,6 +10,7 @@ public class CharacterMenu : MonoBehaviour
     [Header("Jump movement")]
     [Tooltip("Optional target transform. If null, Target Offset is used relative to start position.")]
     [SerializeField] private Transform targetTransform;
+    [SerializeField] private Transform startPosTransform;
     [SerializeField] private Vector3 targetOffset = new Vector3(3f, 0f, 0f);
     [SerializeField] private float duration = 1.0f;
     [SerializeField] private float jumpHeight = 2.0f;
@@ -22,25 +23,28 @@ public class CharacterMenu : MonoBehaviour
     [SerializeField] private string jumpAnim = "Jump";
     [SerializeField] private string idleAnim = "Idle";
 
-    private void Start()
+    private bool isActive = false;
+
+    private void OnEnable()
     {
         if (skeletonGraphic == null)
             skeletonGraphic = GetComponent<SkeletonGraphic>();
 
-        // ensure starting scale
-        transform.localScale = Vector3.one * startScale;
 
-        StartCoroutine(PlayJumpToTarget());
+        if(!isActive)
+            StartJump();
     }
 
-    public void ButtonDemo()
+    public void StartJump()
     {
         StartCoroutine(PlayJumpToTarget());
     }
 
     private IEnumerator PlayJumpToTarget()
     {
-        Vector3 startPos = transform.position;
+        // ensure starting scale
+        transform.localScale = Vector3.one * startScale;
+        Vector3 startPos = startPosTransform.position; // Fixed start position
         Vector3 endPos = (targetTransform != null) ? targetTransform.position : startPos + targetOffset;
 
         // Play jump animation (Spine)
@@ -84,5 +88,7 @@ public class CharacterMenu : MonoBehaviour
             if (state != null)
                 state.SetAnimation(0, idleAnim, true);
         }
+
+        isActive = true;
     }
 }

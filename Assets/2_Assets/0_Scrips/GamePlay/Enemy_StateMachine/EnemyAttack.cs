@@ -76,10 +76,10 @@ public class EnemyAttack : EnemyStateMachine
 
     private Coroutine _attackRoutine;
 
+    public string nameBossAttack;
+
     public override void Enter()
     {
-        Debug.Log("Enter Attack State" + Time.time);
-
         // mark state and block other transitions
         enemyController.state = EnemyController.State.Attack;
         enemyController.isAttacking = true;
@@ -96,7 +96,7 @@ public class EnemyAttack : EnemyStateMachine
         {
             float randomValue = Random.Range(0f, 1f);
             //attackAnimationName = (randomValue <= 0.5f) ? "Attack1" : "Attack2";
-            attackAnimationName =  "Attack1";
+            attackAnimationName = nameBossAttack;
         }
         else
         {
@@ -114,6 +114,10 @@ public class EnemyAttack : EnemyStateMachine
         // short idle before attacking
         yield return new WaitForSeconds(preAttackDelay);
 
+        if(nameBossAttack == "Attack1")
+        {
+            maxAttacks = 0;
+        }
         int attacks = Random.Range(minAttacks, maxAttacks + 1);
 
         for (int i = 0; i < attacks; i++)

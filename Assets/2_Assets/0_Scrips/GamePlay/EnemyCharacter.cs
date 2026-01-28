@@ -15,6 +15,7 @@ public class EnemyCharacter : MonoBehaviour
         Fall,
         Ulti,
         Grabed,
+        ChasePlayer,
         Spawn
     }
     public State state = State.Idle;

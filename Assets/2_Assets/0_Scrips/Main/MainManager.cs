@@ -32,6 +32,8 @@ public class MainManager : MonoBehaviour
     //intdex popup shop
     public int indexPopupShop = 0;
 
+    public CharacterMenu characterMenu;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -115,6 +117,7 @@ public class MainManager : MonoBehaviour
             buttonSetting.SetActive(false);
             buttonBack.SetActive(true);
         }
+
     }
     public void SetTopBar()
     {

@@ -61,6 +61,9 @@ public class GamePlayManager : MonoBehaviour
 
     [SerializeField] private GameObject _showFightBoss;
 
+    public GameObject kinfe;
+
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -100,6 +103,12 @@ public class GamePlayManager : MonoBehaviour
 
         backUlti.SetActive(false);
         _showFightBoss.SetActive(false);
+    }
+
+    public void demoWave()
+    {
+        GameObject go= ObjectPooler.Instance.SpawnFromPool("WaveBoss", _CameraFollow.transform.position, Quaternion.Euler(60,0,-90));
+        go.transform.position = new Vector3(go.transform.position.x, go.transform.position.y, 0);
     }
 
     private void Update()
