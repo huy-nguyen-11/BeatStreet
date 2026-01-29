@@ -118,7 +118,7 @@ public class EnemyAttack : EnemyStateMachine
         {
             maxAttacks = 0;
         }
-        int attacks = Random.Range(minAttacks, maxAttacks + 1);
+        int attacks = (Random.value <= 0.25f) ? 2 : 1;
 
         for (int i = 0; i < attacks; i++)
         {

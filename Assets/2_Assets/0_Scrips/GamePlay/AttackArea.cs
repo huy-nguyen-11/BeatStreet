@@ -260,13 +260,18 @@ public class AttackArea : MonoBehaviour
         {
             PlayerChar player = hit.gameObject.GetComponent<PlayerChar>();
             Transform enemy = transform.parent.parent;
+            EnemyController enemyController = enemy.transform.GetChild(0).GetComponent<EnemyController>();
             if (!player.playerController.isImmortal
-                && Mathf.Abs(player.transform.position.x - enemy.position.x) <= 1.2f
+                //&& Mathf.Abs(player.transform.position.x - enemy.position.x) <= 1.2f
                 && Mathf.Abs(player.transform.position.y - enemy.transform.position.y) <= 0.2f)
             {
                 AudioBase.Instance.AudioEnemy(1);
                 bool direction = transform.parent.rotation.y == 0 ? true : false;
                 player.playerController.HitDirection = direction;
+                if(enemyController.typeOfEnemy == TypeOfEnemy.Boss && enemyController.idEnemy == 2)
+                {
+                    player.playerController.HitCount = 2;
+                }
                 player.playerController.SetHit(Dame);
                 ObjectPooler.Instance.SpawnFromPool("Hit", transform.position, Quaternion.Euler(0, 0, 0));
             }

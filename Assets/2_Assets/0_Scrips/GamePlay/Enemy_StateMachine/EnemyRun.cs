@@ -21,18 +21,57 @@ public class EnemyRun : EnemyStateMachine
             enemyController.isStopping = false;
             enemyController.stopTimer = 0f;
         }
+        
+        // Check attack ngay khi vào Run state để tránh animation Run không cần thiết
+        // Đặc biệt quan trọng với Boss sau khi tấn công xong
+        // Gọi CheckAttack() trực tiếp để tận dụng logic đã có sẵn
+        if (!enemyController.isGrabbed 
+            && !enemyController.playerController.IsDead 
+            && !GamePlayManager.Instance.isCheckUlti
+            && enemyController.state != EnemyController.State.Hit
+            && enemyController.state != EnemyController.State.Fall
+            && enemyController.state != EnemyController.State.Attack)
+        {
+            enemyController.CheckAttack();
+        }
     }
     public override void Update()
     {
+        //if (enemyController.playerController.IsDead) enemyController.SwitchToRunState(enemyController.enemyIdle);
+        //// Stop execution if grabbed
+        //if (enemyController.isGrabbed)
+        //{
+        //    return;
+        //}
+        //if (!GamePlayManager.Instance.isCheckUlti)
+        //    if (enemyController.state != EnemyController.State.Hit)
+        //        enemyController.Movement();
         if (enemyController.playerController.IsDead) enemyController.SwitchToRunState(enemyController.enemyIdle);
         // Stop execution if grabbed
         if (enemyController.isGrabbed)
         {
             return;
         }
+        
+        // Check attack trước khi di chuyển để tránh animation Run không cần thiết
         if (!GamePlayManager.Instance.isCheckUlti)
-            if (enemyController.state != EnemyController.State.Hit)
+        {
+            // Check attack trước khi di chuyển - nếu có thể attack sẽ chuyển state ngay
+            // Điều này đặc biệt quan trọng với Boss sau khi tấn công xong
+            if (enemyController.state != EnemyController.State.Hit
+                && enemyController.state != EnemyController.State.Fall
+                && enemyController.state != EnemyController.State.Attack)
+            {
+                enemyController.CheckAttack();
+            }
+            
+            // Chỉ di chuyển nếu vẫn còn ở Run state (chưa chuyển sang Attack)
+            if (enemyController.state == EnemyController.State.Run)
+            {
+                // <-- ADDED DEBUG: trace caller of Movement -> will lead to MoveToPlayer
                 enemyController.Movement();
+            }
+        }
 
     }
     public override void Exit()

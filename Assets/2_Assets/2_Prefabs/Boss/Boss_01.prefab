@@ -1651,11 +1651,11 @@ MonoBehaviour:
   isCheckAnimAttack: 0
   isGetHitStrengthMax: 0
   patrolRadius: 0.75
-  moveSpeed: 2.5
-  moveSpeedRun: 2.6
-  moveSpeedWalk: 1.2
-  moveSpeedRunBack: 2.2
-  moveSpeedWalkBack: 0.9
+  moveSpeed: 0
+  moveSpeedRun: 0.6
+  moveSpeedWalk: 0.35
+  moveSpeedRunBack: 0.3
+  moveSpeedWalkBack: 0.5
   attackRadius: 1.5
   attackCooldown: 2
   isWall: 0
@@ -1682,6 +1682,7 @@ MonoBehaviour:
   posBullet: {fileID: 392872544716511242}
   posKnife: {fileID: 0}
   posWave: {fileID: 0}
+  debugAI: 0
   velocity: 0
   isCheckGravity: 0
 --- !u!114 &6676198972385863334
@@ -2105,7 +2106,7 @@ Transform:
   m_GameObject: {fileID: 5725898449473545431}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.545, y: 0.686, z: 0}
+  m_LocalPosition: {x: 0.825, y: 0.686, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2182,7 +2183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2e7ca66ef0b59647b3037b6a634c56a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boxSize: {x: 2.3, y: 1.2}
+  boxSize: {x: 2, y: 1.2}
   isCheckCharacter: 0
   layerMaskPlayer:
     serializedVersion: 2

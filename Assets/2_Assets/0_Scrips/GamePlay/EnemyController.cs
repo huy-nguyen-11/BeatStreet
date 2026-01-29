@@ -91,8 +91,9 @@ public class EnemyController : EnemyCharacter
     private const string ANIM_WALK = "Walk";
     private const string ANIM_RUN_BACK = "Run"; // adjust if your project uses different naming
     private const string ANIM_WALK_BACK = "Run_Back"; // adjust if your project uses different naming
-   // private const string ANIM_IDLE = "Idle"; // minimal: ensure Idle exists
-
+                                                      // private const string ANIM_IDLE = "Idle"; // minimal: ensure Idle exists
+    [HideInInspector]
+    public bool shouldDirectChase = false;
     // thresholds (tweak to taste)
     public float runThreshold = 1.0f;
     public float walkThreshold = 0.25f;
@@ -236,57 +237,7 @@ public class EnemyController : EnemyCharacter
     // Helper: pick move animation based on next target
     private float SetMoveAnimationByTarget(Vector3 nextTarget)
     {
-        //// Safety checks
-        //if (isGrabbed || isBeingThrown) return 0f;
-        //if (Char == null || player == null) return moveSpeed;
-        //if (state == State.Dead || state == State.Attack || state == State.Hit || state == State.Fall) return moveSpeed;
 
-        //Vector3 toTarget = nextTarget - Char.position;
-        //float dist = toTarget.magnitude;
-        //float absDistX = Mathf.Abs(toTarget.x);
-
-        //// Determine forward/backward relative to facing
-        //bool facingRight = player.position.x > Char.position.x; // matches UpdateEnemyRotation
-        //int moveDirX = (int)Mathf.Sign(toTarget.x);
-        //bool movingForward = (moveDirX == (facingRight ? 1 : -1));
-
-        //string targetAnim = (absDistX <= walkThreshold) ? ANIM_WALK : ANIM_RUN;
-
-        //// choose back variants if moving backwards
-        //if (!movingForward)
-        //{
-        //    if (targetAnim == ANIM_RUN) targetAnim = ANIM_RUN_BACK;
-        //    else targetAnim = ANIM_WALK_BACK;
-        //}
-
-        //if(typeOfEnemy == TypeOfEnemy.Boss)
-        //{
-        //    if (currentMoveAnim != ANIM_RUN)
-        //    {
-        //        currentMoveAnim = ANIM_RUN;
-        //        PlayAnim(ANIM_RUN, true);
-        //    }
-        //}
-        //else
-        //{
-        //    if (currentMoveAnim != targetAnim)
-        //    {
-        //        currentMoveAnim = targetAnim;
-        //        PlayAnim(targetAnim, true);
-        //    }
-        //}
-        //if(typeOfEnemy == TypeOfEnemy.Boss)
-        //{
-        //    return 0.5f;
-        //}
-        //else
-        //{
-        //    if (targetAnim == ANIM_RUN) return moveSpeedRun;
-        //    if (targetAnim == ANIM_WALK) return moveSpeedWalk;
-        //    if (targetAnim == ANIM_RUN_BACK) return moveSpeedRunBack;
-        //    if (targetAnim == ANIM_WALK_BACK) return moveSpeedWalkBack;
-        //    return moveSpeed;
-        //}
         // Safety checks
         if (isGrabbed || isBeingThrown) return 0f;
         if (Char == null || player == null) return moveSpeed;
@@ -332,12 +283,18 @@ public class EnemyController : EnemyCharacter
         // Boss special-case: force run
         if (typeOfEnemy == TypeOfEnemy.Boss)
         {
+            // Avoid showing run animation when we're essentially at the target.
+            if (dist <= idleThreshold)
+            {
+                return 0f;
+            }
+
             if (currentMoveAnim != ANIM_RUN)
             {
                 currentMoveAnim = ANIM_RUN;
                 PlayAnim(ANIM_RUN, true);
             }
-            return 0.5f;
+            return moveSpeedRun;
         }
 
         // Only switch animation when it actually changes
@@ -353,6 +310,7 @@ public class EnemyController : EnemyCharacter
         if (chosenAnim == ANIM_RUN_BACK) return moveSpeedRunBack;
         if (chosenAnim == ANIM_WALK_BACK) return moveSpeedWalkBack;
         return moveSpeed;
+
     }
 
     // --------------------------------------------------
@@ -483,37 +441,16 @@ public class EnemyController : EnemyCharacter
                 SetRandomPatrolTarget();
         }
     }
-  
+
+    public bool debugAI = false;
     private void MoveToPlayer()
     {
-        // BOSS
-        if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 2)
-        {
-            Vector3 _targetPos = player.position;
-            float _speed = SetMoveAnimationByTarget(_targetPos);
-            Vector3 _direction = (_targetPos - Char.position).normalized;
-            lastDirection = _direction;
-            Char.position += _direction * _speed * Time.deltaTime;
-
-            // Check wall collision
-            if (!canCheckWall && CheckWallCollision())
-            {
-                Debug.Log("avoid wall boss");
-                AvoidWall();
-                canCheckWall = true;
-                StartCoroutine(CheckWallCollisionRoutine());
-            }
-            return;
-        }
-
         if (isAttacking)
         {
             return;
         }
         if (isBeingThrown || isGrabbed) return;
         // replace existing:
-        //float distanceX = Mathf.Abs(Char.position.x - player.position.x);
-        //float num = distanceX < 1.35f ? 0f : 1f;
         float targetOffset = rangeAttack ;
         Vector3 leftTarget = player.position + Vector3.left * targetOffset;
         Vector3 rightTarget = player.position + Vector3.right * targetOffset;
@@ -540,6 +477,48 @@ public class EnemyController : EnemyCharacter
             PatrolRandomly();
             return;
         }
+
+        // BOSS - special chase behavior for idEnemy == 2
+        if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 2 && shouldDirectChase)
+        {
+            // Guard: respect grabbed/throw/dead/attack/hit/fall states
+            if (isGrabbed || isBeingThrown) return;
+            if (Char == null || player == null) return;
+            if (state == State.Dead || state == State.Attack || state == State.Hit || state == State.Fall) return;
+
+
+            // Force chase animation + fixed speed = 1
+            const string CHASE_ANIM = "Attack2";
+            const float CHASE_SPEED = 2.5f;
+
+            if (currentMoveAnim != CHASE_ANIM)
+            {
+                currentMoveAnim = CHASE_ANIM;
+                PlayAnim(CHASE_ANIM, true);
+            }
+
+            Vector3 _targetPos = targetPos;
+            Vector3 _direction = (_targetPos - Char.position).normalized;
+            lastDirection = _direction;
+            Char.position += _direction * CHASE_SPEED * Time.deltaTime;
+            //todo check attack
+            // Nếu đã đến target, giữ vị trí đó
+            if (Vector3.Distance(Char.position, targetPos) < 0.2f)
+            {
+                isStopping = true;
+                patrolTimer = 0f;
+                SwitchToRunState(enemyIdle);
+            }
+            // Check wall collision (avoid wall and set cooldown)
+            if (!canCheckWall && CheckWallCollision())
+            {
+                AvoidWall();
+                canCheckWall = true;
+                StartCoroutine(CheckWallCollisionRoutine());
+            }
+            return;
+        }
+
 
         float speed = SetMoveAnimationByTarget(targetPos);
 
@@ -736,7 +715,7 @@ public class EnemyController : EnemyCharacter
     public void CheckAttack()
     {
         if (isBeingThrown) return;
-        if (isAttack || isAttacking) return;
+        if (isAttack || isAttacking || !isActiveRun) return;
 
         float distanceX = Mathf.Abs(Char.position.x - player.position.x);
         float distanceY = Mathf.Abs(Char.position.y - player.position.y);
@@ -774,7 +753,7 @@ public class EnemyController : EnemyCharacter
             }
             return;
         }
-        else if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 2 && distanceX <= 1.5f && distanceY <= 0.2f)
+        else if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 2 && distanceX <= 1.2f && distanceY <= 0.2f)
         {
             if (!isAttack)
             {
@@ -867,7 +846,7 @@ public class EnemyController : EnemyCharacter
                     SetAttack(idEnemy);
                 }
             }
-            else if(typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 1)
+            else if( idEnemy == 1)
             {
                 if (e.Data.Name == "hit" && enemyAttack.nameBossAttack == "Attack1")
                 {
@@ -880,10 +859,12 @@ public class EnemyController : EnemyCharacter
                     SetAttack(idEnemy);
                 }
             }
-            else if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 2)
+            else if (idEnemy == 2)
             {
                 if (e.Data.Name == "hit" && enemyAttack.nameBossAttack == "Attack1")
                 {
+                    SetAttack(idEnemy);
+                    GamePlayManager.Instance._CameraFollow.Shake();
                     int dir = Char.transform.rotation.y < 0 ? -1 : 1;
                     GameObject go = ObjectPooler.Instance.SpawnFromPool("WaveBoss", posWave.transform.position, Quaternion.Euler(60, 0, -90 * dir));
                     go.transform.position = new Vector3(go.transform.position.x, go.transform.position.y, 0);
@@ -892,12 +873,12 @@ public class EnemyController : EnemyCharacter
 
                 //todo handle other attack event attack 2 of enemey id 2
             }
-            else
+        }
+        else
+        {
+            if (e.Data.Name == "Hit" || e.Data.Name == "hit")
             {
-                if (e.Data.Name == "Hit"|| e.Data.Name == "hit")
-                {
-                    SetAttack(idEnemy);
-                }
+                SetAttack(idEnemy);
             }
         }
     }
@@ -1197,5 +1178,4 @@ public class EnemyController : EnemyCharacter
             transform.position += velocity * Time.deltaTime * Vector3.up;
         }
     }
-
 }

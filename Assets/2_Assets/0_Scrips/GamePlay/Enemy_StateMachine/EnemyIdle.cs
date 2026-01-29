@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 
 public class EnemyIdle : EnemyStateMachine
@@ -45,6 +45,13 @@ public class EnemyIdle : EnemyStateMachine
                 && !GamePlayManager.Instance.isCheckUlti
                 && !enemyController.isStopping)
             {
+                // Decide boss-id2 direct-chase chance once here (leave flag for MoveToPlayer)
+                if (enemyController.typeOfEnemy == TypeOfEnemy.Boss && enemyController.idEnemy == 2)
+                {
+                    float dx = Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x);
+                    float dy = Mathf.Abs(enemyController.Char.position.y - enemyController.player.position.y);
+                    enemyController.shouldDirectChase = ((dy > 2f && dx > 1.5f) || dx > 2f) && Random.value <= 0.5f;
+                }
                 enemyController.SetRun();
             }
         }
@@ -117,42 +124,32 @@ public class EnemyIdle : EnemyStateMachine
 
         if (!enemyController.isAttack)
         {
-            
+            // <-- ADDED DEBUG: show why Idle decides to SetRun
+            float dist = Vector2.Distance(enemyController.transform.position, enemyController.player.position);
+
             if (!enemyController.isActiveRun && Vector2.Distance(enemyController.transform.position, enemyController.player.position) <= 2.5f)
             {
                 enemyController.SetRandomPatrolTarget();
-
-                enemyController.SetRun();
-                enemyController.isActiveRun = true;
+                if (enemyController.typeOfEnemy == TypeOfEnemy.Boss && enemyController.idEnemy == 2)
+                {
+                    {
+                        float dx = Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x);
+                        float dy = Mathf.Abs(enemyController.Char.position.y - enemyController.player.position.y);
+                        enemyController.shouldDirectChase = ((dy > 2f && dx > 1.5f) || dx > 2f) && Random.value <= 0.5f;
+                    }
+                    enemyController.SetRun();
+                    enemyController.isActiveRun = true;
+                }
             }
         }
     }
-    IEnumerator DelayAttack()
-    {
-    
-        if(enemyController.typeOfEnemy == TypeOfEnemy.Boss && enemyController.idEnemy == 0)
-        {
-            yield return new WaitForSeconds(0.25f);
-            int idEnemy = enemyController.Char.GetComponent<EnemyChar>().idEnemy;
 
-            if (enemyController.Char.position.x <= enemyController.player.position.x)
-            {
-                GamePlayManager.Instance.isEnemyOnLeft[idEnemy] = true;
-            }
-            else
-            {
-                GamePlayManager.Instance.isEnemyOnRight[idEnemy] = true;
-            }
-
-            enemyController.SwitchToRunState(enemyController.enemyAttack);
-        }
-        else
+        IEnumerator DelayAttack()
         {
-            yield return new WaitForSeconds(1.45f);
-            if (Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) <= (enemyController.rangeAttack + 0.2f)
-               && Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) >= 0.15f
-               && Mathf.Abs(enemyController.Char.position.y - enemyController.player.position.y) <= 0.2f)
+
+            if (enemyController.typeOfEnemy == TypeOfEnemy.Boss && enemyController.idEnemy == 0)
             {
+                yield return new WaitForSeconds(0.25f);
                 int idEnemy = enemyController.Char.GetComponent<EnemyChar>().idEnemy;
 
                 if (enemyController.Char.position.x <= enemyController.player.position.x)
@@ -164,16 +161,38 @@ public class EnemyIdle : EnemyStateMachine
                     GamePlayManager.Instance.isEnemyOnRight[idEnemy] = true;
                 }
 
-                Debug.Log("Switch to Attack State"+ Time.time);
                 enemyController.SwitchToRunState(enemyController.enemyAttack);
             }
             else
             {
-                Debug.Log("Switch to Run State"+ Time.time);
-                enemyController.SwitchToRunState(enemyController.enemyRun);
+                yield return new WaitForSeconds(1.45f);
+                if (Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) <= (enemyController.rangeAttack + 0.2f)
+                   && Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) >= 0.15f
+                   && Mathf.Abs(enemyController.Char.position.y - enemyController.player.position.y) <= 0.2f)
+                {
+                    int idEnemy = enemyController.Char.GetComponent<EnemyChar>().idEnemy;
+
+                    if (enemyController.Char.position.x <= enemyController.player.position.x)
+                    {
+                        GamePlayManager.Instance.isEnemyOnLeft[idEnemy] = true;
+                    }
+                    else
+                    {
+                        GamePlayManager.Instance.isEnemyOnRight[idEnemy] = true;
+                    }
+
+                    Debug.Log("Switch to Attack State" + Time.time);
+                    enemyController.SwitchToRunState(enemyController.enemyAttack);
+                }
+                else
+                {
+                    Debug.Log("Switch to Run State" + Time.time);
+                    enemyController.SwitchToRunState(enemyController.enemyRun);
+                }
             }
         }
-    }
+   
+
     public override void Exit()
     {
         if (_coroutine != null)
