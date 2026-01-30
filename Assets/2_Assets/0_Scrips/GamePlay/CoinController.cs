@@ -1,18 +1,25 @@
-﻿using System.Collections;
+﻿using DG.Tweening;
+using System.Collections;
 using UnityEngine;
 
-public class CoinController : MonoBehaviour
+public class CoinController : MonoBehaviour, IpooledObject
 {
     public Transform player;
     Rigidbody2D rb;
     Vector2 moveDirection;
     bool isMove = false;
-    void Start()
+
+    public void OnObjectSpawn()
     {
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
         rb = GetComponent<Rigidbody2D>();
         MoveToRandomPosition();
         StartCoroutine(SetTimeStop());
+    }
+
+    void Start()
+    {
+
     }
     void Update()
     {
@@ -27,7 +34,7 @@ public class CoinController : MonoBehaviour
             if (Vector2.Distance(transform.position, player.position) <= 0.3f)
             {
                 GamePlayManager.Instance.AddCoin();
-                Destroy(gameObject);
+                gameObject.SetActive(false);
             }
         }
     }

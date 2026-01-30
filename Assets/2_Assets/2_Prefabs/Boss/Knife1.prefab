@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 2577936075384923534}
   - component: {fileID: 6568187819821402702}
   - component: {fileID: 3209150215659009748}
+  - component: {fileID: 8903824504595522890}
+  - component: {fileID: 4814291568244690478}
   m_Layer: 0
   m_Name: Knife1
   m_TagString: Bullet
@@ -103,14 +105,87 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb82c6fc0961ec54d8929390a6289961, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KnifeBoss
-  moveSpeed: 11
-  rotateSpeed: 1440
+  moveSpeed: 8
+  rotateSpeed: 720
   direction: 1
   centerPos: {fileID: 0}
   amplitude: 0.5
   frequency: 3
-  startTimmer: 0.063
-  lifeTimeMax: 1.2
+  startTimmer: 0.12
+  lifeTimeMax: 1.45
   enemyLayer:
     serializedVersion: 2
     m_Bits: 0
+--- !u!50 &8903824504595522890
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 679227976605457053}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 0.0001
+  m_LinearDamping: 0
+  m_AngularDamping: 0
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!61 &4814291568244690478
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 679227976605457053}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: -0.49359244, y: 0.56334}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 2.96, y: 3.62}
+    newSize: {x: 2.96, y: 3.62}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1.2646173, y: 1.5705155}
+  m_EdgeRadius: 0

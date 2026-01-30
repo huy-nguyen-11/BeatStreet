@@ -4606,9 +4606,13 @@ MonoBehaviour:
   - tag: WaveBossEffect
     prefab: {fileID: 8600108310729929846, guid: ee125c2cfa899ce4ca6dd4c9486cb7d7, type: 3}
     size: 10
+  - tag: Coin
+    prefab: {fileID: 1077053216685021442, guid: e8453c02a51ac6241a74824dab520851, type: 3}
+    size: 20
   bulletTF: {fileID: 93726378}
   effectTF: {fileID: 1392793444}
   textTF: {fileID: 658200180}
+  coinsTF: {fileID: 480966015}
 --- !u!4 &419776725
 Transform:
   m_ObjectHideFlags: 0
@@ -4625,6 +4629,7 @@ Transform:
   - {fileID: 93726378}
   - {fileID: 1392793444}
   - {fileID: 658200180}
+  - {fileID: 480966015}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &426874360
@@ -4704,6 +4709,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 426874360}
   m_CullTransparentMesh: 1
+--- !u!1 &480966014
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 480966015}
+  m_Layer: 0
+  m_Name: Coins
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &480966015
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 480966014}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 419776725}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &490022213
 GameObject:
   m_ObjectHideFlags: 0

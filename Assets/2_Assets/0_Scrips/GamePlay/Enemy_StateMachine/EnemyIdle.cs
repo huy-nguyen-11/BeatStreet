@@ -124,9 +124,6 @@ public class EnemyIdle : EnemyStateMachine
 
         if (!enemyController.isAttack)
         {
-            // <-- ADDED DEBUG: show why Idle decides to SetRun
-            float dist = Vector2.Distance(enemyController.transform.position, enemyController.player.position);
-
             if (!enemyController.isActiveRun && Vector2.Distance(enemyController.transform.position, enemyController.player.position) <= 2.5f)
             {
                 enemyController.SetRandomPatrolTarget();
@@ -140,6 +137,12 @@ public class EnemyIdle : EnemyStateMachine
                     enemyController.SetRun();
                     enemyController.isActiveRun = true;
                 }
+                else
+                {
+                    enemyController.SetRun();
+                    enemyController.isActiveRun = true;
+                }
+
             }
         }
     }

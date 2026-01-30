@@ -1,3 +1,4 @@
+﻿using DG.Tweening;
 using Spine.Unity;
 using UnityEngine;
 
@@ -63,4 +64,39 @@ public class EnemyCharacter : MonoBehaviour
         }
         return entry;
     }
+
+    private Tween flashTween;
+
+    public void FlashHit()
+    {
+        FlashRed(0.1f, 2);
+    }
+
+    public void FlashRed(
+        float flashDuration = 0.08f,
+        int flashCount = 3,
+        Color? hitColor = null
+    )
+    {
+        if (skeletonAnimation == null) return;
+
+        Color flashColor = hitColor ?? new Color(1f, 0.3f, 0.3f, 1f);
+
+        flashTween?.Kill();
+
+        flashTween = DOTween.Sequence()
+            .SetUpdate(true) 
+            .AppendCallback(() =>
+            {
+                skeletonAnimation.skeleton.SetColor(flashColor);
+            })
+            .AppendInterval(flashDuration)
+            .AppendCallback(() =>
+            {
+                skeletonAnimation.skeleton.SetColor(Color.white);
+            })
+            .AppendInterval(flashDuration)
+            .SetLoops(flashCount);
+    }
+
 }

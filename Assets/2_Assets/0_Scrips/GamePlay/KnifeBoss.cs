@@ -175,4 +175,28 @@ public class KnifeBoss : MonoBehaviour, IpooledObject
 
     //    return damage;
     //}
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            PlayerController playerController = collision.GetComponent<PlayerController>();
+
+            if (playerController == null)
+            {
+                playerController = collision.GetComponentInParent<PlayerController>();
+            }
+            if (playerController == null)
+            {
+                playerController = PlayerController.Instance;
+            }
+
+            if (playerController != null)
+            {
+                int damage = 1; // You can set the damage value as needed
+                playerController.SetHit(damage);
+            }
+        }
+    }
+
 }

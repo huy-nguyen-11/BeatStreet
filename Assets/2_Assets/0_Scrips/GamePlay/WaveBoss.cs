@@ -23,11 +23,15 @@ public class WaveBoss : MonoBehaviour, IpooledObject
     private HashSet<int> _hitEnemyIds = new HashSet<int>();
     public LayerMask enemyLayer;
 
+    //damagae
+    private int baseDamage = 5;
+    private int currentDamage;
+
     public void OnObjectSpawn()
     {
         _timmer = startTimmer;
         lifeTime = lifeTimeMax;
-
+        currentDamage = baseDamage;
         posX = transform.position.x;
 
         _hitEnemyIds.Clear();
@@ -48,11 +52,19 @@ public class WaveBoss : MonoBehaviour, IpooledObject
     {
         float dt = Time.deltaTime;
         lifeTime -= dt;
-
+        UpdateDamage();
         MoveHorizontal(dt);
         CheckEnemyHit();
         HandleTrail(dt);
         HandleLifeTime();
+    }
+
+    void UpdateDamage()
+    {
+        float lifeRatio = lifeTime / lifeTimeMax;
+        lifeRatio = Mathf.Clamp01(lifeRatio);
+
+        currentDamage = Mathf.RoundToInt(baseDamage * lifeRatio);
     }
 
     void MoveHorizontal(float dt)
@@ -114,4 +126,26 @@ public class WaveBoss : MonoBehaviour, IpooledObject
 
     //    return damage;
     //}
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            PlayerController playerController = collision.GetComponent<PlayerController>();
+
+            if (playerController == null)
+            {
+                playerController = collision.GetComponentInParent<PlayerController>();
+            }
+            if (playerController == null)
+            {
+                playerController = PlayerController.Instance;
+            }
+
+            if (playerController != null)
+            {
+                playerController.SetHit(currentDamage);
+            }
+        }
+    }
 }

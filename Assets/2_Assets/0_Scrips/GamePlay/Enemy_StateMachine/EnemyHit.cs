@@ -29,16 +29,9 @@ public class EnemyHit : EnemyStateMachine
         }
         else
         {
-            if (enemyController.currentHitIndex >= 0 && enemyController.currentHitIndex <= 2)
+            if (enemyController.currentHitIndex >= 0 && enemyController.currentHitIndex <= 4)
             {
-                SetHitbox();
-                enemyController.PlayAnim(hitAnim, false);
-                if (coroutine != null)
-                    enemyController.StopCoroutine(coroutine);
-                coroutine = enemyController.StartCoroutine(SetStateIdle());
-            }
-            else if (enemyController.currentHitIndex >= 3 && enemyController.currentHitIndex <= 4)
-            {
+                Debug.Log("hit");
                 SetHitbox();
                 enemyController.PlayAnim(hitAnim, false);
                 if (coroutine != null)

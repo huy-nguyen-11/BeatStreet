@@ -20,7 +20,7 @@ public class ObjectPooler : MonoBehaviour
 
     public List<Pool> pools;
     public Dictionary<string, Queue<GameObject>> poolDictionary;
-    public Transform bulletTF , effectTF, textTF /* , boomerangTF , sawTF , shotgunTF , bulletTurretTF, coinTF , plasmaTF , textTF , hommingTF*/;
+    public Transform bulletTF , effectTF, textTF, coinsTF /* , boomerangTF , sawTF , shotgunTF , bulletTurretTF, coinTF , plasmaTF , textTF , hommingTF*/;
 
     // Start is called before the first frame update
     void Start()
@@ -110,6 +110,10 @@ public class ObjectPooler : MonoBehaviour
                 else if (obj.tag == "Text")
                 {
                     obj.transform.parent = textTF;
+                }
+                else if (obj.tag == "Coin")
+                {
+                    obj.transform.parent = coinsTF;
                 }
                 else
                 {

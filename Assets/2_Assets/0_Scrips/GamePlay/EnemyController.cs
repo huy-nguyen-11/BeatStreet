@@ -395,7 +395,7 @@ public class EnemyController : EnemyCharacter
             // Only increment timer if we're not already at target
             if (distanceToTarget > 0.2f)
             {
-                float patrolDuration = typeOfEnemy == TypeOfEnemy.Boss ? 2.5f : 1.5f;
+                float patrolDuration = typeOfEnemy == TypeOfEnemy.Boss ? 3.65f : 1.5f;
 
                 patrolTimer += Time.deltaTime;
                 if (patrolTimer >= patrolDuration)
@@ -434,7 +434,7 @@ public class EnemyController : EnemyCharacter
         {
             isStopping = false;
             stopTimer = 0f;
-            float num = typeOfEnemy == TypeOfEnemy.Boss ? 0f : 0.25f;
+            float num = typeOfEnemy == TypeOfEnemy.Boss ? 0.15f : 0.3f;
             isPatrolling = Random.value < num; //random 20% patrol, 80% move to player
             isAvoidingPlayer = false;
             if (isPatrolling && typeOfEnemy == TypeOfEnemy.Enemy)
@@ -905,7 +905,11 @@ public class EnemyController : EnemyCharacter
             return;
         }
         currentHitIndex++;
-        
+        if(typeOfEnemy == TypeOfEnemy.Boss)
+        {
+            FlashHit();
+        }
+
         if (isMaxHit && typeOfEnemy != TypeOfEnemy.Boss)
         {
             GamePlayManager.Instance._CameraFollow.Shake2();
@@ -1013,7 +1017,8 @@ public class EnemyController : EnemyCharacter
         int number = Random.Range(3, 6);
         for (int i = 0; i < number; i++)
         {
-            Instantiate(prfCoin, Char.position, Quaternion.identity);
+            //Instantiate(prfCoin, Char.position, Quaternion.identity);
+            ObjectPooler.Instance.SpawnFromPool("Coin", Char.position, Quaternion.identity);
         }
     }
     public void ResetState()
@@ -1042,15 +1047,16 @@ public class EnemyController : EnemyCharacter
             return;
         }
 
-        if (isAttacking)
-        {
-            if (enemy != enemyDead && enemy != enemyFall && enemy != enemyGrabed)
-            {
-                // block non-critical transitions while attacking
-                Debug.Log("aaaa");
-                return;
-            }
-        }
+        //if (isAttacking)
+        //{
+        //    if (enemy != enemyDead && enemy != enemyFall && enemy != enemyGrabed)
+        //    {
+        //        // block non-critical transitions while attacking
+        //        Debug.Log("aaaa");
+        //        return;
+        //    }
+        //}
+
         // If we're switching INTO Grabed, set isGrabbed immediately to block other callers
         if (enemy == enemyGrabed)
         {
