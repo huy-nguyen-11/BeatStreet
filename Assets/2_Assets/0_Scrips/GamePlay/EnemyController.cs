@@ -775,7 +775,7 @@ public class EnemyController : EnemyCharacter
                     patrolTimer = 0f;
                     isPatrolling = false;
                     isAttack = true;
-                    isEnableThrower = false;
+                  
                     enemyAttack.nameBossAttack = "Attack2";
                     //SwitchToRunState(enemyAttack);
                     if (state != State.Idle)
@@ -796,7 +796,7 @@ public class EnemyController : EnemyCharacter
             }
             return;
         }
-        else if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 2 && distanceX <= 1.2f && distanceY <= 0.2f && isEnableThrower)
+        else if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 2 && distanceX <= 1.2f && distanceY <= 0.2f)
         {
             if (!isAttack)
             {
@@ -829,7 +829,7 @@ public class EnemyController : EnemyCharacter
         //is elite enemy
         if(typeOfEnemy == TypeOfEnemy.EliteEnemy)
         {
-            if (distanceX <= 2 && distanceY <= 0.2f && distanceX > rangeAttack + 0.2f)
+            if (distanceX <= 2 && distanceY <= 0.2f && distanceX > rangeAttack + 0.5f && isEnableThrower)
             {
                 if (!isAttack)
                 {
@@ -837,6 +837,7 @@ public class EnemyController : EnemyCharacter
                     stopTimer = 0f;
                     patrolTimer = 0f;
                     isPatrolling = false;
+                    isEnableThrower = false;
                     enemyAttack.isEliteEnemyAttack = true;
                     isAttack = true;
                     //SwitchToRunState(enemyAttack);

@@ -42,10 +42,10 @@ public class BomEnemy : MonoBehaviour , IpooledObject
         // mặt đất thấp hơn spawn
         groundPos = new Vector2(
             spawnPos.x,
-            spawnPos.y - 0.6f
+            spawnPos.y - 0.4f
         );
         //groundPos = transform.position;
-        height = 0.6f;
+        height = 0.4f;
         heightVelocity = initialHeightVelocity;
 
     }
@@ -165,6 +165,40 @@ public class BomEnemy : MonoBehaviour , IpooledObject
         GetComponent<SpriteRenderer>().enabled = true;
     }
 
+    void OnDisable()
+    {
+        // Stop any running coroutines started by this instance
+        StopAllCoroutines();
+
+        // Reset runtime state so object can be safely reused by pooling
+        exploded = false;
+        isGrounded = false;
+        bounceCount = 0;
+        height = 0f;
+        heightVelocity = 0f;
+        horizontalVelocity = Vector2.zero;
+
+        // Reset visual state
+        var sr = GetComponent<SpriteRenderer>();
+        if (sr != null)
+            sr.enabled = true;
+
+        // Turn off explosion effect if assigned
+        if (explosion != null)
+            explosion.SetActive(false);
+
+        // Clean up any spawned fire object
+        if (fireGo != null)
+        {
+            Destroy(fireGo);
+            fireGo = null;
+        }
+
+        // Reset transform rotation to default so it doesn't carry over rotation
+        transform.rotation = Quaternion.identity;
+    }
+
+
     public void Explode()
     {
         if (exploded) return;
@@ -189,7 +223,5 @@ public class BomEnemy : MonoBehaviour , IpooledObject
         horizontalVelocity = throwDir.normalized * throwSpeed;
         initialHeightVelocity = heightForce;
         heightVelocity = heightForce;
-
-        Debug.Log("[Bomb] Throw called");
     }
 }

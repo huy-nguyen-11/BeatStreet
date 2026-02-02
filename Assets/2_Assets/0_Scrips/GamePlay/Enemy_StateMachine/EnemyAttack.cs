@@ -71,8 +71,6 @@ public class EnemyAttack : EnemyStateMachine
     // tuning
     private float preAttackDelay = 1f;     // idle before first attack
     private float interAttackDelay = 0.12f;  // delay between successive attacks
-    private int minAttacks = 1;
-    private int maxAttacks = 2;
 
     private Coroutine _attackRoutine;
 
@@ -119,11 +117,15 @@ public class EnemyAttack : EnemyStateMachine
         // short idle before attacking
         yield return new WaitForSeconds(preAttackDelay);
 
+        int attacks;
         if (nameBossAttack == "Attack1" || isEliteEnemyAttack)
         {
-            maxAttacks = 0;
+            attacks = 1;
         }
-        int attacks = (Random.value <= 0.25f) ? 2 : 1;
+        else
+        {
+            attacks = (Random.value <= 0.25f) ? 2 : 1;
+        }
 
         for (int i = 0; i < attacks; i++)
         {
@@ -170,10 +172,10 @@ public class EnemyAttack : EnemyStateMachine
         enemyController.isAttacking = false;
         enemyController.isAttack = false;
         isEliteEnemyAttack = false;
-        if(enemyController.isEnableThrower)
-        {
-            enemyController.isEnableThrower = false;
-        }
+        //if(enemyController.isEnableThrower)
+        //{
+        //    enemyController.isEnableThrower = false;
+        //}
         // after attack, return to Idle so DelayAttack can handle timing before next attack
         enemyController.SwitchToRunState(enemyController.enemyIdle);
     }
