@@ -162,7 +162,7 @@ MonoBehaviour:
   rangeAttack: 0.85
   isBoss: 0
   Level: 0
-  idEnemy: 1
+  idEnemy: 5
   Hp: 3
   dame: 3
   playerLayer:
@@ -189,6 +189,7 @@ MonoBehaviour:
   isWall: 0
   canCheckWall: 0
   isAttack: 0
+  isAttacking: 0
   wallLayer:
     serializedVersion: 2
     m_Bits: 256
@@ -202,11 +203,15 @@ MonoBehaviour:
   isStopping: 0
   stopDuration: 1
   isBeingThrown: 0
+  shouldDirectChase: 0
   runThreshold: 1
   walkThreshold: 0.25
   idleThreshold: 0.05
   animationHysteresis: 0.08
   posBullet: {fileID: 0}
+  posKnife: {fileID: 0}
+  posWave: {fileID: 0}
+  debugAI: 0
   velocity: 0
   isCheckGravity: 0
 --- !u!1 &1255429059378504096

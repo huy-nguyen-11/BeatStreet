@@ -7,6 +7,7 @@ using UnityEngine;
 public enum TypeOfEnemy
 {
     Enemy,
+    EliteEnemy,
     Boss,
 }
 
@@ -103,7 +104,7 @@ public class EnemyController : EnemyCharacter
     public float animationHysteresis = 0.08f;
 
     private string currentMoveAnim = null;
-    public Transform posBullet , posKnife , posWave;
+    public Transform posBullet , posKnife , posWave , posThrower;
 
 
     // Public method to reset move animation (useful when transitioning from states like Fall)
@@ -152,6 +153,9 @@ public class EnemyController : EnemyCharacter
         rb = transform.parent.GetComponent<Rigidbody2D>();
     }
 
+    private float timmerCheckThrower = 0f;
+    public bool isEnableThrower = false;
+
     void Update()
     {
         stateManager.Update();
@@ -171,6 +175,16 @@ public class EnemyController : EnemyCharacter
         }
         if (state != State.Hit && state != State.Fall && state != State.Attack)
             CheckAttack();
+
+        if(!isEnableThrower)
+        {
+            timmerCheckThrower += Time.deltaTime;
+            if(timmerCheckThrower >= 3f)
+            {
+                isEnableThrower = true;
+                timmerCheckThrower = 0f;
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -437,7 +451,7 @@ public class EnemyController : EnemyCharacter
             float num = typeOfEnemy == TypeOfEnemy.Boss ? 0.15f : 0.3f;
             isPatrolling = Random.value < num; //random 20% patrol, 80% move to player
             isAvoidingPlayer = false;
-            if (isPatrolling && typeOfEnemy == TypeOfEnemy.Enemy)
+            if (isPatrolling && (typeOfEnemy == TypeOfEnemy.Enemy || typeOfEnemy == TypeOfEnemy.EliteEnemy))
                 SetRandomPatrolTarget();
         }
     }
@@ -735,7 +749,21 @@ public class EnemyController : EnemyCharacter
                     isAttack = true;
                     //SwitchToRunState(enemyIdle);
                     enemyAttack.nameBossAttack = "Attack1";
-                    SwitchToRunState(enemyAttack);
+                    //SwitchToRunState(enemyAttack);
+                    if (state != State.Idle)
+                    {
+                        SwitchToRunState(enemyIdle);
+                    }
+                    if (state != State.Idle)
+                    {
+                        // immediately request attack state
+                        SwitchToRunState(enemyAttack);
+                    }
+                    else
+                    {
+                        // if already Idle, also start Attack immediately
+                        SwitchToRunState(enemyAttack);
+                    }
                 }
             }
             else if(distanceX < 1.5f && distanceY <= 0.2f)
@@ -747,13 +775,28 @@ public class EnemyController : EnemyCharacter
                     patrolTimer = 0f;
                     isPatrolling = false;
                     isAttack = true;
+                    isEnableThrower = false;
                     enemyAttack.nameBossAttack = "Attack2";
-                    SwitchToRunState(enemyAttack);
+                    //SwitchToRunState(enemyAttack);
+                    if (state != State.Idle)
+                    {
+                        SwitchToRunState(enemyIdle);
+                    }
+                    if (state != State.Idle)
+                    {
+                        // immediately request attack state
+                        SwitchToRunState(enemyAttack);
+                    }
+                    else
+                    {
+                        // if already Idle, also start Attack immediately
+                        SwitchToRunState(enemyAttack);
+                    }
                 }
             }
             return;
         }
-        else if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 2 && distanceX <= 1.2f && distanceY <= 0.2f)
+        else if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 2 && distanceX <= 1.2f && distanceY <= 0.2f && isEnableThrower)
         {
             if (!isAttack)
             {
@@ -763,10 +806,57 @@ public class EnemyController : EnemyCharacter
                 isPatrolling = false;
                 isAttack = true;
                 enemyAttack.nameBossAttack = "Attack1";
-                SwitchToRunState(enemyAttack);
+                //SwitchToRunState(enemyAttack);
+                if (state != State.Idle)
+                {
+                    SwitchToRunState(enemyIdle);
+                }
+                if (state != State.Idle)
+                {
+                    // immediately request attack state
+                    SwitchToRunState(enemyAttack);
+                }
+                else
+                {
+                    // if already Idle, also start Attack immediately
+                    SwitchToRunState(enemyAttack);
+                }
             }
 
             return;
+        }
+
+        //is elite enemy
+        if(typeOfEnemy == TypeOfEnemy.EliteEnemy)
+        {
+            if (distanceX <= 2 && distanceY <= 0.2f && distanceX > rangeAttack + 0.2f)
+            {
+                if (!isAttack)
+                {
+                    isStopping = false;
+                    stopTimer = 0f;
+                    patrolTimer = 0f;
+                    isPatrolling = false;
+                    enemyAttack.isEliteEnemyAttack = true;
+                    isAttack = true;
+                    //SwitchToRunState(enemyAttack);
+                    if (state != State.Idle)
+                    {
+                        SwitchToRunState(enemyIdle);
+                    }
+                    if (state != State.Idle)
+                    {
+                        // immediately request attack state
+                        SwitchToRunState(enemyAttack);
+                    }
+                    else
+                    {
+                        // if already Idle, also start Attack immediately
+                        SwitchToRunState(enemyAttack);
+                    }
+                    return;
+                }
+            }
         }
 
         // Xác định vị trí tấn công lý tưởng của enemy này (bên trái hoặc phải player)
@@ -872,6 +962,23 @@ public class EnemyController : EnemyCharacter
                 }
 
                 //todo handle other attack event attack 2 of enemey id 2
+            }
+        }
+        else if(typeOfEnemy == TypeOfEnemy.EliteEnemy)
+        {
+            if (e.Data.Name == "Shoot" || e.Data.Name == "shoot")
+            {
+                if (idEnemy == 2)
+                {
+                    GameObject bomb = ObjectPooler.Instance.SpawnFromPool("Bomb", posThrower.position, transform.rotation);
+                    BomEnemy bomEnemy = bomb.GetComponent<BomEnemy>();
+                    int dir = Char.transform.rotation.y < 0 ? -1 : 1;
+                    bomEnemy.Throw(throwDir: new Vector2(dir, 0f), throwSpeed: 3f, heightForce: 7f);
+                }
+            }
+            else if(e.Data.Name == "Hit" || e.Data.Name == "hit")
+            {
+                SetAttack(idEnemy);
             }
         }
         else

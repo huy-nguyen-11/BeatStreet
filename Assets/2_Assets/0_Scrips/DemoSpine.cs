@@ -148,6 +148,8 @@ public class DemoSpine : MonoBehaviour
     //}
 
     [SerializeField] private SkeletonAnimation skeletonAnimation;
+    public GameObject bom;
+    public Transform posBom;
 
     private Tween flashTween;
 
@@ -189,4 +191,47 @@ public class DemoSpine : MonoBehaviour
     {
         flashTween?.Kill();
     }
+
+    public void Explode()
+    {
+        if (bom != null)
+        {
+            GameObject bomb = Instantiate(bom, posBom.transform.position , Quaternion.identity);
+            BomEnemy bomEnemy = bom.GetComponent<BomEnemy>();
+            bomEnemy.Throw(
+                throwDir: new Vector2(1f, 0f),  // ném sang phải
+                throwSpeed: 3f,
+                heightForce: 7f
+            );
+        }
+    }
+
+    public void Bone()
+    {
+        if (bom != null)
+        {
+            GameObject bomb = Instantiate(bom, posBom.transform.position, Quaternion.identity);
+            BomEnemy bomEnemy = bom.GetComponent<BomEnemy>();
+            bomEnemy.Throw(
+                throwDir: new Vector2(1f, 0f),  // ném sang phải
+                throwSpeed: 6f,
+                heightForce: 3.5f
+            );
+        }
+    }
+
+    public void Molotov()
+    {
+        if (bom != null)
+        {
+            GameObject bomb = Instantiate(bom, posBom.transform.position, Quaternion.identity);
+            BomEnemy bomEnemy = bom.GetComponent<BomEnemy>();
+            bomEnemy.Throw(
+                throwDir: new Vector2(1f, 0f),  // ném sang phải
+                throwSpeed: 3f,
+                heightForce: 4f
+            );
+        }
+    }
+
 }

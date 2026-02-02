@@ -77,6 +77,7 @@ public class EnemyAttack : EnemyStateMachine
     private Coroutine _attackRoutine;
 
     public string nameBossAttack;
+    public bool isEliteEnemyAttack;
 
     public override void Enter()
     {
@@ -98,6 +99,10 @@ public class EnemyAttack : EnemyStateMachine
             //attackAnimationName = (randomValue <= 0.5f) ? "Attack1" : "Attack2";
             attackAnimationName = nameBossAttack;
         }
+        else if( enemyController.typeOfEnemy == TypeOfEnemy.EliteEnemy && isEliteEnemyAttack)
+        {
+            attackAnimationName = "Attack_2";
+        }
         else
         {
             attackAnimationName = "Attack";
@@ -114,7 +119,7 @@ public class EnemyAttack : EnemyStateMachine
         // short idle before attacking
         yield return new WaitForSeconds(preAttackDelay);
 
-        if(nameBossAttack == "Attack1")
+        if (nameBossAttack == "Attack1" || isEliteEnemyAttack)
         {
             maxAttacks = 0;
         }
@@ -127,7 +132,7 @@ public class EnemyAttack : EnemyStateMachine
             // play attack animation and wait for completion
             attackEntry = enemyController.skeletonAnimation.AnimationState.SetAnimation(0, attackAnimationName, false);
             bool isFacingRight = enemyController.Char.rotation.y < 0f;
-            if(enemyController.typeOfEnemy != TypeOfEnemy.Boss)
+            if (enemyController.typeOfEnemy != TypeOfEnemy.Boss && enemyController.typeOfEnemy != TypeOfEnemy.EliteEnemy)
             {
                 enemyController.rb.linearVelocity = Vector2.right * (isFacingRight ? -0.2f : 0.2f);
             }
@@ -164,7 +169,11 @@ public class EnemyAttack : EnemyStateMachine
         // finished attacking: allow transitions and go to Idle to re-evaluate player
         enemyController.isAttacking = false;
         enemyController.isAttack = false;
-
+        isEliteEnemyAttack = false;
+        if(enemyController.isEnableThrower)
+        {
+            enemyController.isEnableThrower = false;
+        }
         // after attack, return to Idle so DelayAttack can handle timing before next attack
         enemyController.SwitchToRunState(enemyController.enemyIdle);
     }
