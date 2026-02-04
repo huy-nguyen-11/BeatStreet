@@ -97,7 +97,7 @@ public class LuckySpin : MonoBehaviour
             PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") - DataManager.Instance.priceSpin);
             DataManager.Instance.priceSpin += 100;
             CheckRewardStatus();
-            controllerSpin.ValidateRoundFree();
+            //controllerSpin.ValidateRoundFree();
             StartCoroutine(SetTimeRun());
             DataManager.Instance.SaveFile();
             MainManager.Instance.SetTopBar();
@@ -113,7 +113,7 @@ public class LuckySpin : MonoBehaviour
         PlayerPrefs.SetString(LAST_REWARD_TIME, lastRewardTime.ToString());
         PlayerPrefs.Save();
         CheckRewardStatus();
-        controllerSpin.ValidateRoundFree();
+        //controllerSpin.ValidateRoundFree();
         StartCoroutine(SetTimeRun());
         DataManager.Instance.SaveFile();
         MainManager.Instance.SetTopBar();
@@ -129,7 +129,7 @@ public class LuckySpin : MonoBehaviour
             {
                 MainManager.Instance.SetMission(3, 1);
                 CheckRewardStatus();
-                controllerSpin.ValidateRoundFree();
+                //controllerSpin.ValidateRoundFree();
                 StartCoroutine(SetTimeRun());
                 DataManager.Instance.SaveFile();
                 MainManager.Instance.SetTopBar();

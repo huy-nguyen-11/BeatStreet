@@ -20,6 +20,54 @@ public class AttackArea : MonoBehaviour
     private bool isJumpHitActive = false;
     private HashSet<Collider2D> hitEnemies = new HashSet<Collider2D>();
 
+    //for enemey toggle
+    private bool isEnemyToggleAttack = false;
+
+    // Tấn công bằng lưỡi (enemy): check liên tục, hit player tối đa 1 lần mỗi đợt
+    private bool isEnemyTongueHitActive = false;
+    private bool hasHitPlayerThisTongue = false;
+
+    /// <summary> Bật check liên tục tấn công lưỡi. Gọi từ Animation Event khi lưỡi bắt đầu. </summary>
+    public void StartEnemyTongueHit(float dame)
+    {
+        Dame = dame;
+        isEnemyTongueHitActive = true;
+        hasHitPlayerThisTongue = false;
+    }
+
+    /// <summary> Tắt check, kết thúc đợt tấn công lưỡi. Gọi từ Animation Event khi lưỡi kết thúc. </summary>
+    public void EndEnemyTongueHit()
+    {
+        isEnemyTongueHitActive = false;
+    }
+
+    private void CheckEnemyTongueHitPlayer()
+    {
+        if (hasHitPlayerThisTongue) return;
+
+        Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskPlayer);
+        if (hits.Length == 0) return;
+        foreach (var hit in hits)
+        {
+            PlayerChar player = hit.gameObject.GetComponent<PlayerChar>();
+            if (player == null) continue;
+
+            Transform enemy = transform.parent.parent;
+            EnemyController enemyController = enemy.transform.GetChild(0).GetComponent<EnemyController>();
+
+            if (player.playerController.isImmortal) continue;
+            if (Mathf.Abs(player.transform.position.y - enemy.transform.position.y) > 0.35f) continue;
+
+            hasHitPlayerThisTongue = true;
+            AudioBase.Instance.AudioEnemy(1);
+            bool direction = transform.parent.rotation.y == 0 ? true : false;
+            player.playerController.HitDirection = direction;
+            player.playerController.SetHit(Dame);
+            ObjectPooler.Instance.SpawnFromPool("Hit", transform.position, Quaternion.Euler(0, 0, 0));
+            break;
+        }
+    }
+
 
     private void Update()
     {
@@ -47,6 +95,11 @@ public class AttackArea : MonoBehaviour
         if (isJumpHitActive)
         {
             CheckJumpHitEnemies();
+        }
+
+        if (isEnemyTongueHitActive)
+        {
+            CheckEnemyTongueHitPlayer();
         }
 
         if (collisionQueue.Count > 0)
@@ -263,7 +316,7 @@ public class AttackArea : MonoBehaviour
             EnemyController enemyController = enemy.transform.GetChild(0).GetComponent<EnemyController>();
             if (!player.playerController.isImmortal
                 //&& Mathf.Abs(player.transform.position.x - enemy.position.x) <= 1.2f
-                && Mathf.Abs(player.transform.position.y - enemy.transform.position.y) <= 0.2f)
+                && Mathf.Abs(player.transform.position.y - enemy.transform.position.y) <= 0.35f)
             {
                 AudioBase.Instance.AudioEnemy(1);
                 bool direction = transform.parent.rotation.y == 0 ? true : false;

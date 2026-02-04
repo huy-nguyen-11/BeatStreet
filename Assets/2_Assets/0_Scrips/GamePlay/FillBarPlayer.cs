@@ -14,9 +14,13 @@ public class FillBarPlayer : MonoBehaviour
     public bool isCheckFly;
     private void FixedUpdate()
     {
-        imgFillHp.DOFillAmount(hp / maxHp, 0.3f);
-        if (!isCheckFly)
-            imgFillMana.DOFillAmount(mana / maxMana, 0.3f);
+        //imgFillHp.DOFillAmount(hp / maxHp, 0.3f);
+        //if (!isCheckFly)
+        //    imgFillMana.DOFillAmount(mana / maxMana, 0.3f);
+
+        imgFillHp.fillAmount = hp / maxHp;
+        if(!isCheckFly)
+            imgFillMana.fillAmount = mana / maxMana;
     }
     public void OnInit(float maxHp, float mana)
     {

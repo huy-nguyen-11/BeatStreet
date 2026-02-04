@@ -18,7 +18,7 @@ public class EnergyRecovery : MonoBehaviour
 
     void Update()
     {
-        RecoverEnergy();
+        //RecoverEnergy();
     }
 
     void CheckOfflineRecovery()

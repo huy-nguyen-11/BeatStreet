@@ -55,6 +55,8 @@ public class Bullet : MonoBehaviour, IpooledObject
             
             if (playerController != null)
             {
+                playerController.HitDirection = moveRight;
+                ObjectPooler.Instance.SpawnFromPool("Hit", transform.position, Quaternion.Euler(0, 0, 0));
                 playerController.SetHit(damage);
             }
             

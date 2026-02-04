@@ -395,22 +395,31 @@ public class ShopController : MonoBehaviour
         }
         else
         {
-            MG_Interface.Current.Purchase_Item(MG_ProductData.DiamontPacks[id].productId, (bool result, bool onIAP, string productId) =>
-            {
-                if (result)
-                {
-                    AudioBase.Instance.SetAudioUI(1);
-                    PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + SetDiamont(id));
-                    isOnClick = false;
-                    getReward.DoAddGemsEffect(_listPosGems[id].position, PlayerPrefs.GetInt("Diamont") - SetDiamont(id), PlayerPrefs.GetInt("Diamont"));
-                    MainManager.Instance.SetTopBar();
-                    DataManager.Instance.SaveFile();
-                    StartCoroutine(WaitForCoolDownOnClick());
-                }
-                else
-                {
-                }
-            });
+            //MG_Interface.Current.Purchase_Item(MG_ProductData.DiamontPacks[id].productId, (bool result, bool onIAP, string productId) =>
+            //{
+            //    if (result)
+            //    {
+            //        AudioBase.Instance.SetAudioUI(1);
+            //        PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + SetDiamont(id));
+            //        isOnClick = false;
+            //        getReward.DoAddGemsEffect(_listPosGems[id].position, PlayerPrefs.GetInt("Diamont") - SetDiamont(id), PlayerPrefs.GetInt("Diamont"));
+            //        MainManager.Instance.SetTopBar();
+            //        DataManager.Instance.SaveFile();
+            //        StartCoroutine(WaitForCoolDownOnClick());
+            //    }
+            //    else
+            //    {
+            //    }
+            //});
+
+            //for test demo buy diamond
+            AudioBase.Instance.SetAudioUI(1);
+            PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + SetDiamont(id));
+            isOnClick = false;
+            getReward.DoAddGemsEffect(_listPosGems[id].position, PlayerPrefs.GetInt("Diamont") - SetDiamont(id), PlayerPrefs.GetInt("Diamont"));
+            MainManager.Instance.SetTopBar();
+            DataManager.Instance.SaveFile();
+            StartCoroutine(WaitForCoolDownOnClick());
         }
 
     }

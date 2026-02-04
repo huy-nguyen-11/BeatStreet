@@ -109,8 +109,11 @@ MonoBehaviour:
   initialHeightVelocity: 7
   gravity: -35
   bounceDamping: 0.4
-  maxBounceCount: 2
+  maxBounceCount: 3
   rotationSpeed: 360
+  damageLayer:
+    serializedVersion: 2
+    m_Bits: 64
   explosion: {fileID: 7911219078498215938}
   fire: {fileID: 0}
 --- !u!1 &7638574964621388980

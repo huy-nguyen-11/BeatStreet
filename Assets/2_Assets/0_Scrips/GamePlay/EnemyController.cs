@@ -1,6 +1,7 @@
 using DG.Tweening;
 using Spine;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -105,7 +106,22 @@ public class EnemyController : EnemyCharacter
 
     private string currentMoveAnim = null;
     public Transform posBullet , posKnife , posWave , posThrower;
+    public float rangeThrower;
+    public float timerCheckThrower = 3f;
 
+    // for all enemies tracking
+    private static readonly List<EnemyController> s_AllEnemies = new List<EnemyController>();
+
+    private void OnEnable()
+    {
+        if (!s_AllEnemies.Contains(this))
+            s_AllEnemies.Add(this);
+    }
+
+    private void OnDisable()
+    {
+        s_AllEnemies.Remove(this);
+    }
 
     // Public method to reset move animation (useful when transitioning from states like Fall)
     public void ResetMoveAnimation()
@@ -115,7 +131,8 @@ public class EnemyController : EnemyCharacter
 
     private void Awake()
     {
-        playerController = FindObjectOfType<PlayerController>();
+        //playerController = FindObjectOfType<PlayerController>();
+        playerController = GamePlayManager.Instance._Player;
         player = playerController.transform.parent;
         enemyIdle = new EnemyIdle(this);
         enemyRun = new EnemyRun(this);
@@ -179,7 +196,7 @@ public class EnemyController : EnemyCharacter
         if(!isEnableThrower)
         {
             timmerCheckThrower += Time.deltaTime;
-            if(timmerCheckThrower >= 3f)
+            if(timmerCheckThrower >= timerCheckThrower)
             {
                 isEnableThrower = true;
                 timmerCheckThrower = 0f;
@@ -231,9 +248,13 @@ public class EnemyController : EnemyCharacter
         Vector3 separation = Vector3.zero;
         int count = 0;
 
-        foreach (var enemy in FindObjectsOfType<EnemyController>())
+        for (int i = 0; i < s_AllEnemies.Count; i++)
         {
+            var enemy = s_AllEnemies[i];
+            if (enemy == null) continue;
             if (enemy == this || enemy.state == State.Dead) continue;
+            if (enemy.Char == null) continue;
+
             float dist = Vector3.Distance(Char.position, enemy.Char.position);
             if (dist < minDist && dist > 0.01f)
             {
@@ -241,6 +262,7 @@ public class EnemyController : EnemyCharacter
                 count++;
             }
         }
+
 
         if (count > 0)
         {
@@ -399,10 +421,11 @@ public class EnemyController : EnemyCharacter
 
             // FIX: Only increment patrol timer if we're actually moving
             // Check if we have a valid target and are moving towards it
+            float preferredRange = (typeOfEnemy == TypeOfEnemy.EliteEnemy) ? rangeThrower : rangeAttack;
             Vector3 currentTarget = isPatrolling ? randomTarget :
                 (Char.position.x < player.position.x ?
-                    player.position + Vector3.left * rangeAttack :
-                    player.position + Vector3.right * rangeAttack);
+                    player.position + Vector3.left * preferredRange :
+                    player.position + Vector3.right * preferredRange);
 
             float distanceToTarget = Vector3.Distance(Char.position, currentTarget);
 
@@ -465,7 +488,8 @@ public class EnemyController : EnemyCharacter
         }
         if (isBeingThrown || isGrabbed) return;
         // replace existing:
-        float targetOffset = rangeAttack ;
+        //float targetOffset = rangeAttack;
+        float targetOffset = (typeOfEnemy == TypeOfEnemy.EliteEnemy) ? rangeThrower : rangeAttack;
         Vector3 leftTarget = player.position + Vector3.left * targetOffset;
         Vector3 rightTarget = player.position + Vector3.right * targetOffset;
 
@@ -592,6 +616,27 @@ public class EnemyController : EnemyCharacter
     public void SetRandomPatrolTarget() // ramdom target when start patrol
     {
         int attempts = 10;
+
+        if (typeOfEnemy == TypeOfEnemy.EliteEnemy && player != null)
+        {
+            for (int i = 0; i < attempts; i++)
+            {
+                float side = (Random.value < 0.5f) ? -1f : 1f;
+                Vector3 candidate = new Vector3(
+                    player.position.x + side * rangeThrower + Random.Range(-0.5f, 0.5f),
+                    player.position.y + Random.Range(-0.8f, 0.8f),
+                    0f);
+                // clamp vào biên bản đồ
+                candidate.x = Mathf.Clamp(candidate.x, GamePlayManager.Instance.minPosX, GamePlayManager.Instance.maxPosX);
+                candidate.y = Mathf.Clamp(candidate.y, GamePlayManager.Instance.minPosY, GamePlayManager.Instance.maxPosY);
+                if (Vector3.Distance(candidate, lastRandomTarget) > 1f && !IsTargetOccupiedByOtherEnemy(candidate))
+                {
+                    randomTarget = candidate;
+                    return;
+                }
+            }
+        }
+
         for (int i = 0; i < attempts; i++)
         {
             Vector3 noise = GetRandomPositionInRect(GamePlayManager.Instance.minPosX, GamePlayManager.Instance.maxPosX, GamePlayManager.Instance.minPosY, GamePlayManager.Instance.maxPosY, 0);
@@ -602,39 +647,6 @@ public class EnemyController : EnemyCharacter
                 return;
             }
         }
-        //int attempts = 10;
-        //Transform player = PlayerController.Instance.transform;
-
-        //bool enemyOnLeft = transform.position.x < player.position.x;
-
-        //float minX = GamePlayManager.Instance.minPosX;
-        //float maxX = GamePlayManager.Instance.maxPosX;
-
-        ////  Giới hạn theo phía player
-        //if (enemyOnLeft)
-        //    maxX = player.position.x;
-        //else
-        //    minX = player.position.x;
-
-        //for (int i = 0; i < attempts; i++)
-        //{
-        //    Vector3 noise = GetRandomPositionInRect(
-        //        minX,
-        //        maxX,
-        //        GamePlayManager.Instance.minPosY,
-        //        GamePlayManager.Instance.maxPosY,
-        //        0
-        //    );
-
-        //    noise.z = 0;
-
-        //    if (Vector3.Distance(noise, lastRandomTarget) > 1f &&
-        //        !IsTargetOccupiedByOtherEnemy(noise))
-        //    {
-        //        randomTarget = noise;
-        //        return;
-        //    }
-        //}
     }
 
     public void AvoidWall() // random target when hit wall
@@ -829,7 +841,7 @@ public class EnemyController : EnemyCharacter
         //is elite enemy
         if(typeOfEnemy == TypeOfEnemy.EliteEnemy)
         {
-            if (distanceX <= 2 && distanceY <= 0.2f && distanceX > rangeAttack + 0.5f && isEnableThrower)
+            if (distanceX <= rangeThrower + 0.5f && distanceY <= 0.35f && distanceX > rangeAttack + 0.35f && isEnableThrower) //id enemey=2 - enemey bomb
             {
                 if (!isAttack)
                 {
@@ -937,7 +949,7 @@ public class EnemyController : EnemyCharacter
                     SetAttack(idEnemy);
                 }
             }
-            else if( idEnemy == 1)
+            else if (idEnemy == 1)
             {
                 if (e.Data.Name == "hit" && enemyAttack.nameBossAttack == "Attack1")
                 {
@@ -965,7 +977,7 @@ public class EnemyController : EnemyCharacter
                 //todo handle other attack event attack 2 of enemey id 2
             }
         }
-        else if(typeOfEnemy == TypeOfEnemy.EliteEnemy)
+        else if (typeOfEnemy == TypeOfEnemy.EliteEnemy)
         {
             if (e.Data.Name == "Shoot" || e.Data.Name == "shoot")
             {
@@ -974,12 +986,41 @@ public class EnemyController : EnemyCharacter
                     GameObject bomb = ObjectPooler.Instance.SpawnFromPool("Bomb", posThrower.position, transform.rotation);
                     BomEnemy bomEnemy = bomb.GetComponent<BomEnemy>();
                     int dir = Char.transform.rotation.y < 0 ? -1 : 1;
-                    bomEnemy.Throw(throwDir: new Vector2(dir, 0f), throwSpeed: 3f, heightForce: 7f);
+                    bomEnemy.Throw(throwDir: new Vector2(dir, 0f), throwSpeed: 3f, heightForce: 6f);
+                }
+                else if (idEnemy == 10)
+                {
+                    GameObject molotov = ObjectPooler.Instance.SpawnFromPool("Molotov", posThrower.position, transform.rotation);
+                    BomEnemy bomEnemy = molotov.GetComponent<BomEnemy>();
+                    int dir = Char.transform.rotation.y < 0 ? -1 : 1;
+                    bomEnemy.Throw(throwDir: new Vector2(dir, 0f), throwSpeed: 3f, heightForce: 5f);
+                }
+                else if (idEnemy == 11)
+                {
+                    GameObject bone = ObjectPooler.Instance.SpawnFromPool("Bone", posThrower.position, transform.rotation);
+                    BomEnemy bomEnemy = bone.GetComponent<BomEnemy>();
+                    int dir = Char.transform.rotation.y < 0 ? -1 : 1;
+                    bomEnemy.Throw(throwDir: new Vector2(dir, 0f), throwSpeed: 7f, heightForce: 3.5f);
+                }
+                else if (idEnemy == 4 || idEnemy == 5)
+                {
+                    GameObject spoon = ObjectPooler.Instance.SpawnFromPool("Spoon", posThrower.position, transform.rotation);
+                    BomEnemy bomEnemy = spoon.GetComponent<BomEnemy>();
+                    int dir = Char.transform.rotation.y < 0 ? -1 : 1;
+                    bomEnemy.Throw(throwDir: new Vector2(dir, 0f), throwSpeed: 7f, heightForce: 3f);
                 }
             }
-            else if(e.Data.Name == "Hit" || e.Data.Name == "hit")
+            else if (e.Data.Name == "Hit" || e.Data.Name == "hit")
             {
                 SetAttack(idEnemy);
+            }
+            else if (e.Data.Name == "TongueHit")
+            {
+                attackArea.StartEnemyTongueHit(dame);
+            }
+            else if (e.Data.Name == "end_hit" && idEnemy == 6)
+            {
+                attackArea.EndEnemyTongueHit();
             }
         }
         else
@@ -1040,12 +1081,6 @@ public class EnemyController : EnemyCharacter
         if (state == State.Dead || isGrabbed || rb == null)
             return;
 
-        //bool playerOnRight = player.position.x > Char.position.x;
-        //float knockbackDirection = playerOnRight ? 1f : -1f;
-        
-        //Vector2 knockbackForce = new Vector2(knockbackDirection * 8f, 3f);
-        //rb.linearVelocity = knockbackForce;
-        
         if (state != State.Fall)
         {
             SwitchToRunState(enemyFall);
@@ -1132,18 +1167,6 @@ public class EnemyController : EnemyCharacter
     public void ResetState()
     {
         SwitchToRunState(enemyIdle);
-        //// Ensure all "stopping" timers/flags cleared so Run can proceed immediately
-        //isStopping = false;
-        //stopTimer = 0f;
-        //patrolTimer = 0f;
-        //isPatrolling = false;
-        //isCheckingPlayer = false;
-
-        //// Mark as active run so Idle won't steal control
-        //isActiveRun = true;
-
-        //// Switch to Run state so enemy resumes movement after finishing attack
-        //SwitchToRunState(enemyRun);
     }
 
 
@@ -1154,16 +1177,6 @@ public class EnemyController : EnemyCharacter
         {
             return;
         }
-
-        //if (isAttacking)
-        //{
-        //    if (enemy != enemyDead && enemy != enemyFall && enemy != enemyGrabed)
-        //    {
-        //        // block non-critical transitions while attacking
-        //        Debug.Log("aaaa");
-        //        return;
-        //    }
-        //}
 
         // If we're switching INTO Grabed, set isGrabbed immediately to block other callers
         if (enemy == enemyGrabed)
@@ -1209,11 +1222,6 @@ public class EnemyController : EnemyCharacter
         Gizmos.DrawWireSphere(randomTarget, 0.5f);
     }
 
-    //public void EnemyIsCatched()
-    //{
-    //    Debug.Log("enemy is catched");
-    //}
-
     // Forcefully set Grabbed state immediately (atomic) to avoid races
     public void ForceEnterGrabbed()
     {
@@ -1243,9 +1251,13 @@ public class EnemyController : EnemyCharacter
     private bool IsTargetOccupiedByOtherEnemy(Vector3 target, EnemyController ignore = null)
     {
         float minDist = 1f;
-        foreach (var enemy in FindObjectsOfType<EnemyController>())
+
+        for (int i = 0; i < s_AllEnemies.Count; i++)
         {
+            var enemy = s_AllEnemies[i];
+            if (enemy == null) continue;
             if (enemy == this || enemy == ignore || enemy.state == State.Dead) continue;
+            if (enemy.Char == null) continue;
             if (Vector3.Distance(enemy.Char.position, target) < minDist)
                 return true;
         }

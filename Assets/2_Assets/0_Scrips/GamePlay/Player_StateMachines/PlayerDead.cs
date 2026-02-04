@@ -11,9 +11,21 @@ public class PlayerDead : PlayerStateManager
         playerController.PlayAnim("Dead" , false);
         playerController.state = PlayerController.State.Dead;
         playerController.rb.linearVelocity = Vector2.zero;
+        AudioBase.Instance.AudioPlayer(5);
+
+        // If death came from fire/DoT hazard, do not apply fall/knockback.
+        if (playerController.deathStayInPlace)
+        {
+            playerController.deathStayInPlace = false; // consume flag
+            playerController.isFall = false;
+            playerController.velocity = 0;
+            isFall = false;
+            _coroutine = null;
+            return;
+        }
+
         playerController.isFall = true;
         playerController.velocity = 8;
-        AudioBase.Instance.AudioPlayer(5);
         _coroutine = playerController.StartCoroutine(FallCoroutine());
         isFall = true;
     }

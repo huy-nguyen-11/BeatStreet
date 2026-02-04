@@ -199,24 +199,24 @@ public class MainManager : MonoBehaviour
             }
         }
     }
-    public void BtnBuyVip()
-    {
-        AudioBase.Instance.SetAudioUI(0);
-        MG_Interface.Current.Purchase_Item(MG_ProductData.VIP_Pack.productId, (bool result, bool onIAP, string productId) =>
-        {
-            if (result)
-            {
-                AudioBase.Instance.SetAudioUI(1);
-                DataManager.Instance.isCheckVip = true;
-                CheckVIP();
-                OpenPanel(3);
-                DataManager.Instance.SaveFile();
-            }
-            else
-            {
-            }
-        });
-    }
+    //public void BtnBuyVip()
+    //{
+    //    AudioBase.Instance.SetAudioUI(0);
+    //    MG_Interface.Current.Purchase_Item(MG_ProductData.VIP_Pack.productId, (bool result, bool onIAP, string productId) =>
+    //    {
+    //        if (result)
+    //        {
+    //            AudioBase.Instance.SetAudioUI(1);
+    //            DataManager.Instance.isCheckVip = true;
+    //            CheckVIP();
+    //            OpenPanel(3);
+    //            DataManager.Instance.SaveFile();
+    //        }
+    //        else
+    //        {
+    //        }
+    //    });
+    //}
     private void CheckVIP()
     {
         if (DataManager.Instance.isCheckVip)

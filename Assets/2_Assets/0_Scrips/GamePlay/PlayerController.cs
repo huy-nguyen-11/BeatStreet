@@ -100,6 +100,9 @@ public class PlayerController : PlayerCharacter
     [SerializeField] public float moveSpeed = 5f;
     public bool IsDead = false;
     public bool HitDirection = false;
+    // Fire/DoT damage: take damage without hit-stun/knockback, and if dead keep position.
+    public bool deathStayInPlace = false;
+    private bool suppressHitReactionThisDamage = false;
     // Tounch
     public float moveThreshold = 50f;
     public float jumpThreshold = 100f;
@@ -1040,15 +1043,30 @@ public class PlayerController : PlayerCharacter
         {
             if (!isFall)
             {
-                PerformHit();
-                if (state != State.Jump && state != State.Skill1 && state != State.Skill2)
+                if (!suppressHitReactionThisDamage)
                 {
-                    if (playerGrab != null && playerGrab.IsGrabActive())
+                    PerformHit();
+                    if (state != State.Jump && state != State.Skill1 && state != State.Skill2)
                     {
-                        playerGrab.CancelGrab();
+                        if (playerGrab != null && playerGrab.IsGrabActive())
+                        {
+                            playerGrab.CancelGrab();
+                        }
+                        SwitchToRunState(playerHit);
                     }
-                    SwitchToRunState(playerHit);
                 }
+                else
+                {
+                    if (state != State.Jump && state != State.Skill1 && state != State.Skill2)
+                    {
+                        if (playerGrab != null && playerGrab.IsGrabActive())
+                        {
+                            playerGrab.CancelGrab();
+                        }
+                        SwitchToRunState(playerHit);
+                    }
+                }
+
             }
         }
         else
@@ -1063,6 +1081,22 @@ public class PlayerController : PlayerCharacter
             StartCoroutine(GamePlayManager.Instance.OpenPopupGameOver(2));
         }
         fillBar.SetNewHp(Hp);
+    }
+
+    /// <summary>
+    /// Damage from fire/DoT while stepping on hazards:
+    /// - Không tăng HitCount / không vào PlayerHit (không bị bay ra khi đủ hit)
+    /// - Nếu chết: chết ngay tại chỗ (không SetFall)
+    /// </summary>
+    public void SetHitFromFire(float dameHit)
+    {
+        suppressHitReactionThisDamage = true;
+        deathStayInPlace = true;
+        SetHit(dameHit);
+        // If still alive, only suppress reaction for this tick.
+        if (!IsDead)
+            deathStayInPlace = false;
+        suppressHitReactionThisDamage = false;
     }
     public void SpawnTxtHit(float dame)
     {
@@ -1094,11 +1128,11 @@ public class PlayerController : PlayerCharacter
     }
     public void SetFall()
     {
-        bool Direction = transform.rotation.y != 0 ? false : true;
-        if (Direction)
-            rb.linearVelocity = -Vector2.right * 3.5f;
-        else
-            rb.linearVelocity = Vector2.right * 3.5f;
+        // When falling/dead, knock the player in the direction of received damage.
+        // HitDirection is set by the attacker before calling SetHit().
+        if (rb == null) return;
+        float dir = HitDirection ? 1f : -1f;
+        rb.linearVelocity = Vector2.right * (3.5f * dir);
     }
 
     // Public helper to set facing consistently (updates flag + visual rotation)

@@ -147,53 +147,53 @@ public class EnemyIdle : EnemyStateMachine
         }
     }
 
-        IEnumerator DelayAttack()
-        {
+        //IEnumerator DelayAttack()
+        //{
 
-            if (enemyController.typeOfEnemy == TypeOfEnemy.Boss && enemyController.idEnemy == 0)
-            {
-                yield return new WaitForSeconds(0.25f);
-                int idEnemy = enemyController.Char.GetComponent<EnemyChar>().idEnemy;
+        //    if (enemyController.typeOfEnemy == TypeOfEnemy.Boss && enemyController.idEnemy == 0)
+        //    {
+        //        yield return new WaitForSeconds(0.25f);
+        //        int idEnemy = enemyController.Char.GetComponent<EnemyChar>().idEnemy;
 
-                if (enemyController.Char.position.x <= enemyController.player.position.x)
-                {
-                    GamePlayManager.Instance.isEnemyOnLeft[idEnemy] = true;
-                }
-                else
-                {
-                    GamePlayManager.Instance.isEnemyOnRight[idEnemy] = true;
-                }
+        //        if (enemyController.Char.position.x <= enemyController.player.position.x)
+        //        {
+        //            GamePlayManager.Instance.isEnemyOnLeft[idEnemy] = true;
+        //        }
+        //        else
+        //        {
+        //            GamePlayManager.Instance.isEnemyOnRight[idEnemy] = true;
+        //        }
 
-                enemyController.SwitchToRunState(enemyController.enemyAttack);
-            }
-            else
-            {
-                yield return new WaitForSeconds(1.45f);
-                if (Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) <= (enemyController.rangeAttack + 0.2f)
-                   && Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) >= 0.15f
-                   && Mathf.Abs(enemyController.Char.position.y - enemyController.player.position.y) <= 0.2f)
-                {
-                    int idEnemy = enemyController.Char.GetComponent<EnemyChar>().idEnemy;
+        //        enemyController.SwitchToRunState(enemyController.enemyAttack);
+        //    }
+        //    else
+        //    {
+        //        yield return new WaitForSeconds(1.45f);
+        //        if (Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) <= (enemyController.rangeAttack + 0.2f)
+        //           && Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x) >= 0.15f
+        //           && Mathf.Abs(enemyController.Char.position.y - enemyController.player.position.y) <= 0.2f)
+        //        {
+        //            int idEnemy = enemyController.Char.GetComponent<EnemyChar>().idEnemy;
 
-                    if (enemyController.Char.position.x <= enemyController.player.position.x)
-                    {
-                        GamePlayManager.Instance.isEnemyOnLeft[idEnemy] = true;
-                    }
-                    else
-                    {
-                        GamePlayManager.Instance.isEnemyOnRight[idEnemy] = true;
-                    }
+        //            if (enemyController.Char.position.x <= enemyController.player.position.x)
+        //            {
+        //                GamePlayManager.Instance.isEnemyOnLeft[idEnemy] = true;
+        //            }
+        //            else
+        //            {
+        //                GamePlayManager.Instance.isEnemyOnRight[idEnemy] = true;
+        //            }
 
-                    Debug.Log("Switch to Attack State" + Time.time);
-                    enemyController.SwitchToRunState(enemyController.enemyAttack);
-                }
-                else
-                {
-                    Debug.Log("Switch to Run State" + Time.time);
-                    enemyController.SwitchToRunState(enemyController.enemyRun);
-                }
-            }
-        }
+        //            Debug.Log("Switch to Attack State" + Time.time);
+        //            enemyController.SwitchToRunState(enemyController.enemyAttack);
+        //        }
+        //        else
+        //        {
+        //            Debug.Log("Switch to Run State" + Time.time);
+        //            enemyController.SwitchToRunState(enemyController.enemyRun);
+        //        }
+        //    }
+        //}
    
 
     public override void Exit()

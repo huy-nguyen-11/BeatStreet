@@ -26,10 +26,11 @@ public class BomEnemy : MonoBehaviour , IpooledObject
     private bool exploded;
 
     private bool isGrounded;
-
+    public LayerMask damageLayer;
     [SerializeField] private GameObject explosion , fire;
     private GameObject fireGo;
-
+    private bool isEnableHit = true;
+    private bool moveRight = true;
 
     public void OnObjectSpawn()
     {
@@ -48,6 +49,7 @@ public class BomEnemy : MonoBehaviour , IpooledObject
         height = 0.4f;
         heightVelocity = initialHeightVelocity;
 
+        isEnableHit = true;
     }
 
     void Start()
@@ -98,6 +100,7 @@ public class BomEnemy : MonoBehaviour , IpooledObject
             {
                 heightVelocity = 0f;
                 isGrounded = true;
+                isEnableHit = false;
                 OnBombLanded();
             }
         }
@@ -126,22 +129,35 @@ public class BomEnemy : MonoBehaviour , IpooledObject
     {
         if(explosion != null)
         {
-            GetComponent<SpriteRenderer>().enabled = false;
-            explosion.gameObject.SetActive(true);
-            StartCoroutine(DestroyObject());
-        }else if(fire)
+            StartCoroutine(HandleBombExplosion());
+        }
+        else if(fire)
         {
             GetComponent<SpriteRenderer>().enabled = false;
             fireGo = Instantiate(fire, transform.position, Quaternion.identity);
             StartCoroutine(DisableFireChildrenSequentially(fireGo));
         }
+        else
+        {
+            StartCoroutine(DestroyObject());
+        }
         // 👉 Gắn delay nổ ở đây nếu muốn
         // Invoke(nameof(Explode), 0.5f);
     }
 
+    IEnumerator HandleBombExplosion()
+    {
+        yield return new WaitForSeconds(0.75f);
+        GamePlayManager.Instance._CameraFollow.Shake();
+        DealExplosionDamage();
+        GetComponent<SpriteRenderer>().enabled = false;
+        explosion.gameObject.SetActive(true);
+        StartCoroutine(DestroyObject());
+    }
+
     IEnumerator DisableFireChildrenSequentially(GameObject fireParent)
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.5f);
         int childCount = fireParent.transform.childCount;
 
         for (int i = 0; i < childCount; i++)
@@ -198,30 +214,65 @@ public class BomEnemy : MonoBehaviour , IpooledObject
         transform.rotation = Quaternion.identity;
     }
 
-
-    public void Explode()
-    {
-        if (exploded) return;
-        exploded = true;
-
-        Debug.Log("[Bomb] BOOM 💥");
-
-        // TODO:
-        // - Spawn effect
-        // - Damage enemy
-        // - Camera shake
-
-        Destroy(gameObject);
-    }
-
     // ===============================
     // PUBLIC API
     // ===============================
 
     public void Throw(Vector2 throwDir, float throwSpeed, float heightForce)
     {
+        moveRight = throwDir.x >= 0;
         horizontalVelocity = throwDir.normalized * throwSpeed;
         initialHeightVelocity = heightForce;
         heightVelocity = heightForce;
+    }
+
+    void DealExplosionDamage()
+    {
+        Collider2D[] hits = Physics2D.OverlapCircleAll( transform.position,0.6f, damageLayer);
+
+        foreach (var hit in hits)
+        {
+            if(hit == null) continue;
+            PlayerChar player = hit.gameObject.GetComponent<PlayerChar>();
+            if(player != null)
+            {
+                //player.playerController.HitDirection = moveRight;
+                player.playerController.HitDirection = player.transform.position.x >= transform.position.x;
+                player.playerController.HitCount = 2;// todo knock back player
+                player.playerController.SetHit(1);
+                ObjectPooler.Instance.SpawnFromPool("Hit", transform.position, Quaternion.Euler(0, 0, 0));
+            }
+                
+           
+            // Enemy (nếu cần)
+            // var enemy = hit.GetComponent<EnemyBase>();
+            // if (enemy != null)
+            //     enemy.TakeDamage(damage);
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            PlayerController playerController = collision.GetComponent<PlayerController>();
+
+            if (playerController == null)
+            {
+                playerController = collision.GetComponentInParent<PlayerController>();
+            }
+            if (playerController == null)
+            {
+                playerController = PlayerController.Instance;
+            }
+
+            if (playerController != null && isEnableHit)
+            {
+                playerController.HitDirection = moveRight;
+                playerController.SetHit(1);
+                ObjectPooler.Instance.SpawnFromPool("Hit", transform.position, Quaternion.Euler(0, 0, 0));
+                isEnableHit = false;
+            }
+        }
     }
 }

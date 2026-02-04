@@ -444,7 +444,7 @@ MonoBehaviour:
   fillBar: {fileID: 7911696150518581383}
   skeletonAnimation: {fileID: 2604085430875873315}
   wakeUpAnim: Idle
-  typeOfEnemy: 1
+  typeOfEnemy: 2
   player: {fileID: 0}
   playerController: {fileID: 0}
   txtLevel: {fileID: 117690607258283832}
@@ -495,6 +495,7 @@ MonoBehaviour:
   isStopping: 0
   stopDuration: 1
   isBeingThrown: 0
+  shouldDirectChase: 0
   runThreshold: 1
   walkThreshold: 0.25
   idleThreshold: 0.05
@@ -502,6 +503,10 @@ MonoBehaviour:
   posBullet: {fileID: 0}
   posKnife: {fileID: 7464952504698417861}
   posWave: {fileID: 0}
+  posThrower: {fileID: 0}
+  rangeThrower: 0
+  timerCheckThrower: 3
+  isEnableThrower: 0
   debugAI: 0
   velocity: 0
   isCheckGravity: 0
