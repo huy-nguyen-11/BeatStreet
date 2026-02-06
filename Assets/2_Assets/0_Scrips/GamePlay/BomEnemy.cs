@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 
 public class BomEnemy : MonoBehaviour , IpooledObject
@@ -50,6 +50,11 @@ public class BomEnemy : MonoBehaviour , IpooledObject
         heightVelocity = initialHeightVelocity;
 
         isEnableHit = true;
+
+        //if(fireGo != null)
+        //{
+        //    transform.GetChild(0).GetChild(0).gameObject.SetActive(false); // deactive broken bomb sprite
+        //}
     }
 
     void Start()
@@ -134,6 +139,7 @@ public class BomEnemy : MonoBehaviour , IpooledObject
         else if(fire)
         {
             GetComponent<SpriteRenderer>().enabled = false;
+            //transform.GetChild(0).GetChild(0).gameObject.SetActive(true); // active broken bomb sprite
             fireGo = Instantiate(fire, transform.position, Quaternion.identity);
             StartCoroutine(DisableFireChildrenSequentially(fireGo));
         }
@@ -157,7 +163,7 @@ public class BomEnemy : MonoBehaviour , IpooledObject
 
     IEnumerator DisableFireChildrenSequentially(GameObject fireParent)
     {
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(2f);
         int childCount = fireParent.transform.childCount;
 
         for (int i = 0; i < childCount; i++)
@@ -208,6 +214,7 @@ public class BomEnemy : MonoBehaviour , IpooledObject
         {
             Destroy(fireGo);
             fireGo = null;
+            //transform.GetChild(0).GetChild(0).gameObject.SetActive(false); // deactive broken bomb sprite
         }
 
         // Reset transform rotation to default so it doesn't carry over rotation
@@ -218,6 +225,7 @@ public class BomEnemy : MonoBehaviour , IpooledObject
     // PUBLIC API
     // ===============================
 
+
     public void Throw(Vector2 throwDir, float throwSpeed, float heightForce)
     {
         moveRight = throwDir.x >= 0;
@@ -226,28 +234,44 @@ public class BomEnemy : MonoBehaviour , IpooledObject
         heightVelocity = heightForce;
     }
 
+    [Header("Explosion")]
+    [SerializeField] private float explosionDamagePlayer = 1f;
+    [SerializeField] private float explosionDamageEnemy = 3f;
+    [SerializeField] private float explosionRadius = 0.6f;
+
     void DealExplosionDamage()
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll( transform.position,0.6f, damageLayer);
+        // Include both Player and Enemy layers
+        LayerMask combinedMask = damageLayer;
+        int enemyLayerIndex = LayerMask.NameToLayer("Enemy");
+        if (enemyLayerIndex >= 0)
+            combinedMask |= (1 << enemyLayerIndex);
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, explosionRadius, combinedMask);
 
         foreach (var hit in hits)
         {
-            if(hit == null) continue;
-            PlayerChar player = hit.gameObject.GetComponent<PlayerChar>();
-            if(player != null)
+            if (hit == null) continue;
+
+            PlayerChar player = hit.GetComponent<PlayerChar>();
+            if (player != null)
             {
-                //player.playerController.HitDirection = moveRight;
                 player.playerController.HitDirection = player.transform.position.x >= transform.position.x;
-                player.playerController.HitCount = 2;// todo knock back player
-                player.playerController.SetHit(1);
+                player.playerController.HitCount = 2;
+                player.playerController.SetHit(explosionDamagePlayer);
                 ObjectPooler.Instance.SpawnFromPool("Hit", transform.position, Quaternion.Euler(0, 0, 0));
+                continue;
             }
-                
-           
-            // Enemy (nếu cần)
-            // var enemy = hit.GetComponent<EnemyBase>();
-            // if (enemy != null)
-            //     enemy.TakeDamage(damage);
+
+            EnemyChar enemyChar = hit.GetComponent<EnemyChar>();
+            if (enemyChar == null)
+                enemyChar = hit.GetComponentInParent<EnemyChar>();
+
+            if (enemyChar != null && enemyChar.enemyController != null
+                && enemyChar.enemyController.state != EnemyCharacter.State.Dead)
+            {
+                enemyChar.enemyController.SetHit(explosionDamageEnemy);
+            }
         }
     }
 
@@ -275,4 +299,6 @@ public class BomEnemy : MonoBehaviour , IpooledObject
             }
         }
     }
+
+
 }

@@ -451,7 +451,7 @@ MonoBehaviour:
   Char: {fileID: 0}
   rb: {fileID: 0}
   attackArea: {fileID: 4105619480821737580}
-  rangeAttack: 1
+  rangeAttack: 1.5
   isBoss: 1
   Level: 0
   idEnemy: 1
@@ -493,7 +493,7 @@ MonoBehaviour:
   patrolTimer: 0
   stopTimer: 0
   isStopping: 0
-  stopDuration: 1
+  stopDuration: 2
   isBeingThrown: 0
   shouldDirectChase: 0
   runThreshold: 1
@@ -504,8 +504,8 @@ MonoBehaviour:
   posKnife: {fileID: 7464952504698417861}
   posWave: {fileID: 0}
   posThrower: {fileID: 0}
-  rangeThrower: 0
-  timerCheckThrower: 3
+  rangeThrower: 3.25
+  timerCheckThrower: 5
   isEnableThrower: 0
   debugAI: 0
   velocity: 0

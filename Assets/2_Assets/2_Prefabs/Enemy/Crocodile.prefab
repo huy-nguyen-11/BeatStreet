@@ -2091,7 +2091,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5104558240800163104}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.19901481, w: 0.9799965}
+  m_LocalRotation: {x: 0, y: 0, z: 0.19901483, w: 0.9799965}
   m_LocalPosition: {x: 0.63897055, y: -6.2453864e-10, z: 0}
   m_LocalScale: {x: 1.0000001, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2145,9 +2145,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5238915312777158102}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.23416086, w: 0.9721979}
-  m_LocalPosition: {x: 0.4988473, y: -0.00000032358216, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0.23416083, w: 0.9721979}
+  m_LocalPosition: {x: 0.49884728, y: -0.00000028800756, z: 0}
+  m_LocalScale: {x: 1, y: 0.99999994, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2888879262436214832}
@@ -2989,6 +2989,7 @@ MonoBehaviour:
   posWave: {fileID: 0}
   posThrower: {fileID: 4889620436729335462}
   rangeThrower: 2.5
+  timerCheckThrower: 5
   isEnableThrower: 0
   debugAI: 0
   velocity: 0

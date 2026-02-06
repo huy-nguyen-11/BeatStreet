@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -8,35 +9,37 @@ public class FireDamaga : MonoBehaviour
     public float damageInterval = 1f;
 
     private Coroutine damageCoroutine;
-    private PlayerController currentPlayer;
+    private readonly HashSet<PlayerController> playersInFire = new HashSet<PlayerController>();
+    private readonly HashSet<EnemyController> enemiesInFire = new HashSet<EnemyController>();
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
         {
-            //currentPlayer = collision.GetComponent<PlayerController>();
-            //if (currentPlayer != null)
-            //{
-            //    Debug.Log("Player entered fire damage area.");
-            //    damageCoroutine = StartCoroutine(DamageOverTime());
-            //}
-
             PlayerController playerController = collision.GetComponent<PlayerController>();
-
             if (playerController == null)
-            {
                 playerController = collision.GetComponentInParent<PlayerController>();
-            }
             if (playerController == null)
-            {
                 playerController = PlayerController.Instance;
-            }
 
             if (playerController != null)
             {
-                //playerController.SetHit(damage);
-                currentPlayer = playerController;
-                damageCoroutine = StartCoroutine(DamageOverTime());
+                playersInFire.Add(playerController);
+                if (damageCoroutine == null)
+                    damageCoroutine = StartCoroutine(DamageOverTime());
+            }
+        }
+        else if (collision.CompareTag("Enemy"))
+        {
+            EnemyChar enemyChar = collision.GetComponent<EnemyChar>();
+            if (enemyChar == null)
+                enemyChar = collision.GetComponentInParent<EnemyChar>();
+
+            if (enemyChar != null && enemyChar.enemyController != null)
+            {
+                enemiesInFire.Add(enemyChar.enemyController);
+                if (damageCoroutine == null)
+                    damageCoroutine = StartCoroutine(DamageOverTime());
             }
         }
     }
@@ -45,16 +48,45 @@ public class FireDamaga : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            StopDamage();
+            PlayerController playerController = collision.GetComponent<PlayerController>();
+            if (playerController == null)
+                playerController = collision.GetComponentInParent<PlayerController>();
+            if (playerController == null)
+                playerController = PlayerController.Instance;
+
+            if (playerController != null)
+                playersInFire.Remove(playerController);
         }
+        else if (collision.CompareTag("Enemy"))
+        {
+            EnemyChar enemyChar = collision.GetComponent<EnemyChar>();
+            if (enemyChar == null)
+                enemyChar = collision.GetComponentInParent<EnemyChar>();
+
+            if (enemyChar != null && enemyChar.enemyController != null)
+                enemiesInFire.Remove(enemyChar.enemyController);
+        }
+
+        if (playersInFire.Count == 0 && enemiesInFire.Count == 0)
+            StopDamage();
     }
 
     IEnumerator DamageOverTime()
     {
         while (true)
         {
-            //todo effect burn ; no set fall player
-            currentPlayer.SetHitFromFire(fireDamage);
+            foreach (var player in playersInFire)
+            {
+                if (player != null && !player.IsDead)
+                    player.SetHitFromFire(fireDamage);
+            }
+
+            foreach (var enemy in enemiesInFire)
+            {
+                if (enemy != null && enemy.state != EnemyCharacter.State.Dead)
+                    enemy.SetHit(fireDamage);
+            }
+
             yield return new WaitForSeconds(damageInterval);
         }
     }
@@ -67,7 +99,8 @@ public class FireDamaga : MonoBehaviour
             damageCoroutine = null;
         }
 
-        currentPlayer = null;
+        playersInFire.Clear();
+        enemiesInFire.Clear();
     }
 
     private void OnDisable()

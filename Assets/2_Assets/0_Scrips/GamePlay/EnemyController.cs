@@ -109,6 +109,7 @@ public class EnemyController : EnemyCharacter
     public float rangeThrower;
     public float timerCheckThrower = 3f;
 
+
     // for all enemies tracking
     private static readonly List<EnemyController> s_AllEnemies = new List<EnemyController>();
 
@@ -421,7 +422,7 @@ public class EnemyController : EnemyCharacter
 
             // FIX: Only increment patrol timer if we're actually moving
             // Check if we have a valid target and are moving towards it
-            float preferredRange = (typeOfEnemy == TypeOfEnemy.EliteEnemy) ? rangeThrower : rangeAttack;
+            float preferredRange = (typeOfEnemy == TypeOfEnemy.EliteEnemy || typeOfEnemy == TypeOfEnemy.Boss) ? rangeThrower : rangeAttack;
             Vector3 currentTarget = isPatrolling ? randomTarget :
                 (Char.position.x < player.position.x ?
                     player.position + Vector3.left * preferredRange :
@@ -462,8 +463,6 @@ public class EnemyController : EnemyCharacter
     //// Handle stop timer so Idle can advance even when state machine isn't running Movement
     public void TickStopTimer()
     {
-        //if (typeOfEnemy == TypeOfEnemy.Boss) return;
-
         if (!isStopping) return;
 
         stopTimer += Time.deltaTime;
@@ -471,15 +470,17 @@ public class EnemyController : EnemyCharacter
         {
             isStopping = false;
             stopTimer = 0f;
-            float num = typeOfEnemy == TypeOfEnemy.Boss ? 0.15f : 0.3f;
-            isPatrolling = Random.value < num; //random 20% patrol, 80% move to player
+            float num = typeOfEnemy == TypeOfEnemy.Boss ? 0.3f : 0.3f;
+            isPatrolling = Random.value < num;
             isAvoidingPlayer = false;
-            if (isPatrolling && (typeOfEnemy == TypeOfEnemy.Enemy || typeOfEnemy == TypeOfEnemy.EliteEnemy))
+            //if (isPatrolling && (typeOfEnemy == TypeOfEnemy.Enemy || typeOfEnemy == TypeOfEnemy.EliteEnemy))
+            //    SetRandomPatrolTarget();
+
+            if(isPatrolling)
                 SetRandomPatrolTarget();
         }
     }
 
-    public bool debugAI = false;
     private void MoveToPlayer()
     {
         if (isAttacking)
@@ -489,7 +490,7 @@ public class EnemyController : EnemyCharacter
         if (isBeingThrown || isGrabbed) return;
         // replace existing:
         //float targetOffset = rangeAttack;
-        float targetOffset = (typeOfEnemy == TypeOfEnemy.EliteEnemy) ? rangeThrower : rangeAttack;
+        float targetOffset = (typeOfEnemy == TypeOfEnemy.EliteEnemy && typeOfEnemy == TypeOfEnemy.Boss) ? rangeThrower : rangeAttack;
         Vector3 leftTarget = player.position + Vector3.left * targetOffset;
         Vector3 rightTarget = player.position + Vector3.right * targetOffset;
 
@@ -534,7 +535,7 @@ public class EnemyController : EnemyCharacter
                 currentMoveAnim = CHASE_ANIM;
                 PlayAnim(CHASE_ANIM, true);
             }
-
+            Debug.Log("chck attacl chasing");
             Vector3 _targetPos = targetPos;
             Vector3 _direction = (_targetPos - Char.position).normalized;
             lastDirection = _direction;
@@ -617,25 +618,25 @@ public class EnemyController : EnemyCharacter
     {
         int attempts = 10;
 
-        if (typeOfEnemy == TypeOfEnemy.EliteEnemy && player != null)
-        {
-            for (int i = 0; i < attempts; i++)
-            {
-                float side = (Random.value < 0.5f) ? -1f : 1f;
-                Vector3 candidate = new Vector3(
-                    player.position.x + side * rangeThrower + Random.Range(-0.5f, 0.5f),
-                    player.position.y + Random.Range(-0.8f, 0.8f),
-                    0f);
-                // clamp vào biên bản đồ
-                candidate.x = Mathf.Clamp(candidate.x, GamePlayManager.Instance.minPosX, GamePlayManager.Instance.maxPosX);
-                candidate.y = Mathf.Clamp(candidate.y, GamePlayManager.Instance.minPosY, GamePlayManager.Instance.maxPosY);
-                if (Vector3.Distance(candidate, lastRandomTarget) > 1f && !IsTargetOccupiedByOtherEnemy(candidate))
-                {
-                    randomTarget = candidate;
-                    return;
-                }
-            }
-        }
+        //if ((typeOfEnemy == TypeOfEnemy.EliteEnemy || typeOfEnemy == TypeOfEnemy.Boss) && player != null)
+        //{
+        //    for (int i = 0; i < attempts; i++)
+        //    {
+        //        float side = (Random.value < 0.5f) ? -1f : 1f;
+        //        Vector3 candidate = new Vector3(
+        //            player.position.x + side * rangeThrower + Random.Range(-0.5f, 0.5f),
+        //            player.position.y + Random.Range(-0.8f, 0.8f),
+        //            0f);
+        //        // clamp vào biên bản đồ
+        //        candidate.x = Mathf.Clamp(candidate.x, GamePlayManager.Instance.minPosX, GamePlayManager.Instance.maxPosX);
+        //        candidate.y = Mathf.Clamp(candidate.y, GamePlayManager.Instance.minPosY, GamePlayManager.Instance.maxPosY);
+        //        if (Vector3.Distance(candidate, lastRandomTarget) > 1f && !IsTargetOccupiedByOtherEnemy(candidate))
+        //        {
+        //            randomTarget = candidate;
+        //            return;
+        //        }
+        //    }
+        //}
 
         for (int i = 0; i < attempts; i++)
         {
@@ -749,7 +750,7 @@ public class EnemyController : EnemyCharacter
         //is boss
         if (typeOfEnemy == TypeOfEnemy.Boss &&( idEnemy == 0 || idEnemy == 1))
         {
-            if (distanceX <= 3.75f && distanceY <= 0.2f && distanceX >= 1.5f)
+            if (distanceX <= rangeThrower + 0.5f && distanceY <= 0.2f && distanceX >= rangeAttack + 0.35f && isEnableThrower) //distanceX <= 3.75f && distanceY <= 0.2f && distanceX >= 1.5f
             {
                 if (!isAttack)
                 {
@@ -776,72 +777,74 @@ public class EnemyController : EnemyCharacter
                         // if already Idle, also start Attack immediately
                         SwitchToRunState(enemyAttack);
                     }
-                }
-            }
-            else if(distanceX < 1.5f && distanceY <= 0.2f)
-            {
-                if (!isAttack)
-                {
-                    isStopping = false;
-                    stopTimer = 0f;
-                    patrolTimer = 0f;
-                    isPatrolling = false;
-                    isAttack = true;
-                  
-                    enemyAttack.nameBossAttack = "Attack2";
-                    //SwitchToRunState(enemyAttack);
-                    if (state != State.Idle)
-                    {
-                        SwitchToRunState(enemyIdle);
-                    }
-                    if (state != State.Idle)
-                    {
-                        // immediately request attack state
-                        SwitchToRunState(enemyAttack);
-                    }
-                    else
-                    {
-                        // if already Idle, also start Attack immediately
-                        SwitchToRunState(enemyAttack);
-                    }
-                }
-            }
-            return;
-        }
-        else if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 2 && distanceX <= 1.2f && distanceY <= 0.2f)
-        {
-            if (!isAttack)
-            {
-                isStopping = false;
-                stopTimer = 0f;
-                patrolTimer = 0f;
-                isPatrolling = false;
-                isAttack = true;
-                enemyAttack.nameBossAttack = "Attack1";
-                //SwitchToRunState(enemyAttack);
-                if (state != State.Idle)
-                {
-                    SwitchToRunState(enemyIdle);
-                }
-                if (state != State.Idle)
-                {
-                    // immediately request attack state
-                    SwitchToRunState(enemyAttack);
-                }
-                else
-                {
-                    // if already Idle, also start Attack immediately
-                    SwitchToRunState(enemyAttack);
-                }
-            }
 
-            return;
+                    return;
+                }
+            }
+            //else if(distanceX < 1.5f && distanceY <= 0.2f)
+            //{
+            //    if (!isAttack)
+            //    {
+            //        isStopping = false;
+            //        stopTimer = 0f;
+            //        patrolTimer = 0f;
+            //        isPatrolling = false;
+            //        isAttack = true;
+                  
+            //        enemyAttack.nameBossAttack = "Attack2";
+            //        //SwitchToRunState(enemyAttack);
+            //        if (state != State.Idle)
+            //        {
+            //            SwitchToRunState(enemyIdle);
+            //        }
+            //        if (state != State.Idle)
+            //        {
+            //            // immediately request attack state
+            //            SwitchToRunState(enemyAttack);
+            //        }
+            //        else
+            //        {
+            //            // if already Idle, also start Attack immediately
+            //            SwitchToRunState(enemyAttack);
+            //        }
+            //    }
+            //}
+            //return;
         }
+        //else if (typeOfEnemy == TypeOfEnemy.Boss && idEnemy == 2 && distanceX <= 1.2f && distanceY <= 0.2f)
+        //{
+        //    if (!isAttack)
+        //    {
+        //        isStopping = false;
+        //        stopTimer = 0f;
+        //        patrolTimer = 0f;
+        //        isPatrolling = false;
+        //        isAttack = true;
+        //        enemyAttack.nameBossAttack = "Attack1";
+        //        //SwitchToRunState(enemyAttack);
+        //        if (state != State.Idle)
+        //        {
+        //            SwitchToRunState(enemyIdle);
+        //        }
+        //        if (state != State.Idle)
+        //        {
+        //            // immediately request attack state
+        //            SwitchToRunState(enemyAttack);
+        //        }
+        //        else
+        //        {
+        //            // if already Idle, also start Attack immediately
+        //            SwitchToRunState(enemyAttack);
+        //        }
+        //    }
+
+        //    return;
+        //}
 
         //is elite enemy
         if(typeOfEnemy == TypeOfEnemy.EliteEnemy)
         {
-            if (distanceX <= rangeThrower + 0.5f && distanceY <= 0.35f && distanceX > rangeAttack + 0.35f && isEnableThrower) //id enemey=2 - enemey bomb
+            if (distanceX <= rangeThrower + 0.5f && distanceY <= 0.35f && distanceX > rangeAttack + 0.35f && isEnableThrower)
             {
                 if (!isAttack)
                 {
@@ -913,7 +916,17 @@ public class EnemyController : EnemyCharacter
                     stopTimer = 0f;
                     patrolTimer = 0f;
                     isPatrolling = false;
-
+                    if (typeOfEnemy == TypeOfEnemy.Boss)
+                    {
+                        if (idEnemy == 0 || idEnemy == 1)
+                        {
+                            enemyAttack.nameBossAttack = "Attack2";
+                        }
+                        else
+                        {
+                            enemyAttack.nameBossAttack = "Attack1";
+                        }
+                    }
                     isAttack = true;
                     if (state != State.Idle)
                     {
@@ -942,7 +955,7 @@ public class EnemyController : EnemyCharacter
             {
                 if (e.Data.Name == "hit" && enemyAttack.nameBossAttack == "Attack1")
                 {
-                    ObjectPooler.Instance.SpawnFromPool("Bullet", posBullet.position, transform.rotation);
+                    StartCoroutine(ShootBulletsDelayed(3, 0.05f));
                 }
                 else if (e.Data.Name == "hit" && enemyAttack.nameBossAttack == "Attack2")
                 {
@@ -993,14 +1006,14 @@ public class EnemyController : EnemyCharacter
                     GameObject molotov = ObjectPooler.Instance.SpawnFromPool("Molotov", posThrower.position, transform.rotation);
                     BomEnemy bomEnemy = molotov.GetComponent<BomEnemy>();
                     int dir = Char.transform.rotation.y < 0 ? -1 : 1;
-                    bomEnemy.Throw(throwDir: new Vector2(dir, 0f), throwSpeed: 3f, heightForce: 5f);
+                    bomEnemy.Throw(throwDir: new Vector2(dir, 0f), throwSpeed: 4f, heightForce: 6f);
                 }
                 else if (idEnemy == 11)
                 {
                     GameObject bone = ObjectPooler.Instance.SpawnFromPool("Bone", posThrower.position, transform.rotation);
                     BomEnemy bomEnemy = bone.GetComponent<BomEnemy>();
                     int dir = Char.transform.rotation.y < 0 ? -1 : 1;
-                    bomEnemy.Throw(throwDir: new Vector2(dir, 0f), throwSpeed: 7f, heightForce: 3.5f);
+                    bomEnemy.Throw(throwDir: new Vector2(dir, 0f), throwSpeed: 8f, heightForce: 3f);
                 }
                 else if (idEnemy == 4 || idEnemy == 5)
                 {
@@ -1029,6 +1042,16 @@ public class EnemyController : EnemyCharacter
             {
                 SetAttack(idEnemy);
             }
+        }
+    }
+
+    IEnumerator ShootBulletsDelayed(int count, float delayBetween)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            ObjectPooler.Instance.SpawnFromPool("Bullet", posBullet.position, transform.rotation);
+            if (i < count - 1)
+                yield return new WaitForSeconds(delayBetween);
         }
     }
 

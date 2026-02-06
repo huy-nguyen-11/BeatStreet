@@ -1673,7 +1673,7 @@ MonoBehaviour:
   patrolTimer: 0
   stopTimer: 0
   isStopping: 0
-  stopDuration: 1
+  stopDuration: 2
   isBeingThrown: 0
   shouldDirectChase: 0
   runThreshold: 1
@@ -1684,8 +1684,10 @@ MonoBehaviour:
   posKnife: {fileID: 0}
   posWave: {fileID: 0}
   posThrower: {fileID: 0}
-  rangeThrower: 0
-  timerCheckThrower: 3
+  rangeThrower: 3.25
+  timerCheckThrower: 5
+  targetCommitChance: 0.2
+  targetRollInterval: 3
   isEnableThrower: 0
   debugAI: 0
   velocity: 0

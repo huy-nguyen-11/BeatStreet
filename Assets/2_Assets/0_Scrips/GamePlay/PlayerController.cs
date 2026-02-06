@@ -766,7 +766,9 @@ public class PlayerController : PlayerCharacter
         Hp = DataManager.Instance.playerData[id].Hp;
         fillBar.OnInit(Hp, Mana);
         IsDead = false;
-        transform.localPosition = new Vector2(transform.localRotation.x, 0);
+        // Reset local Y về 0 (giữ nguyên X)
+        var pos = transform.localPosition;
+        transform.localPosition = new Vector3(pos.x, 0f, pos.z);
     }
 
     float gravity = -18f;
@@ -975,12 +977,10 @@ public class PlayerController : PlayerCharacter
     public IEnumerator SetImmortalHitBox()
     {
         isFall = false;
-        //transform.GetComponent<SpriteRenderer>().DOFade(0, 0.05f).SetLoops(-1, LoopType.Yoyo);
+        FlashKnockBack(0.1f, 10);
         isImmortal = true;
-        yield return new WaitForSeconds(/*_attributesPet[16]*/0f);
+        yield return new WaitForSeconds(/*_attributesPet[16]*/2f);
         isImmortal = false;
-        //transform.GetComponent<SpriteRenderer>().DOKill();
-        //transform.GetComponent<SpriteRenderer>().DOFade(1, 0);
     }
 
     public (EnemyChar enemy, float distance) GetNearestEnemy()
@@ -1111,6 +1111,10 @@ public class PlayerController : PlayerCharacter
         {
             yield return null;
         }
+        // Reset local Y về 0 sau khi ngã chạm đất
+        var pos = transform.localPosition;
+        transform.localPosition = new Vector3(pos.x, 0f, pos.z);
+
         GameObject fx = ObjectPooler.Instance.SpawnFromPool("Fx_Fall", posFxFall.position, Quaternion.identity);
         fx.GetComponent<SkeletonAnimation>().AnimationState.SetAnimation(0, "fall", false);
         yield return new WaitForSeconds(0.12f);
@@ -1199,6 +1203,10 @@ public class PlayerController : PlayerCharacter
             rb.linearVelocity = Vector2.zero;
         }
 
+        // Reset local Y về 0 sau khi nhảy/ngã (playerController con trong PlayerChar)
+        var pos = transform.localPosition;
+        transform.localPosition = new Vector3(pos.x, 0f, pos.z);
+
         // wait one frame so any in-flight state changes or animation events settle
         yield return null;
 
@@ -1266,4 +1274,40 @@ public class PlayerController : PlayerCharacter
     //    Gizmos.color = Color.green;
     //    Gizmos.DrawWireSphere(transform.position, detectionRange);
     //}
+
+    private Coroutine flashCoroutine;
+    Color hitColor = HexToColor("#FFCD45");
+
+    public void FlashKnockBack(float flashTime = 0.1f, int flashCount = 3)
+    {
+        if (flashCoroutine != null)
+            StopCoroutine(flashCoroutine);
+
+        flashCoroutine = StartCoroutine(FlashCoroutine(flashTime, flashCount));
+    }
+
+    private IEnumerator FlashCoroutine(float flashTime, int flashCount)
+    {
+        for (int i = 0; i < flashCount; i++)
+        {
+            skeletonAnimation.skeleton.SetColor(hitColor);
+            yield return new WaitForSeconds(flashTime);
+
+            skeletonAnimation.skeleton.SetColor(Color.white);
+            yield return new WaitForSeconds(flashTime);
+        }
+    }
+
+    public static Color HexToColor(string hex)
+    {
+        if (!hex.StartsWith("#"))
+            hex = "#" + hex;
+
+        Color color;
+        if (ColorUtility.TryParseHtmlString(hex, out color))
+            return color;
+
+        Debug.LogWarning($"Invalid hex color: {hex}");
+        return Color.white;
+    }
 }

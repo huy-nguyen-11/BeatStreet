@@ -7,7 +7,7 @@ public class PlayerHit : PlayerStateManager
     //[SerializeField] private float jumpDistance = 1.65f;
     //[SerializeField] private float jumpDuration = 1f;
     //[SerializeField] private int jumpCount = 1;
-    bool isFall;
+    bool _isFall;
     Coroutine _coroutine;
     public override void Enter()
     {
@@ -24,15 +24,16 @@ public class PlayerHit : PlayerStateManager
         else
         {
             playerController.isFall = true;
+            playerController.isImmortal = true;
             playerController.PlayAnim("Dead", false);
             playerController.velocity = 8;
             _coroutine = playerController.StartCoroutine(playerController.FallCoroutine());
-            isFall = true;
+            _isFall = true;
         }
     }
     public override void Update()
     {
-        if (isFall)
+        if (_isFall)
         {
             playerController.ProcessGravity();
             playerController.SetFall();
@@ -41,7 +42,7 @@ public class PlayerHit : PlayerStateManager
 
     public override void Exit()
     {
-        isFall = false;
+        _isFall = false;
         playerController.isFall = false;
         if (_coroutine != null)
         {

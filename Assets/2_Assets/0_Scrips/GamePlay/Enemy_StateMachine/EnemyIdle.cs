@@ -50,7 +50,7 @@ public class EnemyIdle : EnemyStateMachine
                 {
                     float dx = Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x);
                     float dy = Mathf.Abs(enemyController.Char.position.y - enemyController.player.position.y);
-                    enemyController.shouldDirectChase = ((dy > 2f && dx > 1.5f) || dx > 2f) && Random.value <= 0.5f;
+                    enemyController.shouldDirectChase = ((dy > 2f && dx > 1.5f) || dx > 2f) && Random.value <= 1f;
                 }
                 enemyController.SetRun();
             }
@@ -132,7 +132,7 @@ public class EnemyIdle : EnemyStateMachine
                     {
                         float dx = Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x);
                         float dy = Mathf.Abs(enemyController.Char.position.y - enemyController.player.position.y);
-                        enemyController.shouldDirectChase = ((dy > 2f && dx > 1.5f) || dx > 2f) && Random.value <= 0.5f;
+                        enemyController.shouldDirectChase = ((dy > 2f && dx > 1.5f) || dx > 2f) && Random.value <= 1f;
                     }
                     enemyController.SetRun();
                     enemyController.isActiveRun = true;

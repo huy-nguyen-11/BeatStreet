@@ -44,6 +44,10 @@ public class PlayerDead : PlayerStateManager
         {
             yield return null;
         }
+        // Reset local Y về 0 sau khi ngã chạm đất
+        var pos = playerController.transform.localPosition;
+        playerController.transform.localPosition = new Vector3(pos.x, 0f, pos.z);
+
         isFall = false;
         playerController.rb.linearVelocity = Vector2.zero;
     }
