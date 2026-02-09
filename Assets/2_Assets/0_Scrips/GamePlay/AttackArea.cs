@@ -23,11 +23,13 @@ public class AttackArea : MonoBehaviour
     //for enemey toggle
     private bool isEnemyToggleAttack = false;
 
-    // Tấn công bằng lưỡi (enemy): check liên tục, hit player tối đa 1 lần mỗi đợt
     private bool isEnemyTongueHitActive = false;
     private bool hasHitPlayerThisTongue = false;
 
-    /// <summary> Bật check liên tục tấn công lưỡi. Gọi từ Animation Event khi lưỡi bắt đầu. </summary>
+    private const float CHASE_HIT_COOLDOWN = 0.4f;
+    private float lastChaseHitTime = -999f;
+
+    /// <summary>On enemy attack tongue. </summary>
     public void StartEnemyTongueHit(float dame)
     {
         Dame = dame;
@@ -35,7 +37,6 @@ public class AttackArea : MonoBehaviour
         hasHitPlayerThisTongue = false;
     }
 
-    /// <summary> Tắt check, kết thúc đợt tấn công lưỡi. Gọi từ Animation Event khi lưỡi kết thúc. </summary>
     public void EndEnemyTongueHit()
     {
         isEnemyTongueHitActive = false;
@@ -68,6 +69,38 @@ public class AttackArea : MonoBehaviour
         }
     }
 
+    private void CheckEnemyChaseHitPlayer()
+    {
+        EnemyController enemyController = GetComponentInParent<EnemyController>();
+        if (enemyController == null) return;
+        if (enemyController.typeOfEnemy != TypeOfEnemy.Boss || enemyController.idEnemy != 2 || !enemyController.shouldDirectChase) return;
+        if (enemyController.isGrabbed || enemyController.isBeingThrown) return;
+        if (enemyController.state != EnemyController.State.Run) return;
+
+        if (Time.time - lastChaseHitTime < CHASE_HIT_COOLDOWN) return;
+
+        Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, 0, layerMaskPlayer);
+        if (hits.Length == 0) return;
+
+        Vector3 enemyPos = enemyController.Char != null ? enemyController.Char.position : enemyController.transform.position;
+        foreach (var hit in hits)
+        {
+            PlayerChar player = hit.gameObject.GetComponent<PlayerChar>();
+            if (player == null) continue;
+            if (player.playerController.isImmortal) continue;
+            if (Mathf.Abs(player.transform.position.y - enemyPos.y) > 0.35f) continue;
+
+            lastChaseHitTime = Time.time;
+            AudioBase.Instance.AudioEnemy(1);
+            bool direction = enemyController.Char != null && Mathf.Abs(Mathf.DeltaAngle(enemyController.Char.localEulerAngles.y, 0f)) < 90f;
+            player.playerController.HitDirection = direction;
+            player.playerController.HitCount = 2;
+            player.playerController.SetHit(enemyController.dame);
+            ObjectPooler.Instance.SpawnFromPool("Hit", player.transform.position, Quaternion.Euler(0, 0, 0));
+            enemyController.shouldDirectChase = false;
+            break;
+        }
+    }
 
     private void Update()
     {
@@ -101,6 +134,8 @@ public class AttackArea : MonoBehaviour
         {
             CheckEnemyTongueHitPlayer();
         }
+
+        CheckEnemyChaseHitPlayer();
 
         if (collisionQueue.Count > 0)
         {

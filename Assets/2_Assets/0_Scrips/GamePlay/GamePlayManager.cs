@@ -62,7 +62,9 @@ public class GamePlayManager : MonoBehaviour
     [SerializeField] private GameObject _showFightBoss;
 
     public GameObject kinfe;
-
+    
+    // count hit boss for stagger
+    public int countHitBoss = 0;
 
     private void Awake()
     {

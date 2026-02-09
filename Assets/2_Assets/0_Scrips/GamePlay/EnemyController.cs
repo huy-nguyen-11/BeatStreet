@@ -96,6 +96,7 @@ public class EnemyController : EnemyCharacter
                                                       // private const string ANIM_IDLE = "Idle"; // minimal: ensure Idle exists
     [HideInInspector]
     public bool shouldDirectChase = false;
+
     // thresholds (tweak to taste)
     public float runThreshold = 1.0f;
     public float walkThreshold = 0.25f;
@@ -109,9 +110,11 @@ public class EnemyController : EnemyCharacter
     public float rangeThrower;
     public float timerCheckThrower = 3f;
 
-
     // for all enemies tracking
     private static readonly List<EnemyController> s_AllEnemies = new List<EnemyController>();
+
+    //aura boss
+    [SerializeField] private GameObject auraBoss;
 
     private void OnEnable()
     {
@@ -163,6 +166,11 @@ public class EnemyController : EnemyCharacter
         SetLevel();
 
         skeletonAnimation.AnimationState.Event += HandleAttackEvent;
+
+        if(auraBoss != null)
+        {
+            auraBoss.SetActive(false);
+        }
     }
 
     public void InitializeEnemy()
@@ -240,6 +248,14 @@ public class EnemyController : EnemyCharacter
 
     private bool isAvoidingPlayer = false;
     private bool isPatrolling = true;
+
+    /// <summary>Boss id=2: Bật chase và ngắt patrol/avoid để di chuyển trực tiếp về player.</summary>
+    public void PrepareDirectChase()
+    {
+        shouldDirectChase = true;
+        isPatrolling = false;
+        isAvoidingPlayer = false;
+    }
 
     private void SeparateFromOtherEnemies()
     {
@@ -499,7 +515,6 @@ public class EnemyController : EnemyCharacter
 
         Vector3 targetPos;
         // replace existing Debug.Log("target");
-        // Nếu enemy đang ở gần vị trí tấn công thì giữ vị trí đó, không chuyển sang tuần tra
         if (!leftOccupied && Char.position.x < player.position.x)
             targetPos = leftTarget;
         else if (!rightOccupied && Char.position.x > player.position.x)
@@ -510,7 +525,6 @@ public class EnemyController : EnemyCharacter
             targetPos = rightTarget;
         else
         {
-            // Cả hai bên đều có enemy, chuyển sang tuần tra ngẫu nhiên
             isPatrolling = true;
             SetRandomPatrolTarget();
             PatrolRandomly();
@@ -535,15 +549,15 @@ public class EnemyController : EnemyCharacter
                 currentMoveAnim = CHASE_ANIM;
                 PlayAnim(CHASE_ANIM, true);
             }
-            Debug.Log("chck attacl chasing");
+
             Vector3 _targetPos = targetPos;
             Vector3 _direction = (_targetPos - Char.position).normalized;
             lastDirection = _direction;
             Char.position += _direction * CHASE_SPEED * Time.deltaTime;
-            //todo check attack
-            // Nếu đã đến target, giữ vị trí đó
+            // Nếu đã đến target, kết thúc chase
             if (Vector3.Distance(Char.position, targetPos) < 0.2f)
             {
+                shouldDirectChase = false; // Tắt chase để tránh AttackArea hit khi boss đã dừng
                 isStopping = true;
                 patrolTimer = 0f;
                 SwitchToRunState(enemyIdle);
@@ -744,8 +758,15 @@ public class EnemyController : EnemyCharacter
         if (isBeingThrown) return;
         if (isAttack || isAttacking || !isActiveRun) return;
 
+        // check player in front
+        bool facingRight = Mathf.Abs(Mathf.DeltaAngle(Char.localEulerAngles.y, 0f)) < 90f;
+        bool playerInFront = facingRight ? (player.position.x > Char.position.x) : (player.position.x < Char.position.x);
+        if (!playerInFront) return;
+
         float distanceX = Mathf.Abs(Char.position.x - player.position.x);
         float distanceY = Mathf.Abs(Char.position.y - player.position.y);
+
+        
 
         //is boss
         if (typeOfEnemy == TypeOfEnemy.Boss &&( idEnemy == 0 || idEnemy == 1))
@@ -1089,7 +1110,7 @@ public class EnemyController : EnemyCharacter
         }
         else
         {
-            if (state != State.Fall)
+            if (state != State.Fall/* && typeOfEnemy != TypeOfEnemy.Boss*/)// demo for test boss not hit state
                 SwitchToRunState(enemyHit);
         }
         

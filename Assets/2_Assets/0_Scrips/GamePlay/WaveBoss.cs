@@ -144,6 +144,7 @@ public class WaveBoss : MonoBehaviour, IpooledObject
 
             if (playerController != null)
             {
+                playerController.HitDirection = direction > 0;
                 playerController.SetHit(currentDamage);
             }
         }
