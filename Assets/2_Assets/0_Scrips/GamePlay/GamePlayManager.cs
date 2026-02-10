@@ -607,4 +607,39 @@ public class GamePlayManager : MonoBehaviour
         yield return new WaitForSeconds(1.2f);
         _showFightBoss.SetActive(false);
     }
+
+    //for count hit boss to stagger
+    public void SetHitCountBoss()
+    {
+        switch (_Player.idAttackArea)
+        {
+            case 0:
+                GamePlayManager.Instance.countHitBoss++;
+                //Debug.Log("normal attack");
+                break;
+            case 1:
+               // Debug.Log("Ulti attack");
+               GamePlayManager.Instance.countHitBoss+=10;
+                break;
+            case 2:
+                GamePlayManager.Instance.countHitBoss+=2;
+                //Debug.Log("jump attack");
+                break;
+            case 3:
+                GamePlayManager.Instance.countHitBoss += 3;
+                //Debug.Log("strength attack");
+                break;
+            case 4:
+                GamePlayManager.Instance.countHitBoss += 3;
+                //Debug.Log("slide attack");
+                break;
+            case 5:
+                //Debug.Log("strength attack max");
+                GamePlayManager.Instance.countHitBoss += 5;
+                break;
+            case 6:
+                break;
+
+        }
+    }
 }

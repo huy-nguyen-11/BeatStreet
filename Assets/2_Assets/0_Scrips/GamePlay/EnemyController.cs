@@ -1110,8 +1110,21 @@ public class EnemyController : EnemyCharacter
         }
         else
         {
-            if (state != State.Fall/* && typeOfEnemy != TypeOfEnemy.Boss*/)// demo for test boss not hit state
-                SwitchToRunState(enemyHit);
+            if (state != State.Fall)
+            {
+                if(typeOfEnemy == TypeOfEnemy.Boss)
+                {
+                    if(GamePlayManager.Instance.countHitBoss > 9)
+                    {
+                        SwitchToRunState(enemyHit);
+                        GamePlayManager.Instance.countHitBoss = 0;
+                    }
+                }
+                else
+                {
+                    SwitchToRunState(enemyHit);
+                }
+            }  
         }
         
         if (coroutine == null)

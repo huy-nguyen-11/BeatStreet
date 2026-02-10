@@ -410,7 +410,11 @@ public class AttackArea : MonoBehaviour
             // and EnemyFall.Enter() reads isGetHitStrengthMax to decide knockback direction.
             enemy.enemyController.isGetHitStrengthMax = isSkillStrength;
             enemy.enemyController.SetHit(Dame, isMaxHit);
-            if(isNormalAttack)
+            if(enemy.enemyController.typeOfEnemy == TypeOfEnemy.Boss)
+            {
+                GamePlayManager.Instance.SetHitCountBoss();
+            }
+            if (isNormalAttack)
             {
                 ObjectPooler.Instance.SpawnFromPool("Hit", new Vector3(collision.transform.position.x , collision.transform.position.y + 0.5f , 0f), Quaternion.Euler(0, 0, 0));
             }
