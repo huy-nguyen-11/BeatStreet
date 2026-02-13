@@ -114,7 +114,9 @@ public class EnemyController : EnemyCharacter
     private static readonly List<EnemyController> s_AllEnemies = new List<EnemyController>();
 
     //aura boss
+    public int phaseBoss = 1;
     [SerializeField] private GameObject auraBoss;
+    float startHp;
 
     private void OnEnable()
     {
@@ -170,6 +172,12 @@ public class EnemyController : EnemyCharacter
         if(auraBoss != null)
         {
             auraBoss.SetActive(false);
+        }
+
+        if(typeOfEnemy == TypeOfEnemy.Boss)
+        {
+           phaseBoss = 1;
+            startHp = Hp;
         }
     }
 
@@ -1096,6 +1104,13 @@ public class EnemyController : EnemyCharacter
         {
             SetDead();
             return;
+        } 
+
+        if(hp <= startHp / 2 && typeOfEnemy == TypeOfEnemy.Boss && phaseBoss == 1)
+        {
+            phaseBoss = 2;
+            if(auraBoss != null)
+                auraBoss.SetActive(true);
         }
         currentHitIndex++;
         if(typeOfEnemy == TypeOfEnemy.Boss)
@@ -1114,7 +1129,8 @@ public class EnemyController : EnemyCharacter
             {
                 if(typeOfEnemy == TypeOfEnemy.Boss)
                 {
-                    if(GamePlayManager.Instance.countHitBoss > 9)
+                    int num = phaseBoss == 2 ? 5 : 9;
+                    if (GamePlayManager.Instance.countHitBoss > num)
                     {
                         SwitchToRunState(enemyHit);
                         GamePlayManager.Instance.countHitBoss = 0;
@@ -1155,6 +1171,13 @@ public class EnemyController : EnemyCharacter
     }
     public void SetDead()
     {
+        float chance = Random.Range(0f, 1f);
+        bool isDropItem = chance < 0.15f ? true : false;
+        if (isDropItem)
+        {
+            int numItem = Random.Range(0, 4);
+            GamePlayManager.Instance.DropItem(numItem, Char.position);
+        }
         DropCoin();
         // Force state to Dead and enter EnemyDead state immediately to stop AI
         if (stateManager != null)

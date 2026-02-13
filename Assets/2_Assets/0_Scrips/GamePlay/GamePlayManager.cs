@@ -28,11 +28,11 @@ public class GamePlayManager : MonoBehaviour
     // GameOver
     public GameOver gameOver;
     // Item
-    List<int> idSkill = new List<int>() { 0, 3, 6 };
-    List<int> idDefence = new List<int>() { 1, 4, 7 };
-    List<int> idAttack = new List<int>() { 2, 5, 8 };
+    List<int> idSkill = new List<int>() { 0, 1, 2 };
+    List<int> idDefence = new List<int>() { 6, 7, 8 };
+    List<int> idAttack = new List<int>() { 3, 4, 5 };
     List<int> idHealMana = new List<int>() { 9, 10, 11 };
-    List<int> idHealHp = new List<int>() { 12, 13, 14, 15, 16, 17 };
+    List<int> idHealHp = new List<int>() { 12, 13, 14 };
     List<int> idEquip = new List<int>() { 18, 19, 20, 21, 22, 23, 24, 25, 26 };
     Coroutine coroutineItem1;
     Coroutine coroutineItem2;
@@ -65,6 +65,9 @@ public class GamePlayManager : MonoBehaviour
     
     // count hit boss for stagger
     public int countHitBoss = 0;
+
+    //item buff
+    public List<GameObject> listItemBuff = new List<GameObject>();
 
     private void Awake()
     {
@@ -301,34 +304,36 @@ public class GamePlayManager : MonoBehaviour
     }
     private void UseOfItems(int id)
     {
+        Debug.Log("Use item id: " + id);
         if (idSkill.Contains(id))
         {
+            Debug.Log("Use item skill with id: " + id);
             attributePlayer[0] = dataManager.dataBase.imgEquipItems.AttributeItems[id];
             StartCoroutine(SetItemSkill());
         }
         else if (idDefence.Contains(id))
         {
+            Debug.Log("Use item defence with id: " + id);
             attributePlayer[1] = dataManager.dataBase.imgEquipItems.AttributeItems[id];
             StartCoroutine(SetItemDefence());
         }
         else if (idAttack.Contains(id))
         {
+            Debug.Log("Use item attack with id: " + id);
             attributePlayer[2] = dataManager.dataBase.imgEquipItems.AttributeItems[id];
             StartCoroutine(SetItemDame());
         }
         else if (idHealMana.Contains(id))
         {
+            Debug.Log("Use item heal mana with id: " + id); 
             attributePlayer[3] = dataManager.dataBase.imgEquipItems.AttributeItems[id];
             _Player.SetMana(_Player.fillBar.maxMana * (attributePlayer[3] / 100));
         }
         else if (idHealHp.Contains(id))
         {
+            Debug.Log("Use item heal hp with id: " + id);
             attributePlayer[4] = dataManager.dataBase.imgEquipItems.AttributeItems[id];
             _Player.SetHp(_Player.fillBar.maxHp * (attributePlayer[4] / 100f));
-        }
-        else if (idEquip.Contains(id))
-        {
-
         }
     }
     IEnumerator SetItemSkill()
@@ -641,5 +646,11 @@ public class GamePlayManager : MonoBehaviour
                 break;
 
         }
+    }
+
+    public void DropItem(int idItem , Vector3 posItem)
+    {
+        GameObject _go = Instantiate(listItemBuff[idItem], posItem, Quaternion.identity);
+        _go.GetComponent<ItemPlayer>().Throw(new Vector2(1,0));
     }
 }

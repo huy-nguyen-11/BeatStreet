@@ -81,7 +81,7 @@ public class DealController : MonoBehaviour
     }
     private int RandomType(int id)
     {
-        int type = Random.Range(0, 3);
+        int type = Random.Range(0, 2);
         if (id == 0)
         {
             if (type == 2)
@@ -109,14 +109,14 @@ public class DealController : MonoBehaviour
     {
         if (idType == 0)
         {
-            int id = Random.Range(0, 9);
+            int id = Random.Range(0, 3);
             return id;
         }
-        else if (idType == 1)
-        {
-            int id = Random.Range(0, 18);
-            return id;
-        }
+        //else if (idType == 1)
+        //{
+        //    int id = Random.Range(0, 18);
+        //    return id;
+        //}
         else
             return 0;
     }
@@ -164,8 +164,8 @@ public class DealController : MonoBehaviour
     {
         if (deal.IdType == 0)
             return dataManager.dataBase.imgEquipItems.sprPiecePlayerLevelUp[deal.IdPiece];
-        else if (deal.IdType == 1)
-            return dataManager.dataBase.imgEquipItems.sprPieceEnemy[deal.IdPiece];
+        //else if (deal.IdType == 1)
+        //    return dataManager.dataBase.imgEquipItems.sprPieceEnemy[deal.IdPiece];
         else
             return _iconKey;
     }
@@ -179,8 +179,8 @@ public class DealController : MonoBehaviour
         {
             if (deal.IdType == 0)
                 return dataManager.dataBase.imgEquipItems.namePlayer[deal.IdPiece];
-            else if (deal.IdType == 1)
-                return dataManager.dataBase.imgEquipItems.nameEnemy[deal.IdPiece];
+            //else if (deal.IdType == 1)
+            //    return dataManager.dataBase.imgEquipItems.nameEnemy[deal.IdPiece];
             else
                 return "Key";
         }

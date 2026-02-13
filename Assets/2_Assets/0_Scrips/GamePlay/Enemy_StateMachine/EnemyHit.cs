@@ -51,11 +51,13 @@ public class EnemyHit : EnemyStateMachine
     {
         float hit = GamePlayManager.Instance._Player.Char.position.x
             <= enemyController.Char.position.x ? -0.15f : 0.15f;
-        enemyController.rb.linearVelocity = Vector2.left * hit;
+        int num = enemyController.typeOfEnemy == TypeOfEnemy.Boss ? 10 : 1;
+        enemyController.rb.linearVelocity = Vector2.left * hit * num;
     }
     IEnumerator SetStateIdle()
     {
-        yield return new WaitForSeconds(0.5f);
+        float num = enemyController.typeOfEnemy == TypeOfEnemy.Boss ? 1.2f : 0.5f;
+        yield return new WaitForSeconds(num);
         enemyController.SwitchToRunState(enemyController.enemyIdle);
     }
     public override void Exit()

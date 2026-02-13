@@ -144,6 +144,7 @@ public class WaveBoss : MonoBehaviour, IpooledObject
 
             if (playerController != null)
             {
+                if(playerController.isImmortal|| playerController.state == PlayerController.State.Dead) return;
                 playerController.HitDirection = direction > 0;
                 playerController.SetHit(currentDamage);
             }

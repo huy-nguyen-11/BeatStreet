@@ -154,6 +154,7 @@ MonoBehaviour:
   fillBar: {fileID: 9152542989357397529}
   skeletonAnimation: {fileID: 4783723242637640790}
   wakeUpAnim: Wake_up
+  colorHitString: 
   typeOfEnemy: 1
   player: {fileID: 0}
   playerController: {fileID: 0}
@@ -216,8 +217,9 @@ MonoBehaviour:
   posThrower: {fileID: 3137027685876056533}
   rangeThrower: 2.5
   timerCheckThrower: 5
+  phaseBoss: 1
+  auraBoss: {fileID: 0}
   isEnableThrower: 0
-  debugAI: 0
   velocity: 0
   isCheckGravity: 0
 --- !u!114 &5056768187026513136
@@ -993,8 +995,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.22000001, y: 0.22000001, z: 0.22000001}
-  m_ConstrainProportionsScale: 1
+  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 244856404680787716}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

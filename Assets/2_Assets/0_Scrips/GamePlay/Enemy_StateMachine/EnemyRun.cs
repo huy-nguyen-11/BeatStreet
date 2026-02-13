@@ -69,8 +69,8 @@ public class EnemyRun : EnemyStateMachine
                     float dx = Mathf.Abs(enemyController.Char.position.x - enemyController.player.position.x);
                     float dy = Mathf.Abs(enemyController.Char.position.y - enemyController.player.position.y);
                     bool farEnough = (dy > 2f && dx > 1.5f) || dx > 2f;
-                    //if (farEnough && Random.value <= enemyController.directChaseRatio)
-                    //    enemyController.PrepareDirectChase();
+                    if (farEnough && enemyController.phaseBoss ==2)
+                        enemyController.PrepareDirectChase();
                 }
                 enemyController.Movement();
             }

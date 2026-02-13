@@ -48,7 +48,7 @@ namespace I2.MiniGames
 		[Rename("Max Volume")]public float _Sound_KnotCollision_MaxVolume=1;
 		public UnityEventAudioClip _PlayKnotSound = new UnityEventAudioClip();
 		private int id_result;
-		public GameObject ResultObj, PopupItem;
+		public GameObject ResultObj, PopupItem , btnBack;
 		public Sprite[] icons;
 		public string[] numb_item;
 		#endregion
@@ -378,15 +378,16 @@ namespace I2.MiniGames
 			_Controller.spining = false;
 //			Debug.Log ("Reward Item Id " + id);
 			PopupItem.GetComponentInChildren<DOTweenAnimation> ().DORewind ();
-			PopupItem.transform.GetChild(0).GetChild(1).GetComponent<Image>().sprite = icons[id];
-			PopupItem.transform.GetChild(0).GetChild(2).GetComponent<TextMeshProUGUI>().text = numb_item[id];
+			PopupItem.transform.GetChild(1).GetChild(1).GetChild(0).GetComponent<Image>().sprite = icons[id];
+			PopupItem.transform.GetChild(1).GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text = numb_item[id];
 			PopupItem.SetActive (true);
 			yield return new WaitForSeconds (0.5f);
 			if(true)
 			PopupItem.GetComponent<AudioSource> ().Play ();
 			PopupItem.GetComponentInChildren<DOTweenAnimation> ().DOPlay ();
 			yield return new WaitForSeconds (3f);
-			PopupItem.SetActive (false);
+			btnBack.SetActive (true);
+            PopupItem.SetActive (false);
 
 		}
 

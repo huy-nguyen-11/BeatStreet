@@ -22,7 +22,7 @@ public class EnemyCharacter : MonoBehaviour
     public State state = State.Idle;
     public FillBarEnemy fillBar;
     [SerializeField] public SkeletonAnimation skeletonAnimation;
-    [SerializeField] public string wakeUpAnim;
+    [SerializeField] public string wakeUpAnim , colorHitString;
 
     public void PlayAnim(string animName, bool loop = true)
     {
@@ -80,7 +80,7 @@ public class EnemyCharacter : MonoBehaviour
     {
         if (skeletonAnimation == null) return;
 
-        Color flashColor = hitColor ?? new Color(1f, 0.3f, 0.3f, 1f);
+        Color flashColor = hitColor ?? HexToColor(colorHitString);
 
         flashTween?.Kill();
 
@@ -97,6 +97,19 @@ public class EnemyCharacter : MonoBehaviour
             })
             .AppendInterval(flashDuration)
             .SetLoops(flashCount);
+    }
+
+    public static Color HexToColor(string hex)
+    {
+        if (!hex.StartsWith("#"))
+            hex = "#" + hex;
+
+        Color color;
+        if (ColorUtility.TryParseHtmlString(hex, out color))
+            return color;
+
+        Debug.LogWarning($"Invalid hex color: {hex}");
+        return Color.white;
     }
 
 }

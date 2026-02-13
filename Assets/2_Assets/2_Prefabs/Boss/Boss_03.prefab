@@ -1599,6 +1599,7 @@ MonoBehaviour:
   fillBar: {fileID: 3744795674840304949}
   skeletonAnimation: {fileID: 7320634408757499389}
   wakeUpAnim: Idle
+  colorHitString: '#EC9292'
   typeOfEnemy: 2
   player: {fileID: 0}
   playerController: {fileID: 0}
@@ -1661,7 +1662,8 @@ MonoBehaviour:
   posThrower: {fileID: 0}
   rangeThrower: 0
   timerCheckThrower: 3
-  auraBoss: {fileID: 0}
+  phaseBoss: 1
+  auraBoss: {fileID: 7998666701650287308}
   isEnableThrower: 0
   velocity: 0
   isCheckGravity: 0
@@ -6547,7 +6549,7 @@ ParticleSystemRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 6
+  m_SortingOrder: 7
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -12391,7 +12393,7 @@ ParticleSystemRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 6
+  m_SortingOrder: 7
   m_RenderMode: 1
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -13203,7 +13205,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8860932861020969996
 Transform:
   m_ObjectHideFlags: 0
@@ -17991,7 +17993,7 @@ ParticleSystemRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 6
+  m_SortingOrder: 7
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0

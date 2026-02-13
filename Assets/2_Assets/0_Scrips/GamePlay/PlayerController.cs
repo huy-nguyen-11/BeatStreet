@@ -116,8 +116,8 @@ public class PlayerController : PlayerCharacter
     private Dictionary<int, float> touchStartTimes = new Dictionary<int, float>();
     public int idTounchRun;
     private float holdTimer;
-    [SerializeField] private float holdMoveTolerancePixels = 25f; // cho phép ngón tay rung nhẹ
-    [SerializeField] private float holdJoystickTolerance = 0.5f;  // giảm độ khắt khe của joystick khi giữ
+    [SerializeField] private float holdMoveTolerancePixels = 25f; 
+    [SerializeField] private float holdJoystickTolerance = 0.5f; 
 
     // Facing state to avoid repeated flips/snapping
     public bool isFacingRight = true;
