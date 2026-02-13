@@ -304,34 +304,28 @@ public class GamePlayManager : MonoBehaviour
     }
     private void UseOfItems(int id)
     {
-        Debug.Log("Use item id: " + id);
         if (idSkill.Contains(id))
         {
-            Debug.Log("Use item skill with id: " + id);
             attributePlayer[0] = dataManager.dataBase.imgEquipItems.AttributeItems[id];
             StartCoroutine(SetItemSkill());
         }
         else if (idDefence.Contains(id))
         {
-            Debug.Log("Use item defence with id: " + id);
             attributePlayer[1] = dataManager.dataBase.imgEquipItems.AttributeItems[id];
             StartCoroutine(SetItemDefence());
         }
         else if (idAttack.Contains(id))
         {
-            Debug.Log("Use item attack with id: " + id);
             attributePlayer[2] = dataManager.dataBase.imgEquipItems.AttributeItems[id];
             StartCoroutine(SetItemDame());
         }
         else if (idHealMana.Contains(id))
-        {
-            Debug.Log("Use item heal mana with id: " + id); 
+        { 
             attributePlayer[3] = dataManager.dataBase.imgEquipItems.AttributeItems[id];
             _Player.SetMana(_Player.fillBar.maxMana * (attributePlayer[3] / 100));
         }
         else if (idHealHp.Contains(id))
         {
-            Debug.Log("Use item heal hp with id: " + id);
             attributePlayer[4] = dataManager.dataBase.imgEquipItems.AttributeItems[id];
             _Player.SetHp(_Player.fillBar.maxHp * (attributePlayer[4] / 100f));
         }
