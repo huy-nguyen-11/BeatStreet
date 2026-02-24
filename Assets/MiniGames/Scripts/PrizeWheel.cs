@@ -376,17 +376,23 @@ namespace I2.MiniGames
 
 		IEnumerator LuckyReward(int id){
 			_Controller.spining = false;
-//			Debug.Log ("Reward Item Id " + id);
-			PopupItem.GetComponentInChildren<DOTweenAnimation> ().DORewind ();
-			PopupItem.transform.GetChild(1).GetChild(1).GetChild(0).GetComponent<Image>().sprite = icons[id];
-			PopupItem.transform.GetChild(1).GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text = numb_item[id];
+            //Debug.Log ("Reward Item Id " + id);
+            //PopupItem.GetComponentInChildren<DOTweenAnimation>().DORewind();
+			PopupItem.transform.GetChild(2).DOScale(Vector3.one, 0.3f).From(Vector3.zero).SetEase(Ease.InOutSine).onComplete = () => {
+                PopupItem.transform.GetChild(2).GetChild(1).DORotate(new Vector3(0, 360, 0), 0.3f, RotateMode.FastBeyond360).From(new Vector3(0, 180, 0)).SetEase(Ease.OutQuad);
+            };
+            PopupItem.transform.GetChild(2).GetChild(1).GetChild(0).GetComponent<Image>().sprite = icons[id];
+			PopupItem.transform.GetChild(2).GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text = numb_item[id];
 			PopupItem.SetActive (true);
-			yield return new WaitForSeconds (0.5f);
+			yield return new WaitForSeconds(0.5f);
 			if(true)
-			PopupItem.GetComponent<AudioSource> ().Play ();
-			PopupItem.GetComponentInChildren<DOTweenAnimation> ().DOPlay ();
+            //PopupItem.GetComponent<AudioSource>().Play();
+            //PopupItem.transform.GetChild(2).GetComponent< DOTweenAnimation>().DOPlay();
 			yield return new WaitForSeconds (3f);
 			btnBack.SetActive (true);
+            PopupItem.transform.GetChild(2).transform.localScale = Vector3.zero;
+            PopupItem.transform.GetChild(2).GetChild(1).transform.rotation = new Quaternion(0, 180, 0, 0);
+            PopupItem.transform.GetChild(2).gameObject.SetActive(true);
             PopupItem.SetActive (false);
 
 		}
