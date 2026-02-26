@@ -14,7 +14,8 @@ public class PlayerIdle : PlayerStateManager
             playerController.rb.linearVelocity = Vector2.zero;
         }
         playerController.PlayAnim("Idle", true);
-        playerController.fxStrength.SetActive(false);
+        if( playerController.fxStrength != null)
+            playerController.fxStrength.SetActive(false);
         
         // Reset foot step effect timer when entering idle state
         playerController.ResetFootStepTimer();

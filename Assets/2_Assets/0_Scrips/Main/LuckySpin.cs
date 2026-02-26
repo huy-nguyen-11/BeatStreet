@@ -1,6 +1,7 @@
 ﻿using I2.MiniGames;
 using System;
 using System.Collections;
+using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +15,8 @@ public class LuckySpin : MonoBehaviour
     private TimeSpan rewardInterval = new TimeSpan(0, 15, 0);
     private DateTime lastRewardTime;
     private DateTime currentTime;
+    private const string LAST_FREE_SPIN_DATE = "LastFreeSpinDate";
+    private DateTime lastFreeSpinDate;
     public bool isRun;
 
     public Sprite spYellowOn, spYellowOff, spGreenOn, spGreenOff;
@@ -30,9 +33,43 @@ public class LuckySpin : MonoBehaviour
             TimeSpan timeRemaining = rewardInterval - (currentTime - lastRewardTime);
             popupRefreshTime.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = $"{timeRemaining.Hours}:{timeRemaining.Minutes}:{timeRemaining.Seconds}";
         }
+        else
+        {
+            if (popupRefreshTime != null && popupRefreshTime.activeSelf)
+                CheckRewardStatus();
+        }
     }
     public void CheckRewardStatus()
     {
+        // Load last free-spin date (yyyy-MM-dd)
+        Debug.Log("Checking reward status...");
+        if (PlayerPrefs.HasKey(LAST_FREE_SPIN_DATE))
+        {
+            string lastFreeStr = PlayerPrefs.GetString(LAST_FREE_SPIN_DATE);
+            if (!DateTime.TryParseExact(lastFreeStr, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out lastFreeSpinDate))
+                lastFreeSpinDate = DateTime.MinValue;
+        }
+        else
+        {
+            lastFreeSpinDate = DateTime.MinValue;
+        }
+
+        if (lastFreeSpinDate != DateTime.MinValue && lastFreeSpinDate.Date == DateTime.Now.Date)
+        {
+            if (_btnSpin != null && _btnSpin.Length > 1 && _btnSpin[0] != null)
+            {
+                var go = _btnSpin[0];
+                var btn = go.GetComponent<Button>();
+                if (btn != null) btn.interactable = false;
+                var img = go.GetComponent<Image>();
+                if (img != null) img.sprite = spYellowOff;
+                go.transform.GetChild(0).gameObject.SetActive(false);
+                go.transform.GetChild(1).gameObject.SetActive(true);
+            }
+            return;
+        }
+
+
         if (PlayerPrefs.HasKey(LAST_REWARD_TIME))
         {
             string lastRewardString = PlayerPrefs.GetString(LAST_REWARD_TIME);
@@ -48,14 +85,14 @@ public class LuckySpin : MonoBehaviour
             popupRefreshTime.SetActive(false);
             DataManager.Instance.priceSpin = 100;
             DataManager.Instance.isFreeAdsSpin = true;
-            SetBtnSpin(0);
+            //SetBtnSpin(0);
         }
         else
         {
             popupRefreshTime.SetActive(true);
             if (DataManager.Instance.isFreeAdsSpin)
             {
-                SetBtnSpin(1);
+                //SetBtnSpin(1);
                 DataManager.Instance.isFreeAdsSpin = false;
             }
             else
@@ -110,8 +147,10 @@ public class LuckySpin : MonoBehaviour
         AudioBase.Instance.SetAudioUI(0);
         MainManager.Instance.SetMission(3, 1);
         isRun = true;
-        lastRewardTime = DateTime.Now;
-        PlayerPrefs.SetString(LAST_REWARD_TIME, lastRewardTime.ToString());
+        //lastRewardTime = DateTime.Now;
+        //PlayerPrefs.SetString(LAST_REWARD_TIME, lastRewardTime.ToString());
+        var todayStr = DateTime.Now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+        PlayerPrefs.SetString(LAST_FREE_SPIN_DATE, todayStr);
         PlayerPrefs.Save();
         CheckRewardStatus();
         //controllerSpin.ValidateRoundFree();
@@ -130,6 +169,11 @@ public class LuckySpin : MonoBehaviour
             if (result)
             {
                 MainManager.Instance.SetMission(3, 1);
+
+                lastRewardTime = DateTime.Now;
+                PlayerPrefs.SetString(LAST_REWARD_TIME, lastRewardTime.ToString());
+                PlayerPrefs.Save();
+                popupRefreshTime.SetActive(true);
                 CheckRewardStatus();
                 controllerSpin.ValidateRound();
                 StartCoroutine(SetTimeRun());

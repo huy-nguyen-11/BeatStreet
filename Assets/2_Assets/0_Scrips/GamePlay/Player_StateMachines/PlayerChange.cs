@@ -29,13 +29,15 @@ public class PlayerChange : PlayerStateManager
             playerController.StopCoroutine(_coroutine);
             _coroutine = null;
         }
-        playerController.fxStrength.SetActive(false);
+        if(playerController.fxStrength != null)
+            playerController.fxStrength.SetActive(false);
     }
 
     IEnumerator WaitForChangeAnimEnd()
     {
         yield return new WaitForSeconds(0.3f);
-        playerController.fxStrength.SetActive(true);
+        if(playerController.fxStrength != null)
+            playerController.fxStrength.SetActive(true);
     }
 
     public override void FixedUpdate()

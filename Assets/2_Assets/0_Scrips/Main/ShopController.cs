@@ -24,11 +24,166 @@ public class ShopController : MonoBehaviour
     public GameObject _contentShop;
 
     private bool isOnClick = true;
+    private int _contentNextIndex = 0;//indexslot
+    public ShowPopUpReward showPopUpReward;
+
+    //for count watch ads to open reward;
+    [SerializeField] private TextMeshProUGUI tmpDiamondsWatchCount , tmpCoinsWatchCount , tmpTreasureWatchCount; // assign in inspector (shows "X/3")
+    [SerializeField] private GameObject botKeys;
+    private const int MAX_DAILY_DIAMOND_ADS = 3;
+    private const int MAX_DAILY_COIN_ADS = 3;
+    private const int MAX_DAILY_TREASURE_ADS = 3;
+    private const string PrefKey_DiamondsAdCount = "DiamondsAdCount";
+    private const string PrefKey_DiamondsAdDate = "DiamondsAdDate";
+    private const string PrefKey_CoinsAdCount = "CoinsAdCount";
+    private const string PrefKey_CoinsAdDate = "CoinsAdDate";
+    private const string PrefKey_TreasureAdCount = "TreasureAdCount";
+    private const string PrefKey_TreasureAdDate = "TreasureAdDate";
+
+    //for check watch ads to get diamont
+    private void EnsureDailyAdResetIfNeeded()
+    {
+        string savedDate = PlayerPrefs.GetString(PrefKey_DiamondsAdDate, "");
+        string today = System.DateTime.UtcNow.ToString("yyyy-MM-dd");
+        if (savedDate != today)
+        {
+            PlayerPrefs.SetString(PrefKey_DiamondsAdDate, today);
+            PlayerPrefs.SetInt(PrefKey_DiamondsAdCount, 0);
+            PlayerPrefs.Save();
+        }
+    }
+
+    private int GetSavedAdCount()
+    {
+        EnsureDailyAdResetIfNeeded();
+        return PlayerPrefs.GetInt(PrefKey_DiamondsAdCount, 0);
+    }
+
+    private int GetRemainingAdViews()
+    {
+        int used = GetSavedAdCount();
+        int remaining = MAX_DAILY_DIAMOND_ADS - used;
+        return remaining < 0 ? 0 : remaining;
+    }
+
+    private void IncrementAdCount()
+    {
+        EnsureDailyAdResetIfNeeded();
+        int used = PlayerPrefs.GetInt(PrefKey_DiamondsAdCount, 0);
+        used++;
+        PlayerPrefs.SetInt(PrefKey_DiamondsAdCount, used);
+        PlayerPrefs.Save();
+        UpdateDiamondsAdCountUI();
+    }
+
+    private void UpdateDiamondsAdCountUI()
+    {
+        if (tmpDiamondsWatchCount == null) return;
+        tmpDiamondsWatchCount.text = (MAX_DAILY_DIAMOND_ADS - GetRemainingAdViews()) + "/" + MAX_DAILY_DIAMOND_ADS;
+    }
+
+    //for check watch ads to get coins
+    private void EnsureDailyCoinAdResetIfNeeded()
+    {
+        string savedDate = PlayerPrefs.GetString(PrefKey_CoinsAdDate, "");
+        string today = System.DateTime.UtcNow.ToString("yyyy-MM-dd");
+        if (savedDate != today)
+        {
+            PlayerPrefs.SetString(PrefKey_CoinsAdDate, today);
+            PlayerPrefs.SetInt(PrefKey_CoinsAdCount, 0);
+            PlayerPrefs.Save();
+        }
+    }
+
+    private int GetSavedCoinAdCount()
+    {
+        EnsureDailyCoinAdResetIfNeeded();
+        return PlayerPrefs.GetInt(PrefKey_CoinsAdCount, 0);
+    }
+
+    private int GetRemainingCoinAdViews()
+    {
+        int used = GetSavedCoinAdCount();
+        int remaining = MAX_DAILY_COIN_ADS - used;
+        return remaining < 0 ? 0 : remaining;
+    }
+
+    private void IncrementCoinAdCount()
+    {
+        EnsureDailyCoinAdResetIfNeeded();
+        int used = PlayerPrefs.GetInt(PrefKey_CoinsAdCount, 0);
+        used++;
+        PlayerPrefs.SetInt(PrefKey_CoinsAdCount, used);
+        PlayerPrefs.Save();
+        UpdateCoinsAdCountUI();
+    }
+
+    private void UpdateCoinsAdCountUI()
+    {
+        if (tmpCoinsWatchCount == null) return;
+        tmpCoinsWatchCount.text = (MAX_DAILY_COIN_ADS - GetRemainingCoinAdViews()) + "/" + MAX_DAILY_COIN_ADS;
+    }
+
+    //for check watch ads to get treasure   
+    void UpdateKeysAmount()
+    {
+        botKeys.SetActive(PlayerPrefs.GetInt("Key") > 0);
+        botKeys.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = PlayerPrefs.GetInt("Key").ToString();
+    }
+
+    private void EnsureDailyTreasureAdResetIfNeeded()
+    {
+        string savedDate = PlayerPrefs.GetString(PrefKey_TreasureAdDate, "");
+        string today = System.DateTime.UtcNow.ToString("yyyy-MM-dd");
+        if (savedDate != today)
+        {
+            PlayerPrefs.SetString(PrefKey_TreasureAdDate, today);
+            PlayerPrefs.SetInt(PrefKey_TreasureAdDate, 0);
+            PlayerPrefs.Save();
+        }
+    }
+
+    private int GetSaveTreasureAdCount()
+    {
+        EnsureDailyTreasureAdResetIfNeeded();
+        return PlayerPrefs.GetInt(PrefKey_TreasureAdCount, 0);
+    }
+
+    private int GetRemainingTreasureAdViews()
+    {
+        int used = GetSaveTreasureAdCount();
+        int remaining = MAX_DAILY_TREASURE_ADS - used;
+        return remaining < 0 ? 0 : remaining;
+    }
+
+    private void IncrementTreasureAdCount()
+    {
+        EnsureDailyTreasureAdResetIfNeeded();
+        int used = PlayerPrefs.GetInt(PrefKey_TreasureAdCount, 0);
+        used++;
+        PlayerPrefs.SetInt(PrefKey_TreasureAdCount, used);
+        PlayerPrefs.Save();
+        UpdateTreasureAdCountUI();
+    }
+
+    private void UpdateTreasureAdCountUI()
+    {
+        if (tmpTreasureWatchCount == null) return;
+        tmpTreasureWatchCount.text = (MAX_DAILY_TREASURE_ADS - GetRemainingTreasureAdViews()) + "/" + MAX_DAILY_TREASURE_ADS;
+    }
 
     private void OnEnable()
     {
         OpenPopup(MainManager.Instance.indexPopupShop);
         isOnClick = true;
+
+        EnsureDailyAdResetIfNeeded();
+        UpdateDiamondsAdCountUI();
+
+        EnsureDailyCoinAdResetIfNeeded();
+        UpdateCoinsAdCountUI();
+
+        UpdateKeysAmount();
     }
 
     public void OpenPopup(int index)
@@ -57,11 +212,23 @@ public class ShopController : MonoBehaviour
     public void BtnClaim()
     {
         AudioBase.Instance.SetAudioUI(0);
-        _panels[0].SetActive(false);
-        _panels[1].SetActive(false);
+        //_panels[0].SetActive(false);
+        //_panels[1].SetActive(false);
+        //for (int i = 0; i < _content.transform.childCount; i++)
+        //{
+        //    Destroy(_content.transform.GetChild(i).gameObject);
+        //}
         for (int i = 0; i < _content.transform.childCount; i++)
         {
-            Destroy(_content.transform.GetChild(i).gameObject);
+            var child = _content.transform.GetChild(i).gameObject;
+            //child.SetActive(false);
+            if (child.transform.childCount > 1)
+            {
+                var img = child.transform.GetChild(0).GetComponent<Image>();
+                if (img != null) img.sprite = null;
+                var txt = child.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+                if (txt != null) txt.text = "";
+            }
         }
     }
     public void BtnOpenPopupChests(int id)
@@ -137,13 +304,19 @@ public class ShopController : MonoBehaviour
         AudioBase.Instance.SetAudioUI(0);
         if (id == 0)
         {
-            //if (PlayerPrefs.GetInt("Key") >= 3)
-            //{
-            //    AudioBase.Instance.SetAudioUI(1);
-            //    PlayerPrefs.SetInt("Key", PlayerPrefs.GetInt("Key") - 3);
-            //    RandomChest(3, 1, 1, 1);
-            //}
-            WatchingAdsForOpenTreasure();
+            if (PlayerPrefs.GetInt("Key") >= 1)
+            {
+                AudioBase.Instance.SetAudioUI(1);
+                PlayerPrefs.SetInt("Key", PlayerPrefs.GetInt("Key") - 1);
+                UpdateKeysAmount();
+                showPopUpReward.rewardAmount = 5;
+                RandomChest(3, 1, 1, 1);
+            }
+            else
+            {
+                WatchingAdsForOpenTreasure();
+                showPopUpReward.rewardAmount = 5;
+            }
         }
         else if (id == 1)
         {
@@ -152,6 +325,7 @@ public class ShopController : MonoBehaviour
                 AudioBase.Instance.SetAudioUI(1);
                 PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 900);
                 PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 500);
+                showPopUpReward.rewardAmount = 11;
                 RandomChest(30, 5, 6, 20);
             }
         }
@@ -163,6 +337,7 @@ public class ShopController : MonoBehaviour
                 PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 2500);
                 PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 12000);
                 RandomChest(90, 10, 6, 60);
+                showPopUpReward.rewardAmount = 11;
             }
         }
         MainManager.Instance.SetTopBar();
@@ -174,6 +349,10 @@ public class ShopController : MonoBehaviour
         listItem.Clear();
         listPlayerEvolve.Clear();
         _content.transform.position = new Vector2(_content.transform.position.x, 0);
+
+        // Prepare slots in _content
+        PrepareContentSlots();
+
         for (int i = 0; i < PlLevelUp; i++)
         {
             int id = Random.Range(0, DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerLevelUp.Count);
@@ -210,6 +389,15 @@ public class ShopController : MonoBehaviour
     //for button watch ads open reward treasure
     private void WatchingAdsForOpenTreasure()
     {
+        int remaining = GetRemainingTreasureAdViews();
+        if (remaining <= 0)
+        {
+            // daily limit reached
+            Debug.Log("Daily treasure ad limit reached.");
+            // Optionally show a user-facing message here
+            return;
+        }
+
         if (Application.internetReachability == NetworkReachability.NotReachable)
         {
             Debug.Log("No internet connection available.");
@@ -223,6 +411,7 @@ public class ShopController : MonoBehaviour
 
     void HandleOpenTreasure(bool resut)
     {
+        IncrementTreasureAdCount();
         RandomChest(3, 1, 1, 1);
     }
 
@@ -232,9 +421,27 @@ public class ShopController : MonoBehaviour
         {
             int checkNumber = listPlayerLevelUp[0];
             int count = listPlayerLevelUp.FindAll(x => x == checkNumber).Count;
-            GameObject item = Instantiate(prfItem, _content.transform.position, Quaternion.identity, _content.transform);
-            item.transform.GetChild(0).GetComponent<Image>().sprite = DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerLevelUp[checkNumber];
-            item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = count.ToString();
+            //GameObject item = Instantiate(prfItem, _content.transform.position, Quaternion.identity, _content.transform);
+
+            GameObject item;
+            if (TryGetNextContentSlot(out item))
+            {
+                item.SetActive(true);
+                var img = item.transform.GetChild(0).GetComponent<Image>();
+                var txt = item.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+                if (img != null) img.sprite = DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerLevelUp[checkNumber];
+                if (txt != null) txt.text = count.ToString();
+            }
+            else
+            {
+                // fallback:
+                item = Instantiate(prfItem, _content.transform.position, Quaternion.identity, _content.transform);
+                item.transform.GetChild(0).GetComponent<Image>().sprite = DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerLevelUp[checkNumber];
+                item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = count.ToString();
+            }
+
+            //item.transform.GetChild(0).GetComponent<Image>().sprite = DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerLevelUp[checkNumber];
+            //item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = count.ToString();
             DataManager.Instance.warehouse.CountPiecePlayerLevelUp[checkNumber] += count;
             listPlayerLevelUp.RemoveAll(x => x == checkNumber);
         }
@@ -252,15 +459,31 @@ public class ShopController : MonoBehaviour
             listEnemy.RemoveAll(x => x == checkNumber);
         }
     }
+
     private void CheckListItem()
     {
         while (listItem.Count > 0)
         {
             int checkNumber = listItem[0];
             int count = listItem.FindAll(x => x == checkNumber).Count;
-            GameObject item = Instantiate(prfItem, _content.transform.position, Quaternion.identity, _content.transform);
-            item.transform.GetChild(0).GetComponent<Image>().sprite = DataManager.Instance.dataBase.imgEquipItems.sprItem[checkNumber];
-            item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = count.ToString();
+            //GameObject item = Instantiate(prfItem, _content.transform.position, Quaternion.identity, _content.transform);
+            //item.transform.GetChild(0).GetComponent<Image>().sprite = DataManager.Instance.dataBase.imgEquipItems.sprItem[checkNumber];
+            //item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = count.ToString();
+            GameObject item;
+            if (TryGetNextContentSlot(out item))
+            {
+                item.SetActive(true);
+                var img = item.transform.GetChild(0).GetComponent<Image>();
+                var txt = item.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+                if (img != null) img.sprite = DataManager.Instance.dataBase.imgEquipItems.sprItem[checkNumber];
+                if (txt != null) txt.text = count.ToString();
+            }
+            else
+            {
+                item = Instantiate(prfItem, _content.transform.position, Quaternion.identity, _content.transform);
+                item.transform.GetChild(0).GetComponent<Image>().sprite = DataManager.Instance.dataBase.imgEquipItems.sprItem[checkNumber];
+                item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = count.ToString();
+            }
             DataManager.Instance.warehouse.CountItem[checkNumber] += count;
             listItem.RemoveAll(x => x == checkNumber);
         }
@@ -271,13 +494,61 @@ public class ShopController : MonoBehaviour
         {
             int checkNumber = listPlayerEvolve[0];
             int count = listPlayerEvolve.FindAll(x => x == checkNumber).Count;
-            GameObject item = Instantiate(prfItem, _content.transform.position, Quaternion.identity, _content.transform);
-            item.transform.GetChild(0).GetComponent<Image>().sprite = DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerEvolve[checkNumber];
-            item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = count.ToString();
+            //GameObject item = Instantiate(prfItem, _content.transform.position, Quaternion.identity, _content.transform);
+            //item.transform.GetChild(0).GetComponent<Image>().sprite = DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerEvolve[checkNumber];
+            //item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = count.ToString();
+            GameObject item;
+            if (TryGetNextContentSlot(out item))
+            {
+                item.SetActive(true);
+                var img = item.transform.GetChild(0).GetComponent<Image>();
+                var txt = item.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+                if (img != null) img.sprite = DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerEvolve[checkNumber];
+                if (txt != null) txt.text = count.ToString();
+            }
+            else
+            {
+                item = Instantiate(prfItem, _content.transform.position, Quaternion.identity, _content.transform);
+                item.transform.GetChild(0).GetComponent<Image>().sprite = DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerEvolve[checkNumber];
+                item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = count.ToString();
+            }
             DataManager.Instance.warehouse.CountPiecePlayerEvolve[checkNumber] += count;
             listPlayerEvolve.RemoveAll(x => x == checkNumber);
         }
     }
+
+    // Reset and deactivate slots in _content, reset index
+    private void PrepareContentSlots()
+    {
+        _contentNextIndex = 0;
+        for (int i = 0; i < _content.transform.childCount; i++)
+        {
+            var child = _content.transform.GetChild(i).gameObject;
+            child.SetActive(false);
+            if (child.transform.childCount > 1)
+            {
+                var img = child.transform.GetChild(0).GetComponent<Image>();
+                if (img != null) img.sprite = null;
+                var txt = child.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+                if (txt != null) txt.text = "";
+            }
+        }
+    }
+
+    // get next available slot in _content, return false if no more slots
+    private bool TryGetNextContentSlot(out GameObject slot)
+    {
+        slot = null;
+        if (_content == null) return false;
+        if (_contentNextIndex < _content.transform.childCount)
+        {
+            slot = _content.transform.GetChild(_contentNextIndex).gameObject;
+            _contentNextIndex++;
+            return true;
+        }
+        return false;
+    }
+
     //public void BtnBuyCoin(int id)
     //{
     //    AudioBase.Instance.SetAudioUI(0);
@@ -342,6 +613,14 @@ public class ShopController : MonoBehaviour
     public void ButtonWatchAdsToGteCoins()
     {
         Debug.Log("watch ads to get coins!");
+        int remaining = GetRemainingCoinAdViews();
+        if (remaining <= 0)
+        {
+            Debug.Log("Daily coin-ad limit reached.");
+            // Optionally show user-facing UI/message here
+            return;
+        }
+
         if (Application.internetReachability == NetworkReachability.NotReachable)
         {
             Debug.Log("No internet connection available.");
@@ -356,6 +635,7 @@ public class ShopController : MonoBehaviour
     void HandleRewardCoins(bool resut)
     {
         PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 50);
+        IncrementCoinAdCount();
         getReward.DoAddCoinEffect(_listPosCoins[0].position, PlayerPrefs.GetInt("Coin") - 50, PlayerPrefs.GetInt("Coin"));
     }
 
@@ -381,7 +661,16 @@ public class ShopController : MonoBehaviour
         AudioBase.Instance.SetAudioUI(0);
         if(id == 0)
         {
-            Debug.Log("watch ads to get gems!");
+            int remaining = GetRemainingAdViews();
+            if (remaining <= 0)
+            {
+                // daily limit reached
+                Debug.Log("Daily diamond ad limit reached.");
+                // Optionally show a user-facing message here
+                return;
+            }
+
+
             if (Application.internetReachability == NetworkReachability.NotReachable)
             {
                Debug.Log("No internet connection available.");
@@ -429,6 +718,7 @@ public class ShopController : MonoBehaviour
         if (resutl)
         {
             PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + 50);
+            IncrementAdCount(); // record this ad watch toward daily limit
             isOnClick = false;
             getReward.DoAddGemsEffect(_listPosGems[0].position, PlayerPrefs.GetInt("Diamont") - 50, PlayerPrefs.GetInt("Diamont"));
             StartCoroutine(WaitForCoolDownOnClick());

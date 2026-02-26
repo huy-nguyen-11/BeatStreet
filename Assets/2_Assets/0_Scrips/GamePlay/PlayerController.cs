@@ -200,8 +200,8 @@ public class PlayerController : PlayerCharacter
             skeletonAnimation.AnimationState.Event += HandleAttackEvent;
         }
         isSpeedUpAttack = false;
-
-        fxStrength.SetActive(false);
+        if(fxStrength != null)
+            fxStrength.SetActive(false);
     }
     
     private void OnDestroy()

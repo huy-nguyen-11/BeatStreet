@@ -376,10 +376,42 @@ namespace I2.MiniGames
 
 		IEnumerator LuckyReward(int id){
 			_Controller.spining = false;
-            //Debug.Log ("Reward Item Id " + id);
-            //PopupItem.GetComponentInChildren<DOTweenAnimation>().DORewind();
-			PopupItem.transform.GetChild(2).DOScale(Vector3.one, 0.3f).From(Vector3.zero).SetEase(Ease.InOutSine).onComplete = () => {
-                PopupItem.transform.GetChild(2).GetChild(1).DORotate(new Vector3(0, 360, 0), 0.3f, RotateMode.FastBeyond360).From(new Vector3(0, 180, 0)).SetEase(Ease.OutQuad);
+			//Debug.Log ("Reward Item Id " + id);
+			//PopupItem.GetComponentInChildren<DOTweenAnimation>().DORewind();
+			//get data
+			switch (id)
+			{
+				case 0:
+                    PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + 50);
+                    break;
+				case 1:
+                    PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 1000);
+                    break;
+				case 2:
+                    PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + 100);
+                    break;
+				case 3:
+                    PlayerPrefs.SetInt("Key", PlayerPrefs.GetInt("Key") + 3);
+                    break;
+                case 4:
+                    PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + 200);
+                    break;
+                case 5:
+                    PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 3000);
+                    break;
+                case 6:
+                    PlayerPrefs.SetInt("Key", PlayerPrefs.GetInt("Key") + 5);
+                    break;
+                case 7:
+                    PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 5000);
+                    break;
+            }
+            //PlayerPrefs.SetInt("Key", PlayerPrefs.GetInt("Key") + numb_item[id]);
+            //PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 900);
+            //PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 500);
+
+            PopupItem.transform.GetChild(2).DOScale(Vector3.one, 0.3f).From(Vector3.zero).SetEase(Ease.InOutSine).onComplete = () => {
+                PopupItem.transform.GetChild(2).GetChild(1).DORotate(new Vector3(0, 0, 0), 0.3f, RotateMode.FastBeyond360).From(new Vector3(0, 90, 0)).SetEase(Ease.OutQuad);
             };
             PopupItem.transform.GetChild(2).GetChild(1).GetChild(0).GetComponent<Image>().sprite = icons[id];
 			PopupItem.transform.GetChild(2).GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text = numb_item[id];
