@@ -922,7 +922,7 @@ public class PlayerController : PlayerCharacter
     {
         comboTimer = 0f;
         comboAttack++;
-        if (comboAttack > 2)
+        if (comboAttack > 4)
         {
             comboAttack = 0;
         }

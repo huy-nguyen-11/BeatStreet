@@ -31,7 +31,6 @@ public class EnemyHit : EnemyStateMachine
         {
             if (enemyController.currentHitIndex >= 0 && enemyController.currentHitIndex <= 4)
             {
-                Debug.Log("hit");
                 SetHitbox();
                 enemyController.PlayAnim(hitAnim, false);
                 if (coroutine != null)
