@@ -418,6 +418,11 @@ public class AttackArea : MonoBehaviour
             // EnemyController.SetHit(...) may immediately switch to EnemyFall (max hit),
             // and EnemyFall.Enter() reads isGetHitStrengthMax to decide knockback direction.
             enemy.enemyController.isGetHitStrengthMax = isSkillStrength;
+
+            // Mark that this attack actually hit an enemy (used to allow finishing anims)
+            if (PlayerController.Instance != null)
+                PlayerController.Instance.lastAttackHadHit = true;
+
             enemy.enemyController.SetHit(Dame, isMaxHit);
             if(enemy.enemyController.typeOfEnemy == TypeOfEnemy.Boss)
             {

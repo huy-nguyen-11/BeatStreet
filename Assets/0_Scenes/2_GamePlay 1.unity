@@ -18838,6 +18838,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1732686249212289169, guid: db411c34185178945a127e56646da5bd, type: 3}
+      propertyPath: m_Text
+      value: FULL MANA
+      objectReference: {fileID: 0}
     - target: {fileID: 2671709352285546909, guid: db411c34185178945a127e56646da5bd, type: 3}
       propertyPath: m_Camera
       value: 
@@ -39769,6 +39773,7 @@ MonoBehaviour:
   holdJoystickTolerance: 0.5
   isFacingRight: 1
   comboIndex: 0
+  lastAttackHadHit: 0
   isAttackingCombo: 0
   queuedComboAttack: 0
   comboAttackAnims:

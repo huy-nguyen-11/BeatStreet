@@ -172,13 +172,11 @@ namespace MysticDev
             }
         }
 
-        public void Unlock()
+
+        public void FullManageDevMode()
         {
-            LevelControllerMain levelControllerMain = FindObjectOfType<LevelControllerMain>();
-            if (levelControllerMain != null)
-            {
-                levelControllerMain.UnlockAllLevelsForTest();
-            }
+            if(GamePlayManager.Instance == null) return;
+            GamePlayManager.Instance.DemoFillMana();
         }
 
         #endregion

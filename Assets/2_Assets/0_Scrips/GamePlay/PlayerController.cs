@@ -125,7 +125,8 @@ public class PlayerController : PlayerCharacter
     // track last processed entry to avoid duplicate handling
     private TrackEntry lastProcessedAttackEntry = null;
 
-    public int comboIndex = 0;           // 0, 1, 2
+    public int comboIndex = 0;           // 0, 1, 2 ,3,4
+    public bool lastAttackHadHit = false;
     public bool isAttackingCombo = false;  // Flag đang trong combo
     public bool queuedComboAttack = false; // Flag spam tap
     public List<string> comboAttackAnims = new List<string>
@@ -721,8 +722,9 @@ public class PlayerController : PlayerCharacter
             queuedComboAttack = true;
             return;
         }
-
+        lastAttackHadHit = false;
         comboAttack = 0; // Reset combo
+        comboIndex = 0;  // Reset combo animation index
         queuedComboAttack = false;
 
         AimToNearestEnemyOnAttack();

@@ -23,10 +23,11 @@ public class PlayerUlti : PlayerStateManager
 
     IEnumerator WaitForResetSkin()
     {
-        playerController.PlayAnim("Skill_1" , false);
+        yield return new WaitForSeconds(0.5f);
 
+        playerController.PlayAnim("Skill_2" , false);
         playerController.idAttackArea = 1;// set id attack area == 0
-        yield return new WaitForSeconds(1.97f);
+        yield return new WaitForSeconds(4.3f);
         GamePlayManager.Instance.SetStopFollowCamera();
         GamePlayManager.Instance.isCheckUlti = false;
         //GamePlayManager.Instance._Enemy.SetDead();
@@ -50,7 +51,7 @@ public class PlayerUlti : PlayerStateManager
             }
            
         }
-        else if(e.Data.Name == "End_attack")
+        else if(e.Data.Name == "Hit_Max")
         {
             GamePlayManager.Instance._Enemy.SetDead();
         }

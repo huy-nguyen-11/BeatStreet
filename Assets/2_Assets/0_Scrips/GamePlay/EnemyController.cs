@@ -1125,22 +1125,31 @@ public class EnemyController : EnemyCharacter
         }
         else
         {
-            if (state != State.Fall)
+            if (state == State.Hit)
             {
-                if(typeOfEnemy == TypeOfEnemy.Boss)
+                //imemediately reset hit animation to allow chaining hit reactions
+                enemyHit.SetAnimHit();
+            }
+            else
+            {
+                if (state != State.Fall)
                 {
-                    int num = phaseBoss == 2 ? 5 : 9;
-                    if (GamePlayManager.Instance.countHitBoss > num)
+                    if (typeOfEnemy == TypeOfEnemy.Boss)
+                    {
+                        int num = phaseBoss == 2 ? 5 : 9;
+                        if (GamePlayManager.Instance.countHitBoss > num)
+                        {
+                            SwitchToRunState(enemyHit);
+                            GamePlayManager.Instance.countHitBoss = 0;
+                        }
+                    }
+                    else
                     {
                         SwitchToRunState(enemyHit);
-                        GamePlayManager.Instance.countHitBoss = 0;
                     }
                 }
-                else
-                {
-                    SwitchToRunState(enemyHit);
-                }
-            }  
+            }
+           
         }
         
         if (coroutine == null)

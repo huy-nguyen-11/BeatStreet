@@ -186,10 +186,10 @@ public class GamePlayManager : MonoBehaviour
 
     public void SetCharsToCharSortingLayer()
     {
-        SetSortingForTransform(_Player.transform, "Canvas", 2);
-        SetSortingForTransform(_Player.transform.GetChild(1), "Canvas", 2);
-        SetSortingForTransform(_Player.transform.GetChild(2), "Canvas", 2);
-        SetSortingForTransform(_Enemy.transform, "Canvas", 2);
+        SetSortingForTransform(_Player.transform, "Canvas", 10);
+        SetSortingForTransform(_Player.transform.GetChild(1), "Canvas", 5);
+        SetSortingForTransform(_Player.transform.GetChild(2), "Canvas", 7);
+        SetSortingForTransform(_Enemy.transform, "Canvas", 9);
     }
 
     public void SetPlayerToDefaultSortingLayer()
@@ -646,5 +646,18 @@ public class GamePlayManager : MonoBehaviour
     {
         GameObject _go = Instantiate(listItemBuff[idItem], posItem, Quaternion.identity);
         _go.GetComponent<ItemPlayer>().Throw(new Vector2(1,0));
+    }
+
+    // Add inside the GamePlayManager class
+    [ContextMenu("Demo Fill Mana")]
+    public void DemoFillMana()
+    {
+        if (_Player == null)
+            _Player = FindObjectOfType<PlayerController>();
+        if (_Player == null) return;
+
+        float amountToFull = _Player.fillBar.maxMana - _Player.Mana;
+        if (amountToFull > 0f)
+            _Player.SetMana(amountToFull);
     }
 }

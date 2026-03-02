@@ -29,6 +29,8 @@ public class PlayerAttack : PlayerStateManager
 
     private void PlayComboAttackWithEvent()
     {
+        //playerController.lastAttackHadHit = false;
+
         int idx = playerController.comboIndex % playerController.comboAttackAnims.Count;
         string animName = playerController.comboAttackAnims[idx];
 
@@ -49,13 +51,56 @@ public class PlayerAttack : PlayerStateManager
     {
         if (playerController.state != PlayerController.State.Attack)
             return;
-        playerController.comboIndex++;
-        if (playerController.comboIndex >= playerController.comboAttackAnims.Count)
-            playerController.comboIndex = 0;
+
+        //playerController.comboIndex++;
+        //if (playerController.comboIndex >= playerController.comboAttackAnims.Count)
+        //    playerController.comboIndex = 0;
+
+        //if (playerController.queuedComboAttack)
+        //{
+        //    playerController.queuedComboAttack = false;
+        //    PlayComboAttackWithEvent();
+        //}
+        //else
+        //{
+        //    playerController.ResetStatus();
+        //}
+        // If we're still within the basic attack chain (0,1,2) — always allow increment.
+        // Only allow proceeding beyond index 2 (to 3,4...) if the last attack actually hit an enemy.
+        int current = playerController.comboIndex;
+        int maxIndex = playerController.comboAttackAnims.Count - 1;
+
+        if (current < 2)
+        {
+            playerController.comboIndex++;
+            if (playerController.comboIndex > maxIndex)
+                playerController.comboIndex = 0;
+        }
+        else
+        {
+            // current >= 2: require a real hit to continue to finishers
+            if (playerController.lastAttackHadHit)
+            {
+                playerController.comboIndex++;
+                if (playerController.comboIndex > maxIndex)
+                    playerController.comboIndex = 0;
+            }
+            else
+            {
+                // no hit: reset combo to start
+                playerController.comboIndex = 0;
+            }
+        }
+
+        // consume/reset the flag
+        playerController.lastAttackHadHit = false;
 
         if (playerController.queuedComboAttack)
         {
             playerController.queuedComboAttack = false;
+
+            // Only request next attack if comboIndex is within allowed range.
+            // PlayComboAttackWithEvent will play the animation for current comboIndex.
             PlayComboAttackWithEvent();
         }
         else

@@ -29,21 +29,26 @@ public class EnemyHit : EnemyStateMachine
         }
         else
         {
-            if (enemyController.currentHitIndex >= 0 && enemyController.currentHitIndex <= 4)
-            {
-                SetHitbox();
-                enemyController.PlayAnim(hitAnim, false);
-                if (coroutine != null)
-                    enemyController.StopCoroutine(coroutine);
-                coroutine = enemyController.StartCoroutine(SetStateIdle());
-            }
-            else
-            {
-                if (coroutine != null)
-                    enemyController.StopCoroutine(coroutine);
-                if (enemyController.state != EnemyController.State.Fall)
-                    enemyController.SwitchToRunState(enemyController.enemyFall);
-            }
+            //if (enemyController.currentHitIndex >= 0 && enemyController.currentHitIndex <= 4)
+            //{
+            //    SetHitbox();
+            //    enemyController.PlayAnim(hitAnim, false);
+            //    if (coroutine != null)
+            //        enemyController.StopCoroutine(coroutine);
+            //    coroutine = enemyController.StartCoroutine(SetStateIdle());
+            //}
+            //else
+            //{
+            //    if (coroutine != null)
+            //        enemyController.StopCoroutine(coroutine);
+            //    if (enemyController.state != EnemyController.State.Fall)
+            //        enemyController.SwitchToRunState(enemyController.enemyFall);
+            //}
+            SetHitbox();
+            enemyController.PlayAnim(hitAnim, false);
+            if (coroutine != null)
+                enemyController.StopCoroutine(coroutine);
+            coroutine = enemyController.StartCoroutine(SetStateIdle());
         }
     }
     private void SetHitbox()

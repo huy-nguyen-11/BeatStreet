@@ -803,7 +803,7 @@ public class LevelControllerMain : MonoBehaviour
     {
         // Mở khóa tất cả level tương ứng với số nút level đang có
         dataManager.LevelCurren = _btnLevels.Length;
-
+        //Debug.Log("All levels unlocked for testing. Current level count: " + dataManager.LevelCurren);
         // Lưu lại dữ liệu và cập nhật lại UI nút level
         dataManager.SaveFile();
         SetListBtn();
