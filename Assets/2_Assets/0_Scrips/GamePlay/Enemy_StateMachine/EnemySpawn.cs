@@ -27,7 +27,6 @@ public class EnemySpawn : EnemyStateMachine
 
             if (enemyController.skeletonAnimation.AnimationState != null)
             {
-                Debug.Log("Playing Spawn animation.");
                 spawnAnimEntry = enemyController.skeletonAnimation.AnimationState.SetAnimation(0, "Jump", false);
                 spawnAnimEntry.Complete += OnSpawnAnimationComplete;
                 return;
@@ -45,11 +44,9 @@ public class EnemySpawn : EnemyStateMachine
 
     private void OnSpawnAnimationComplete(TrackEntry trackEntry)
     {
-        Debug.Log("Spawn animation complete event received.");
         // When spawn animation completes, switch to idle state
         if (enemyController.state == EnemyController.State.Spawn)
         {
-            Debug.Log("Spawn animation complete, switching to Run state.");
             enemyController.SwitchToRunState(enemyController.enemyIdle);
         }
     }

@@ -374,6 +374,7 @@ public class EnemyController : EnemyCharacter
 
     }
 
+
     // --------------------------------------------------
     // Movement entrypoint: ensure facing is up-to-date before decision
     public void Movement()
@@ -383,8 +384,6 @@ public class EnemyController : EnemyCharacter
         {
             return;
         }
-
-
 
         // Keep facing consistent for animation decision
         UpdateEnemyRotation();
@@ -451,7 +450,7 @@ public class EnemyController : EnemyCharacter
                 (Char.position.x < player.position.x ?
                     player.position + Vector3.left * preferredRange :
                     player.position + Vector3.right * preferredRange);
-
+            // After currentTarget is assigned in Movement()
             float distanceToTarget = Vector3.Distance(Char.position, currentTarget);
 
             // Only increment timer if we're not already at target
@@ -517,7 +516,7 @@ public class EnemyController : EnemyCharacter
         float targetOffset = (typeOfEnemy == TypeOfEnemy.EliteEnemy && typeOfEnemy == TypeOfEnemy.Boss) ? rangeThrower : rangeAttack;
         Vector3 leftTarget = player.position + Vector3.left * targetOffset;
         Vector3 rightTarget = player.position + Vector3.right * targetOffset;
-
+        
         bool leftOccupied = IsTargetOccupiedByOtherEnemy(leftTarget);
         bool rightOccupied = IsTargetOccupiedByOtherEnemy(rightTarget);
 
@@ -909,6 +908,7 @@ public class EnemyController : EnemyCharacter
             ? player.position + Vector3.left * rangeAttack
             : player.position + Vector3.right * rangeAttack;
 
+        // After myTarget is assigned in CheckAttack()
         // Nếu enemy đã ở rất gần player (<= 0.15f) nhưng vị trí tấn công chưa bị chiếm, hãy di chuyển đến vị trí tấn công
         if (distanceX <= 0.15f && distanceY <= 0.2f)
         {
@@ -1178,6 +1178,7 @@ public class EnemyController : EnemyCharacter
     {
         SwitchToRunState(enemyIdle);
     }
+
     public void SetDead()
     {
         float chance = Random.Range(0f, 1f);
@@ -1196,54 +1197,84 @@ public class EnemyController : EnemyCharacter
         stateManager.Enter();
         GamePlayManager.Instance._CameraFollow.Shake2();
         GamePlayManager.Instance.CheckEnemyDead();
-        Vector2 upwardDirection = new Vector2(0, 0.85f);
-        Vector3 jumpDirection = player.transform.right;
+
+        Vector2 upwardDirection = new Vector2(0, 0.65f);
         float horizontalDirection0 = player.transform.rotation.y != 0 ? -1 : 1;
         float horizontalDirection1 = player.transform.position.x > Char.transform.position.x ? -1 : 1;
-        float horizontalDirection = 0;
-        if (isGetHitStrengthMax)
-        {
-            horizontalDirection = horizontalDirection1;
-        }
-        else
-        {
-            horizontalDirection = horizontalDirection0;
-        }
+        float horizontalDirection = isGetHitStrengthMax ? horizontalDirection1 : horizontalDirection0;
+        //Debug.Log("dead with direction"+ horizontalDirection);
+        // hướng ném tổng hợp (ngang + lên trên) để tạo quỹ đạo cong
         Vector2 moveDirection = new Vector2(horizontalDirection, upwardDirection.y).normalized;
-        Vector2 targetPosition = (Vector2)transform.parent.position + moveDirection * 3f;
 
-        // prevent Movement() and other AI from modifying position while the tween runs
+        // vị trí bắt đầu/kết thúc để nội suy quỹ đạo ném
+        Vector2 startPos = Char.position;
+        float baseDistance = 3f;
+        float extraDistance = isGetHitStrengthMax ? 3f : 2f;
+        float throwDistance = baseDistance + extraDistance;
+        Vector2 endPos = startPos + moveDirection * throwDistance;
+
+
+        // không dùng physics để tránh phụ thuộc mass / gravity, chỉ animate thủ công giống DOTween nhưng theo parabol
         isBeingThrown = true;
-
-        // stop physics to avoid physics pushing back
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
             rb.angularVelocity = 0f;
-            rb.simulated = false; // disable physics simulation for the duration
+            rb.simulated = false;
         }
-        if(typeOfEnemy == TypeOfEnemy.Boss)
+
+        if (typeOfEnemy == TypeOfEnemy.Boss)
         {
-            //to do handle boss dead : effect, sound ...
+            // TODO: handle boss dead (hiệu ứng riêng nếu cần)
         }
         else
         {
-            transform.parent.DOMove(targetPosition, 0.6f).SetEase(Ease.Linear)
-           .OnComplete(() =>
-           {
-               // mark thrown finished and deactivate
-               isBeingThrown = false;
-               // keep physics disabled since deactivating
-               if (rb != null)
-               {
-                   rb.simulated = false;
-               }
+            float arcHeight = 0.85f;
+            float duration = 1f;
+            float throwZAngle = -45f;
+            Debug.Log(
+    $"[Enemy SetDead] startPos={startPos}, endPos={endPos}, " +
+    $"horizontalDir={horizontalDirection}, arcHeight={arcHeight}, duration={duration}"
+);
+            StartCoroutine(HandleDeadThrownLanding(startPos, endPos, arcHeight, duration, throwZAngle));
+        }
 
-               GamePlayManager.Instance._CameraFollow.Shake();
-               Char.gameObject.SetActive(false);
-           });
+    }
+
+    private IEnumerator HandleDeadThrownLanding(Vector2 startPos, Vector2 endPos, float arcHeight, float duration, float zAngle)
+    {
+        // áp góc xoay theo trục Z (giữ nguyên X, Y của Char)
+        if (Char != null)
+        {
+            Vector3 euler = Char.eulerAngles;
+            Char.rotation = Quaternion.Euler(euler.x, euler.y, zAngle);
+        }
+
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / duration;
+            if (t > 1f) t = 1f;
+
+            // nội suy vị trí ngang
+            Vector2 pos = Vector2.Lerp(startPos, endPos, t);
+            // tạo độ cong parabol (0 -> 1 -> 0)
+            float parabola = 4f * t * (1f - t);
+            pos.y += arcHeight * parabola;
+
+            Char.position = pos;
+            yield return null;
+        }
+
+        isBeingThrown = false;
+
+        GamePlayManager.Instance._CameraFollow.Shake();
+        if (Char != null)
+        {
+            Char.gameObject.SetActive(false);
         }
     }
+
     public void DropCoin()
     {
         int number = Random.Range(3, 6);

@@ -151,6 +151,11 @@ public class PlayerGrab : PlayerStateManager
     {
         if (isGrabActive && grabbedEnemyController != null)
         {
+            // Nếu enemy đã chết, không còn ép vị trí/rotation nữa để giữ hiệu ứng chết (ném, xoay Z, v.v.)
+            if (grabbedEnemyController.state == EnemyCharacter.State.Dead)
+            {
+                return;
+            }
             //// Keep enemy root (Char) attached to player during grab so it visually follows
             //if (grabbedEnemyController.Char != null && playerController.Char != null)
             //{
@@ -441,9 +446,7 @@ public class PlayerGrab : PlayerStateManager
         // Kiểm tra nếu số lần tấn công vượt quá ngưỡng, tự động ném enemy
         if (_grabAttackCount > _maxGrabAttacks && isGrabActive && grabbedEnemyController != null)
         {
-            // Ném enemy theo hướng player đang quay mặt
             float throwDirection = playerController.isFacingRight ? 1f : -1f;
-            Debug.Log("Auto throw after max grab attacks: " + _grabAttackCount);
             playerController.isThrowEnemy = true;
             StartThrow(throwDirection);
             return;
@@ -481,8 +484,13 @@ public class PlayerGrab : PlayerStateManager
         {
             try
             {
-                grabbedEnemyController.isGrabbed = false;
-                grabbedEnemyController.SwitchToRunState(grabbedEnemyController.enemyIdle);
+                // Nếu enemy đã chết thì không ép chuyển state/rotation nữa,
+                // để EnemyDead/SetDead tự xử lý (bao gồm cả xoay Z khi bị ném).
+                if (grabbedEnemyController.state != EnemyCharacter.State.Dead)
+                {
+                    grabbedEnemyController.isGrabbed = false;
+                    grabbedEnemyController.SwitchToRunState(grabbedEnemyController.enemyIdle);
+                }
             }
             catch { }
         }

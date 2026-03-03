@@ -41,15 +41,31 @@ public class PlayerUlti : PlayerStateManager
     {
         if (e.Data.Name == "Hit")
         {
-            if (GamePlayManager.Instance._Enemy.isBoss)
+            //if (GamePlayManager.Instance._Enemy.isBoss)
+            //{
+            //    GamePlayManager.Instance._Enemy.PlayAnim("Damaged", true);
+            //}
+            //else
+            //{
+            //    GamePlayManager.Instance._Enemy.PlayAnim("Hit", true);
+            //}
+            var enemy = GamePlayManager.Instance._Enemy;
+            if (enemy == null) return;
+
+            // Choose animation name based on boss or normal enemy
+            string anim = enemy.isBoss ? "Damaged" : "Hit";
+
+            // Ensure enemy state is set to Hit (but don't force if dead or falling)
+            if (enemy.state != EnemyController.State.Dead && enemy.state != EnemyController.State.Fall)
             {
-                GamePlayManager.Instance._Enemy.PlayAnim("Damaged", true);
+                // allow enemy state machine to handle hit logic (knockback, timers, etc.)
+                enemy.SwitchToRunState(enemy.enemyHit);
             }
-            else
-            {
-                GamePlayManager.Instance._Enemy.PlayAnim("Hit", true);
-            }
-           
+
+            // Play overlay (track 1) non-looping so repeated hits will layer and feel intense.
+            // EnemyCharacter.PlayAnimOnTrack will queue an empty animation after the duration to clear the overlay.
+            enemy.PlayAnimOnTrack(anim, trackIndex: 1, loop: false);
+
         }
         else if(e.Data.Name == "Hit_Max")
         {

@@ -92,7 +92,7 @@ namespace MysticDev
                 
             }
             
-            MG.reporter.SetActive( checkDevMode );
+            MG.reporter.SetActive( false );
             
         }
 
