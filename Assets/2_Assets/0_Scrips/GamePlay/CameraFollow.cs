@@ -105,24 +105,25 @@ public class CameraFollow2D : MonoBehaviour
 
         transform.position = smoothedPosition;
     }
-    private void OnDrawGizmos()
-    {
-        if (!useBounds) return;
+    //private void OnDrawGizmos()
+    //{
+    //    if (!useBounds) return;
 
-        /*  Gizmos.color = Color.yellow;
-          Gizmos.DrawWireCube(
-              new Vector3((minX + maxX) / 2, (minY + maxY) / 2, 0),
-              new Vector3(maxX - minX, maxY - minY, 1)
-          );*/
-        if (Application.isPlaying && cam != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(
-                new Vector3((minX + maxX) / 2, (minY + maxY) / 2, 0),
-                new Vector3(maxX - minX - halfWidth * 2, maxY - minY - halfHeight * 2, 1)
-            );
-        }
-    }
+    //    /*  Gizmos.color = Color.yellow;
+    //      Gizmos.DrawWireCube(
+    //          new Vector3((minX + maxX) / 2, (minY + maxY) / 2, 0),
+    //          new Vector3(maxX - minX, maxY - minY, 1)
+    //      );*/
+    //    if (Application.isPlaying && cam != null)
+    //    {
+    //        Gizmos.color = Color.red;
+    //        Gizmos.DrawWireCube(
+    //            new Vector3((minX + maxX) / 2, (minY + maxY) / 2, 0),
+    //            new Vector3(maxX - minX - halfWidth * 2, maxY - minY - halfHeight * 2, 1)
+    //        );
+    //    }
+    //}
+
     // Cập nhật khi thay đổi kích thước màn hình
     private void OnValidate()
     {

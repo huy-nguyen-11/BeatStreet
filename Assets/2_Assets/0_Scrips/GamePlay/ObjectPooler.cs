@@ -109,7 +109,8 @@ public class ObjectPooler : MonoBehaviour
                 }
                 else if (obj.tag == "Text")
                 {
-                    obj.transform.parent = textTF;
+                    //obj.transform.parent = textTF;
+                    obj.transform.SetParent(textTF, false);
                 }
                 else if (obj.tag == "Coin")
                 {

@@ -74,6 +74,9 @@ namespace MysticDev
                 checkDevMode = false;
                 checkRewardLoaded = false;
             }
+
+            MG.reporter.SetActive(false);
+
         }
 
         // Start is called before the first frame update
@@ -91,9 +94,6 @@ namespace MysticDev
                 devPopup.gameObject.SetActive( false );
                 
             }
-            
-            MG.reporter.SetActive( false );
-            
         }
 
         // Update is called once per frame
