@@ -6,10 +6,13 @@ public class EnemyDead : EnemyStateMachine
     private string deadAnim;
     public override void Enter()
     {
-        deadAnim = enemyController.typeOfEnemy == TypeOfEnemy.Boss ? "Death" : "Dead";
+        deadAnim = enemyController.typeOfEnemy == TypeOfEnemy.Boss ? "Death" : "Dead_2";
         enemyController.PlayAnim(deadAnim , false);
         AudioBase.Instance.AudioPlayerAtkHit();
         enemyController.state = EnemyController.State.Dead;
+
+        if (enemyController.fillBar != null)
+            enemyController.fillBar.SetNewHp(0f);
     }
     public override void Update()
     {

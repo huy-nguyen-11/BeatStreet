@@ -13,10 +13,14 @@ public class EnemyFall : EnemyStateMachine
 
     public override void Enter()
     {
-        fallAnim = enemyController.typeOfEnemy == TypeOfEnemy.Boss ? "Death" : "Dead";
+        //fallAnim = enemyController.typeOfEnemy == TypeOfEnemy.Boss ? "Death" : "Dead";
         numFall = enemyController.typeOfEnemy == TypeOfEnemy.Boss ? 1.2f : 2.5f;
         enemyController.velocity = 8f;
-        enemyController.PlayAnim(fallAnim, false);
+        //enemyController.PlayAnim(fallAnim, false);
+        if(enemyController.typeOfEnemy == TypeOfEnemy.Boss)
+            enemyController.PlayAnim("Death", false);
+        else
+            enemyController.PlayAnimFall("Dead_2", "Dead");
         enemyController.state = EnemyController.State.Fall;
         if (enemyController.isGetHitStrengthMax)
         {

@@ -41,6 +41,19 @@ public class EnemyCharacter : MonoBehaviour
         }
     }
 
+    public void PlayAnimFall(string anim1, string anim2)
+    {
+        if (skeletonAnimation != null)
+        {
+            // Use AnimationState to set the animation on track 0
+            if (skeletonAnimation.AnimationState != null)
+            {
+                skeletonAnimation.AnimationState.SetAnimation(0, anim1, false);
+                skeletonAnimation.AnimationState.AddAnimation(0, anim2, false, 0.6f);
+            }
+        }
+    }
+
     // Play an animation on a specified Spine track so it layers above track 0 (e.g. track 1).
     // If loop == false, an empty animation is queued to clear the overlay after the animation duration.
     public Spine.TrackEntry PlayAnimOnTrack(string animName, int trackIndex = 1, bool loop = false)

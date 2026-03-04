@@ -1,6 +1,7 @@
 using DG.Tweening;
 using System.Collections;
 using UnityEngine;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class PlayerUlti : PlayerStateManager
 {
@@ -25,7 +26,7 @@ public class PlayerUlti : PlayerStateManager
     {
         yield return new WaitForSeconds(0.5f);
 
-        playerController.PlayAnim("Skill_2" , false);
+        playerController.PlayAnim(playerController.animUlti , false);
         playerController.idAttackArea = 1;// set id attack area == 0
         yield return new WaitForSeconds(4.3f);
         GamePlayManager.Instance.SetStopFollowCamera();
@@ -54,7 +55,7 @@ public class PlayerUlti : PlayerStateManager
 
             // Choose animation name based on boss or normal enemy
             string anim = enemy.isBoss ? "Damaged" : "Hit";
-
+            ObjectPooler.Instance.SpawnFromPool("Hit", new Vector3(enemy.transform.position.x, enemy.transform.position.y + 0.3f, 0), Quaternion.Euler(0, 0, 0));
             // Ensure enemy state is set to Hit (but don't force if dead or falling)
             if (enemy.state != EnemyController.State.Dead && enemy.state != EnemyController.State.Fall)
             {

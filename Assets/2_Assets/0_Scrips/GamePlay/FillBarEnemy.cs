@@ -17,7 +17,6 @@ public class FillBarEnemy : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        //imgFillHp.DOFillAmount(hp / maxHp, 0.3f);
         imgFillHp.fillAmount = hp / maxHp;
     }
     public void OnInit(float maxHp)

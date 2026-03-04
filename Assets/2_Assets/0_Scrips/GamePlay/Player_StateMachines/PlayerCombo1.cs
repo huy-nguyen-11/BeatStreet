@@ -15,7 +15,7 @@ public class PlayerCombo1 : PlayerStateManager
         playerController.state = PlayerController.State.Attack;
         //playerController.animator.Play("Combo1");
         bool wasRunning = (playerController.state == PlayerController.State.Run);
-        playerController.PlayAnimAttack("Attack_1_5");
+        playerController.PlayAnimAttack(playerController.animSlideAttack1);
 
         playerController.idAttackArea = 4;// set id attack area == 4
                                           //playerController.rb.linearVelocity = Vector3.zero;

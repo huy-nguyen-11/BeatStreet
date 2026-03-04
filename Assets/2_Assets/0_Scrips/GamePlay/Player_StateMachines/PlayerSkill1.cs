@@ -15,7 +15,7 @@ public class PlayerSkill1 : PlayerStateManager
     {
         //playerController.animator.Play("Skill1");
         bool wasRunning = (playerController.state == PlayerController.State.Run);
-        playerController.PlayAnimAttack("Attack_1_4");
+        playerController.PlayAnimAttack(playerController.animSlideAttack2);
 
         playerController.idAttackArea = 4;// set id attack area == 4
         //playerController.rb.linearVelocity = Vector3.zero;

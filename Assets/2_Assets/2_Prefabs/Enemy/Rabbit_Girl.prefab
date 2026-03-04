@@ -198,6 +198,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5234591670213488703
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -243,6 +244,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 3
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 926860538, guid: 58d6487a4aac19341bb8ffa327a01c01, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
   m_FlipX: 0
@@ -252,7 +254,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &556060030687493257
 GameObject:
@@ -5747,7 +5748,7 @@ ParticleSystem:
     vectorLabel1_3: W
 --- !u!199 &2045827673263577916
 ParticleSystemRenderer:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -5793,6 +5794,7 @@ ParticleSystemRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 7
+  m_MaskInteraction: 0
   m_RenderMode: 3
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -5824,7 +5826,6 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
-  m_MaskInteraction: 0
 --- !u!1 &2876754129980280876
 GameObject:
   m_ObjectHideFlags: 0
@@ -7143,6 +7144,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 4
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &5424490481948467441
 MonoBehaviour:
@@ -7203,6 +7205,7 @@ MonoBehaviour:
   fillBar: {fileID: 6965268470196919744}
   skeletonAnimation: {fileID: 5424490481948467441}
   wakeUpAnim: Wake_up
+  colorHitString: 
   typeOfEnemy: 1
   player: {fileID: 0}
   playerController: {fileID: 0}
@@ -7265,8 +7268,9 @@ MonoBehaviour:
   posThrower: {fileID: 1352075553532751083}
   rangeThrower: 2
   timerCheckThrower: 6
+  phaseBoss: 1
+  auraBoss: {fileID: 0}
   isEnableThrower: 0
-  debugAI: 0
   velocity: 0
   isCheckGravity: 0
 --- !u!114 &8843918729508522476
@@ -7766,6 +7770,7 @@ MeshRenderer:
   m_SortingLayerID: 579529517
   m_SortingLayer: 1
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &494264627899007566
 MonoBehaviour:
@@ -7825,6 +7830,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0

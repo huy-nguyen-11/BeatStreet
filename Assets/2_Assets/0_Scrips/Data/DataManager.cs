@@ -50,6 +50,7 @@ public class DataManager : MonoBehaviour
     private void OnEnable()
     {
         dataPath = Application.persistentDataPath + "/data.json";
+        Debug.Log("Data Path: " + dataPath);
         if (PlayerPrefs.GetInt("DataDefault") == 0)
         {
             PlayerPrefs.SetInt("DataDefault", 1);

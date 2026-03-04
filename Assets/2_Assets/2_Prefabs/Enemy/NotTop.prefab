@@ -239,6 +239,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 4
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &1836627540556401032
 MonoBehaviour:
@@ -299,6 +300,7 @@ MonoBehaviour:
   fillBar: {fileID: 4153755397646239795}
   skeletonAnimation: {fileID: 1836627540556401032}
   wakeUpAnim: Wake_up
+  colorHitString: 
   typeOfEnemy: 0
   player: {fileID: 0}
   playerController: {fileID: 0}
@@ -358,7 +360,12 @@ MonoBehaviour:
   posBullet: {fileID: 0}
   posKnife: {fileID: 0}
   posWave: {fileID: 0}
-  debugAI: 0
+  posThrower: {fileID: 0}
+  rangeThrower: 0
+  timerCheckThrower: 3
+  phaseBoss: 1
+  auraBoss: {fileID: 0}
+  isEnableThrower: 0
   velocity: 0
   isCheckGravity: 0
 --- !u!1 &6276017718089606514
@@ -617,6 +624,7 @@ MeshRenderer:
   m_SortingLayerID: 579529517
   m_SortingLayer: 1
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &5302260857206919708
 MonoBehaviour:
@@ -676,6 +684,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -746,6 +755,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1771082667191257809
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -791,6 +801,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 3
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 926860538, guid: 58d6487a4aac19341bb8ffa327a01c01, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
   m_FlipX: 0
@@ -800,7 +811,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &4855996881774029273
 PrefabInstance:

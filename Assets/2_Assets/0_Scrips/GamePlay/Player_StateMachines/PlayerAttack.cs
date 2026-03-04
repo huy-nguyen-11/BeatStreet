@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using Spine;
 
@@ -33,6 +33,12 @@ public class PlayerAttack : PlayerStateManager
 
         int idx = playerController.comboIndex % playerController.comboAttackAnims.Count;
         string animName = playerController.comboAttackAnims[idx];
+
+        // If this is the last animation in the combo list, make player temporarily immortal
+        if (idx == playerController.comboAttackAnims.Count - 1)
+        {
+            playerController.isImmortal = true;
+        }
 
         //playerController.idAttackArea = playerController.comboIndex;// set id attack area == index combo
         playerController.idAttackArea = 0;// set id attack area == 0
@@ -69,6 +75,22 @@ public class PlayerAttack : PlayerStateManager
         // Only allow proceeding beyond index 2 (to 3,4...) if the last attack actually hit an enemy.
         int current = playerController.comboIndex;
         int maxIndex = playerController.comboAttackAnims.Count - 1;
+
+        // Nếu vừa kết thúc đòn cuối trong list combo: luôn bật cooldown và kết thúc chuỗi,
+        // dù người chơi có spam tap (queuedComboAttack) đi nữa.
+        if (current == maxIndex)
+        {
+            playerController.isImmortal = false;
+            playerController.comboIndex = 0;
+            playerController.queuedComboAttack = false;
+            playerController.lastAttackHadHit = false;
+
+            playerController.isAttackCooldown = true;
+            playerController.attackCooldownTimer = playerController.attackCooldownDuration;
+
+            playerController.ResetStatus();
+            return;
+        }
 
         if (current < 2)
         {

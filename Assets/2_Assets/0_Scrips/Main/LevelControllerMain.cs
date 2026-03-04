@@ -779,7 +779,7 @@ public class LevelControllerMain : MonoBehaviour
     private void PlayGame()
     {
         //SceneManager.LoadSceneAsync("2_GamePlay");
-        SceneManager.LoadSceneAsync("2_GamePlay");
+        SceneManager.LoadSceneAsync("2_GamePlay 1");
     }
     public void BtnBuyEnergy()
     {

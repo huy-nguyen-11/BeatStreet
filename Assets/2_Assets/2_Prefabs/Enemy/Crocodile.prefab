@@ -84,6 +84,7 @@ MeshRenderer:
   m_SortingLayerID: 579529517
   m_SortingLayer: 1
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &9187787862364088896
 MonoBehaviour:
@@ -143,6 +144,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -2091,7 +2093,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5104558240800163104}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.19901483, w: 0.9799965}
+  m_LocalRotation: {x: 0, y: 0, z: 0.19901481, w: 0.9799965}
   m_LocalPosition: {x: 0.63897055, y: -6.2453864e-10, z: 0}
   m_LocalScale: {x: 1.0000001, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2145,9 +2147,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5238915312777158102}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.23416083, w: 0.9721979}
-  m_LocalPosition: {x: 0.49884728, y: -0.00000028800756, z: 0}
-  m_LocalScale: {x: 1, y: 0.99999994, z: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0.23416086, w: 0.9721979}
+  m_LocalPosition: {x: 0.4988473, y: -0.00000032358216, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2888879262436214832}
@@ -2868,6 +2870,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 4
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &5554242100911940009
 MonoBehaviour:
@@ -2928,6 +2931,7 @@ MonoBehaviour:
   fillBar: {fileID: 1140223498837569873}
   skeletonAnimation: {fileID: 5554242100911940009}
   wakeUpAnim: Wake_up
+  colorHitString: 
   typeOfEnemy: 1
   player: {fileID: 0}
   playerController: {fileID: 0}
@@ -2990,8 +2994,9 @@ MonoBehaviour:
   posThrower: {fileID: 4889620436729335462}
   rangeThrower: 2.5
   timerCheckThrower: 5
+  phaseBoss: 1
+  auraBoss: {fileID: 0}
   isEnableThrower: 0
-  debugAI: 0
   velocity: 0
   isCheckGravity: 0
 --- !u!114 &235659855649126711
@@ -3173,6 +3178,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7837873883663300145
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -3218,6 +3224,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 3
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 926860538, guid: 58d6487a4aac19341bb8ffa327a01c01, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
   m_FlipX: 0
@@ -3227,7 +3234,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &7396640715402470773
 GameObject:

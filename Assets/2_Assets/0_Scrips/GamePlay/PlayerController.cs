@@ -121,24 +121,27 @@ public class PlayerController : PlayerCharacter
 
     // Facing state to avoid repeated flips/snapping
     public bool isFacingRight = true;
-
+    
     // track last processed entry to avoid duplicate handling
     private TrackEntry lastProcessedAttackEntry = null;
-
+    
     public int comboIndex = 0;           // 0, 1, 2 ,3,4
     public bool lastAttackHadHit = false;
     public bool isAttackingCombo = false;  // Flag đang trong combo
     public bool queuedComboAttack = false; // Flag spam tap
-    public List<string> comboAttackAnims = new List<string>
-{
-    "Attack_1", "Attack_1_2", "Attack_1_3" // Điều chỉnh tên animation
-};
+    public List<string> comboAttackAnims;
+    public string animSlideAttack1, animSlideAttack2 , animUlti;
     private float grabCooldown = 2;
     public bool canGrab = false;
     public bool isSpeedUpAttack = false;
     public bool isResettingFromJump = false;
     private PlayerStateManager pendingStateAfterReset = null;
     [SerializeField] private float joystickMoveThreshold = 12f;
+
+    // Normal attack cooldown
+    public bool isAttackCooldown = false;
+    public float attackCooldownTimer = 0f;
+    public float attackCooldownDuration = 2f;
     
     // Foot step effect
     private float footStepEffectTimer = 0f;
@@ -308,6 +311,17 @@ public class PlayerController : PlayerCharacter
             {
                 canGrab = true;
                 grabCooldown = 2;
+            }
+        }
+
+        // Update normal attack cooldown
+        if (isAttackCooldown)
+        {
+            attackCooldownTimer -= Time.deltaTime;
+            if (attackCooldownTimer <= 0f)
+            {
+                isAttackCooldown = false;
+                attackCooldownTimer = 0f;
             }
         }
 
@@ -526,7 +540,7 @@ public class PlayerController : PlayerCharacter
                     float frameMove = Vector2.Distance(touch.position, lastPos);
                     touchLastPositions[touchId] = touch.position;
                     bool nearlyStationary = frameMove <= holdMoveTolerancePixels;
-                    if (nearlyStationary && joystick.HandleNormalizedMagnitude <= 0.3f && state != State.Change && state != State.SpeedUp && state != State.Hit)
+                    if (nearlyStationary && joystick.HandleNormalizedMagnitude <= 0.3f && state != State.Change && state != State.SpeedUp && state != State.Hit && !isAttackCooldown)
                     {
                         holdTimer += Time.deltaTime;
                         if (holdTimer > changeHoldTime && !isGetJoy)
@@ -555,7 +569,8 @@ public class PlayerController : PlayerCharacter
                     {
                         holdTimer += Time.deltaTime;
            
-                        if ((joystick.HandleNormalizedMagnitude <= 0.3f) && holdTimer > changeHoldTime && state != State.Change && state != State.SpeedUp && state != State.Hit)
+                        if ((joystick.HandleNormalizedMagnitude <= 0.3f) && holdTimer > changeHoldTime && state != State.Change && state 
+                            != State.SpeedUp && state != State.Hit && !isAttackCooldown)
                         {
                             holdTimer = 0f;
                             SwitchToRunState(playerChange);
@@ -717,6 +732,11 @@ public class PlayerController : PlayerCharacter
 
     public void TriggerAttack()
     {
+        if (isAttackCooldown)
+        {
+            return;
+        }
+
         if (state == State.Attack)
         {
             queuedComboAttack = true;
@@ -813,6 +833,12 @@ public class PlayerController : PlayerCharacter
             return;
         }
 
+        // Block normal attack + charge (Change) during attack cooldown (speedrun is unaffected)
+        if (isAttackCooldown && (player == playerAttack || player == playerChange))
+        {
+            return;
+        }
+
         // If currently resetting from jump, queue the requested state instead of switching immediately
         if (isJumping || isResettingFromJump)
         {
@@ -829,6 +855,8 @@ public class PlayerController : PlayerCharacter
 
     void HandleAttackEvent(TrackEntry trackEntry , Spine.Event e)
     {
+        if(GamePlayManager.Instance.isCheckUlti) return;
+
         if (e.Data.Name == "Hit" )
         {
             SetAttack(id);

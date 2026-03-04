@@ -157,9 +157,12 @@ public class GamePlayManager : MonoBehaviour
                         _Enemy = enemy.transform.GetChild(0).GetComponent<EnemyController>();
                         bool isEnemyOnRight = enemy.transform.position.x > _Player.transform.position.x;
                         SetCharsToCharSortingLayer();
-                        _Player.Char.transform.position = new Vector3(_CameraFollow.transform.position.x - 0.5f ,_CameraFollow.transform.position.y - 1 , 0);
+                        Debug.Log(_Player.id);
+                        float numRange = _Player.id == 0 ? 0.5f : 0.75f;
+                        float numRange2 = _Player.id == 0 ? 0.6f : 1.3f;
+                        _Player.Char.transform.position = new Vector3(_CameraFollow.transform.position.x - numRange ,_CameraFollow.transform.position.y - 1 , 0);
                         _Player.SetFacingDirection(true);
-                        _Enemy.Char.transform.position = new Vector3(_CameraFollow.transform.position.x + 0.3f, _CameraFollow.transform.position.y -1 , 0);
+                        _Enemy.Char.transform.position = new Vector3(_CameraFollow.transform.position.x + numRange2, _CameraFollow.transform.position.y -1 , 0);
                         _Enemy.Char.rotation = Quaternion.Euler(0, 180, 0);
                         _Enemy.SetUltiPlayer();
                         _Player.SetUltiPlayer();

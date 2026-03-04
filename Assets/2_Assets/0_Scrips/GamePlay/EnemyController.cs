@@ -1231,25 +1231,13 @@ public class EnemyController : EnemyCharacter
         {
             float arcHeight = 0.85f;
             float duration = 1f;
-            float throwZAngle = -45f;
-            Debug.Log(
-    $"[Enemy SetDead] startPos={startPos}, endPos={endPos}, " +
-    $"horizontalDir={horizontalDirection}, arcHeight={arcHeight}, duration={duration}"
-);
-            StartCoroutine(HandleDeadThrownLanding(startPos, endPos, arcHeight, duration, throwZAngle));
+            StartCoroutine(HandleDeadThrownLanding(startPos, endPos, arcHeight, duration));
         }
 
     }
 
-    private IEnumerator HandleDeadThrownLanding(Vector2 startPos, Vector2 endPos, float arcHeight, float duration, float zAngle)
+    private IEnumerator HandleDeadThrownLanding(Vector2 startPos, Vector2 endPos, float arcHeight, float duration)
     {
-        // áp góc xoay theo trục Z (giữ nguyên X, Y của Char)
-        if (Char != null)
-        {
-            Vector3 euler = Char.eulerAngles;
-            Char.rotation = Quaternion.Euler(euler.x, euler.y, zAngle);
-        }
-
         float t = 0f;
         while (t < 1f)
         {
