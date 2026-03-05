@@ -1,7 +1,9 @@
 using DG.Tweening;
 using TMPro;
+using Spine.Unity;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class PlayerUpgrade : MonoBehaviour
 {
@@ -17,6 +19,9 @@ public class PlayerUpgrade : MonoBehaviour
     [SerializeField] Sprite[] _sprPrice;
     //[SerializeField] ScrollSnapPagination scrollSnap;
     [SerializeField] GameObject _buttonUpgrade , _buttonSwitch , _buttonIncrease , _buttonDeacrease , _progressTicket , playerChar , playerActiveChar;
+    [Header("Active character preview (Spine)")]
+    [SerializeField] private SkeletonGraphic playerActiveCharSkeleton;
+    [SerializeField] private List<SkeletonDataAsset> playerSkeletonDataAssets = new List<SkeletonDataAsset>();
     DataManager _dataManager;
     int idPlayer;
     int countUpGrade = 1;
@@ -132,6 +137,11 @@ public class PlayerUpgrade : MonoBehaviour
         idPlayer = id;
         countUpGrade = 1;
         isCheckUnLock = _dataManager.playerData[id].isUnlock;
+        if (_dataManager.playerData[id].isUnlock)
+        {
+            DataManager.Instance.idPlayer = id;
+            DataManager.Instance.SaveFile();
+        }
         pieceUpgradeLevelUp = PieceLevelUp(idPlayer);
         pieceUpgradeLevelEvolve = PieceLevelEvolve(idPlayer);
         SetBtnPlayerInformation(id);
@@ -157,14 +167,38 @@ public class PlayerUpgrade : MonoBehaviour
                 playerChar.SetActive(true);
                 playerActiveChar.SetActive(false);
                 playerChar.GetComponent<Image>().sprite = _sprAvatarLock[id];
+                ApplyActiveCharacterSkeleton(-1);
             }
             else
             {
                 playerChar.SetActive(false);
                 playerActiveChar.SetActive(true);
+                ApplyActiveCharacterSkeleton(id);
             }
            
         }
+    }
+
+    private void ApplyActiveCharacterSkeleton(int id)
+    {
+        if (playerActiveCharSkeleton == null)
+            return;
+
+        SkeletonDataAsset asset = null;
+        if (id >= 0 && id < playerSkeletonDataAssets.Count)
+            asset = playerSkeletonDataAssets[id];
+
+        if (asset == null)
+            return;
+
+        if (playerActiveCharSkeleton.skeletonDataAsset == asset)
+        {
+            playerActiveCharSkeleton.Initialize(false);
+            return;
+        }
+
+        playerActiveCharSkeleton.skeletonDataAsset = asset;
+        playerActiveCharSkeleton.Initialize(true);
     }
     private void SetParameter(int id)
     {
@@ -225,22 +259,33 @@ public class PlayerUpgrade : MonoBehaviour
             //        BtnUpgrade(idPlayer, idStatus);
             //    });
             //    _buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Comming soon";
-            //    //_buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Comming soon";
             //    _buttonUpgrade.transform.GetComponent<Button>().interactable = false;
             //}
-            int idPlayer = id;
-            int idStatus = 1;
-            _buttonUpgrade.GetComponent<Button>().onClick.AddListener(delegate
+            if (PlayerPrefs.GetInt("Coin",0) < 1000)
             {
-                BtnUpgrade(idPlayer, idStatus);
-            });
-            _buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Comming soon";
-            _buttonUpgrade.transform.GetComponent<Button>().interactable = false;
-            Debug.Log("lock");
+                _buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "1000";
+                int idPlayer = id;
+                int idStatus = 2;
+                //_buttonUpgrade.GetComponent<Button>().onClick.AddListener(delegate
+                //{
+                //    BtnUpgrade(idPlayer, idStatus);
+                //});
+                _buttonUpgrade.transform.GetComponent<Button>().interactable = false;
+            }
+            else
+            {
+                int idPlayer = id;
+                int idStatus = 1;
+                _buttonUpgrade.GetComponent<Button>().onClick.AddListener(delegate
+                {
+                    BtnUpgrade(idPlayer, idStatus);
+                });
+                //_buttonUpgrade.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Comming soon";
+                _buttonUpgrade.transform.GetComponent<Button>().interactable = true;
+            }
         }
         else
         {
-            Debug.Log("unlock");
             _buttonUpgrade.transform.GetComponent<Button>().interactable = true;
             if (isStatusUpgrade && _dataManager.playerData[id].LevelEvolve < 40
                 || !isStatusUpgrade && _dataManager.playerData[id].Level < _dataManager.playerData[id].LevelEvolve)
@@ -249,7 +294,7 @@ public class PlayerUpgrade : MonoBehaviour
                 _buttonUpgrade.transform.GetChild(1).gameObject.SetActive(true); // text
                 _buttonUpgrade.transform.GetChild(2).gameObject.SetActive(true); // text coin
                 _buttonUpgrade.transform.GetChild(3).gameObject.SetActive(false); // text mission
-                Debug.Log("upgrade");
+
                 int idPlayer = id;
                 int idStatus = 0;
                 _buttonUpgrade.GetComponent<Button>().onClick.AddListener(delegate
@@ -529,11 +574,21 @@ public class PlayerUpgrade : MonoBehaviour
         }
         else if (status == 1)
         {
-            if (_dataManager.warehouse.CountPiecePlayerLevelUp[id] >= _dataManager.playerData[id].pieceUnlock)
+            //if (_dataManager.warehouse.CountPiecePlayerLevelUp[id] >= _dataManager.playerData[id].pieceUnlock)
+            //{
+            //    AudioBase.Instance.SetAudioUI(3);
+            //    _dataManager.warehouse.CountPiecePlayerLevelUp[id] -= _dataManager.playerData[id].pieceUnlock;
+            //    _dataManager.playerData[id].isUnlock = true;
+            //    BtnInformation(id);
+            //    _dataManager.SaveFile();
+            //}
+            if (PlayerPrefs.GetInt("Coin", 0) > 1000)
             {
                 AudioBase.Instance.SetAudioUI(3);
-                _dataManager.warehouse.CountPiecePlayerLevelUp[id] -= _dataManager.playerData[id].pieceUnlock;
+                PlayerPrefs.SetInt("Coins", PlayerPrefs.GetInt("Coin", 0) - 1000);
                 _dataManager.playerData[id].isUnlock = true;
+                DataManager.Instance.idPlayer = id;
+                DataManager.Instance.SaveFile();
                 BtnInformation(id);
                 _dataManager.SaveFile();
             }

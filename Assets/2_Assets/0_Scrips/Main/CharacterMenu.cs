@@ -1,11 +1,13 @@
 using Spine.Unity;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CharacterMenu : MonoBehaviour
 {
     [Header("Spine")]
     [SerializeField] private SkeletonGraphic skeletonGraphic;
+    [SerializeField] private List<SkeletonDataAsset> skeletonOptions = new List<SkeletonDataAsset>();
 
     [Header("Jump movement")]
     [Tooltip("Optional target transform. If null, Target Offset is used relative to start position.")]
@@ -29,10 +31,23 @@ public class CharacterMenu : MonoBehaviour
     {
         if (skeletonGraphic == null)
             skeletonGraphic = GetComponent<SkeletonGraphic>();
-
-
-        if(!isActive)
+        SetDataChar();
+        if (!isActive)
             StartJump();
+    }
+
+    void SetDataChar()
+    {
+        if (DataManager.Instance == null || skeletonOptions == null || skeletonOptions.Count == 0 || skeletonGraphic == null)
+            return;
+
+        int id = Mathf.Clamp(DataManager.Instance.idPlayer, 0, skeletonOptions.Count - 1);
+        var asset = skeletonOptions[id];
+        if (asset == null) return;
+
+        // assign the selected SkeletonDataAsset to the SkeletonGraphic and reinitialize
+        skeletonGraphic.skeletonDataAsset = asset;
+        skeletonGraphic.Initialize(true);
     }
 
     public void StartJump()

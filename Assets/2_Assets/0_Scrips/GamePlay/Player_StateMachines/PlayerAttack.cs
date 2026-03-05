@@ -55,9 +55,6 @@ public class PlayerAttack : PlayerStateManager
     /// </summary>
     private void OnAttackEventFired(Spine.TrackEntry entry)
     {
-        if (playerController.state != PlayerController.State.Attack)
-            return;
-
         //playerController.comboIndex++;
         //if (playerController.comboIndex >= playerController.comboAttackAnims.Count)
         //    playerController.comboIndex = 0;

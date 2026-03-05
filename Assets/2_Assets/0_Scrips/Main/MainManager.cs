@@ -11,12 +11,6 @@ public class MainManager : MonoBehaviour
     [SerializeField] GameObject[] _panels;
     [SerializeField] GameObject _BarBottom, buttonSetting , buttonBack , buttonNoAds , buttonStarterPack ;
     [SerializeField] Transform _BarTop;
-    [SerializeField] Image[] _imgBtnBottoms;
-    [SerializeField] Sprite[] _sprBtnBottomsTrue;
-    [SerializeField] Sprite[] _sprBtnBottomsFalse;
-    [SerializeField] Transform[] _btnUpgrade;
-    [SerializeField] Sprite[] _sprAvtPlayer;
-    [SerializeField] Sprite[] _sprAvtEnemy;
     [SerializeField] private TextMeshProUGUI _textCoins, _textGems;
 
     // Sound, Music

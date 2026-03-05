@@ -67,6 +67,9 @@ public class PlayerUlti : PlayerStateManager
             // EnemyCharacter.PlayAnimOnTrack will queue an empty animation after the duration to clear the overlay.
             enemy.PlayAnimOnTrack(anim, trackIndex: 1, loop: false);
 
+            float dirSign = Mathf.Sign(playerController.transform.right.x);
+            enemy.transform.position += new Vector3(dirSign * 0.135f, 0f, 0f); // can change with id player
+
         }
         else if(e.Data.Name == "Hit_Max")
         {

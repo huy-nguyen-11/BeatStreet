@@ -12,7 +12,7 @@ public class DataManager : MonoBehaviour
     public int LevelCurren;
     public int LevelSelect;
     public int LevelMode;
-    public int IdPlayerCurren;
+    //public int IdPlayerCurren;
     public bool isRotateScreen;
     // Vip
     public bool isCheckVip;

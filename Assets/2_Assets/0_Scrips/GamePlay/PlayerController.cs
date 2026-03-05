@@ -1046,6 +1046,112 @@ public class PlayerController : PlayerCharacter
         SetFacingDirection(facingRight);
     }
 
+    /// <summary>
+    /// Di chuyển player tới vị trí lý tưởng để đánh Ulti:
+    /// - Cách enemy ~1.0 đơn vị theo trục X (trong khoảng 0.85 - 1.2), bên trái hoặc phải.
+    /// - Đảm bảo |deltaY| với enemy không vượt quá 0.2.
+    /// - Nếu hướng đang chọn bị vướng tường thì thử di chuyển sang hướng còn lại.
+    /// </summary>
+    public void MoveToIdealUltiPosition(Transform enemyTransform)
+    {
+        if (enemyTransform == null)
+            return;
+
+        // Dùng Char làm gốc nếu có, vì Rigidbody2D thường nằm ở Char
+        Vector3 playerPos = Char != null ? Char.position : transform.position;
+        Vector3 enemyPos = enemyTransform.position;
+
+        // Các ngưỡng khoảng cách mong muốn theo trục X so với enemy
+        const float minXDist = 0.85f;
+        const float maxXDist = 1.2f;
+        const float idealXDist = 1.0f; // nằm trong [min, max]
+
+        // Ưu tiên hướng hiện tại (đang đứng bên trái hay bên phải enemy)
+        bool isLeftOfEnemy = playerPos.x < enemyPos.x;
+        int[] dirOrder = isLeftOfEnemy
+            ? new int[] { -1, 1 }  // đang ở bên trái -> thử trái trước rồi phải
+            : new int[] { 1, -1 }; // đang ở bên phải -> thử phải trước rồi trái
+
+        var gm = GamePlayManager.Instance;
+        Vector3? chosenPos = null;
+
+        // Thử lần lượt 2 phía quanh enemy
+        foreach (int dir in dirOrder)
+        {
+            // Vị trí mục tiêu lý tưởng theo trục X: cách enemy ~1 đơn vị
+            float targetX = enemyPos.x + dir * idealXDist;
+
+            // Vị trí mục tiêu theo trục Y: giới hạn sao cho |targetY - enemyY| <= 0.2
+            float targetY = Mathf.Clamp(playerPos.y, enemyPos.y - 0.2f, enemyPos.y + 0.2f);
+
+            Vector3 candidate = new Vector3(targetX, targetY, playerPos.z);
+
+            // Nếu có layer tường: không chọn hướng mà đường đi bị chắn bởi tường
+            bool blockedByWall = false;
+            if (obstacleLayer.value != 0)
+            {
+                RaycastHit2D hit = Physics2D.Linecast(playerPos, candidate, obstacleLayer);
+                if (hit.collider != null)
+                {
+                    blockedByWall = true;
+                }
+            }
+            if (blockedByWall)
+                continue;
+
+            // Giới hạn trong biên bản đồ/camera nếu có thiết lập
+            if (gm != null)
+            {
+                candidate.x = Mathf.Clamp(candidate.x, gm.minPosX, gm.maxPosX);
+
+                // Chỉ clamp Y nếu min/max Y được cấu hình hợp lệ
+                if (gm.maxPosY > gm.minPosY)
+                    candidate.y = Mathf.Clamp(candidate.y, gm.minPosY, gm.maxPosY);
+            }
+
+            // Kiểm tra lại điều kiện khoảng cách sau khi clamp
+            float dx = Mathf.Abs(candidate.x - enemyPos.x);
+            float dy = Mathf.Abs(candidate.y - enemyPos.y);
+            if (dx < minXDist || dx > maxXDist)
+                continue;
+            if (dy > 0.2f)
+                continue;
+
+            // Tìm được vị trí phù hợp
+            chosenPos = candidate;
+            break;
+        }
+
+        // Nếu cả hai phía đều không thỏa mãn (do tường / biên bản đồ),
+        // fallback: chỉ chỉnh lại trục Y nếu khoảng cách X hiện tại đã tương đối phù hợp.
+        if (!chosenPos.HasValue)
+        {
+            float currentDx = Mathf.Abs(playerPos.x - enemyPos.x);
+            if (currentDx >= minXDist && currentDx <= maxXDist)
+            {
+                float newY = Mathf.Clamp(playerPos.y, enemyPos.y - 0.2f, enemyPos.y + 0.2f);
+                Vector3 fallback = new Vector3(playerPos.x, newY, playerPos.z);
+
+                if (gm != null)
+                {
+                    fallback.x = Mathf.Clamp(fallback.x, gm.minPosX, gm.maxPosX);
+                    if (gm.maxPosY > gm.minPosY)
+                        fallback.y = Mathf.Clamp(fallback.y, gm.minPosY, gm.maxPosY);
+                }
+
+                chosenPos = fallback;
+            }
+        }
+
+        if (!chosenPos.HasValue)
+            return;
+
+        if (Char != null)
+            Char.position = chosenPos.Value;
+        else
+            transform.position = chosenPos.Value;
+    }
+
     public void SetHit(float dameHit)
     {
         if (IsDead) return;

@@ -146,8 +146,11 @@ public class GamePlayManager : MonoBehaviour
                 Vector2 EnemyPos = enemy.transform.position;
                 if (Mathf.Abs(EnemyPos.y - PlayerPos.y) <= 0.5f)
                 {
-                    if (Mathf.Abs(EnemyPos.x - PlayerPos.x) <= 2f)
+                    if (Mathf.Abs(EnemyPos.x - PlayerPos.x) <= 1.5f)
                     {
+                        // Trước khi vào Ulti: di chuyển player về vị trí lý tưởng quanh enemy
+                        _Player.MoveToIdealUltiPosition(enemy.transform);
+
                         backUlti.SetActive(true);
                         isCheckUlti = true;
                         _BtnGamePlays[0].SetActive(false);
@@ -156,14 +159,16 @@ public class GamePlayManager : MonoBehaviour
                         _Player.SetMana(-100);
                         _Enemy = enemy.transform.GetChild(0).GetComponent<EnemyController>();
                         bool isEnemyOnRight = enemy.transform.position.x > _Player.transform.position.x;
+                        if (_Player != null)
+                            _Player.SetFacingDirection(isEnemyOnRight);
                         SetCharsToCharSortingLayer();
-                        Debug.Log(_Player.id);
-                        float numRange = _Player.id == 0 ? 0.5f : 0.75f;
-                        float numRange2 = _Player.id == 0 ? 0.6f : 1.3f;
-                        _Player.Char.transform.position = new Vector3(_CameraFollow.transform.position.x - numRange ,_CameraFollow.transform.position.y - 1 , 0);
-                        _Player.SetFacingDirection(true);
-                        _Enemy.Char.transform.position = new Vector3(_CameraFollow.transform.position.x + numRange2, _CameraFollow.transform.position.y -1 , 0);
-                        _Enemy.Char.rotation = Quaternion.Euler(0, 180, 0);
+
+                        //float numRange = _Player.id == 0 ? 0.5f : 0.75f;
+                        //float numRange2 = _Player.id == 0 ? 0.6f : 1.3f;
+                        //_Player.Char.transform.position = new Vector3(_CameraFollow.transform.position.x - numRange ,_CameraFollow.transform.position.y - 1 , 0);
+                        //_Player.SetFacingDirection(true);
+                        //_Enemy.Char.transform.position = new Vector3(_CameraFollow.transform.position.x + numRange2, _CameraFollow.transform.position.y -1 , 0);
+                        //_Enemy.Char.rotation = Quaternion.Euler(0, 180, 0);
                         _Enemy.SetUltiPlayer();
                         _Player.SetUltiPlayer();
                     }
