@@ -137,9 +137,8 @@ public class EnemyController : EnemyCharacter
 
     private void Awake()
     {
-        //playerController = FindObjectOfType<PlayerController>();
-        playerController = GamePlayManager.Instance._Player;
-        player = playerController.transform.parent;
+        //playerController = GamePlayManager.Instance._Player;
+        //player = playerController.transform.parent;
         enemyIdle = new EnemyIdle(this);
         enemyRun = new EnemyRun(this);
         enemyHit = new EnemyHit(this);
@@ -152,6 +151,12 @@ public class EnemyController : EnemyCharacter
     }
     void Start()
     {
+        if(GamePlayManager.Instance._Player != null)
+        {
+            playerController = GamePlayManager.Instance._Player;
+            player = playerController.transform.parent;
+
+        }
         isActiveRun = false;
         dataManager = DataManager.Instance;
         Char = transform.parent.GetComponent<Transform>();
@@ -192,6 +197,7 @@ public class EnemyController : EnemyCharacter
 
     void Update()
     {
+        if(playerController == null) return;
         stateManager.Update();
         if (state == State.Dead) return;
         if (playerController.IsDead) return;
@@ -230,7 +236,8 @@ public class EnemyController : EnemyCharacter
     private void LateUpdate()
     {
         //update sorting order
-        if(state == State.Dead) return;
+        if (player == null) return;
+        if (state == State.Dead) return;
         if(state == State.Grabed) return;
         float posY = Char.position.y;
         float posYPlayer = player.position.y;

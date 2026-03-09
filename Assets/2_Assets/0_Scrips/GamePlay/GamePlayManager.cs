@@ -10,6 +10,12 @@ public class GamePlayManager : MonoBehaviour
 {
     public static GamePlayManager Instance { get; private set; }
     DataManager dataManager;
+    //for spawn,config player
+    [SerializeField] private List<GameObject> listPlayer;
+    [SerializeField] private FillBarPlayer _fillBar;
+    public Transform targetForJoystic;
+    public GameObject joyStickControl;
+
     [SerializeField] TextMeshProUGUI _txtLevelPlayer;
     [SerializeField] GameObject[] _BtnGamePlays;
     [SerializeField] GameObject _tutorialGame;
@@ -84,9 +90,10 @@ public class GamePlayManager : MonoBehaviour
     public void Start()
     {
         dataManager = DataManager.Instance;
-        _Player = FindObjectOfType<PlayerController>();
+        OnInitGamePlay();
+        //_Player = FindObjectOfType<PlayerController>();
         levelMap = dataManager.LevelSelect;
-        _txtLevelPlayer.text = "Lv." + dataManager.playerData[_Player.id].Level.ToString();
+        //_txtLevelPlayer.text = "Lv." + dataManager.playerData[_Player.id].Level.ToString();
         if (levelMap == 0)
         {
             Time.timeScale = 0;
@@ -108,6 +115,20 @@ public class GamePlayManager : MonoBehaviour
 
         backUlti.SetActive(false);
         _showFightBoss.SetActive(false);
+    }
+
+    void OnInitGamePlay()
+    {
+        GameObject player = Instantiate(listPlayer[dataManager.idPlayer], Vector3.zero, Quaternion.identity);
+        _Player = player.transform.GetChild(0).GetComponent<PlayerController>();
+        if(_Player != null)
+        {
+            _Player.fillBar = _fillBar;
+            _Player.joystick = joyStickControl.GetComponent<VariableJoystick>();
+            _txtLevelPlayer.text = "Lv." + dataManager.playerData[_Player.id].Level.ToString();
+        }
+        _CameraFollow.target = player.transform;
+        targetForJoystic = player.transform.GetChild(4);
     }
 
     public void demoWave()

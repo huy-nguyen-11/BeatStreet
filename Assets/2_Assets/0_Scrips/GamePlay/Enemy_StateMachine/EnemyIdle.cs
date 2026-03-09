@@ -86,6 +86,7 @@ public class EnemyIdle : EnemyStateMachine
     }
     public override void Update()
     {
+        if(enemyController.playerController==null) return;
         if (enemyController.playerController.IsDead) return;
         if (GamePlayManager.Instance.isCheckUlti) return;
         // Stop all logic if grabbed

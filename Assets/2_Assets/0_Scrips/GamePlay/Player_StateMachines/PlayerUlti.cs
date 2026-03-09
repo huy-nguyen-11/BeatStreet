@@ -68,7 +68,8 @@ public class PlayerUlti : PlayerStateManager
             enemy.PlayAnimOnTrack(anim, trackIndex: 1, loop: false);
 
             float dirSign = Mathf.Sign(playerController.transform.right.x);
-            enemy.transform.position += new Vector3(dirSign * 0.135f, 0f, 0f); // can change with id player
+            float num = playerController.id == 2 ? 0.135f : 0.02f; // can change with id player
+            enemy.transform.position += new Vector3(dirSign * num, 0f, 0f); // can change with id player
 
         }
         else if(e.Data.Name == "Hit_Max")

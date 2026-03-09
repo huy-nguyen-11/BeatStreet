@@ -79,7 +79,8 @@ public class LevelMap : MonoBehaviour
         GamePlayManager.Instance._CameraFollow.maxY = maxY;
         listTurnEnemy = transform.GetChild(0);
         listWallTurn = transform.GetChild(1);
-        GamePlayManager.Instance._Player.transform.parent.position = PointPlayer.position;
+        if (GamePlayManager.Instance._Player != null)
+            GamePlayManager.Instance._Player.transform.parent.position = PointPlayer.position;
     }
     private void OnDrawGizmos()
     {

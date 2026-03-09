@@ -152,6 +152,9 @@ public class PlayerController : PlayerCharacter
 
     //for attack grab enemy
     public bool isThrowEnemy = false;
+
+    public FillBarPlayer fillBar;
+
     #endregion
 
     private void Awake()
@@ -325,7 +328,7 @@ public class PlayerController : PlayerCharacter
             }
         }
 
-        stateManager.Update();
+        stateManager?.Update();
         if (IsDead
             || state == State.Dead
             || state == State.Wingame
@@ -336,7 +339,8 @@ public class PlayerController : PlayerCharacter
         //if (state == State.Hit) return;
         //if(isFall) return;
 
-        CheckTouchInput();
+        if(joystick != null)
+            CheckTouchInput();
 
         comboTimer += Time.deltaTime;
         HitTimer += Time.deltaTime;
@@ -813,7 +817,7 @@ public class PlayerController : PlayerCharacter
 
     private void FixedUpdate()
     {
-        stateManager.FixedUpdate();
+        stateManager?.FixedUpdate();
     }
 
     public void SwitchToRunState(PlayerStateManager player)

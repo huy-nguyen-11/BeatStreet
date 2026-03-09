@@ -42,10 +42,10 @@ public class DailyReward : MonoBehaviour
             {
                 if (PlayerPrefs.GetInt($"Button_{i}_Claimed", 0) == 1)
                 {
-                    listDays[i].transform.GetChild(0).gameObject.SetActive(false); // glow
-                    listDays[i].transform.GetChild(1).gameObject.SetActive(false); // day select
-                    listDays[i].transform.GetChild(2).gameObject.SetActive(true); // day normal
-                    listDays[i].transform.GetChild(4).gameObject.SetActive(true); // is claimed
+                    //listDays[i].transform.GetChild(0).gameObject.SetActive(false); // glow
+                    listDays[i].transform.GetChild(0).gameObject.SetActive(false); // day select
+                    listDays[i].transform.GetChild(1).gameObject.SetActive(true); // day normal
+                    listDays[i].transform.GetChild(3).gameObject.SetActive(true); // is claimed
 
                     //listDays[i].transform.Find("infor").gameObject.SetActive(false);
                     //listDays[i].transform.Find("imgChecked").gameObject.SetActive(true);
@@ -61,10 +61,10 @@ public class DailyReward : MonoBehaviour
                 }
                 else
                 {
-                    listDays[i].transform.GetChild(0).gameObject.SetActive(false); // glow
-                    listDays[i].transform.GetChild(1).gameObject.SetActive(false); // day select
-                    listDays[i].transform.GetChild(2).gameObject.SetActive(true); // day normal
-                    listDays[i].transform.GetChild(4).gameObject.SetActive(false); // is claimed
+                    //listDays[i].transform.GetChild(0).gameObject.SetActive(false); // glow
+                    listDays[i].transform.GetChild(0).gameObject.SetActive(false); // day select
+                    listDays[i].transform.GetChild(1).gameObject.SetActive(true); // day normal
+                    listDays[i].transform.GetChild(3).gameObject.SetActive(false); // is claimed
                     //listDays[i].transform.Find("infor").gameObject.SetActive(true);
                     //listDays[i].transform.Find("imgChecked").gameObject.SetActive(false);
                     //listDays[i].transform.Find("imgToday").gameObject.SetActive(false);
@@ -91,10 +91,10 @@ public class DailyReward : MonoBehaviour
                 //listDays[i].transform.Find("imgChecked").gameObject.SetActive(false);
                 //listDays[i].transform.Find("imgToday").gameObject.SetActive(true);
                 //listDays[i].transform.Find("title").gameObject.GetComponent<Image>().sprite = titleSpriteToday;
-                listDays[i].transform.GetChild(0).gameObject.SetActive(true); // glow
-                listDays[i].transform.GetChild(1).gameObject.SetActive(true); // day select
-                listDays[i].transform.GetChild(2).gameObject.SetActive(false); // day normal
-                listDays[i].transform.GetChild(4).gameObject.SetActive(false); // is claimed
+                //listDays[i].transform.GetChild(0).gameObject.SetActive(true); // glow
+                listDays[i].transform.GetChild(0).gameObject.SetActive(true); // day select
+                listDays[i].transform.GetChild(1).gameObject.SetActive(false); // day normal
+                listDays[i].transform.GetChild(3).gameObject.SetActive(false); // is claimed
 
                 scaleTween = listDays[i].transform.GetChild(1).transform.DOScale(1.06f, 0.5f).SetEase(Ease.InOutQuad)
                     .SetLoops(-1, LoopType.Yoyo);
@@ -114,10 +114,10 @@ public class DailyReward : MonoBehaviour
                 //{
                 //    listDays[i].transform.Find("title").gameObject.GetComponent<Image>().sprite = titleSpriteDayHeart;
                 //}
-                listDays[i].transform.GetChild(0).gameObject.SetActive(false); // glow
-                listDays[i].transform.GetChild(1).gameObject.SetActive(false); // day select
-                listDays[i].transform.GetChild(2).gameObject.SetActive(true); // day normal
-                listDays[i].transform.GetChild(4).gameObject.SetActive(true); // is claimed
+                //listDays[i].transform.GetChild(0).gameObject.SetActive(false); // glow
+                listDays[i].transform.GetChild(0).gameObject.SetActive(false); // day select
+                listDays[i].transform.GetChild(0).gameObject.SetActive(true); // day normal
+                listDays[i].transform.GetChild(3).gameObject.SetActive(true); // is claimed
                 scaleTween.Kill();
                 buttonClaim.GetComponent<Button>().interactable = false;
                 buttonClaimX2.GetComponent<Button>().interactable = false;
@@ -135,10 +135,10 @@ public class DailyReward : MonoBehaviour
                 //{
                 //    listDays[i].transform.Find("title").gameObject.GetComponent<Image>().sprite = titleSpriteDayHeart;
                 //}
-                listDays[i].transform.GetChild(0).gameObject.SetActive(false); // glow
-                listDays[i].transform.GetChild(1).gameObject.SetActive(false); // day select
-                listDays[i].transform.GetChild(2).gameObject.SetActive(true); // day normal
-                listDays[i].transform.GetChild(4).gameObject.SetActive(false); // is claimed
+                //listDays[i].transform.GetChild(0).gameObject.SetActive(false); // glow
+                listDays[i].transform.GetChild(0).gameObject.SetActive(false); // day select
+                listDays[i].transform.GetChild(1).gameObject.SetActive(true); // day normal
+                listDays[i].transform.GetChild(3).gameObject.SetActive(false); // is claimed
                 buttonClaim.GetComponent<Button>().interactable = false;
                 buttonClaimX2.GetComponent<Button>().interactable = false;
             }

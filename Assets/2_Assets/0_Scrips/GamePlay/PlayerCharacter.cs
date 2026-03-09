@@ -30,7 +30,7 @@ public class PlayerCharacter : MonoBehaviour
     public State state = State.Idle;
     public int id;
     public RuntimeAnimatorController[] _anims;
-    public FillBarPlayer fillBar;
+   
     [SerializeField] public Animator animator;
     [SerializeField] public SkeletonAnimation skeletonAnimation;
     [SerializeField] public PlayerController playerController;

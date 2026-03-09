@@ -34,7 +34,6 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     [SerializeField] protected RectTransform background = null;
     [SerializeField] private RectTransform handle = null;
     [SerializeField] public Transform followTarget = null;
-    [SerializeField] public GameObject playerController= null;
     [Header("Input Options")]
     [SerializeField, Tooltip("When true, the joystick will use the initial touch position as the input center while dragging.")]
     private bool useInitialTouchAsCenter = true;
@@ -92,6 +91,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         canvasRect = canvas.transform as RectTransform;
 
         // If follow target specified, position the background under it
+        followTarget = GamePlayManager.Instance.targetForJoystic;
         if (followTarget != null)
         {
             Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(canvas.worldCamera ?? Camera.main, followTarget.position);
