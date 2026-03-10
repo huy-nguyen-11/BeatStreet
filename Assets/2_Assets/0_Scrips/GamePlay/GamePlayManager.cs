@@ -146,7 +146,7 @@ public class GamePlayManager : MonoBehaviour
 
     private void SpawnMap()
     {
-        GameObject map = Instantiate(_prfLevelMap[levelMap], Vector3.zero, Quaternion.identity);
+        GameObject map = Instantiate(_prfLevelMap[levelMap], _prfLevelMap[levelMap].transform.position, Quaternion.identity);
         _levelMap = map.GetComponent<LevelMap>();
     }
     public void SetBtnUlti(bool isActive)
