@@ -482,10 +482,10 @@ public class AttackArea : MonoBehaviour
         isMaxHit = value;
     }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.matrix = Matrix4x4.TRS(transform.position, Quaternion.Euler(0, 0, 0), Vector3.one);
-        Gizmos.DrawWireCube(Vector3.zero, boxSize);
-    }
+    //private void OnDrawGizmos()
+    //{
+    //    Gizmos.color = Color.red;
+    //    Gizmos.matrix = Matrix4x4.TRS(transform.position, Quaternion.Euler(0, 0, 0), Vector3.one);
+    //    Gizmos.DrawWireCube(Vector3.zero, boxSize);
+    //}
 }

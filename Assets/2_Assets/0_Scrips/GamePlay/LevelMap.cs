@@ -82,24 +82,24 @@ public class LevelMap : MonoBehaviour
         if (GamePlayManager.Instance._Player != null)
             GamePlayManager.Instance._Player.transform.parent.position = PointPlayer.position;
     }
-    private void OnDrawGizmos()
-    {
-        if (GamePlayManager.Instance! != null)
-            if (!GamePlayManager.Instance._CameraFollow.useBounds) return;
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(
-            new Vector3((minX + maxX) / 2, (minY + maxY) / 2, 0),
-            new Vector3(maxX - minX, maxY - minY, 1)
-        );
-        if (Application.isPlaying && Camera.main != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(
-                new Vector3((minX + maxX) / 2, (minY + maxY) / 2, 0),
-                new Vector3(maxX - minX - halfWidth * 2, maxY - minY - halfHeight * 2, 1)
-            );
-        }
-    }
+    //private void OnDrawGizmos()
+    //{
+    //    if (GamePlayManager.Instance! != null)
+    //        if (!GamePlayManager.Instance._CameraFollow.useBounds) return;
+    //    Gizmos.color = Color.yellow;
+    //    Gizmos.DrawWireCube(
+    //        new Vector3((minX + maxX) / 2, (minY + maxY) / 2, 0),
+    //        new Vector3(maxX - minX, maxY - minY, 1)
+    //    );
+    //    if (Application.isPlaying && Camera.main != null)
+    //    {
+    //        Gizmos.color = Color.red;
+    //        Gizmos.DrawWireCube(
+    //            new Vector3((minX + maxX) / 2, (minY + maxY) / 2, 0),
+    //            new Vector3(maxX - minX - halfWidth * 2, maxY - minY - halfHeight * 2, 1)
+    //        );
+    //    }
+    //}
 
     public void SetCamera()
     {
