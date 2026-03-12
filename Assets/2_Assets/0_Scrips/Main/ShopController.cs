@@ -12,7 +12,7 @@ public class ShopController : MonoBehaviour
     [SerializeField] List<GameObject> _listPopUp ;
     [SerializeField] List<Image> _listImageButtons;
     [SerializeField] Sprite spSlect, spNormal;
-    [SerializeField] Button _btnVip;
+
     private List<string> nameChests = new List<string>() { "Classic", "Specail", "Mythic" };
     public List<int> listPlayerLevelUp = new List<int>();
     public List<int> listEnemy = new List<int>();
@@ -182,6 +182,9 @@ public class ShopController : MonoBehaviour
 
         EnsureDailyCoinAdResetIfNeeded();
         UpdateCoinsAdCountUI();
+
+        EnsureDailyTreasureAdResetIfNeeded();
+        UpdateTreasureAdCountUI();
 
         UpdateKeysAmount();
     }

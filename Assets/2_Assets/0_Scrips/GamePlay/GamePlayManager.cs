@@ -323,13 +323,32 @@ public class GamePlayManager : MonoBehaviour
     {
         AudioBase.Instance.SetAudioUI(4);
         SetMission(10, 1);
-        UseOfItems(!check ? dataManager.idItem1 : dataManager.idItem2);
+        int usedItemId = !check ? dataManager.idItem1 : dataManager.idItem2;
+        UseOfItems(usedItemId);
+
+        // Consume from warehouse only when the item is actually used in gameplay
+        if (usedItemId != 99)
+        {
+            if (dataManager.warehouse != null && dataManager.warehouse.CountItem != null
+                && usedItemId >= 0 && usedItemId < dataManager.warehouse.CountItem.Count)
+            {
+                dataManager.warehouse.CountItem[usedItemId]--;
+                if (dataManager.warehouse.CountItem[usedItemId] <= 0 && dataManager.warehouse.ListItems != null
+                    && dataManager.warehouse.ListItems.Contains(usedItemId))
+                {
+                    dataManager.warehouse.ListItems.Remove(usedItemId);
+                }
+            }
+        }
         if (!check)
             dataManager.idItem1 = 99;
         else
             dataManager.idItem2 = 99;
         _Items[2].GetChild(0).gameObject.SetActive(dataManager.idItem1 != 99);
         _Items[3].GetChild(0).gameObject.SetActive(dataManager.idItem2 != 99);
+
+        // Save AFTER clearing equipped slot so main scene won't think it's still equipped
+        dataManager.SaveFile();
     }
     private void UseOfItems(int id)
     {

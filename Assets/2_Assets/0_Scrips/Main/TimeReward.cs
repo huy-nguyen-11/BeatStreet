@@ -106,7 +106,8 @@ public class TimeReward : MonoBehaviour
             freeButton.GetComponent<Image>().sprite = disableSp;
             isCounting = true;
             timeRemaining = totalTimeInSeconds2;
-            StartCoroutine(Counter());
+            if(gameObject.activeInHierarchy)
+                StartCoroutine(Counter());
         }
     }
 

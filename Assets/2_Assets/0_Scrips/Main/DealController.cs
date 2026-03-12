@@ -12,8 +12,7 @@ public class DealController : MonoBehaviour
     public Sprite[] _iconBtn;
 
     // List Check
-    public List<int> PiecePlayer;
-    public List<int> PieceEnemy;
+    //public List<int> PiecePlayer;
     private bool TypeKey;
     [SerializeField] private Sprite _iconNotUp , _iconUp;
 
@@ -81,7 +80,7 @@ public class DealController : MonoBehaviour
     }
     private int RandomType(int id)
     {
-        int type = Random.Range(0, 2);
+        int type = Random.Range(0, 3);
         if (id == 0)
         {
             if (type == 2)
@@ -107,16 +106,11 @@ public class DealController : MonoBehaviour
     }
     private int RandomIdPiece(int idType)
     {
-        if (idType == 0)
+        if(idType == 0)
         {
             int id = Random.Range(0, 3);
             return id;
         }
-        //else if (idType == 1)
-        //{
-        //    int id = Random.Range(0, 18);
-        //    return id;
-        //}
         else
             return 0;
     }
@@ -162,7 +156,7 @@ public class DealController : MonoBehaviour
     }
     private Sprite SetImgIcon(DealsCurrent deal)
     {
-        if (deal.IdType == 0)
+        if (deal.IdType == 0 || deal.IdType == 1)
             return dataManager.dataBase.imgEquipItems.sprPiecePlayerLevelUp[deal.IdPiece];
         //else if (deal.IdType == 1)
         //    return dataManager.dataBase.imgEquipItems.sprPieceEnemy[deal.IdPiece];
@@ -177,7 +171,7 @@ public class DealController : MonoBehaviour
         }
         else
         {
-            if (deal.IdType == 0)
+            if (deal.IdType == 0 || deal.IdType == 1)
                 return dataManager.dataBase.imgEquipItems.namePlayer[deal.IdPiece];
             //else if (deal.IdType == 1)
             //    return dataManager.dataBase.imgEquipItems.nameEnemy[deal.IdPiece];
@@ -232,6 +226,7 @@ public class DealController : MonoBehaviour
         else
         {
             PlayerPrefs.SetInt("Key", PlayerPrefs.GetInt("Key") + 1);
+            PlayerPrefs.Save();
         }
     }
 }

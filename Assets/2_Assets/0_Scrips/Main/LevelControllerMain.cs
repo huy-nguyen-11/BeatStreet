@@ -155,43 +155,43 @@ public class LevelControllerMain : MonoBehaviour
         {
             if (dataManager.idItem1 == 99 || dataManager.idItem2 == 99)
             {
-                if (dataManager.warehouse.ListItems.Count > 2)
+                // Auto-equip rules:
+                // - Prefer items that exist in warehouse (CountItem > 0)
+                // - Do NOT equip the same item into both slots unless CountItem[item] >= 2
+                int GetCountSafe(int id)
                 {
-                    if (dataManager.idItem1 == 99)
-                    {
-                        int RandomId = Random.Range(0, dataManager.warehouse.ListItems.Count);
-                        dataManager.warehouse.CountItem[dataManager.warehouse.ListItems[RandomId]]--;
-                        dataManager.idItem1 = dataManager.warehouse.ListItems[RandomId];
-                        if (dataManager.warehouse.CountItem[dataManager.warehouse.ListItems[RandomId]] <= 0)
-                            dataManager.warehouse.ListItems.Remove(dataManager.warehouse.ListItems[RandomId]);
-                    }
-                    if (dataManager.idItem2 == 99)
-                    {
-                        int RandomId2 = Random.Range(0, dataManager.warehouse.ListItems.Count);
-                        dataManager.warehouse.CountItem[dataManager.warehouse.ListItems[RandomId2]]--;
-                        dataManager.idItem2 = dataManager.warehouse.ListItems[RandomId2];
-                        if (dataManager.warehouse.CountItem[dataManager.warehouse.ListItems[RandomId2]] <= 0)
-                            dataManager.warehouse.ListItems.Remove(dataManager.warehouse.ListItems[RandomId2]);
-                    }
+                    if (dataManager.warehouse == null || dataManager.warehouse.CountItem == null) return 0;
+                    if (id < 0 || id >= dataManager.warehouse.CountItem.Count) return 0;
+                    return dataManager.warehouse.CountItem[id];
                 }
-                else
+
+                int PickForSlot(int otherEquippedId)
                 {
-                    if (dataManager.warehouse.ListItems.Count > 0 && dataManager.idItem1 == 99)
+                    if (dataManager.warehouse == null || dataManager.warehouse.ListItems == null) return 99;
+                    var list = dataManager.warehouse.ListItems;
+                    if (list.Count == 0) return 99;
+
+                    List<int> candidates = new List<int>(list.Count);
+                    for (int i = 0; i < list.Count; i++)
                     {
-                        dataManager.warehouse.CountItem[dataManager.warehouse.ListItems[0]]--;
-                        dataManager.idItem1 = dataManager.warehouse.ListItems[0];
-                        if (dataManager.warehouse.CountItem[dataManager.warehouse.ListItems[0]] <= 0)
-                            dataManager.warehouse.ListItems.Remove(dataManager.warehouse.ListItems[0]);
-                    }
-                    if (dataManager.warehouse.ListItems.Count > 0 && dataManager.idItem2 == 99)
-                    {
-                        dataManager.warehouse.CountItem[dataManager.warehouse.ListItems[dataManager.warehouse.ListItems.Count == 2 ? 1 : 0]]--;
-                        dataManager.idItem1 = dataManager.warehouse.ListItems[dataManager.warehouse.ListItems.Count == 2 ? 1 : 0];
-                        if (dataManager.warehouse.CountItem[dataManager.warehouse.ListItems[dataManager.warehouse.ListItems.Count == 2 ? 1 : 0]] <= 0)
-                            dataManager.warehouse.ListItems.Remove(dataManager.warehouse.ListItems.Count == 2 ? dataManager.warehouse.ListItems[1] : dataManager.warehouse.ListItems[0]);
+                        int id = list[i];
+                        int count = GetCountSafe(id);
+                        if (count <= 0) continue;
+
+                        if (otherEquippedId != 99 && id == otherEquippedId && count < 2)
+                            continue; // only 1 copy, cannot equip into both slots
+
+                        candidates.Add(id);
                     }
 
+                    if (candidates.Count == 0) return 99;
+                    return candidates[Random.Range(0, candidates.Count)];
                 }
+
+                if (dataManager.idItem1 == 99)
+                    dataManager.idItem1 = PickForSlot(dataManager.idItem2);
+                if (dataManager.idItem2 == 99)
+                    dataManager.idItem2 = PickForSlot(dataManager.idItem1);
             }
         }
 
@@ -205,8 +205,43 @@ public class LevelControllerMain : MonoBehaviour
         }
         if (dataManager.idItem2 != 99)
         {
-            itemButton2.GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.idItem2]; 
+            itemButton2.GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.idItem2];
         }
+
+        //back up
+        //Transform itemButton1 = _popups[0].GetChild(0).GetChild(3); // item equip 1
+        //Transform itemButton2 = _popups[0].GetChild(0).GetChild(4); // item equip 2
+        //if (dataManager.AutoSelect)
+        //{
+        //    if (dataManager.idItem1 == 99 || dataManager.idItem2 == 99)
+        //    {
+        //        if (dataManager.warehouse.ListItems.Count > 2)
+        //        {
+        //            if (dataManager.idItem1 == 99)
+        //            {
+        //                int RandomId = Random.Range(0, dataManager.warehouse.ListItems.Count);
+        //                dataManager.idItem1 = dataManager.warehouse.ListItems[RandomId];
+        //            }
+        //            if (dataManager.idItem2 == 99)
+        //            {
+        //                int RandomId2 = Random.Range(0, dataManager.warehouse.ListItems.Count);
+        //                dataManager.idItem2 = dataManager.warehouse.ListItems[RandomId2];
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (dataManager.warehouse.ListItems.Count > 0 && dataManager.idItem1 == 99)
+        //            {
+        //                dataManager.idItem1 = dataManager.warehouse.ListItems[0];
+        //            }
+        //            if (dataManager.warehouse.ListItems.Count > 0 && dataManager.idItem2 == 99)
+        //            {
+        //                dataManager.idItem2 = dataManager.warehouse.ListItems[dataManager.warehouse.ListItems.Count == 2 ? 1 : 0];
+        //            }
+
+        //        }
+        //    }
+        //}
     }
      
     public void BtnMode(int id)
@@ -471,17 +506,11 @@ public class LevelControllerMain : MonoBehaviour
         if (item == 0)
         {
             _popUpChangeItem1.SetActive(false);
-            if (!dataManager.warehouse.ListItems.Contains(dataManager.idItem1))
-                dataManager.warehouse.ListItems.Add(dataManager.idItem1);
-            dataManager.warehouse.CountItem[dataManager.idItem1]++;
             dataManager.idItem1 = 99;
         }
         else
         {
             _popUpChangeItem2.SetActive(false);
-            if (!dataManager.warehouse.ListItems.Contains(dataManager.idItem2))
-                dataManager.warehouse.ListItems.Add(dataManager.idItem2);
-            dataManager.warehouse.CountItem[dataManager.idItem2]++;
             dataManager.idItem2 = 99;
         }
         _popups[0].GetChild(0).GetChild(3).GetChild(0).gameObject.SetActive(dataManager.idItem1 != 99); // item 1 icon
@@ -512,7 +541,11 @@ public class LevelControllerMain : MonoBehaviour
     {
         _popups[1].gameObject.SetActive(true);
 
-        Debug.Log("item is list warehouse: " + dataManager.warehouse.ListItems + " count of list:" + dataManager.warehouse.ListItems.Count);
+        Debug.Log(" count of list:" + dataManager.warehouse.ListItems.Count);
+        for (int i = 0; i < dataManager.warehouse.ListItems.Count; i++)
+        {
+            Debug.Log("name of iem" + dataManager.warehouse.ListItems[i].ToString());
+        }
 
         int totalPages = 3;
 
@@ -527,15 +560,22 @@ public class LevelControllerMain : MonoBehaviour
                 {
                     int idItem = dataManager.warehouse.ListItems[globalItemIndex];
 
+                    // Re-enable UI elements in case this slot was previously hidden
+                    page.GetChild(i).GetChild(0).gameObject.SetActive(true); // icon item
+                    page.GetChild(i).GetChild(1).gameObject.SetActive(idItem == dataManager.idItem1 || idItem == dataManager.idItem2); // icon equip
+                    page.GetChild(i).GetChild(2).gameObject.SetActive(true); // stars
+                    page.GetChild(i).GetChild(3).gameObject.SetActive(true); // count
+                    page.GetChild(i).gameObject.SetActive(true);
+
                     // Set image icon
                     page.GetChild(i).GetChild(0).GetComponent<Image>().sprite =
                         dataManager.dataBase.imgEquipItems.sprItem[idItem];
-
+                    page.GetChild(i).GetChild(0).GetComponent<Image>().preserveAspect = true;
                     // Set star icons
                     for (int y = 0; y < page.GetChild(i).GetChild(2).childCount; y++)
                     {
                         page.GetChild(i).GetChild(2).GetChild(y).gameObject.SetActive(
-                            y < dataManager.dataBase.imgEquipItems.StarItems[idItem]);
+                            y < dataManager.dataBase.imgEquipItems.StarItems[idItem] +1);
                     }
 
                     // Set item count
@@ -544,6 +584,7 @@ public class LevelControllerMain : MonoBehaviour
 
                     // Set button event
                     Button btn = page.GetChild(i).GetComponent<Button>();
+                    btn.interactable = true;
                     btn.onClick.RemoveAllListeners();
                     btn.onClick.AddListener(() =>
                     {
@@ -564,6 +605,7 @@ public class LevelControllerMain : MonoBehaviour
                     page.GetChild(i).GetChild(1).gameObject.SetActive(false); // icon equip
                     page.GetChild(i).GetChild(2).gameObject.SetActive(false); // stars
                     page.GetChild(i).GetChild(3).gameObject.SetActive(false); // count
+                    page.GetChild(i).GetComponent<Button>().interactable = false;
                 }
             }
         }
@@ -676,16 +718,10 @@ public class LevelControllerMain : MonoBehaviour
         AudioBase.Instance.SetAudioUI(0);
         if (btn == 0)
         {
-            dataManager.warehouse.CountItem[item]--;
-            if (dataManager.warehouse.CountItem[item] <= 0 && dataManager.warehouse.ListItems.Contains(item))
-                dataManager.warehouse.ListItems.Remove(item);
             dataManager.idItem1 = item;
         }
         else
         {
-            dataManager.warehouse.CountItem[item]--;
-            if (dataManager.warehouse.CountItem[item] <= 0 && dataManager.warehouse.ListItems.Contains(item))
-                dataManager.warehouse.ListItems.Remove(item);
             dataManager.idItem2 = item;
         }
         GetItemActive();
@@ -714,33 +750,35 @@ public class LevelControllerMain : MonoBehaviour
             item2.GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.idItem2];
         }
     }
-    private int GetIdPage(int id)
-    {
-        if (id < 9) return 0;
-        else if (id < 18) return 1;
-        else if (id < 27) return 2;
-        else return 3;
-    }
-    private void SetSnapScrollview(int count)
-    {
-        _scrollSnapPagination.totalPages = count;
-        List<Image> tempList = new List<Image>(_scrollSnapPagination.pageIndicators);
-        tempList.Clear();
-        for (int i = 0; i < _popups[1].GetChild(2).childCount; i++)
-        {
-            if (i < count)
-            {
-                _popups[1].GetChild(2).GetChild(i).gameObject.SetActive(true);
-                tempList.Add(_popups[1].GetChild(2).GetChild(i).GetComponent<Image>());
-            }
-            else
-            {
-                _popups[1].GetChild(2).GetChild(i).gameObject.SetActive(false);
-            }
-        }
-        _scrollSnapPagination.pageIndicators = tempList.ToArray();
-        _scrollSnapPagination.Start();
-    }
+
+    //private int GetIdPage(int id)
+    //{
+    //    if (id < 9) return 0;
+    //    else if (id < 18) return 1;
+    //    else if (id < 27) return 2;
+    //    else return 3;
+    //}
+
+    //private void SetSnapScrollview(int count)
+    //{
+    //    _scrollSnapPagination.totalPages = count;
+    //    List<Image> tempList = new List<Image>(_scrollSnapPagination.pageIndicators);
+    //    tempList.Clear();
+    //    for (int i = 0; i < _popups[1].GetChild(2).childCount; i++)
+    //    {
+    //        if (i < count)
+    //        {
+    //            _popups[1].GetChild(2).GetChild(i).gameObject.SetActive(true);
+    //            tempList.Add(_popups[1].GetChild(2).GetChild(i).GetComponent<Image>());
+    //        }
+    //        else
+    //        {
+    //            _popups[1].GetChild(2).GetChild(i).gameObject.SetActive(false);
+    //        }
+    //    }
+    //    _scrollSnapPagination.pageIndicators = tempList.ToArray();
+    //    _scrollSnapPagination.Start();
+    //}
 
     private void TitleItem(int id)
     {

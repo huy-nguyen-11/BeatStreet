@@ -10,6 +10,7 @@ public class MainManager : MonoBehaviour
     DataManager dataManager;
     [SerializeField] GameObject[] _panels;
     [SerializeField] GameObject _BarBottom, buttonSetting , buttonBack , buttonNoAds , buttonStarterPack ;
+    public GameObject popUpGetRewardNoAds, popUpGteRewardStarterpack;
     [SerializeField] Transform _BarTop;
     [SerializeField] private TextMeshProUGUI _textCoins, _textGems;
 
@@ -70,6 +71,9 @@ public class MainManager : MonoBehaviour
         }
 
         SetAvtBtn();
+
+        popUpGetRewardNoAds.SetActive(false);
+        popUpGteRewardStarterpack.SetActive(false);
     }
 
     private void Update()
@@ -242,7 +246,8 @@ public class MainManager : MonoBehaviour
                 //AudioBase.Instance.SetAudioUI(1);
                 PlayerPrefs.SetInt("StarterPack", 1);
                 SetShowButtonPack();
-                //OpenPanel(3);
+                popUpGteRewardStarterpack.SetActive(true);
+                OpenPanel(3);
                 //DataManager.Instance.SaveFile();
             }
             else
@@ -261,7 +266,8 @@ public class MainManager : MonoBehaviour
                 AudioBase.Instance.SetAudioUI(1);
                 PlayerPrefs.SetInt("NoAds", 1);
                 SetShowButtonPack();
-                //OpenPanel(3);
+                popUpGetRewardNoAds.SetActive(true);
+                OpenPanel(3);
                 //DataManager.Instance.SaveFile();
             }
             else
