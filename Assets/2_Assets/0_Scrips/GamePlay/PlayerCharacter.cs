@@ -24,6 +24,7 @@ public class PlayerCharacter : MonoBehaviour
         Wingame,
         Skill1,
         Skill2,
+        Combo3,
         Ulti,
         Throw
     }

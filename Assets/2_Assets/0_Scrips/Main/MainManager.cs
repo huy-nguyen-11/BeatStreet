@@ -149,18 +149,18 @@ public class MainManager : MonoBehaviour
     // Setting
     private void CheckBtnSetting()
     {
-        if (PlayerPrefs.GetFloat("Sound") > 0)
-        {
-            _imgBtnSetting[0].sprite = _sprBtnSettingTrue[0];
-        }
-        else
-            _imgBtnSetting[0].sprite = _sprBtnSettingFalse[0];
-        if (PlayerPrefs.GetFloat("Music") > 0)
-        {
-            _imgBtnSetting[1].sprite = _sprBtnSettingTrue[1];
-        }
-        else
-            _imgBtnSetting[1].sprite = _sprBtnSettingFalse[1];
+        //if (PlayerPrefs.GetFloat("Sound") > 0)
+        //{
+        //    _imgBtnSetting[0].sprite = _sprBtnSettingTrue[0];
+        //}
+        //else
+        //    _imgBtnSetting[0].sprite = _sprBtnSettingFalse[0];
+        //if (PlayerPrefs.GetFloat("Music") > 0)
+        //{
+        //    _imgBtnSetting[1].sprite = _sprBtnSettingTrue[1];
+        //}
+        //else
+        //    _imgBtnSetting[1].sprite = _sprBtnSettingFalse[1];
     }
     public void BtnSound()
     {

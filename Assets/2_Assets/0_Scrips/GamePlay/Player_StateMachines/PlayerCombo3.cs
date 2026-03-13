@@ -6,7 +6,8 @@ public class PlayerCombo3 : PlayerStateManager
     Coroutine coroutine;
     public override void Enter()
     {
-        playerController.state = PlayerController.State.Attack;
+        playerController.state = PlayerController.State.Combo3;
+        //playerController.state = PlayerController.State.Attack;
         //playerController.PlayAnim("Strength_Attack" , false);
         playerController.PlayAnimAttack("Strength_Attack");
 

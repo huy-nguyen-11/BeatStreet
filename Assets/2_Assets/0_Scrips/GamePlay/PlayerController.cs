@@ -544,7 +544,8 @@ public class PlayerController : PlayerCharacter
                     float frameMove = Vector2.Distance(touch.position, lastPos);
                     touchLastPositions[touchId] = touch.position;
                     bool nearlyStationary = frameMove <= holdMoveTolerancePixels;
-                    if (nearlyStationary && joystick.HandleNormalizedMagnitude <= 0.3f && state != State.Change && state != State.SpeedUp && state != State.Hit && !isAttackCooldown)
+                    if (nearlyStationary && joystick.HandleNormalizedMagnitude <= 0.3f && state != State.Change && state != State.SpeedUp && state != State.Hit 
+                        && !isAttackCooldown && state != State.Skill2 && state != State.Combo3)
                     {
                         holdTimer += Time.deltaTime;
                         if (holdTimer > changeHoldTime && !isGetJoy)
@@ -574,7 +575,7 @@ public class PlayerController : PlayerCharacter
                         holdTimer += Time.deltaTime;
            
                         if ((joystick.HandleNormalizedMagnitude <= 0.3f) && holdTimer > changeHoldTime && state != State.Change && state 
-                            != State.SpeedUp && state != State.Hit && !isAttackCooldown)
+                            != State.SpeedUp && state != State.Hit && !isAttackCooldown && state != State.Skill2 && state != State.Combo3)
                         {
                             holdTimer = 0f;
                             SwitchToRunState(playerChange);
