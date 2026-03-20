@@ -15,6 +15,7 @@ public class AttackArea : MonoBehaviour
     private bool isMaxHit = false;
 
     public bool isNormalAttack = false;
+    public bool isWukongAttack = false;
 
     //for skill jump 
     private bool isJumpHitActive = false;
@@ -64,7 +65,7 @@ public class AttackArea : MonoBehaviour
             bool direction = transform.parent.rotation.y == 0 ? true : false;
             player.playerController.HitDirection = direction;
             player.playerController.SetHit(Dame);
-            ObjectPooler.Instance.SpawnFromPool("Hit", player.transform.position, Quaternion.Euler(0, 0, 0));
+            ObjectPooler.Instance.SpawnFromPool("HitPlayer", player.transform.position, Quaternion.Euler(0, 0, 0));
             break;
         }
     }
@@ -96,7 +97,7 @@ public class AttackArea : MonoBehaviour
             player.playerController.HitDirection = direction;
             player.playerController.HitCount = 2;
             player.playerController.SetHit(enemyController.dame);
-            ObjectPooler.Instance.SpawnFromPool("Hit", player.transform.position, Quaternion.Euler(0, 0, 0));
+            ObjectPooler.Instance.SpawnFromPool("HitPlayer", player.transform.position, Quaternion.Euler(0, 0, 0));
             enemyController.shouldDirectChase = false;
             break;
         }
@@ -370,7 +371,7 @@ public class AttackArea : MonoBehaviour
                     }
                 }
                 player.playerController.SetHit(Dame);
-                ObjectPooler.Instance.SpawnFromPool("Hit", transform.position, Quaternion.Euler(0, 0, 0));
+                ObjectPooler.Instance.SpawnFromPool("HitPlayer", transform.position, Quaternion.Euler(0, 0, 0));
             }
         }
     }
@@ -421,21 +422,28 @@ public class AttackArea : MonoBehaviour
 
             // Mark that this attack actually hit an enemy (used to allow finishing anims)
             if (PlayerController.Instance != null)
+            {
                 PlayerController.Instance.lastAttackHadHit = true;
+                PlayerController.Instance.lastHitTime = Time.time;
+            }
 
             enemy.enemyController.SetHit(Dame, isMaxHit);
             if(enemy.enemyController.typeOfEnemy == TypeOfEnemy.Boss)
             {
                 GamePlayManager.Instance.SetHitCountBoss();
             }
+
             if (isNormalAttack)
             {
-                ObjectPooler.Instance.SpawnFromPool("Hit", new Vector3(collision.transform.position.x , collision.transform.position.y + 0.5f , 0f), Quaternion.Euler(0, 0, 0));
+                //ObjectPooler.Instance.SpawnFromPool("Hit", new Vector3(collision.transform.position.x , collision.transform.position.y + 0.5f , 0f), Quaternion.Euler(0, 0, 0));
+                ObjectPooler.Instance.SpawnFromPool("Hit", enemy.enemyController._pointTxtHit.transform.position, Quaternion.Euler(0, 0, 0));
             }
             else
             {
-                ObjectPooler.Instance.SpawnFromPool("Hit", transform.position, Quaternion.Euler(0, 0, 0));
+                //ObjectPooler.Instance.SpawnFromPool("Hit", transform.position, Quaternion.Euler(0, 0, 0));
+                ObjectPooler.Instance.SpawnFromPool("HitMax", enemy.enemyController._pointTxtHit.transform.position, Quaternion.Euler(0, 0, 0));
             }
+
             if (isMaxHit)
             {
                 StartCoroutine(ResetMaxHitFlag());
@@ -482,10 +490,10 @@ public class AttackArea : MonoBehaviour
         isMaxHit = value;
     }
 
-    //private void OnDrawGizmos()
-    //{
-    //    Gizmos.color = Color.red;
-    //    Gizmos.matrix = Matrix4x4.TRS(transform.position, Quaternion.Euler(0, 0, 0), Vector3.one);
-    //    Gizmos.DrawWireCube(Vector3.zero, boxSize);
-    //}
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.matrix = Matrix4x4.TRS(transform.position, Quaternion.Euler(0, 0, 0), Vector3.one);
+        Gizmos.DrawWireCube(Vector3.zero, boxSize);
+    }
 }

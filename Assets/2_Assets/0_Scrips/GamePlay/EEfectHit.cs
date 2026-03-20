@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class EEfectHit : MonoBehaviour, IpooledObject
 {
+    public float timeToDisappear = 1f;
+
     public void OnObjectSpawn()
     {
        this.gameObject.SetActive(true);
-        Invoke("OnRecycle", 0.15f);
+        Invoke("OnRecycle", timeToDisappear);   
     }
 
     void OnRecycle()

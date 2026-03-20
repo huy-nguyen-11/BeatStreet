@@ -43,36 +43,37 @@ public class GameOver : MonoBehaviour
         AudioBase.Instance.SetAudioUI(0);
         GamePlayManager.Instance.BtnBackMain();
     }
-    public void BtnAgain()
-    {
-        AudioBase.Instance.SetAudioUI(0);
-        if (PlayerPrefs.GetInt("Energy") >= 2)
-        {
-            PlayerPrefs.SetInt("Energy", PlayerPrefs.GetInt("Energy") - 2);
-            SceneManager.LoadSceneAsync("2_GamePlay");
-        }
-        else
-        {
-            _popupStatus[3].SetActive(true);
-        }
-    }
-    public void BtnBuyEnergy()
-    {
-        AudioBase.Instance.SetAudioUI(0);
-        if (PlayerPrefs.GetInt("Diamont") >= 40)
-        {
-            AudioBase.Instance.SetAudioUI(2);
-            PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 40);
-            PlayerPrefs.SetInt("Energy", PlayerPrefs.GetInt("Energy") + 20);
-            GamePlayManager.Instance.SetMission(0, 40);
-            _popupStatus[3].SetActive(false); 
-        }
-    }
-    public void BtnClossBuyEnergy()
-    {
-        AudioBase.Instance.SetAudioUI(0);
-        _popupStatus[3].SetActive(false);
-    }
+    //public void BtnAgain()
+    //{
+    //    AudioBase.Instance.SetAudioUI(0);
+    //    if (PlayerPrefs.GetInt("Energy") >= 2)
+    //    {
+    //        PlayerPrefs.SetInt("Energy", PlayerPrefs.GetInt("Energy") - 2);
+    //        SceneManager.LoadSceneAsync("2_GamePlay");
+    //    }
+    //    else
+    //    {
+    //        _popupStatus[3].SetActive(true);
+    //    }
+    //}
+    //public void BtnBuyEnergy()
+    //{
+    //    AudioBase.Instance.SetAudioUI(0);
+    //    if (PlayerPrefs.GetInt("Diamont") >= 40)
+    //    {
+    //        AudioBase.Instance.SetAudioUI(2);
+    //        PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 40);
+    //        PlayerPrefs.SetInt("Energy", PlayerPrefs.GetInt("Energy") + 20);
+    //        GamePlayManager.Instance.SetMission(0, 40);
+    //        _popupStatus[3].SetActive(false); 
+    //    }
+    //}
+    //public void BtnClossBuyEnergy()
+    //{
+    //    AudioBase.Instance.SetAudioUI(0);
+    //    _popupStatus[3].SetActive(false);
+    //}
+
     public void BtnCoinAds()
     {
         AudioBase.Instance.SetAudioUI(0);
@@ -127,8 +128,8 @@ public class GameOver : MonoBehaviour
                 _coroutine = StartCoroutine(SetTimeOffRevive());
                 break;
         }
-        txtCoinAds[0].text = GamePlayManager.Instance.coin.ToString();
-        txtCoinAds[1].text = GamePlayManager.Instance.coin.ToString();
+        //txtCoinAds[0].text = GamePlayManager.Instance.coin.ToString();
+        //txtCoinAds[1].text = GamePlayManager.Instance.coin.ToString();
     }
     private void SetGetBonus()
     {

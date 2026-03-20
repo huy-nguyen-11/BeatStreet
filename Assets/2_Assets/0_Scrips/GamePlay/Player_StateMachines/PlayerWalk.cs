@@ -16,7 +16,7 @@ public class PlayerWalk : PlayerStateManager
             Vector2 rawDir = playerController.joystick.RawDirection;
             if (rawDir.sqrMagnitude > 0f)
             {
-                Vector2 movement = rawDir.normalized * 1.2f;
+                Vector2 movement = rawDir.normalized * 1.5f;
                 playerController.rb.linearVelocity = movement;
             }
         }

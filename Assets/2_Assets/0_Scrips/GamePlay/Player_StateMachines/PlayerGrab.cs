@@ -259,6 +259,10 @@ public class PlayerGrab : PlayerStateManager
             if (e == null || e.Data == null) return;
             if (string.Equals(e.Data.Name, "Throw", System.StringComparison.OrdinalIgnoreCase))
             {
+                if (GamePlayManager.Instance.isEnableAttack)
+                {
+                    GamePlayManager.Instance.isEnableAttack = false;
+                }
                 // perform actual enemy push on the event
                 PerformThrowImmediate(_pendingThrowDirection);
                 _throwOccurred = true;
@@ -464,7 +468,10 @@ public class PlayerGrab : PlayerStateManager
     {
         // Unsubscribe any pending throw/attack handlers
         UnsubscribeThrowEvent();
-
+        if (GamePlayManager.Instance.isEnableAttack)
+        {
+            GamePlayManager.Instance.isEnableAttack = false;
+        }
         // cleanup grab-attack handlers/queue
         try
         {

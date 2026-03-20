@@ -50,8 +50,8 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     private Vector2 input = Vector2.zero;
 
     // Smoothing fields
-    private float handleSmoothTime = 0.05f;
-    private float directionSmoothTime = 0.025f;
+    private float handleSmoothTime = 0.1f;
+    private float directionSmoothTime = 0.05f;
 
     private Vector2 handleTargetPosition = Vector2.zero;
     private Vector2 handleVelocity = Vector2.zero;

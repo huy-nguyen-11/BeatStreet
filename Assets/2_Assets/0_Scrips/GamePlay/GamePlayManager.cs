@@ -75,6 +75,10 @@ public class GamePlayManager : MonoBehaviour
     //item buff
     public List<GameObject> listItemBuff = new List<GameObject>();
 
+    //for grab attack cooldown
+    public bool isEnableAttack = true;
+    private float timerEnableAttack = 1f;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -142,6 +146,16 @@ public class GamePlayManager : MonoBehaviour
         minPosX = _CameraFollow.transform.position.x - 2.1f;
         maxPosX = _CameraFollow.transform.position.x + 2.1f;
         //Debug.Log("range from: " + (_CameraFollow.transform.position.x - 2f) + "to" + (_CameraFollow.transform.position.x + 2f));
+
+        if(isEnableAttack == false)
+        {
+            timerEnableAttack -= Time.deltaTime;
+            if(timerEnableAttack <= 0)
+            {
+                isEnableAttack = true;
+                timerEnableAttack = 1f;
+            }
+        }
     }
 
     private void SpawnMap()

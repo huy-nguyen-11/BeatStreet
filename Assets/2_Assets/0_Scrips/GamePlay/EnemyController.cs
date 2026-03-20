@@ -45,7 +45,7 @@ public class EnemyController : EnemyCharacter
     public bool isActiveRun = false;
     public bool isSpawned = false; // Flag to indicate if enemy was spawned (setactive true)
     // Hit
-    [SerializeField] Transform _pointTxtHit;
+    [SerializeField] public Transform _pointTxtHit;
     [SerializeField] GameObject _prfTxtHit;
     public int currentHitIndex = 0;
     public float HitTimeout = 5.0f;

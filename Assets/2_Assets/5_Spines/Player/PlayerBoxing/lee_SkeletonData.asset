@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: lee_SkeletonData
   m_EditorClassIdentifier: spine-unity::Spine.Unity.SkeletonDataAsset
   atlasAssets:
-  - {fileID: 11400000, guid: 13c32a95f00a8094bb65ebc9c66974b4, type: 2}
+  - {fileID: 11400000, guid: 4ad18daeb6c75404596eccdb34aee855, type: 2}
   scale: 0.01
-  skeletonJSON: {fileID: 4900000, guid: 40f5ce52d25d28d4e9295f50a684298b, type: 3}
+  skeletonJSON: {fileID: 4900000, guid: 28233909008227540aa66be409bde202, type: 3}
   isUpgradingBlendModeMaterials: 0
   blendModeMaterials:
     requiresBlendModeMaterials: 1
@@ -23,8 +23,10 @@ MonoBehaviour:
     additiveMaterials: []
     multiplyMaterials: []
     screenMaterials:
+    - pageName: lee.png
+      material: {fileID: 2100000, guid: dcc2dc0d262eeb84b8bd7131530b0cb6, type: 2}
     - pageName: lee_2.png
-      material: {fileID: 2100000, guid: d9cc1c0c37f7c2440ad1b4dec341c3c9, type: 2}
+      material: {fileID: 2100000, guid: f544e4ae39ea3954f821922fd0ceec7a, type: 2}
   skeletonDataModifiers: []
   fromAnimation: []
   toAnimation: []

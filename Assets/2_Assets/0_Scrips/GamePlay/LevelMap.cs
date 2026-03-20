@@ -69,6 +69,9 @@ public class LevelMap : MonoBehaviour
 
     void Start()
     {
+        listTurnEnemy = transform.GetChild(1);
+        listWallTurn = transform.GetChild(2);
+
         AutoCalculateCameraPoints();
 
         minX = _pointMinXs[TurnEnemy];
@@ -77,8 +80,7 @@ public class LevelMap : MonoBehaviour
         GamePlayManager.Instance._CameraFollow.maxX = maxX;
         GamePlayManager.Instance._CameraFollow.minY = minY;
         GamePlayManager.Instance._CameraFollow.maxY = maxY;
-        listTurnEnemy = transform.GetChild(0);
-        listWallTurn = transform.GetChild(1);
+
         if (GamePlayManager.Instance._Player != null)
             GamePlayManager.Instance._Player.transform.parent.position = PointPlayer.position;
     }

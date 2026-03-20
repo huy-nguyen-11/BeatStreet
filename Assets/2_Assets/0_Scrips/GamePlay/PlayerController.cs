@@ -119,6 +119,12 @@ public class PlayerController : PlayerCharacter
     [SerializeField] private float holdMoveTolerancePixels = 25f; 
     [SerializeField] private float holdJoystickTolerance = 0.5f; 
 
+    // Giảm giật state khi đổi hướng (hysteresis cho Walk/Run/Idle)
+    [SerializeField] private float runToWalkGrace = 0.15f;
+    [SerializeField] private float walkToIdleGrace = 0.15f;
+    private float lastRunStrengthTime = -999f;
+    private float lastWalkStrengthTime = -999f;
+
     // Facing state to avoid repeated flips/snapping
     public bool isFacingRight = true;
     
@@ -127,6 +133,10 @@ public class PlayerController : PlayerCharacter
     
     public int comboIndex = 0;           // 0, 1, 2 ,3,4
     public bool lastAttackHadHit = false;
+    // Timestamp of the last confirmed hit from player's attacks (more reliable than a bool flag).
+    [HideInInspector] public float lastHitTime = -999f;
+    // How long after a hit we still consider it as "this attack hit" for combo advancing.
+    [SerializeField] public float hitConfirmWindow = 0.35f;
     public bool isAttackingCombo = false;  // Flag đang trong combo
     public bool queuedComboAttack = false; // Flag spam tap
     public List<string> comboAttackAnims;
@@ -138,10 +148,11 @@ public class PlayerController : PlayerCharacter
     private PlayerStateManager pendingStateAfterReset = null;
     [SerializeField] private float joystickMoveThreshold = 12f;
 
-    // Normal attack cooldown
+    // Normal / global attack cooldown
     public bool isAttackCooldown = false;
     public float attackCooldownTimer = 0f;
     public float attackCooldownDuration = 2f;
+    // Có thể dùng attackCooldownDuration hoặc truyền thời gian riêng cho từng loại tấn công
     
     // Foot step effect
     private float footStepEffectTimer = 0f;
@@ -149,6 +160,12 @@ public class PlayerController : PlayerCharacter
 
     // near other public fields
     [HideInInspector] public bool isInputBlocked = false;
+
+    // --- Combo input buffer / grace window ---
+    // Allow the player to tap slightly late (after end_attack) and still continue the combo.
+    [SerializeField] private float comboGraceDuration = 0.12f;
+    private float comboGraceUntil = -1f;
+    private Coroutine comboGraceCoroutine;
 
     //for attack grab enemy
     public bool isThrowEnemy = false;
@@ -349,49 +366,102 @@ public class PlayerController : PlayerCharacter
         if (HitTimer > HitResetTime)
             ResetHit();
     }
+
+    public bool IsRecentHit()
+    {
+        return (Time.time - lastHitTime) <= hitConfirmWindow;
+    }
+
+    public bool IsInComboGraceWindow()
+    {
+        return Time.time <= comboGraceUntil;
+    }
+
+    public void BeginComboGraceWindow()
+    {
+        comboGraceUntil = Time.time + comboGraceDuration;
+        if (comboGraceCoroutine != null)
+            StopCoroutine(comboGraceCoroutine);
+        comboGraceCoroutine = StartCoroutine(ComboGraceRoutine(comboGraceUntil));
+    }
+
+    private IEnumerator ComboGraceRoutine(float until)
+    {
+        // Wait until grace expires or we start chaining.
+        while (Time.time < until)
+        {
+            if (queuedComboAttack)
+                yield break;
+            yield return null;
+        }
+
+        // If still in Attack state and nothing queued, return to idle smoothly.
+        if (state == State.Attack && !queuedComboAttack && !IsDead && !isJumping && !isResettingFromJump)
+        {
+            // Don't use ResetStatus() here (it has jump/ground reset semantics).
+            if (rb != null)
+                rb.linearVelocity = Vector2.zero;
+            SwitchToRunState(playerIdle);
+        }
+    }
     public void GetJoy()
     {
         if (GamePlayManager.Instance.isCheckUlti
       && state != State.Skill1
       && state != State.Skill2) return;
 
-        // Use both raw and smoothed magnitude
-        //Vector2 smoothDir = joystick != null ? joystick.RawDirection : Vector2.zero;
-        //float smoothMag = smoothDir.magnitude;
-        //float smoothMag = joystick != null ? joystick.RawMagnitude : 0f;
-        float smoothMag = joystick != null ? joystick.HandleNormalizedMagnitude : 0f;
+
+        float smoothMag = joystick != null ? joystick.RawMagnitude : 0f;
 
         // Configure thresholds (walkThreshold < speedThreshold)
-        float walkThreshold = 0.2f;
+        float walkThreshold = 0.15f;
         float runThreshold = Mathf.Clamp(speedThreshold, 0f, 1f);
 
         bool canMoveState = (state == State.Idle || state == State.SpeedUp || state == State.Change || state == State.Walk || state == State.Run);
 
-
         if (!isJumping && canMoveState && !isFall)
         {
+
             if (smoothMag >= runThreshold)
             {
+                lastRunStrengthTime = Time.time;
+                lastWalkStrengthTime = Time.time;
                 if (state != State.Run)
                 {
                     SwitchToRunState(playerRun);
                 }
-
             }
-            else if (smoothMag >= walkThreshold && smoothMag < runThreshold)
+
+            else if (smoothMag >= walkThreshold)
             {
-                if (state != State.Walk)
+                lastWalkStrengthTime = Time.time;
+                if (state == State.Run)
+                {
+                    if (Time.time - lastRunStrengthTime > runToWalkGrace)
+                    {
+                        SwitchToRunState(playerWalk);
+                    }
+                }
+                else if (state != State.Walk)
                 {
                     SwitchToRunState(playerWalk);
                 }
             }
+
             else
             {
+                bool canFallToIdle =
+                    (state == State.Run || state == State.Walk) &&
+                    (Time.time - lastWalkStrengthTime > walkToIdleGrace);
 
-                if (state != State.Idle && state != State.Change && state != State.SpeedUp)
+                if (canFallToIdle)
                 {
-                    SwitchToRunState(playerIdle);
+                    if (state != State.Idle && state != State.Change && state != State.SpeedUp)
+                    {
+                        SwitchToRunState(playerIdle);
+                    }
                 }
+     
             }
         }
     }
@@ -548,7 +618,7 @@ public class PlayerController : PlayerCharacter
                         && !isAttackCooldown && state != State.Skill2 && state != State.Combo3)
                     {
                         holdTimer += Time.deltaTime;
-                        if (holdTimer > changeHoldTime && !isGetJoy)
+                        if (holdTimer > changeHoldTime && !isGetJoy && GamePlayManager.Instance.isEnableAttack)
                         {
                             holdTimer = 0f;
                             SwitchToRunState(playerChange);
@@ -575,7 +645,7 @@ public class PlayerController : PlayerCharacter
                         holdTimer += Time.deltaTime;
            
                         if ((joystick.HandleNormalizedMagnitude <= 0.3f) && holdTimer > changeHoldTime && state != State.Change && state 
-                            != State.SpeedUp && state != State.Hit && !isAttackCooldown && state != State.Skill2 && state != State.Combo3)
+                            != State.SpeedUp && state != State.Hit && !isAttackCooldown && state != State.Skill2 && state != State.Combo3 && GamePlayManager.Instance.isEnableAttack)
                         {
                             holdTimer = 0f;
                             SwitchToRunState(playerChange);
@@ -652,7 +722,17 @@ public class PlayerController : PlayerCharacter
                                 && state != State.Skill2
                                 && state != State.Skill1)
                             {
-                                TriggerAttack();
+                                // If we just ended an attack, allow late tap to continue combo instead of resetting.
+                                if (IsInComboGraceWindow())
+                                {
+                                    queuedComboAttack = true;
+                                    // ensure we're in Attack state so PlayerAttack can continue chaining
+                                    SwitchToRunState(playerAttack);
+                                }
+                                else
+                                {
+                                    TriggerAttack();
+                                }
                             }
                             else if (state == State.Attack && deltaTime <= maxTapTime)
                             {
@@ -737,7 +817,7 @@ public class PlayerController : PlayerCharacter
 
     public void TriggerAttack()
     {
-        if (isAttackCooldown)
+        if (isAttackCooldown || !GamePlayManager.Instance.isEnableAttack)
         {
             return;
         }
@@ -748,9 +828,17 @@ public class PlayerController : PlayerCharacter
             return;
         }
         lastAttackHadHit = false;
+        lastHitTime = -999f;
         comboAttack = 0; // Reset combo
         comboIndex = 0;  // Reset combo animation index
         queuedComboAttack = false;
+
+        if (stateManager == playerGrab && playerGrab != null && playerGrab.IsGrabActive())
+        {
+            playerGrab.QueueGrabAttack();
+            return;
+        }
+
 
         AimToNearestEnemyOnAttack();
 
@@ -839,7 +927,7 @@ public class PlayerController : PlayerCharacter
         }
 
         // Block normal attack + charge (Change) during attack cooldown (speedrun is unaffected)
-        if (isAttackCooldown && (player == playerAttack || player == playerChange))
+        if ((isAttackCooldown || (GamePlayManager.Instance != null && !GamePlayManager.Instance.isEnableAttack)) && (player == playerAttack || player == playerChange))
         {
             return;
         }
@@ -882,6 +970,11 @@ public class PlayerController : PlayerCharacter
                 currentAttackArea.EndHitJump();
             }
         }
+        else if (e.Data.Name == "Impact" && idAttackArea == 0)
+        {
+            int _dir = isFacingRight ? 1 : 12;
+            ObjectPooler.Instance.SpawnFromPool("HitWukong", new Vector3(transform.position.x - (_dir * 0.3f), transform.position.y - 0.3f, 0f), Quaternion.Euler(0, 0, 0));
+        }
     }
 
     public void SetAttack(int id)
@@ -900,6 +993,8 @@ public class PlayerController : PlayerCharacter
             if (attackArea != null)
             {
                 attackArea.SetAttackSkill(Dame, id); // attack all around player
+                int _dir = isFacingRight ? 1 : 8;
+                ObjectPooler.Instance.SpawnFromPool("HitMaxWukong", new Vector3(attackArea.transform.position.x - (_dir * 0.5f),attackArea.transform.position.y - 0.6f, 0f), Quaternion.Euler(0, 0, 0));
             }
         }
         else if(idAttackArea == 4)

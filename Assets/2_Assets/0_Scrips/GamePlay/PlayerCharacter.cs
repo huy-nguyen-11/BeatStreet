@@ -1,4 +1,4 @@
-﻿using Spine;
+using Spine;
 using Spine.Unity;
 using System.Collections;
 using System.Collections.Generic;
@@ -128,6 +128,40 @@ public class PlayerCharacter : MonoBehaviour
                 skeletonAnimation.AnimationState.Event += handler;
             }
         }
+    }
+
+    /// <summary>
+    /// Queue an animation on track 0 (AddAnimation) and invoke callback when end-attack event fires for that queued entry.
+    /// This avoids hard-cutting the current animation and helps combos look smoother.
+    /// </summary>
+    public Spine.TrackEntry AddAnimWithEventHandler(string animName, bool loop, float delay,
+        System.Action<Spine.TrackEntry> onEventFired = null)
+    {
+        if (skeletonAnimation == null || skeletonAnimation.AnimationState == null)
+            return null;
+
+        Spine.TrackEntry entry = skeletonAnimation.AnimationState.AddAnimation(0, animName, loop, delay);
+        if (onEventFired == null || entry == null)
+            return entry;
+
+        Spine.AnimationState.TrackEntryEventDelegate handler = null;
+        handler = (trackEntry, e) =>
+        {
+            try
+            {
+                if (trackEntry == entry && e != null && e.Data != null)
+                {
+                    if (e.Data.Name == "Attack_end" || e.Data.Name == "End_attack")
+                    {
+                        onEventFired?.Invoke(entry);
+                        skeletonAnimation.AnimationState.Event -= handler;
+                    }
+                }
+            }
+            catch { }
+        };
+        skeletonAnimation.AnimationState.Event += handler;
+        return entry;
     }
 
     // Get current spine track entry for track 0, or null

@@ -7,6 +7,7 @@ public class PlayerAttack : PlayerStateManager
     public PlayerAttack(PlayerController player) : base(player) { }
     private float holdThreshold = 0.07f;
     Coroutine coroutine;
+    private bool _startedFirstAttack = false;
 
     public override void Enter()
     {
@@ -20,14 +21,18 @@ public class PlayerAttack : PlayerStateManager
 
         // Start first attack in combo
         //StartCombo();
-        PlayComboAttackWithEvent();
+        // When entering Attack state from idle/start, always start the first strike via SetAnimation.
+        // Subsequent strikes in the same combo should be queued via AddAnimation for smooth chaining.
+        _startedFirstAttack = false;
+        PlayComboAttackWithEvent(useAddQueue: false);
         AudioBase.Instance.AudioPlayer(0);
     }
+
     public override void Update()
     {
     }
 
-    private void PlayComboAttackWithEvent()
+    private void PlayComboAttackWithEvent(bool useAddQueue)
     {
         //playerController.lastAttackHadHit = false;
 
@@ -43,7 +48,15 @@ public class PlayerAttack : PlayerStateManager
         //playerController.idAttackArea = playerController.comboIndex;// set id attack area == index combo
         playerController.idAttackArea = 0;// set id attack area == 0
 
-        playerController.PlayAnimWithEventHandler(animName, false, OnAttackEventFired);
+        if (!useAddQueue)
+        {
+            _startedFirstAttack = true;
+            playerController.PlayAnimWithEventHandler(animName, false, OnAttackEventFired);
+        }
+        else
+        {
+            playerController.AddAnimWithEventHandler(animName, false, 0f, OnAttackEventFired);
+        }
 
         // Apply velocity using isFacingRight (reliable, not rotation.y)
         float lunge = playerController.isFacingRight ? 0.1f : -0.1f;
@@ -55,26 +68,11 @@ public class PlayerAttack : PlayerStateManager
     /// </summary>
     private void OnAttackEventFired(Spine.TrackEntry entry)
     {
-        //playerController.comboIndex++;
-        //if (playerController.comboIndex >= playerController.comboAttackAnims.Count)
-        //    playerController.comboIndex = 0;
-
-        //if (playerController.queuedComboAttack)
-        //{
-        //    playerController.queuedComboAttack = false;
-        //    PlayComboAttackWithEvent();
-        //}
-        //else
-        //{
-        //    playerController.ResetStatus();
-        //}
-        // If we're still within the basic attack chain (0,1,2) — always allow increment.
-        // Only allow proceeding beyond index 2 (to 3,4...) if the last attack actually hit an enemy.
+      
         int current = playerController.comboIndex;
         int maxIndex = playerController.comboAttackAnims.Count - 1;
 
-        // Nếu vừa kết thúc đòn cuối trong list combo: luôn bật cooldown và kết thúc chuỗi,
-        // dù người chơi có spam tap (queuedComboAttack) đi nữa.
+
         if (current == maxIndex)
         {
             playerController.isImmortal = false;
@@ -85,11 +83,20 @@ public class PlayerAttack : PlayerStateManager
             playerController.isAttackCooldown = true;
             playerController.attackCooldownTimer = playerController.attackCooldownDuration;
 
-            playerController.ResetStatus();
+            // Finished full combo chain -> go back to idle
+            playerController.SwitchToRunState(playerController.playerIdle);
             return;
         }
 
-        if (current < 2)
+        // Decide whether this strike "counts as hit" for advancing.
+        // Use a timestamp window to avoid race conditions where collision detection happens a few frames late.
+        bool hasRecentHit = playerController.lastAttackHadHit || playerController.IsRecentHit();
+
+        // Preserve your original intent: require a real hit to continue into finishers (from index >= 2).
+        bool requireHitForThisAdvance = current >= 2;
+        bool canAdvance = !requireHitForThisAdvance || hasRecentHit;
+
+        if (canAdvance)
         {
             playerController.comboIndex++;
             if (playerController.comboIndex > maxIndex)
@@ -97,18 +104,8 @@ public class PlayerAttack : PlayerStateManager
         }
         else
         {
-            // current >= 2: require a real hit to continue to finishers
-            if (playerController.lastAttackHadHit)
-            {
-                playerController.comboIndex++;
-                if (playerController.comboIndex > maxIndex)
-                    playerController.comboIndex = 0;
-            }
-            else
-            {
-                // no hit: reset combo to start
-                playerController.comboIndex = 0;
-            }
+            // no confirmed hit: reset combo to start
+            playerController.comboIndex = 0;
         }
 
         // consume/reset the flag
@@ -118,13 +115,13 @@ public class PlayerAttack : PlayerStateManager
         {
             playerController.queuedComboAttack = false;
 
-            // Only request next attack if comboIndex is within allowed range.
-            // PlayComboAttackWithEvent will play the animation for current comboIndex.
-            PlayComboAttackWithEvent();
+            // Queue next strike smoothly (AddAnimation) to avoid hard-cut jitter.
+            PlayComboAttackWithEvent(useAddQueue: true);
         }
         else
         {
-            playerController.ResetStatus();
+            // No tap queued: allow a short grace window for late taps before returning to idle.
+            playerController.BeginComboGraceWindow();
         }
     }
 
