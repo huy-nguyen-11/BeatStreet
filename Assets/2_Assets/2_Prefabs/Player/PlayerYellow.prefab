@@ -6839,7 +6839,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: spine-unity::Spine.Unity.SkeletonAnimation
-  skeletonDataAsset: {fileID: 11400000, guid: cb720b4bbd95758429740c2211f94e6f, type: 2}
+  skeletonDataAsset: {fileID: 11400000, guid: 0e56130d4e5c2694997f24232e576408, type: 2}
   initialSkinName: 
   fixPrefabOverrideViaMeshFilter: 2
   initialFlipX: 0
@@ -6981,6 +6981,8 @@ MonoBehaviour:
   idTounchRun: 0
   holdMoveTolerancePixels: 25
   holdJoystickTolerance: 0.5
+  runToWalkGrace: 0.15
+  walkToIdleGrace: 0.15
   isFacingRight: 1
   comboIndex: 0
   lastAttackHadHit: 0

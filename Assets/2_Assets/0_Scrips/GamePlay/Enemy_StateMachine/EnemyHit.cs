@@ -60,7 +60,7 @@ public class EnemyHit : EnemyStateMachine
     }
     IEnumerator SetStateIdle()
     {
-        float num = enemyController.typeOfEnemy == TypeOfEnemy.Boss ? 1.2f : 0.5f;
+        float num = enemyController.typeOfEnemy == TypeOfEnemy.Boss ? 1.2f : 0.8f;
         yield return new WaitForSeconds(num);
         enemyController.SwitchToRunState(enemyController.enemyIdle);
     }

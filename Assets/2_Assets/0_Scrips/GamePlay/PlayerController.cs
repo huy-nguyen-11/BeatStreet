@@ -994,7 +994,11 @@ public class PlayerController : PlayerCharacter
             {
                 attackArea.SetAttackSkill(Dame, id); // attack all around player
                 int _dir = isFacingRight ? 1 : 8;
-                ObjectPooler.Instance.SpawnFromPool("HitMaxWukong", new Vector3(attackArea.transform.position.x - (_dir * 0.5f),attackArea.transform.position.y - 0.6f, 0f), Quaternion.Euler(0, 0, 0));
+                if(id == 2)
+                {
+                    ObjectPooler.Instance.SpawnFromPool("HitMaxWukong", new Vector3(attackArea.transform.position.x - (_dir * 0.5f),
+                        attackArea.transform.position.y - 0.6f, 0f), Quaternion.Euler(0, 0, 0));
+                }
             }
         }
         else if(idAttackArea == 4)

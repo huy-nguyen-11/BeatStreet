@@ -417,6 +417,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   isNormalAttack: 0
+  isWukongAttack: 0
 --- !u!50 &1391360343582091771
 Rigidbody2D:
   serializedVersion: 5
@@ -666,7 +667,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: spine-unity::Spine.Unity.SkeletonAnimation
-  skeletonDataAsset: {fileID: 11400000, guid: dadbf0aac380da048a86cd68f34097b2, type: 2}
+  skeletonDataAsset: {fileID: 11400000, guid: 018a2555baeb979448cb2789ecd73b19, type: 2}
   initialSkinName: 
   fixPrefabOverrideViaMeshFilter: 2
   initialFlipX: 0

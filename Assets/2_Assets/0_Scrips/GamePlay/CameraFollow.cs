@@ -150,7 +150,7 @@ public class CameraFollow2D : MonoBehaviour
 
     public void Shake2()
     {
-        Shake2(0.12f, 0.05f,45,0);
+        Shake2(0.25f, 0.1f,35,0);
     }
 
     public void Shake(float duration, float strength, int vibrato = 15, float randomness = 0f)
