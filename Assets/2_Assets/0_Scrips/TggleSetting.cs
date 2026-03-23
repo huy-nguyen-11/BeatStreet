@@ -41,26 +41,62 @@ public class TggleSetting : MonoBehaviour
         }
 
         SetSwitchState(toggle.isOn);
+
+        // Ensure audio matches the saved state at startup
+        ApplyAudioState(toggle.isOn);
     }
 
     void OnSwitch(bool on)
     {
         Debug.Log("open!");
+        //uiHandleRectTransform.DOAnchorPos(on ? handlePosition * -1 : handlePosition, .4f).SetEase(Ease.InOutBack).SetUpdate(true).OnComplete(() =>
+        //{
+        //    backgroundImage.sprite = on ? backgroundActiveSprite : backgroundInactiveSprite; // Change background image
+        //    handleImage.sprite = on ? handleOn : handleOff; // Change handle image
+
+        //    switch (index)
+        //    {
+        //        case 0:
+        //            //AudioManager.instance.ToggleMusic(on);
+        //            break;
+        //        case 1:
+        //            //AudioManager.instance.ToggleSFX(on);
+        //            break;
+        //    }
+        //});
         uiHandleRectTransform.DOAnchorPos(on ? handlePosition * -1 : handlePosition, .4f).SetEase(Ease.InOutBack).SetUpdate(true).OnComplete(() =>
         {
             backgroundImage.sprite = on ? backgroundActiveSprite : backgroundInactiveSprite; // Change background image
             handleImage.sprite = on ? handleOn : handleOff; // Change handle image
 
-            switch (index)
-            {
-                case 0:
-                    //AudioManager.instance.ToggleMusic(on);
-                    break;
-                case 1:
-                    //AudioManager.instance.ToggleSFX(on);
-                    break;
-            }
+            ApplyAudioState(on);
         });
+    }
+
+    void ApplyAudioState(bool on)
+    {
+        switch (index)
+        {
+            case 0:
+                PlayerPrefs.SetInt("MusicOn", on ? 1 : 0);
+                PlayerPrefs.Save();
+                if (AudioBase.Instance != null)
+                {
+                    // mute/unmute music source(s)
+                    AudioBase.Instance.audioBgrMussic.mute = !on;
+                }
+                break;
+            case 1:
+                PlayerPrefs.SetInt("SFXOn", on ? 1 : 0);
+                PlayerPrefs.Save();
+                if (AudioBase.Instance != null)
+                {
+                    // mute/unmute sound effects sources (UI and gameplay)
+                    AudioBase.Instance.audioBgrSoundUI.mute = !on;
+                    AudioBase.Instance.audioBgrSoundGPL.mute = !on;
+                }
+                break;
+        }
     }
 
     void SetSwitchState(bool on)
