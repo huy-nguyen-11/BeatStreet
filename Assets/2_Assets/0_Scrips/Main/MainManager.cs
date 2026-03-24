@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -50,9 +50,15 @@ public class MainManager : MonoBehaviour
     private void OnEnable()
     {
         CheckVIP();
-        AudioBase.Instance.SetVolumeMusic(PlayerPrefs.GetFloat("Music"));
-        AudioBase.Instance.SetVolumeSound(PlayerPrefs.GetFloat("Sound"));
+        // MainMenu music: if enabled, force volume = 0.6
+        bool musicOn = PlayerPrefs.GetInt("MusicOn", 1) == 1;
+        AudioBase.Instance.ToggleMusic(musicOn);
+        AudioBase.Instance.SetVolumeMusic(musicOn ? 0.6f : 0f);
+        bool sfxOn = PlayerPrefs.GetInt("SFXOn", 1) == 1;
+        AudioBase.Instance.ToggleSFX(sfxOn);
+        AudioBase.Instance.SetVolumeSound(sfxOn ? PlayerPrefs.GetFloat("Sound", 1f) : 0f);
         AudioBase.Instance.SetMusicUI();
+        CheckBtnSetting();
     }
     void Start()
     {
@@ -149,31 +155,28 @@ public class MainManager : MonoBehaviour
     // Setting
     private void CheckBtnSetting()
     {
-        //if (PlayerPrefs.GetFloat("Sound") > 0)
-        //{
-        //    _imgBtnSetting[0].sprite = _sprBtnSettingTrue[0];
-        //}
-        //else
-        //    _imgBtnSetting[0].sprite = _sprBtnSettingFalse[0];
-        //if (PlayerPrefs.GetFloat("Music") > 0)
-        //{
-        //    _imgBtnSetting[1].sprite = _sprBtnSettingTrue[1];
-        //}
-        //else
-        //    _imgBtnSetting[1].sprite = _sprBtnSettingFalse[1];
+        if (_imgBtnSetting == null || _imgBtnSetting.Length < 2) return;
+
+        bool sfxOn = PlayerPrefs.GetInt("SFXOn", 1) == 1;
+        bool musicOn = PlayerPrefs.GetInt("MusicOn", 1) == 1;
+
+        _imgBtnSetting[0].sprite = sfxOn ? _sprBtnSettingTrue[0] : _sprBtnSettingFalse[0];
+        _imgBtnSetting[1].sprite = musicOn ? _sprBtnSettingTrue[1] : _sprBtnSettingFalse[1];
     }
     public void BtnSound()
     {
         AudioBase.Instance.SetAudioUI(0);
-        int sound = PlayerPrefs.GetFloat("Sound") > 0 ? 0 : 1;
-        AudioBase.Instance.SetVolumeSound(sound);
+        bool newSfxOn = PlayerPrefs.GetInt("SFXOn", 1) == 0;
+        AudioBase.Instance.ToggleSFX(newSfxOn);
+        AudioBase.Instance.SetVolumeSound(newSfxOn ? 1f : 0f);
         CheckBtnSetting();
     }
     public void BtnMusic()
     {
         AudioBase.Instance.SetAudioUI(0);
-        int music = PlayerPrefs.GetFloat("Music") > 0 ? 0 : 1;
-        AudioBase.Instance.SetVolumeMusic(music);
+        bool newMusicOn = PlayerPrefs.GetInt("MusicOn", 1) == 0;
+        AudioBase.Instance.ToggleMusic(newMusicOn);
+        AudioBase.Instance.SetVolumeMusic(newMusicOn ? 0.6f : 0f);
         CheckBtnSetting();
     }
     // Vip

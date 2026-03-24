@@ -46,9 +46,31 @@ public class TggleSetting : MonoBehaviour
         ApplyAudioState(toggle.isOn);
     }
 
+    private void OnEnable()
+    {
+        if (toggle == null) toggle = GetComponent<Toggle>();
+        if (toggle == null) return;
+
+        bool isOnFromPrefs = toggle.isOn;
+        switch (index)
+        {
+            case 0:
+                isOnFromPrefs = PlayerPrefs.GetInt("MusicOn", 1) == 1;
+                break;
+            case 1:
+                isOnFromPrefs = PlayerPrefs.GetInt("SFXOn", 1) == 1;
+                break;
+        }
+
+        toggle.onValueChanged.RemoveListener(OnSwitch);
+        toggle.isOn = isOnFromPrefs;
+        toggle.onValueChanged.AddListener(OnSwitch);
+        SetSwitchState(isOnFromPrefs);
+    }
+
     void OnSwitch(bool on)
     {
-        Debug.Log("open!");
+        //Debug.Log("open!");
         //uiHandleRectTransform.DOAnchorPos(on ? handlePosition * -1 : handlePosition, .4f).SetEase(Ease.InOutBack).SetUpdate(true).OnComplete(() =>
         //{
         //    backgroundImage.sprite = on ? backgroundActiveSprite : backgroundInactiveSprite; // Change background image

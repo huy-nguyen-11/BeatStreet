@@ -1319,6 +1319,8 @@ MonoBehaviour:
   idTounchRun: 0
   holdMoveTolerancePixels: 25
   holdJoystickTolerance: 0.5
+  runToWalkGrace: 0.15
+  walkToIdleGrace: 0.15
   isFacingRight: 1
   comboIndex: 0
   lastAttackHadHit: 0
@@ -11389,7 +11391,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.013, y: 0.003, z: 0}
-  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 8092117297536134305}
@@ -11444,7 +11446,7 @@ SpriteRenderer:
   m_SortingOrder: 4
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 2aca3f0e3599ffc468ea01029a8ef58f, type: 3}
-  m_Color: {r: 0.8679245, g: 0.80651474, b: 0.80651474, a: 0.5882353}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.5882353}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

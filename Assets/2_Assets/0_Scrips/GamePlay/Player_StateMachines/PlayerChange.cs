@@ -13,7 +13,7 @@ public class PlayerChange : PlayerStateManager
         playerController.PlayAnim("Strength", false);
         _coroutine = playerController.StartCoroutine(WaitForChangeAnimEnd());
         //playerController.PlayAnimHaveEffect("Strength", false, "Strength2");
-        AudioBase.Instance.AudioPlayer(7);
+        AudioBase.Instance.AudioPlayer(5);
         playerController.rb.linearVelocity = Vector2.zero;
     }
     public override void Update()

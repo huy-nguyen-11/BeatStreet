@@ -204,6 +204,9 @@ public class EnemyAttack : EnemyStateMachine
     public string nameBossAttack;
     public bool isEliteEnemyAttack;
 
+    // Add this field near other private fields in the class
+    private Coroutine lungeStopCoroutine;
+
     // ============================================================
     // STATE ENTER
     // ============================================================
@@ -257,7 +260,7 @@ public class EnemyAttack : EnemyStateMachine
             // Play attack animation
             attackEntry = enemyController.skeletonAnimation.AnimationState
                 .SetAnimation(0, attackAnimationName, false);
-
+            AudioBase.Instance.AudioPlayer(3);
             // Small push forward for normal enemies
             if (enemyController.typeOfEnemy != TypeOfEnemy.Boss &&
                 enemyController.typeOfEnemy != TypeOfEnemy.EliteEnemy)
@@ -266,6 +269,10 @@ public class EnemyAttack : EnemyStateMachine
                 enemyController.rb.linearVelocity =
                     Vector2.right * (facingRight ? -0.2f : 0.2f);
             }
+
+            if (lungeStopCoroutine != null)
+                enemyController.StopCoroutine(lungeStopCoroutine);
+            lungeStopCoroutine = enemyController.StartCoroutine(StopEnemyLungeCoroutine(0.10f));
 
             // Register animation complete callback
             if (attackEntry != null)
@@ -294,6 +301,20 @@ public class EnemyAttack : EnemyStateMachine
         }
 
         FinishAttack();
+    }
+
+    private IEnumerator StopEnemyLungeCoroutine(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+
+        // Only zero horizontal velocity if still in Attack state (avoid interfering with other flows)
+        if (enemyController != null && enemyController.state == EnemyController.State.Attack && enemyController.rb != null)
+        {
+            Vector2 v = enemyController.rb.linearVelocity;
+            enemyController.rb.linearVelocity = new Vector2(0f, v.y);
+        }
+
+        lungeStopCoroutine = null;
     }
 
     // ============================================================
@@ -337,6 +358,12 @@ public class EnemyAttack : EnemyStateMachine
 
         enemyController.isAttacking = false;
         enemyController.isAttack = false;
+
+        if (lungeStopCoroutine != null)
+        {
+            try { enemyController.StopCoroutine(lungeStopCoroutine); } catch { }
+            lungeStopCoroutine = null;
+        }
     }
 
     // ============================================================

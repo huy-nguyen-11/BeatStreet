@@ -25,7 +25,7 @@ public class PlayerAttack : PlayerStateManager
         // Subsequent strikes in the same combo should be queued via AddAnimation for smooth chaining.
         _startedFirstAttack = false;
         PlayComboAttackWithEvent(useAddQueue: false);
-        AudioBase.Instance.AudioPlayer(0);
+        //AudioBase.Instance.AudioPlayer(12);
     }
 
     public override void Update()
@@ -47,7 +47,8 @@ public class PlayerAttack : PlayerStateManager
 
         //playerController.idAttackArea = playerController.comboIndex;// set id attack area == index combo
         playerController.idAttackArea = 0;// set id attack area == 0
-
+        //Debug.Log($"Playing attack anim: {animName} (combo index: {playerController.comboIndex}, useAddQueue: {useAddQueue})");
+        AudioBase.Instance.AudioPlayer(playerController.comboIndex);
         if (!useAddQueue)
         {
             _startedFirstAttack = true;
@@ -59,8 +60,50 @@ public class PlayerAttack : PlayerStateManager
         }
 
         // Apply velocity using isFacingRight (reliable, not rotation.y)
-        float lunge = playerController.isFacingRight ? 0.1f : -0.1f;
+        //float lunge = playerController.isFacingRight ? 0.5f : -0.5f;
+        //playerController.rb.linearVelocity = Vector2.right * lunge;
+
+        // Stop any previous lunge-stopper coroutine and start a new short stopper so the player
+        // doesn't keep sliding through the rest of the animation.
+        if (coroutine != null)
+            playerController.StopCoroutine(coroutine);
+
+        // Adjust this duration to taste (0.06 - 0.14 works well). Shorter -> sharper stop.
+        float decelDuration = 0.165f;
+        coroutine = playerController.StartCoroutine(StopLungeCoroutine(decelDuration/*, lunge*/));
+    }
+
+
+    private IEnumerator StopLungeCoroutine(float duration/*, float initialLunge*/)
+    {
+        yield return new WaitForSeconds(0.15f);
+        float lunge = playerController.isFacingRight ? 0.36f : -0.36f;
         playerController.rb.linearVelocity = Vector2.right * lunge;
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+
+            // Ease-out curve: remaining = 1 - t^2 (smooth slow-down)
+            float remaining = 1f - (t * t);
+            if (playerController != null && playerController.rb != null)
+            {
+                Vector2 v = playerController.rb.linearVelocity;
+                playerController.rb.linearVelocity = new Vector2(lunge * remaining, v.y);
+            }
+            yield return null;
+        }
+
+        // ensure fully stopped horizontally if still in Attack state
+        if (playerController != null && playerController.state == PlayerController.State.Attack && playerController.rb != null)
+        {
+            Vector2 v = playerController.rb.linearVelocity;
+            playerController.rb.linearVelocity = new Vector2(0f, v.y);
+        }
+
+        coroutine = null;
     }
 
     /// <summary>
@@ -68,7 +111,6 @@ public class PlayerAttack : PlayerStateManager
     /// </summary>
     private void OnAttackEventFired(Spine.TrackEntry entry)
     {
-      
         int current = playerController.comboIndex;
         int maxIndex = playerController.comboAttackAnims.Count - 1;
 
@@ -127,8 +169,8 @@ public class PlayerAttack : PlayerStateManager
 
     public override void Exit()
     {
-        //if (coroutine != null)
-        //    playerController.StopCoroutine(coroutine);
+        if (coroutine != null)
+            playerController.StopCoroutine(coroutine);
     }
     public override void FixedUpdate()
     {

@@ -18,7 +18,7 @@ public class PlayerSkill2 : PlayerStateManager
     {
         lastXPosition = playerController.Char.position.x;
         playerController.PlayAnimAttack("Strength_Attack_Max");
-
+        AudioBase.Instance.AudioPlayer(15);
         playerController.idAttackArea = 5;// set id attack area == 5
         playerController.state = PlayerController.State.Skill2;
         GamePlayManager.Instance.SetMission(6, 1);
@@ -37,6 +37,7 @@ public class PlayerSkill2 : PlayerStateManager
         //    playerController.SetAttack(4);
         //}
         playerController.isCheckSkill2 = false;
+        AudioBase.Instance.AudioPlayer(20);
     }
     public override void Update()
     {

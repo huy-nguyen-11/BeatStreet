@@ -2,96 +2,7 @@ using UnityEngine;
 
 public class AudioBase : MonoBehaviour
 {
-    //public static AudioBase Instance { get; private set; }
-    //public AudioSource audioBgrMussic;
-    //public AudioSource audioBgrSoundUI;
-    //public AudioSource audioBgrSoundGPL;
 
-    //public AudioClip audioMusicUI;
-    //public AudioClip[] audioMusicGPL;
-    //public AudioClip[] audioSoundUI;
-    //// Player
-    //public AudioClip[] audioSoundPlayer;
-    //// Enemy
-    //public AudioClip[] audioSoundEnemy;
-    //// GameOver
-    //public AudioClip[] audioSoundGPL;
-    ////for daily reward
-    //public bool isCheckPlayed;
-
-    //private void Awake()
-    //{
-    //    if (Instance != null && Instance != this)
-    //    {
-    //        Destroy(this);
-    //    }
-    //    else
-    //    {
-    //        Instance = this;
-    //    }
-    //}
-    //private void OnEnable()
-    //{
-    //    DontDestroyOnLoad(gameObject);
-    //}
-    //void Start()
-    //{
-
-    //}
-    //public void GetMussic()
-    //{
-    //    audioBgrMussic.volume = PlayerPrefs.GetFloat("Music");
-    //    audioBgrSoundUI.volume = PlayerPrefs.GetFloat("Sound");
-    //    audioBgrSoundGPL.volume = PlayerPrefs.GetFloat("Sound");
-    //}
-    //public void SetMusicUI()
-    //{
-    //    audioBgrMussic.clip = audioMusicUI;
-    //    audioBgrMussic.Play();
-    //}
-    //public void SetMusicGPL(int count)
-    //{
-    //    audioBgrMussic.clip = audioMusicGPL[count];
-    //    audioBgrMussic.Play();
-    //}
-    //public void SetVolumeMusic(float volume)
-    //{
-    //    audioBgrMussic.volume = volume;
-    //    PlayerPrefs.SetFloat("Music", volume);
-    //    PlayerPrefs.Save();
-    //}
-    //public void StopMusic()
-    //{
-    //    audioBgrMussic.Stop();
-    //}
-    //public void SetVolumeSound(float volume)
-    //{
-    //    audioBgrSoundUI.volume = volume;
-    //    audioBgrSoundGPL.volume = volume;
-    //    PlayerPrefs.SetFloat("Sound", volume);
-    //    PlayerPrefs.Save();
-    //}
-
-    //public void SetAudioUI(int count)
-    //{
-    //    audioBgrSoundUI.PlayOneShot(audioSoundUI[count]);
-    //}
-    //public void AudioGPl(int count)
-    //{
-    //    audioBgrSoundUI.PlayOneShot(audioSoundGPL[count]);
-    //}
-    //public void AudioPlayer(int count)
-    //{
-    //    audioBgrSoundGPL.PlayOneShot(audioSoundPlayer[count]);
-    //}
-    //public void AudioEnemy(int count)
-    //{
-    //    audioBgrSoundGPL.PlayOneShot(audioSoundEnemy[count]);
-    //}
-    //public void AudioPlayerAtkHit()
-    //{
-    //    audioBgrSoundGPL.PlayOneShot(audioSoundPlayer[11]);
-    //}
     public static AudioBase Instance { get; private set; }
     public AudioSource audioBgrMussic;
     public AudioSource audioBgrSoundUI;
@@ -101,7 +12,7 @@ public class AudioBase : MonoBehaviour
     public AudioClip[] audioMusicGPL;
     public AudioClip[] audioSoundUI;
     // Player
-    public AudioClip[] audioSoundPlayer;
+    public AudioClip[] audioSoundPlayer0;
     // Enemy
     public AudioClip[] audioSoundEnemy;
     // GameOver
@@ -203,16 +114,31 @@ public class AudioBase : MonoBehaviour
         PlayerPrefs.SetFloat("Music", volume);
         PlayerPrefs.Save();
     }
+
+    public void SetVolumeSound(float volume)
+    {
+        if (audioBgrSoundUI != null) audioBgrSoundUI.volume = volume;
+        if (audioBgrSoundGPL != null) audioBgrSoundGPL.volume = volume;
+        PlayerPrefs.SetFloat("Sound", volume);
+        PlayerPrefs.Save();
+    }
     public void StopMusic()
     {
         audioBgrMussic.Stop();
     }
-    public void SetVolumeSound(float volume)
+
+    public void SetBackgroundVolumeIfNotMuted(float volume, bool saveToPrefs = false)
     {
-        audioBgrSoundUI.volume = volume;
-        audioBgrSoundGPL.volume = volume;
-        PlayerPrefs.SetFloat("Sound", volume);
-        PlayerPrefs.Save();
+        if (audioBgrMussic == null) return;
+        if (!audioBgrMussic.mute)
+        {
+            audioBgrMussic.volume = volume;
+            if (saveToPrefs)
+            {
+                PlayerPrefs.SetFloat("Music", volume);
+                PlayerPrefs.Save();
+            }
+        }
     }
 
     public void SetAudioUI(int count)
@@ -225,7 +151,7 @@ public class AudioBase : MonoBehaviour
     }
     public void AudioPlayer(int count)
     {
-        audioBgrSoundGPL.PlayOneShot(audioSoundPlayer[count]);
+        audioBgrSoundGPL.PlayOneShot(audioSoundPlayer0[count]);
     }
     public void AudioEnemy(int count)
     {
@@ -233,6 +159,6 @@ public class AudioBase : MonoBehaviour
     }
     public void AudioPlayerAtkHit()
     {
-        audioBgrSoundGPL.PlayOneShot(audioSoundPlayer[11]);
+        //audioBgrSoundGPL.PlayOneShot(audioSoundPlayer0[11]);
     }
 }

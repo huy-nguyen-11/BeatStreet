@@ -79,6 +79,10 @@ public class GamePlayManager : MonoBehaviour
     public bool isEnableAttack = true;
     private float timerEnableAttack = 1f;
 
+    [Header("Input Block Zones")]
+    [Tooltip("Assign UI Images/RectTransforms where gameplay touch must be ignored. (Do NOT include your joystick.)")]
+    [SerializeField] public List<RectTransform> noTouchZones = new List<RectTransform>();
+    [Tooltip("Optional: also block touch when it begins over ANY UI. Off by default to avoid affecting joystick.")]
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -90,6 +94,10 @@ public class GamePlayManager : MonoBehaviour
             Instance = this;
         }
         AudioBase.Instance.SetMusicGPL(0);
+        // Gameplay music: if enabled, force volume = 0.35
+        bool musicOn = PlayerPrefs.GetInt("MusicOn", 1) == 1;
+        AudioBase.Instance.ToggleMusic(musicOn);
+        AudioBase.Instance.SetVolumeMusic(musicOn ? 0.35f : 0f);
     }
     public void Start()
     {
@@ -116,6 +124,7 @@ public class GamePlayManager : MonoBehaviour
         SpawnMap();
         CheckAudio();
         SetItem();
+
 
         backUlti.SetActive(false);
         _showFightBoss.SetActive(false);
@@ -427,7 +436,7 @@ public class GamePlayManager : MonoBehaviour
             if (_levelMap.TurnEnemy >= _levelMap.listTurnEnemy.childCount - 1)
             {
                 _Player.SwitchToRunState(_Player.playerWingame);
-                AudioBase.Instance.AudioPlayer(11);
+                //AudioBase.Instance.AudioPlayer(11);
                 StartCoroutine(OpenPopupGameOver(0));
             }
             else
@@ -540,6 +549,7 @@ public class GamePlayManager : MonoBehaviour
     public void BtnPause()
     {
         AudioBase.Instance.SetAudioUI(0);
+        CheckAudio();
         Time.timeScale = 0;
         _Pause.SetActive(true);
     }
@@ -551,11 +561,11 @@ public class GamePlayManager : MonoBehaviour
     }
     private void CheckAudio()
     {
-        if (PlayerPrefs.GetFloat("Sound") > 0)
+        if (PlayerPrefs.GetInt("SFXOn", 1) == 1)
             _BtnPause[0].GetChild(0).GetComponent<Image>().sprite = _sprBtnSettingTrue[0];
         else
             _BtnPause[0].GetChild(0).GetComponent<Image>().sprite = _sprBtnSettingFalse[0];
-        if (PlayerPrefs.GetFloat("Music") > 0)
+        if (PlayerPrefs.GetInt("MusicOn", 1) == 1)
         {
             _BtnPause[1].GetChild(0).GetComponent<Image>().sprite = _sprBtnSettingTrue[1];
         }
@@ -567,15 +577,17 @@ public class GamePlayManager : MonoBehaviour
     public void BtnSound()
     {
         AudioBase.Instance.SetAudioUI(0);
-        int sound = PlayerPrefs.GetFloat("Sound") > 0 ? 0 : 1;
-        AudioBase.Instance.SetVolumeSound(sound);
+        bool newSfxOn = PlayerPrefs.GetInt("SFXOn", 1) == 0;
+        AudioBase.Instance.ToggleSFX(newSfxOn);
+        AudioBase.Instance.SetVolumeSound(newSfxOn ? 1f : 0f);
         CheckAudio();
     }
     public void BtnMusic()
     {
         AudioBase.Instance.SetAudioUI(0);
-        int music = PlayerPrefs.GetFloat("Music") > 0 ? 0 : 1;
-        AudioBase.Instance.SetVolumeMusic(music);
+        bool newMusicOn = PlayerPrefs.GetInt("MusicOn", 1) == 0;
+        AudioBase.Instance.ToggleMusic(newMusicOn);
+        AudioBase.Instance.SetVolumeMusic(newMusicOn ? 0.35f : 0f);
         CheckAudio();
     }
     public void BtnTutorialGame()

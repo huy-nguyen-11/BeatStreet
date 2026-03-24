@@ -436,12 +436,14 @@ public class AttackArea : MonoBehaviour
             if (isNormalAttack)
             {
                 //ObjectPooler.Instance.SpawnFromPool("Hit", new Vector3(collision.transform.position.x , collision.transform.position.y + 0.5f , 0f), Quaternion.Euler(0, 0, 0));
+                AudioBase.Instance.AudioPlayer(PlayerController.Instance.comboIndex + 6);
                 ObjectPooler.Instance.SpawnFromPool("Hit", enemy.enemyController._pointTxtHit.transform.position, Quaternion.Euler(0, 0, 0));
             }
             else
             {
                 //ObjectPooler.Instance.SpawnFromPool("Hit", transform.position, Quaternion.Euler(0, 0, 0));
                 ObjectPooler.Instance.SpawnFromPool("HitMax", enemy.enemyController._pointTxtHit.transform.position, Quaternion.Euler(0, 0, 0));
+                AudioBase.Instance.AudioPlayer(11);
             }
 
             if (isMaxHit)

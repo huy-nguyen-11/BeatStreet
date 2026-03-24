@@ -11,7 +11,7 @@ public class PlayerUlti : PlayerStateManager
         //playerController.animator.Play("Ulti");
        
         playerController.state = PlayerController.State.Ulti;
-        AudioBase.Instance.AudioPlayer(8);
+        //AudioBase.Instance.AudioPlayer(8);
         playerController.StartCoroutine(WaitForResetSkin());
         playerController.skeletonAnimation.AnimationState.Event += HandleEvent;
         //UltiVal();

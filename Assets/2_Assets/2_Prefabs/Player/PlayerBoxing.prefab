@@ -142,6 +142,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   isNormalAttack: 1
+  isWukongAttack: 0
 --- !u!50 &6527098820011598599
 Rigidbody2D:
   serializedVersion: 5
@@ -194,7 +195,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 322061934563911614}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.7038063, w: 0.710392}
+  m_LocalRotation: {x: 0, y: 0, z: -0.70380616, w: 0.71039206}
   m_LocalPosition: {x: 0.1910778, y: -0.16961898, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5336,9 +5337,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 986525564350896932}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.045065608, w: 0.99898404}
+  m_LocalRotation: {x: 0, y: 0, z: -0.045065552, w: 0.99898404}
   m_LocalPosition: {x: 1.3137509, y: 0.3881016, z: 0}
-  m_LocalScale: {x: 1.0000001, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1.0000001, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4384889555449975893}
@@ -5442,7 +5443,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1223658078210430422}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.98403287, w: 0.17798696}
+  m_LocalRotation: {x: 0, y: 0, z: 0.98403287, w: 0.1779871}
   m_LocalPosition: {x: 0.1898706, y: 0.28847918, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -6540,8 +6541,6 @@ MeshRenderer:
   - {fileID: 2100000, guid: 5e799a01ee70f3c4085672eb7514f1ee, type: 2}
   - {fileID: 2100000, guid: 8666e5f7577ea1f499a0e4b6974813f8, type: 2}
   - {fileID: 2100000, guid: 5e799a01ee70f3c4085672eb7514f1ee, type: 2}
-  - {fileID: 2100000, guid: 8666e5f7577ea1f499a0e4b6974813f8, type: 2}
-  - {fileID: 2100000, guid: 5e799a01ee70f3c4085672eb7514f1ee, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6935,9 +6934,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3680889044751448718}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.16664092, w: 0.98601764}
+  m_LocalRotation: {x: 0, y: 0, z: -0.1666409, w: 0.98601764}
   m_LocalPosition: {x: 1.1984085, y: -0.6089603, z: 0}
-  m_LocalScale: {x: 1, y: 1.0000001, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4384889555449975893}
@@ -7017,6 +7016,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   isNormalAttack: 0
+  isWukongAttack: 0
 --- !u!50 &13561794908822031
 Rigidbody2D:
   serializedVersion: 5
@@ -7257,6 +7257,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   isNormalAttack: 1
+  isWukongAttack: 0
 --- !u!50 &7880657467341983214
 Rigidbody2D:
   serializedVersion: 5
@@ -7309,9 +7310,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4237279125858359475}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.92222255, w: 0.38665947}
+  m_LocalRotation: {x: 0, y: 0, z: 0.92222244, w: -0.3866598}
   m_LocalPosition: {x: 0.4682878, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: -1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2271159276262179961}
@@ -12508,7 +12509,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4640736691132356505}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.3389562, w: 0.94080216}
+  m_LocalRotation: {x: 0, y: 0, z: 0.33895633, w: 0.9408021}
   m_LocalPosition: {x: 0.553733, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -12809,9 +12810,13 @@ MonoBehaviour:
   idTounchRun: 0
   holdMoveTolerancePixels: 25
   holdJoystickTolerance: 0.5
+  runToWalkGrace: 0.15
+  walkToIdleGrace: 0.15
   isFacingRight: 1
   comboIndex: 0
   lastAttackHadHit: 0
+  lastHitTime: -999
+  hitConfirmWindow: 0.35
   isAttackingCombo: 0
   queuedComboAttack: 0
   comboAttackAnims:
@@ -12832,6 +12837,7 @@ MonoBehaviour:
   attackCooldownDuration: 0.4
   footStepEffectInterval: 0.45
   isInputBlocked: 0
+  comboGraceDuration: 0.12
   isThrowEnemy: 0
   fillBar: {fileID: 0}
   velocity: 0
@@ -13001,9 +13007,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5172488150223470957}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.8221494, w: 0.5692718}
+  m_LocalRotation: {x: 0, y: 0, z: -0.8221493, w: 0.569272}
   m_LocalPosition: {x: 0.4657389, y: -0.5160803, z: 0}
-  m_LocalScale: {x: 1.0000001, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4384889555449975893}
@@ -13431,7 +13437,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: -0.32, y: 0.32, z: 1}
+  m_LocalScale: {x: 0.32, y: 0.32, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5020809344490391508}
@@ -13625,6 +13631,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   isNormalAttack: 0
+  isWukongAttack: 0
 --- !u!50 &5607624159125433981
 Rigidbody2D:
   serializedVersion: 5
@@ -13933,7 +13940,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.07, y: 0.003, z: 0}
-  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 8334410071572141}
@@ -14181,7 +14188,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6750201911642482247}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.8552179, w: 0.51826864}
+  m_LocalRotation: {x: 0, y: 0, z: -0.8552178, w: 0.51826876}
   m_LocalPosition: {x: 0.47056547, y: -0.0009913254, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -14235,7 +14242,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6780480339531350640}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.2781192, w: 0.9605466}
+  m_LocalRotation: {x: 0, y: 0, z: 0.278119, w: 0.9605466}
   m_LocalPosition: {x: 0.5775913, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -14601,7 +14608,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.21453765, y: -1.1464102, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8233654230217027883}
@@ -14883,9 +14890,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8327517482870770363}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.03013742, w: -0.9995458}
+  m_LocalRotation: {x: 0, y: 0, z: -0.9995458, w: 0.030137582}
   m_LocalPosition: {x: 0.115592495, y: -0.32094213, z: 0}
-  m_LocalScale: {x: -1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5050338940021421645}
@@ -14966,6 +14973,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   isNormalAttack: 1
+  isWukongAttack: 0
 --- !u!50 &4888535857441099611
 Rigidbody2D:
   serializedVersion: 5
@@ -20015,7 +20023,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.0712384, y: 0.3253793, z: 0}
-  m_LocalScale: {x: 0.90079737, y: 1.0633307, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4384889555449975893}

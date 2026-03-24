@@ -25,6 +25,8 @@ public class PlayerJump : PlayerStateManager
             GamePlayManager.Instance.SetMission(6, 1);
             playerController.SetMana(-5);
             playerController.PlayAnim2("Jump_Attack");
+            AudioBase.Instance.AudioPlayer(18);
+            AudioBase.Instance.AudioPlayer(1);
             playerController.idAttackArea = 2;// set id attack area == 2
             fx = ObjectPooler.Instance.SpawnFromPool("FxJump_Attack", playerController.posFxJump.position, Quaternion.identity);
             fx.GetComponent<SkeletonAnimation>().AnimationState.SetAnimation(0, "jump_Attack_Fx", false);
@@ -33,6 +35,7 @@ public class PlayerJump : PlayerStateManager
         {
             playerController.velocity = 5;
             playerController.PlayAnim2("Jump");
+            AudioBase.Instance.AudioPlayer(22);
             fx = ObjectPooler.Instance.SpawnFromPool("FxJump", playerController.posFxJump.position, Quaternion.identity);
             fx.GetComponent<SkeletonAnimation>().AnimationState.SetAnimation(0, "jump", false);
         }

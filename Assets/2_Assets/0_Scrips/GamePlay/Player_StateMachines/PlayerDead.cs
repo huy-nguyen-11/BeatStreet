@@ -11,7 +11,7 @@ public class PlayerDead : PlayerStateManager
         playerController.PlayAnim("Dead" , false);
         playerController.state = PlayerController.State.Dead;
         playerController.rb.linearVelocity = Vector2.zero;
-        AudioBase.Instance.AudioPlayer(5);
+        AudioBase.Instance.AudioPlayer(24);
 
         // If death came from fire/DoT hazard, do not apply fall/knockback.
         if (playerController.deathStayInPlace)

@@ -5,6 +5,8 @@ using Spine.Unity;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 // Ensure PlayerController updates early so touch is processed promptly (before other scripts like DemoTouch)
 [DefaultExecutionOrder(-1000)]
@@ -114,10 +116,45 @@ public class PlayerController : PlayerCharacter
     private Dictionary<int, Vector2> touchLastPositions = new Dictionary<int, Vector2>();
     private Vector2 touchStartPositionsRun;
     private Dictionary<int, float> touchStartTimes = new Dictionary<int, float>();
+    // Touches that started on blocked zones should not control gameplay.
+    private readonly HashSet<int> blockedTouchIds = new HashSet<int>();
+
+    [SerializeField] private bool blockTouchOverAnyUI = false;
     public int idTounchRun;
     private float holdTimer;
     [SerializeField] private float holdMoveTolerancePixels = 25f; 
     [SerializeField] private float holdJoystickTolerance = 0.5f; 
+
+    private static bool IsPointerOverAnyUI(int fingerId)
+    {
+        if (EventSystem.current == null) return false;
+
+        // Mouse (Standalone / Editor) uses parameterless overload.
+        if (!Input.touchSupported) return EventSystem.current.IsPointerOverGameObject();
+
+        // Touch devices: must pass fingerId to correctly detect UI under that touch.
+        return EventSystem.current.IsPointerOverGameObject(fingerId);
+    }
+
+    private bool IsInNoTouchZone(Vector2 screenPosition)
+    {
+        if (GamePlayManager.Instance.noTouchZones == null || GamePlayManager.Instance.noTouchZones.Count == 0) return false;
+
+        for (int i = 0; i < GamePlayManager.Instance.noTouchZones.Count; i++)
+        {
+            RectTransform rt = GamePlayManager.Instance.noTouchZones[i];
+            if (rt == null) continue;
+
+            // Use the canvas camera if present; null works for Screen Space - Overlay.
+            Canvas canvas = rt.GetComponentInParent<Canvas>();
+            Camera cam = (canvas != null) ? canvas.worldCamera : null;
+
+            if (RectTransformUtility.RectangleContainsScreenPoint(rt, screenPosition, cam))
+                return true;
+        }
+
+        return false;
+    }
 
     // Giảm giật state khi đổi hướng (hysteresis cho Walk/Run/Idle)
     [SerializeField] private float runToWalkGrace = 0.15f;
@@ -588,11 +625,27 @@ public class PlayerController : PlayerCharacter
         {
             Touch touch = Input.GetTouch(i);
             int touchId = touch.fingerId;
+
+            // If this finger started on a blocked zone, ignore it until it ends/cancels.
+            if (blockedTouchIds.Contains(touchId))
+            {
+                if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+                    blockedTouchIds.Remove(touchId);
+                continue;
+            }
+
             switch (touch.phase)
             {
                 case TouchPhase.Began:
                     if (isJumping || isFall)
                         return;
+
+                    // Block only inside configured zones (and optionally any UI if enabled).
+                    if (IsInNoTouchZone(touch.position) || (blockTouchOverAnyUI && IsPointerOverAnyUI(touchId)))
+                    {
+                        blockedTouchIds.Add(touchId);
+                        continue;
+                    }
 
                     touchStartPositions[touchId] = touch.position;
                     touchLastPositions[touchId] = touch.position;
@@ -811,6 +864,14 @@ public class PlayerController : PlayerCharacter
                         touchLastPositions.Remove(touchId);
                     }
                     break;
+
+                case TouchPhase.Canceled:
+                    // Ensure we don't keep stale tracking if OS cancels the touch.
+                    touchStartPositions.Remove(touchId);
+                    touchStartTimes.Remove(touchId);
+                    touchLastPositions.Remove(touchId);
+                    blockedTouchIds.Remove(touchId);
+                    break;
             }
         }
     }
@@ -873,6 +934,9 @@ public class PlayerController : PlayerCharacter
     public void ClearTouch()
     {
         touchStartPositions.Clear();
+        touchLastPositions.Clear();
+        touchStartTimes.Clear();
+        blockedTouchIds.Clear();
     }
     public void SetRevive()
     {

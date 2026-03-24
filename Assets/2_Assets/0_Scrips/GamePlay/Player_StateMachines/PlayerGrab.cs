@@ -111,7 +111,7 @@ public class PlayerGrab : PlayerStateManager
 
         // Play grab animation
         playerController.PlayAnim("Grab", true);
-        AudioBase.Instance.AudioPlayer(2);
+        AudioBase.Instance.AudioPlayer(1);
 
         _grabAttackCount = 0;
         //_maxGrabAttacks = Random.Range(2, 4);
@@ -259,6 +259,7 @@ public class PlayerGrab : PlayerStateManager
             if (e == null || e.Data == null) return;
             if (string.Equals(e.Data.Name, "Throw", System.StringComparison.OrdinalIgnoreCase))
             {
+                AudioBase.Instance.AudioPlayer(21);
                 if (GamePlayManager.Instance.isEnableAttack)
                 {
                     GamePlayManager.Instance.isEnableAttack = false;
@@ -273,6 +274,7 @@ public class PlayerGrab : PlayerStateManager
         };
 
         // subscribe to Spine event
+        AudioBase.Instance.AudioPlayer(18);
         if (playerController != null && playerController.skeletonAnimation != null)
         {
             playerController.skeletonAnimation.AnimationState.Event += _spineThrowHandler;

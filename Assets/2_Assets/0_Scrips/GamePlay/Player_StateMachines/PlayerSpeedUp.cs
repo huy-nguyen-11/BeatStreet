@@ -10,7 +10,7 @@ public class PlayerSpeedUp : PlayerStateManager
         playerController.state = PlayerController.State.SpeedUp;
         _direction = playerController.isFacingRight ? true : false;
         playerController.SetFacingDirection(_direction);
-        AudioBase.Instance.AudioPlayer(2);
+        AudioBase.Instance.AudioPlayer(19);
 
         //var entry = playerController.skeletonAnimation != null ? playerController.skeletonAnimation.AnimationState.GetCurrent(0) : null;
         //Debug.Log("After PlayAnim: spine entry = " + (entry != null && entry.Animation != null ? entry.Animation.Name : "null"));

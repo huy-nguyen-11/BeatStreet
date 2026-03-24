@@ -16,7 +16,8 @@ public class PlayerCombo1 : PlayerStateManager
         //playerController.animator.Play("Combo1");
         bool wasRunning = (playerController.state == PlayerController.State.Run);
         playerController.PlayAnimAttack(playerController.animSlideAttack1);
-
+        AudioBase.Instance.AudioPlayer(14);
+        AudioBase.Instance.AudioPlayer(2);
         playerController.idAttackArea = 4;// set id attack area == 4
                                           //playerController.rb.linearVelocity = Vector3.zero;
                                           // If a previous coroutine is running, stop it
@@ -28,7 +29,7 @@ public class PlayerCombo1 : PlayerStateManager
 
         // Start a short forward-movement then stop
         coroutine = playerController.StartCoroutine(MoveForwardThenStop(attackForwardDistance, attackForwardTimeout));
-        AudioBase.Instance.AudioPlayer(0);
+  
         //if (coroutine != null)
         //    playerController.StopCoroutine(coroutine);
         //coroutine = playerController.StartCoroutine(playerController.CheckAnimationAndTriggerEvent("Combo1"));

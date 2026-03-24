@@ -7,6 +7,8 @@ public class PlayerThrow : PlayerStateManager
     {
         playerController.state = PlayerController.State.Throw;
         playerController.PlayAnim("Grab_L", false);
+        AudioBase.Instance.AudioPlayer(18);
+        AudioBase.Instance.AudioPlayer(21);
     }
     public override void Update()
     {

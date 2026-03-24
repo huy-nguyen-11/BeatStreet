@@ -26,6 +26,7 @@ public class PlayerHit : PlayerStateManager
             playerController.isFall = true;
             playerController.isImmortal = true;
             playerController.PlayAnim("Dead", false);
+            AudioBase.Instance.AudioPlayer(23);
             playerController.velocity = 8;
             _coroutine = playerController.StartCoroutine(playerController.FallCoroutine());
             _isFall = true;

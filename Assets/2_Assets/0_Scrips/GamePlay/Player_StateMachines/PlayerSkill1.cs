@@ -16,14 +16,15 @@ public class PlayerSkill1 : PlayerStateManager
         //playerController.animator.Play("Skill1");
         bool wasRunning = (playerController.state == PlayerController.State.Run);
         playerController.PlayAnimAttack(playerController.animSlideAttack2);
-
+        AudioBase.Instance.AudioPlayer(14);
+        AudioBase.Instance.AudioPlayer(20);
         playerController.idAttackArea = 4;// set id attack area == 4
         //playerController.rb.linearVelocity = Vector3.zero;
         coroutine = playerController.StartCoroutine(MoveForwardThenStop(attackForwardDistance, attackForwardTimeout));
         playerController.state = PlayerController.State.Skill1;
         GamePlayManager.Instance.SetMission(6, 1);
-        AudioBase.Instance.AudioPlayer(0);
-        AudioBase.Instance.AudioPlayer(4);
+        //AudioBase.Instance.AudioPlayer(0);
+        //AudioBase.Instance.AudioPlayer(4);
         //SetSkill1();
     }
     public override void Update()
