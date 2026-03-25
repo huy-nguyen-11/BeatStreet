@@ -223,6 +223,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5249103849714873607}
   - component: {fileID: 4002340473771019351}
+  - component: {fileID: 2386579306953179375}
   m_Layer: 0
   m_Name: chair_0_0 (1)
   m_TagString: Untagged
@@ -304,6 +305,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &2386579306953179375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 336524691766253284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.5
+  threshold: 0.05
 --- !u!1 &356251019640372829
 GameObject:
   m_ObjectHideFlags: 0
@@ -314,6 +329,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6126766745678549017}
   - component: {fileID: 6945614611536852983}
+  - component: {fileID: 6058597867209502140}
   m_Layer: 0
   m_Name: mailbox_0
   m_TagString: Untagged
@@ -395,6 +411,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &6058597867209502140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 356251019640372829}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.5
+  threshold: 0.05
 --- !u!1 &364675552153278045
 GameObject:
   m_ObjectHideFlags: 0
@@ -1401,6 +1431,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7823968947498628118}
   - component: {fileID: 8113628684661853028}
+  - component: {fileID: 4353377863441118414}
   m_Layer: 0
   m_Name: fire_hydrant_0
   m_TagString: Untagged
@@ -1482,6 +1513,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &4353377863441118414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 851271568513932932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.5
+  threshold: 0.05
 --- !u!1 &860201736029598878
 GameObject:
   m_ObjectHideFlags: 0
@@ -1674,6 +1719,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6624819090736485198}
   - component: {fileID: 8892493730466609139}
+  - component: {fileID: 5721173762991208481}
   m_Layer: 0
   m_Name: light_0 (2)
   m_TagString: Untagged
@@ -1690,7 +1736,7 @@ Transform:
   m_GameObject: {fileID: 1000155055265528346}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 31.32, y: 6.114, z: 0}
+  m_LocalPosition: {x: 31.32, y: 6.01, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1755,6 +1801,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &5721173762991208481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000155055265528346}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -1.5
+  threshold: 0.05
 --- !u!1 &1095747021540056389
 GameObject:
   m_ObjectHideFlags: 0
@@ -1927,7 +1987,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 5
+  m_SortingOrder: 15
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: f9dfd80243598314f9b68dfecf8a5a75, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2379,7 +2439,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 5
+  m_SortingOrder: 20
   m_MaskInteraction: 0
   m_Sprite: {fileID: -4972502316975452809, guid: 927c6f5d5ccc65a41a0e01860c6406ba, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -3874,7 +3934,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.14396954, y: 0.12054014}
+  m_Offset: {x: -0.14396954, y: 0.4025994}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -3884,7 +3944,7 @@ BoxCollider2D:
     drawMode: 2
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 20.609037, y: 1.1600821}
+  m_Size: {x: 20.609037, y: 0.5959636}
   m_EdgeRadius: 0
 --- !u!1 &2863463976032472882
 GameObject:
@@ -3931,6 +3991,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8412399628995436463}
   - component: {fileID: 173200948288408902}
+  - component: {fileID: 8708942160142865437}
   m_Layer: 0
   m_Name: light_0 (3)
   m_TagString: Untagged
@@ -3947,7 +4008,7 @@ Transform:
   m_GameObject: {fileID: 2944231150340636055}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 38.19, y: 6.114, z: 0}
+  m_LocalPosition: {x: 38.94, y: 6.06, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4012,6 +4073,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &8708942160142865437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2944231150340636055}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -1.5
+  threshold: 0.05
 --- !u!1 &2967144752671836785
 GameObject:
   m_ObjectHideFlags: 0
@@ -4204,6 +4279,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4389328338103881365}
   - component: {fileID: 4709915424442306045}
+  - component: {fileID: 4295242483388177454}
   m_Layer: 0
   m_Name: trash_can_0 (2)
   m_TagString: Untagged
@@ -4285,6 +4361,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &4295242483388177454
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3069205721705132842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.5
+  threshold: 0.05
 --- !u!1 &3111382280527910017
 GameObject:
   m_ObjectHideFlags: 0
@@ -4474,6 +4564,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3682478739901448231}
   - component: {fileID: 1279577321670046133}
+  - component: {fileID: 4156272110282302084}
   m_Layer: 0
   m_Name: light_0 (1)
   m_TagString: Untagged
@@ -4490,7 +4581,7 @@ Transform:
   m_GameObject: {fileID: 3287497804643338924}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.76, y: 6.114, z: 0}
+  m_LocalPosition: {x: 4.85, y: 5.94, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4555,6 +4646,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &4156272110282302084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3287497804643338924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -1.5
+  threshold: 0.05
 --- !u!1 &3454328819972526670
 GameObject:
   m_ObjectHideFlags: 0
@@ -5879,6 +5984,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5986353773168957744}
   - component: {fileID: 4524734447423078700}
+  - component: {fileID: 1605438587791897257}
   m_Layer: 0
   m_Name: vending_machine_0 (1)
   m_TagString: Untagged
@@ -5960,6 +6066,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &1605438587791897257
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4049999773060650144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.85
+  threshold: 0.05
 --- !u!1 &4174226208914344669
 GameObject:
   m_ObjectHideFlags: 0
@@ -7272,6 +7392,7 @@ GameObject:
   m_Component:
   - component: {fileID: 78513634974242085}
   - component: {fileID: 6917068785316491027}
+  - component: {fileID: 6990335141154710188}
   m_Layer: 0
   m_Name: mailbox_0 (1)
   m_TagString: Untagged
@@ -7353,6 +7474,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &6990335141154710188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5153882645748490317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.5
+  threshold: 0.05
 --- !u!1 &5402269535129259464
 GameObject:
   m_ObjectHideFlags: 0
@@ -7363,6 +7498,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3844923177460350758}
   - component: {fileID: 4250099090920725760}
+  - component: {fileID: 138972950012564255}
   m_Layer: 0
   m_Name: light_0
   m_TagString: Untagged
@@ -7379,7 +7515,7 @@ Transform:
   m_GameObject: {fileID: 5402269535129259464}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -6.76, y: 6.114, z: 0}
+  m_LocalPosition: {x: -6.76, y: 5.96, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7444,6 +7580,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &138972950012564255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5402269535129259464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -1.5
+  threshold: 0.05
 --- !u!1 &5452395087076734471
 GameObject:
   m_ObjectHideFlags: 0
@@ -7727,6 +7877,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1920563125678244428}
   - component: {fileID: 5150263643219418696}
+  - component: {fileID: 8662648038729450582}
   m_Layer: 0
   m_Name: trash_can_0 (1)
   m_TagString: Untagged
@@ -7808,6 +7959,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &8662648038729450582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5613179307961561971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.5
+  threshold: 0.05
 --- !u!1 &5864400039718495492
 GameObject:
   m_ObjectHideFlags: 0
@@ -8432,7 +8597,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.0002861023, y: 0.12054014}
+  m_Offset: {x: -0.0002861023, y: 0.3716182}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -8442,7 +8607,7 @@ BoxCollider2D:
     drawMode: 2
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 32.18995, y: 1.1600821}
+  m_Size: {x: 32.18995, y: 0.65792596}
   m_EdgeRadius: 0
 --- !u!1 &6211819857275935857
 GameObject:
@@ -9705,6 +9870,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9053751836312770434}
   - component: {fileID: 2485656036438511076}
+  - component: {fileID: 937690018842125397}
   m_Layer: 0
   m_Name: chair_0_0
   m_TagString: Untagged
@@ -9786,6 +9952,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &937690018842125397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8100472675058930614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.5
+  threshold: 0.05
 --- !u!1 &8283362030565266955
 GameObject:
   m_ObjectHideFlags: 0
@@ -9887,6 +10067,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2375109922060094213}
   - component: {fileID: 964450863796216934}
+  - component: {fileID: 3648607933291767216}
   m_Layer: 0
   m_Name: trash_can_0
   m_TagString: Untagged
@@ -9968,6 +10149,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &3648607933291767216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8296485915918211038}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.5
+  threshold: 0.05
 --- !u!1 &8299356707979033719
 GameObject:
   m_ObjectHideFlags: 0
@@ -9978,6 +10173,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2698707436175633281}
   - component: {fileID: 9197600957606072592}
+  - component: {fileID: 5275880758968027740}
   m_Layer: 0
   m_Name: vending_machine_0
   m_TagString: Untagged
@@ -10059,6 +10255,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &5275880758968027740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8299356707979033719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.85
+  threshold: 0.05
 --- !u!1 &8594407307024889857
 GameObject:
   m_ObjectHideFlags: 0

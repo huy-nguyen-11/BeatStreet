@@ -409,6 +409,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5987773167379865252}
   - component: {fileID: 9202100361385062797}
+  - component: {fileID: 1663290564369326621}
   m_Layer: 0
   m_Name: trash_can_0 (1)
   m_TagString: Untagged
@@ -490,6 +491,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &1663290564369326621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 737750550964658727}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.5
+  threshold: 0.05
 --- !u!1 &850972701723608126
 GameObject:
   m_ObjectHideFlags: 0
@@ -500,6 +515,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5952026984291218654}
   - component: {fileID: 4400140508189829202}
+  - component: {fileID: 9032097813090398713}
   m_Layer: 0
   m_Name: chair_0_0 (1)
   m_TagString: Untagged
@@ -581,6 +597,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &9032097813090398713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 850972701723608126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.5
+  threshold: 0.05
 --- !u!1 &1074955243623502494
 GameObject:
   m_ObjectHideFlags: 0
@@ -591,6 +621,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1845314721320288401}
   - component: {fileID: 1816490658244969147}
+  - component: {fileID: 111943298805113702}
   m_Layer: 0
   m_Name: trash_can_0 (2)
   m_TagString: Untagged
@@ -672,6 +703,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &111943298805113702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1074955243623502494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.5
+  threshold: 0.05
 --- !u!1 &1407373022779070700
 GameObject:
   m_ObjectHideFlags: 0
@@ -955,6 +1000,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1957508706200816444}
   - component: {fileID: 3259402636396437408}
+  - component: {fileID: 1969957040912854942}
   m_Layer: 0
   m_Name: trash_can_0 (3)
   m_TagString: Untagged
@@ -1036,6 +1082,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &1969957040912854942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776120434555778812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.5
+  threshold: 0.05
 --- !u!1 &1813506535097031486
 GameObject:
   m_ObjectHideFlags: 0
@@ -2088,6 +2148,7 @@ GameObject:
   m_Component:
   - component: {fileID: 329875620669521207}
   - component: {fileID: 9007876190858295489}
+  - component: {fileID: 6676619222769851823}
   m_Layer: 0
   m_Name: vending_machine_0 (1)
   m_TagString: Untagged
@@ -2169,6 +2230,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &6676619222769851823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2880492033611891155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.85
+  threshold: 0.05
 --- !u!1 &2933412121512289696
 GameObject:
   m_ObjectHideFlags: 0
@@ -2361,6 +2436,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7203040244474828388}
   - component: {fileID: 1404502332474134630}
+  - component: {fileID: 3783349684746230275}
   m_Layer: 0
   m_Name: fire_hydrant_0
   m_TagString: Untagged
@@ -2442,6 +2518,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &3783349684746230275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3187350673521606289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.5
+  threshold: 0.05
 --- !u!1 &3206562899335055739
 GameObject:
   m_ObjectHideFlags: 0
@@ -2523,7 +2613,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 5
+  m_SortingOrder: 15
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: f9dfd80243598314f9b68dfecf8a5a75, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2618,6 +2708,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3387373106720759851}
   - component: {fileID: 3911881119434043280}
+  - component: {fileID: 7951195375600365891}
   m_Layer: 0
   m_Name: mailbox_0
   m_TagString: Untagged
@@ -2699,6 +2790,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &7951195375600365891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3523993873075230241}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.5
+  threshold: 0.05
 --- !u!1 &3528416510232575518
 GameObject:
   m_ObjectHideFlags: 0
@@ -2823,6 +2928,7 @@ GameObject:
   m_Component:
   - component: {fileID: 605060375992481565}
   - component: {fileID: 5355458009070496274}
+  - component: {fileID: 3889887467911351860}
   m_Layer: 0
   m_Name: light_0 (1)
   m_TagString: Untagged
@@ -2904,6 +3010,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &3889887467911351860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3591117960978766110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -1.5
+  threshold: 0.05
 --- !u!1 &3843278831431406349
 GameObject:
   m_ObjectHideFlags: 0
@@ -4023,6 +4143,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3833468328652575912}
   - component: {fileID: 1882749159350534988}
+  - component: {fileID: 4375190422100020494}
   m_Layer: 0
   m_Name: light_0 (3)
   m_TagString: Untagged
@@ -4104,6 +4225,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &4375190422100020494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4560127411213676995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -1.5
+  threshold: 0.05
 --- !u!1 &4624196639173046915
 GameObject:
   m_ObjectHideFlags: 0
@@ -4349,7 +4484,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.25723457, y: 0.12054014}
+  m_Offset: {x: 0.25723457, y: 0.26519322}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -4359,7 +4494,7 @@ BoxCollider2D:
     drawMode: 2
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 10.3571205, y: 1.1600821}
+  m_Size: {x: 10.3571205, y: 0.87077594}
   m_EdgeRadius: 0
 --- !u!1 &4749575717222357765
 GameObject:
@@ -4699,6 +4834,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4977481635373084360}
   - component: {fileID: 1187348287021465613}
+  - component: {fileID: 8839668014623531948}
   m_Layer: 0
   m_Name: light_0
   m_TagString: Untagged
@@ -4780,6 +4916,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &8839668014623531948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4955232733183351776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -1.5
+  threshold: 0.05
 --- !u!1 &5147616124733620521
 GameObject:
   m_ObjectHideFlags: 0
@@ -5010,6 +5160,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1826748114545170330}
   - component: {fileID: 6519636890142394297}
+  - component: {fileID: 4762928695245430433}
+  - component: {fileID: 6430069439468853693}
   m_Layer: 0
   m_Name: car_blue_0
   m_TagString: Untagged
@@ -5091,6 +5243,66 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &4762928695245430433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5349054100307201701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.8
+  threshold: 0.05
+--- !u!61 &6430069439468853693
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5349054100307201701}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0.0637728, y: -0.2072599}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 3.69, y: 2.41}
+    newSize: {x: 3.69, y: 2.41}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 2.8450181, y: 0.9272934}
+  m_EdgeRadius: 0
 --- !u!1 &5358679175400191476
 GameObject:
   m_ObjectHideFlags: 0
@@ -5192,6 +5404,7 @@ GameObject:
   m_Component:
   - component: {fileID: 813253475174977321}
   - component: {fileID: 8943630020564918091}
+  - component: {fileID: 8269593881158186954}
   m_Layer: 0
   m_Name: chair_0_0
   m_TagString: Untagged
@@ -5273,6 +5486,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &8269593881158186954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5567772165513063068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.5
+  threshold: 0.05
 --- !u!1 &5613610320948769857
 GameObject:
   m_ObjectHideFlags: 0
@@ -5514,6 +5741,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8847575635381720847}
   - component: {fileID: 4884823277149466934}
+  - component: {fileID: 2031824719523417508}
   m_Layer: 0
   m_Name: mailbox_0 (1)
   m_TagString: Untagged
@@ -5595,6 +5823,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &2031824719523417508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5961889475656158368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.5
+  threshold: 0.05
 --- !u!1 &6122850846707057276
 GameObject:
   m_ObjectHideFlags: 0
@@ -6054,6 +6296,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6841399705659579831}
   - component: {fileID: 141744443255222685}
+  - component: {fileID: 7955505437860109072}
   m_Layer: 0
   m_Name: vending_machine_0
   m_TagString: Untagged
@@ -6135,6 +6378,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &7955505437860109072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7035412011134686623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.85
+  threshold: 0.05
 --- !u!1 &7035455246840516378
 GameObject:
   m_ObjectHideFlags: 0
@@ -6857,7 +7114,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.010633469, y: 0.12054014}
+  m_Offset: {x: 0.010633469, y: 0.25538832}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -6867,7 +7124,7 @@ BoxCollider2D:
     drawMode: 2
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 33.37817, y: 1.1600821}
+  m_Size: {x: 33.37817, y: 0.89038575}
   m_EdgeRadius: 0
 --- !u!1 &8372868012954594396
 GameObject:
@@ -6879,6 +7136,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8551700240989728946}
   - component: {fileID: 1638486969129262320}
+  - component: {fileID: 8777586769754621436}
   m_Layer: 0
   m_Name: light_0 (2)
   m_TagString: Untagged
@@ -6960,6 +7218,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &8777586769754621436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8372868012954594396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -1.5
+  threshold: 0.05
 --- !u!1 &8478058123940170008
 GameObject:
   m_ObjectHideFlags: 0
@@ -7498,6 +7770,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4190260518441601486}
   - component: {fileID: 7313944618101462555}
+  - component: {fileID: 1254561246733503177}
   m_Layer: 0
   m_Name: trash_can_0
   m_TagString: Untagged
@@ -7579,6 +7852,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &1254561246733503177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8989738536210754409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  yOffset: -0.5
+  threshold: 0.05
 --- !u!1 &9021671143944609922
 GameObject:
   m_ObjectHideFlags: 0
