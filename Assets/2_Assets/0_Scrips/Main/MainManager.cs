@@ -122,6 +122,13 @@ public class MainManager : MonoBehaviour
             buttonBack.SetActive(true);
         }
 
+        if(AudioBase.Instance.isOpenLevel)
+        {
+            AudioBase.Instance.isOpenLevel = false;
+            ClossAllPanel();
+            SetBottomBar(id);
+            _panels[0].SetActive(true);
+        }
     }
     public void SetTopBar()
     {

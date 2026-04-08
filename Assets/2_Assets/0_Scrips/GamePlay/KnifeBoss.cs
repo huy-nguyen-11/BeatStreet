@@ -193,7 +193,7 @@ public class KnifeBoss : MonoBehaviour, IpooledObject
 
             if (playerController != null)
             {
-                if(playerController.isImmortal || playerController.state == PlayerController.State.Dead)
+                if(playerController.isImmortal || playerController.state == PlayerController.State.Dead || ShouldIgnorePlayerHit(playerController))
                 {
                     return;
                 }
@@ -202,6 +202,19 @@ public class KnifeBoss : MonoBehaviour, IpooledObject
                 playerController.SetHit(damage);
             }
         }
+    }
+
+    private bool ShouldIgnorePlayerHit(PlayerController playerController)
+    {
+        if (playerController == null) return true;
+
+        if (playerController.state == PlayerCharacter.State.Ulti)
+            return true;
+
+        if (GamePlayManager.Instance != null && GamePlayManager.Instance.isCheckUlti)
+            return true;
+
+        return false;
     }
 
 }

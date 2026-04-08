@@ -256,6 +256,9 @@ public class BomEnemy : MonoBehaviour , IpooledObject
             PlayerChar player = hit.GetComponent<PlayerChar>();
             if (player != null)
             {
+                if (ShouldIgnorePlayerHit(player.playerController))
+                    continue;
+
                 player.playerController.HitDirection = player.transform.position.x >= transform.position.x;
                 player.playerController.HitCount = 2;
                 player.playerController.SetHit(explosionDamagePlayer);
@@ -292,12 +295,28 @@ public class BomEnemy : MonoBehaviour , IpooledObject
 
             if (playerController != null && isEnableHit)
             {
+                if (ShouldIgnorePlayerHit(playerController))
+                    return;
+
                 playerController.HitDirection = moveRight;
                 playerController.SetHit(1);
                 ObjectPooler.Instance.SpawnFromPool("Hit", transform.position, Quaternion.Euler(0, 0, 0));
                 isEnableHit = false;
             }
         }
+    }
+
+    private bool ShouldIgnorePlayerHit(PlayerController playerController)
+    {
+        if (playerController == null) return true;
+
+        if (playerController.state == PlayerCharacter.State.Ulti)
+            return true;
+
+        if (GamePlayManager.Instance != null && GamePlayManager.Instance.isCheckUlti)
+            return true;
+
+        return false;
     }
 
 

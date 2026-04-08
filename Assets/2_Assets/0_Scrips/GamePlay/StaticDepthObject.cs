@@ -1,71 +1,48 @@
-﻿using UnityEngine;
-using Spine.Unity;
-using Spine;
-
+using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
 public class StaticDepthObject : MonoBehaviour
 {
     [Header("Settings")]
-    public float yOffset = 0f;
+    private string sortingLayerName = "Char";
+    [SerializeField] private int sortingBaseOrder = 100;
+    [SerializeField] private float sortingScale = 100f;
 
-    public float threshold = 0.05f;
+    [Header("Offsets")]
+    [SerializeField] private float yOffset = 0f;
+    [SerializeField] private int orderOffset = 0;
 
-    private SpriteRenderer sr;
-    private Transform player;
-    //private SpriteRenderer playerSR;
-    private SkeletonAnimation playerSkeletonAnim;
+    private SpriteRenderer[] spriteRenderers;
 
-    private float lastPlayerY;
-
-    void Awake()
+    private void Awake()
     {
-        sr = GetComponent<SpriteRenderer>();
+        spriteRenderers = GetComponentsInChildren<SpriteRenderer>(true);
     }
 
-    void Start()
+    private void Start()
     {
-        GameObject p = PlayerController.Instance != null ? PlayerController.Instance.gameObject : GameObject.FindGameObjectWithTag("Player").transform.GetChild(0).gameObject;
-
-        if (p != null)
-        {
-            player = p.transform;
-            //playerSR = p.GetComponent<SpriteRenderer>();
-            playerSkeletonAnim = p.GetComponent<SkeletonAnimation>();
-            lastPlayerY = player.position.y;
-        }
-        else
-        {
-            Debug.LogWarning("not found Player (tag = Player)");
-        }
+        ApplySorting();
     }
 
-    void LateUpdate()
+    private void LateUpdate()
     {
-        if (player == null || playerSkeletonAnim == null) return;
-
-        float playerY = player.position.y;
-
-        if (Mathf.Abs(playerY - lastPlayerY) < 0.0001f) return;
-
-        lastPlayerY = playerY;
-
-        UpdateSorting(playerY);
+        ApplySorting();
     }
 
-    void UpdateSorting(float playerY)
+    private void ApplySorting()
     {
-        float myY = transform.position.y + yOffset;
+        if (spriteRenderers == null || spriteRenderers.Length == 0) return;
 
-        if (myY < playerY - threshold)
+        float yForSorting = transform.position.y + yOffset;
+        int sortingOrder = sortingBaseOrder - Mathf.RoundToInt(yForSorting * sortingScale) + orderOffset;
+
+        for (int i = 0; i < spriteRenderers.Length; i++)
         {
-            //sr.sortingOrder = playerSR.sortingOrder + 1;
-            sr.sortingOrder = /*playerSkeletonAnim.GetComponent<Renderer>().sortingOrder + 10*/ 12;
-        }
-        else if (myY > playerY + threshold)
-        {
-            //sr.sortingOrder = playerSR.sortingOrder - 1;
-            sr.sortingOrder = /*playerSkeletonAnim.GetComponent<Renderer>().sortingOrder - 10*/ 4;
+            SpriteRenderer sr = spriteRenderers[i];
+            if (sr == null) continue;
+
+            sr.sortingLayerName = sortingLayerName;
+            sr.sortingOrder = sortingOrder;
         }
     }
 }

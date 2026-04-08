@@ -19,6 +19,7 @@ public class PlayerGrab : PlayerStateManager
     private Spine.AnimationState.TrackEntryDelegate _throwCompleteHandler;
     private bool _throwAnimCompleted = false;
     private bool _throwOccurred = false;
+    private bool _throwInProgress = false;
 
     // attack
     private bool _grabAttackBusy = false;
@@ -116,6 +117,7 @@ public class PlayerGrab : PlayerStateManager
         _grabAttackCount = 0;
         //_maxGrabAttacks = Random.Range(2, 4);
         _maxGrabAttacks = 2;
+        _throwInProgress = false;
 
         isGrabActive = true;
         grabTimer = 0f;
@@ -129,7 +131,7 @@ public class PlayerGrab : PlayerStateManager
         // If grabbed enemy died or controller lost, cancel grab immediately
         if (grabbedEnemyController == null || grabbedEnemyController.state == EnemyCharacter.State.Dead || playerController.state == PlayerController.State.Dead)
         {
-            CancelGrabAndIdle();
+            CancelGrabAndIdle(true);
             return;
         }
 
@@ -138,9 +140,12 @@ public class PlayerGrab : PlayerStateManager
         // Wait for grab duration to complete
         if (grabTimer >= grabDuration)
         {
-          
-            //ReleaseGrab();
-            CancelGrab();
+            // don't interrupt an ongoing throw animation flow
+            if (!_throwInProgress)
+            {
+                //ReleaseGrab();
+                CancelGrab();
+            }
         }
 
         // cooldown update (optional)
@@ -223,14 +228,28 @@ public class PlayerGrab : PlayerStateManager
     // Call this from PlayerController when detecting swipe while grabbing
     public void StartThrow(float direction)
     {
+        if (_throwInProgress) return;
         if (!isGrabActive || grabbedEnemyController == null) return;
 
         // if enemy died between tap and throw, cancel
         if (grabbedEnemyController.state == EnemyCharacter.State.Dead)
         {
-            CancelGrabAndIdle();
+            CancelGrabAndIdle(true);
             return;
         }
+
+        _throwInProgress = true;
+        _grabAttackQueue = 0;
+        _grabAttackBusy = false;
+        try
+        {
+            if (_grabAttackEntry != null && _grabAttackCompleteHandler != null)
+                _grabAttackEntry.Complete -= _grabAttackCompleteHandler;
+        }
+        catch { }
+        _grabAttackEntry = null;
+        _grabAttackCompleteHandler = null;
+
         _pendingThrowDirection = Mathf.Sign(direction);
         _throwAnimCompleted = false;
         _throwOccurred = false;
@@ -312,7 +331,7 @@ public class PlayerGrab : PlayerStateManager
         if (grabbedEnemyController.state == EnemyCharacter.State.Dead)
         {
 
-            CancelGrabAndIdle();
+            CancelGrabAndIdle(true);
             return;
         }
 
@@ -346,6 +365,8 @@ public class PlayerGrab : PlayerStateManager
             _throwTrackEntry = null;
         }
 
+        _throwInProgress = false;
+
         // Now it's safe to return player to idle
         if (playerController != null)
             playerController.SwitchToRunState(playerController.playerIdle);
@@ -375,7 +396,10 @@ public class PlayerGrab : PlayerStateManager
     /// </summary>
     public void QueueGrabAttack()
     {
-        if (!isGrabActive) return;
+        if (!isGrabActive || _throwInProgress) return;
+
+        int plannedAttacks = _grabAttackCount + (_grabAttackBusy ? 1 : 0) + _grabAttackQueue;
+        if (plannedAttacks >= _maxGrabAttacks) return;
 
         if (!_grabAttackBusy)
             PlayGrabAttack();
@@ -385,13 +409,13 @@ public class PlayerGrab : PlayerStateManager
 
     private void PlayGrabAttack()
     {
-        if (!isGrabActive) return;
+        if (!isGrabActive || _throwInProgress) return;
         if (playerController == null) return;
 
         // if enemy died, cancel grab instead of attacking
         if (grabbedEnemyController == null || grabbedEnemyController.state == EnemyCharacter.State.Dead)
         {
-            CancelGrabAndIdle();
+            CancelGrabAndIdle(true);
             return;
         }
 
@@ -434,6 +458,8 @@ public class PlayerGrab : PlayerStateManager
 
     private void OnGrabAttackComplete(Spine.TrackEntry entry)
     {
+        if (_throwInProgress) return;
+
         // detach handler
         try
         {
@@ -450,7 +476,7 @@ public class PlayerGrab : PlayerStateManager
         _grabAttackCount++;
 
         // Kiểm tra nếu số lần tấn công vượt quá ngưỡng, tự động ném enemy
-        if (_grabAttackCount > _maxGrabAttacks && isGrabActive && grabbedEnemyController != null)
+        if (_grabAttackCount >= _maxGrabAttacks && isGrabActive && grabbedEnemyController != null)
         {
             float throwDirection = playerController.isFacingRight ? 1f : -1f;
             playerController.isThrowEnemy = true;
@@ -466,10 +492,13 @@ public class PlayerGrab : PlayerStateManager
         }
     }
 
-    private void CancelGrabAndIdle()
+    private void CancelGrabAndIdle(bool forceCancel = false)
     {
+        if (_throwInProgress && !forceCancel) return;
+
         // Unsubscribe any pending throw/attack handlers
         UnsubscribeThrowEvent();
+        _throwInProgress = false;
         if (GamePlayManager.Instance.isEnableAttack)
         {
             GamePlayManager.Instance.isEnableAttack = false;
@@ -549,6 +578,7 @@ public class PlayerGrab : PlayerStateManager
             grabbedEnemyController.SwitchToRunState(grabbedEnemyController.enemyIdle);
         }
 
+        _throwInProgress = false;
         isGrabActive = false;
         grabTimer = 0f;
         playerController.canGrab = false;

@@ -63,7 +63,8 @@ public class GamePlayManager : MonoBehaviour
     public float minPosX , maxPosX , maxPosY , minPosY;
 
     //ulti
-    [SerializeField] public GameObject backUlti;
+    [SerializeField] public GameObject backUlti0 , backUlti1;
+    private Vector3 _posBot, _posTop;
 
     [SerializeField] private GameObject _showFightBoss;
 
@@ -83,6 +84,10 @@ public class GamePlayManager : MonoBehaviour
     [Tooltip("Assign UI Images/RectTransforms where gameplay touch must be ignored. (Do NOT include your joystick.)")]
     [SerializeField] public List<RectTransform> noTouchZones = new List<RectTransform>();
     [Tooltip("Optional: also block touch when it begins over ANY UI. Off by default to avoid affecting joystick.")]
+
+    //panel open game
+    [SerializeField] private GameObject panelOpenGame;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -101,6 +106,7 @@ public class GamePlayManager : MonoBehaviour
     }
     public void Start()
     {
+        OpenPanelGame();
         dataManager = DataManager.Instance;
         OnInitGamePlay();
         //_Player = FindObjectOfType<PlayerController>();
@@ -126,8 +132,29 @@ public class GamePlayManager : MonoBehaviour
         SetItem();
 
 
-        backUlti.SetActive(false);
+        backUlti0.SetActive(false);
+        backUlti1.SetActive(false);
+        _posBot = backUlti1.transform.GetChild(1).localPosition;
+        _posTop = backUlti1.transform.GetChild(0).localPosition;
         _showFightBoss.SetActive(false);
+    }
+
+    void OpenPanelGame()
+    {
+        panelOpenGame.SetActive(true);
+
+        CanvasGroup canvasGroup = panelOpenGame.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+        {
+            canvasGroup = panelOpenGame.AddComponent<CanvasGroup>();
+        }
+
+        canvasGroup.alpha = 1f;
+        canvasGroup.DOFade(0f, 1).SetDelay(2)
+            .OnComplete(() =>
+            {
+                panelOpenGame.SetActive(false);
+            });
     }
 
     void OnInitGamePlay()
@@ -192,10 +219,9 @@ public class GamePlayManager : MonoBehaviour
                 {
                     if (Mathf.Abs(EnemyPos.x - PlayerPos.x) <= 1.5f)
                     {
-                        // Trước khi vào Ulti: di chuyển player về vị trí lý tưởng quanh enemy
-                        _Player.MoveToIdealUltiPosition(enemy.transform);
-
-                        backUlti.SetActive(true);
+                        //backUlti0.SetActive(true);
+                        //backUlti1.SetActive(true);
+                        SetBackUltiShow();
                         isCheckUlti = true;
                         _BtnGamePlays[0].SetActive(false);
                         SetMission(8, 1);
@@ -206,7 +232,6 @@ public class GamePlayManager : MonoBehaviour
                         if (_Player != null)
                             _Player.SetFacingDirection(isEnemyOnRight);
                         SetCharsToCharSortingLayer();
-
                         //float numRange = _Player.id == 0 ? 0.5f : 0.75f;
                         //float numRange2 = _Player.id == 0 ? 0.6f : 1.3f;
                         //_Player.Char.transform.position = new Vector3(_CameraFollow.transform.position.x - numRange ,_CameraFollow.transform.position.y - 1 , 0);
@@ -219,6 +244,30 @@ public class GamePlayManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    void SetBackUltiShow()
+    {
+        backUlti0.SetActive(true);
+        backUlti1.SetActive(true);
+        Transform top = backUlti1.transform.GetChild(0);
+        Transform bottom = backUlti1.transform.GetChild(1);
+        float _posYCam = _CameraFollow.transform.position.y;
+        //Debug.Log("posYPlayer: " + _posYPlayer);
+        //Debug.Log("posYBottom: " + bottom.localPosition.y);
+        //Debug.Log("posYTop: " + top.localPosition.y);
+        top.DOLocalMoveY(_posYCam + 1500, 1).From(_posTop).SetEase(Ease.OutQuad);
+        bottom.DOLocalMoveY(_posYCam - 2300,1).From(_posBot).SetEase(Ease.OutQuad);
+    }
+
+    public void ReseBackUltiShow()
+    {
+        backUlti0.SetActive(false);
+        backUlti1.SetActive(false);
+        Transform top = backUlti1.transform.GetChild(0);
+        Transform bottom = backUlti1.transform.GetChild(1);
+        top.position = _posTop;
+        bottom.position = _posBot;
     }
 
     private void GetEnemyBeforeUlti()
@@ -283,9 +332,9 @@ public class GamePlayManager : MonoBehaviour
     public IEnumerator OpenPopupGameOver(int id)
     {
         yield return new WaitForSeconds(1f);
-        if (id == 0)
-            AudioBase.Instance.AudioGPl(0);
-        yield return new WaitForSeconds(1.5f);
+        //if (id == 0)
+        //    AudioBase.Instance.AudioGPl(0);
+        //yield return new WaitForSeconds(1.5f);
         if (id == 0)
         {
             SetDataWinGame();
@@ -447,6 +496,12 @@ public class GamePlayManager : MonoBehaviour
 
             }
         }
+    }
+
+    public void DemoVictory()
+    {
+        _Player.SwitchToRunState(_Player.playerWingame);
+        StartCoroutine(OpenPopupGameOver(0));
     }
 
     //for reset affter ulti

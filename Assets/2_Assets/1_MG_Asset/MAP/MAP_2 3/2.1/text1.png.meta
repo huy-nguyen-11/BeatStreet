@@ -8,12 +8,6 @@ TextureImporter:
   - first:
       213: 8022162580299407019
     second: text1_1
-  - first:
-      213: -2872481687118128862
-    second: text1_2
-  - first:
-      213: 4607904994125022012
-    second: text1_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -55,7 +49,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -127,8 +121,8 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 162
-        height: 271
+        width: 68
+        height: 110
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -147,10 +141,10 @@ TextureImporter:
       name: text1_1
       rect:
         serializedVersion: 2
-        x: 110
-        y: 207
+        x: 68
+        y: 13
         width: 57
-        height: 50
+        height: 103
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -165,55 +159,11 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: text1_2
-      rect:
-        serializedVersion: 2
-        x: 110
-        y: 147
-        width: 55
-        height: 60
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 2295287ef15e228d0800000000000000
-      internalID: -2872481687118128862
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: text1_3
-      rect:
-        serializedVersion: 2
-        x: 172
-        y: 35
-        width: 140
-        height: 254
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: c33029dad2192ff30800000000000000
-      internalID: 4607904994125022012
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -225,8 +175,6 @@ TextureImporter:
     nameFileIdTable:
       text1_0: 4484901307361279120
       text1_1: 8022162580299407019
-      text1_2: -2872481687118128862
-      text1_3: 4607904994125022012
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

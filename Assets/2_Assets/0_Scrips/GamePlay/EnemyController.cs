@@ -109,9 +109,21 @@ public class EnemyController : EnemyCharacter
     public Transform posBullet , posKnife , posWave , posThrower;
     public float rangeThrower;
     public float timerCheckThrower = 3f;
+    private const float AvoidPlayerMinDistance = 1.2f;
+    private const int AvoidPlayerAttempts = 6;
 
     // for all enemies tracking
     private static readonly List<EnemyController> s_AllEnemies = new List<EnemyController>();
+    private string normalSortingLayer = "Char";
+    [SerializeField] private int sortingBaseOrder = 100;
+    [SerializeField] private float sortingScale = 100f;
+    private MeshRenderer[] cachedMeshRenderers;
+
+    // Public static method to get the list of all enemies
+    public static List<EnemyController> GetAllEnemies()
+    {
+        return s_AllEnemies;
+    }
 
     //aura boss
     public int phaseBoss = 1;
@@ -229,26 +241,29 @@ public class EnemyController : EnemyCharacter
 
     private void FixedUpdate()
     {
-        fillBar.transform.rotation = Quaternion.Euler(new Vector3(0, transform.position.y, 0));
         stateManager.FixedUpdate();
     }
 
     private void LateUpdate()
     {
-        //update sorting order
-        if (player == null) return;
         if (state == State.Dead) return;
-        if(state == State.Grabed) return;
-        float posY = Char.position.y;
-        float posYPlayer = player.position.y;
-        float yTolerance = 0.05f;
-        if (posY > posYPlayer + yTolerance )
+        if (state == State.Grabed) return;
+        if (GamePlayManager.Instance != null && GamePlayManager.Instance.isCheckUlti) return;
+        if (Char == null || skeletonAnimation == null) return;
+
+        if (cachedMeshRenderers == null || cachedMeshRenderers.Length == 0)
         {
-            skeletonAnimation.GetComponent<MeshRenderer>().sortingOrder = 4;
+            cachedMeshRenderers = skeletonAnimation.GetComponentsInChildren<MeshRenderer>(true);
         }
-        else if( posY < posYPlayer - yTolerance)
+        if (cachedMeshRenderers == null || cachedMeshRenderers.Length == 0) return;
+
+        int order = sortingBaseOrder - Mathf.RoundToInt(Char.position.y * sortingScale);
+        for (int i = 0; i < cachedMeshRenderers.Length; i++)
         {
-            skeletonAnimation.GetComponent<MeshRenderer>().sortingOrder = 10;
+            MeshRenderer r = cachedMeshRenderers[i];
+            if (r == null) continue;
+            r.sortingLayerName = normalSortingLayer;
+            r.sortingOrder = order;
         }
     }
 
@@ -435,8 +450,7 @@ public class EnemyController : EnemyCharacter
             }
             else if (!isPatrolling && CheckPlayerTooClose())
             {
-                AvoidPlayer();
-                isAvoidingPlayer = true;
+                isAvoidingPlayer = AvoidPlayer();
             }
             else
             {
@@ -697,46 +711,85 @@ public class EnemyController : EnemyCharacter
         }
     }
 
-    public void AvoidPlayer()
+    public bool AvoidPlayer()
     {
-        float rand = Random.value;
-        if (rand < 0.7f)
+        if (Char == null || player == null) return false;
+
+        float direction = Char.position.x > player.position.x ? 1f : -1f;
+        Vector3 preferredTarget = new Vector3(
+            player.position.x + direction * 1f,
+            Char.position.y,
+            Char.position.z
+        );
+
+        if (TrySetAvoidTarget(preferredTarget))
         {
-            // 80%: Né về vị trí cách player 1 đơn vị, cùng trục Y, phía hiện tại
-            float direction = Char.position.x > player.position.x ? 1f : -1f;
+            return true;
+        }
+
+        for (int i = 0; i < AvoidPlayerAttempts; i++)
+        {
+            Vector2 randomDirection = Random.insideUnitCircle * 3f;
+            randomDirection.x = Mathf.Abs(randomDirection.x) * direction;
+
             Vector3 newTarget = new Vector3(
-                player.position.x + direction * 1f,
-                Char.position.y,
+                Char.position.x + randomDirection.x,
+                Char.position.y - randomDirection.y,
                 Char.position.z
             );
 
-            // Đảm bảo không va chạm player
-            if (Physics.OverlapSphere(newTarget, 1.2f, playerLayer).Length == 0)
+            if (TrySetAvoidTarget(newTarget))
             {
-                randomTarget = newTarget;
-                return;
+                return true;
             }
-            // Nếu vị trí này bị chiếm, fallback sang random như bên dưới
         }
 
-        // 20% còn lại hoặc fallback nếu vị trí trên bị chiếm
-        int attempts = 10;
-        for (int i = 0; i < attempts; i++)
+        // Fallback: lùi ngang khỏi player nếu mọi candidate đều bận.
+        Vector3 fallbackTarget = new Vector3(
+            Char.position.x + direction * AvoidPlayerMinDistance,
+            Char.position.y,
+            Char.position.z
+        );
+
+        if (TrySetAvoidTarget(fallbackTarget, ignoreEnemyOccupation: true))
         {
-            float directionMultiplier = Char.position.x > player.position.x ? 1 : -1;
-            Vector3 randomDirection = Random.insideUnitSphere * 3;
-            randomDirection.z = 0;
-            randomDirection.y = -randomDirection.y;
-            randomDirection.x = Mathf.Abs(randomDirection.x) * directionMultiplier;
-            Vector3 newTarget = Char.position + randomDirection;
-
-            if (Physics.OverlapSphere(newTarget, 1.2f, playerLayer).Length == 0)
-            {
-                randomTarget = newTarget;
-                return;
-            }
+            return true;
         }
-    } 
+
+        return false;
+    }
+
+    private bool TrySetAvoidTarget(Vector3 candidate, bool ignoreEnemyOccupation = false)
+    {
+        Vector3 clampedTarget = ClampTargetToArena(candidate);
+        if (!IsAvoidTargetValid(clampedTarget, ignoreEnemyOccupation)) return false;
+
+        randomTarget = clampedTarget;
+        lastRandomTarget = clampedTarget;
+        return true;
+    }
+
+    private bool IsAvoidTargetValid(Vector3 candidate, bool ignoreEnemyOccupation = false)
+    {
+        Vector2 deltaToPlayer = candidate - player.position;
+        if (deltaToPlayer.sqrMagnitude < AvoidPlayerMinDistance * AvoidPlayerMinDistance)
+            return false;
+
+        if (!ignoreEnemyOccupation && IsTargetOccupiedByOtherEnemy(candidate, this))
+            return false;
+
+        return true;
+    }
+
+    private Vector3 ClampTargetToArena(Vector3 target)
+    {
+        if (GamePlayManager.Instance == null) return target;
+
+        target.x = Mathf.Clamp(target.x, GamePlayManager.Instance.minPosX, GamePlayManager.Instance.maxPosX);
+        target.y = Mathf.Clamp(target.y, GamePlayManager.Instance.minPosY, GamePlayManager.Instance.maxPosY);
+        target.z = Char != null ? Char.position.z : target.z;
+        return target;
+    }
 
     bool CheckPlayerTooClose()
     {
@@ -1177,7 +1230,6 @@ public class EnemyController : EnemyCharacter
     }
     public void SpawnTxtHit(float dame)
     {
-        //GameObject txt = Instantiate(_prfTxtHit, _pointTxtHit.transform.position, Quaternion.identity);
         GameObject txt = ObjectPooler.Instance.SpawnFromPool("Text", _pointTxtHit.transform.position, Quaternion.identity);
         txt.GetComponent<TxtHit>().SetTxt(dame, true);
     }
@@ -1195,6 +1247,7 @@ public class EnemyController : EnemyCharacter
             int numItem = Random.Range(0, 4);
             GamePlayManager.Instance.DropItem(numItem, Char.position);
         }
+
         DropCoin();
         // Force state to Dead and enter EnemyDead state immediately to stop AI
         if (stateManager != null)
@@ -1398,8 +1451,13 @@ public class EnemyController : EnemyCharacter
     {
         if (player == null || Char == null || state == State.Grabed) return;
         float yRotation = player.position.x > Char.position.x ? 0f : 180f;
-        //float yRotation = player.position.x > Char.position.x ? 0f : 180f;
         Char.rotation = Quaternion.Euler(0f, yRotation, 0f);
+
+        // Keep health bar upright even when character flips
+        if (fillBar != null)
+        {
+            fillBar.transform.rotation = Quaternion.identity;
+        }
     }
 
     float gravity = -22f;

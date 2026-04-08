@@ -6,6 +6,7 @@ public class LevelMap : MonoBehaviour
     public int level;
     public int TurnEnemy = 0;
     public int CountX = 0;
+    [SerializeField] private List<GameObject> turnOrderedObjects = new List<GameObject>();
     public Transform listTurnEnemy;
     public Transform PointPlayer;
     public Transform listWallTurn;
@@ -74,6 +75,11 @@ public class LevelMap : MonoBehaviour
 
         AutoCalculateCameraPoints();
 
+        // CountX is the turn currently loaded in scene (not the upcoming turn).
+        CountX = TurnEnemy;
+        ApplyTurnVisibility(CountX);
+        ApplyTurnOrderedObjects(TurnEnemy);
+
         minX = _pointMinXs[TurnEnemy];
         maxX = _pointMaxXs[TurnEnemy];
         GamePlayManager.Instance._CameraFollow.minX = minX;
@@ -108,13 +114,52 @@ public class LevelMap : MonoBehaviour
         minX = _pointMinXs[TurnEnemy];
         maxX = _pointMaxXs[TurnEnemy];
         CountX = TurnEnemy;
+        ApplyTurnVisibility(CountX);
+        ApplyTurnOrderedObjects(TurnEnemy);
         GamePlayManager.Instance._CameraFollow.minX = minX;
         GamePlayManager.Instance._CameraFollow.maxX = maxX;
+    }
+
+    private void ApplyTurnVisibility(int loadedTurn)
+    {
+        if (listTurnEnemy == null) return;
+        if (listTurnEnemy.childCount == 0) return;
+
+        int loaded = Mathf.Clamp(loadedTurn, 0, listTurnEnemy.childCount - 1);
+        for (int i = 0; i < listTurnEnemy.childCount; i++)
+        {
+            Transform turnRoot = listTurnEnemy.GetChild(i);
+            if (turnRoot == null) continue;
+
+            // Keep loaded/past turns active. Hide all future turns to save CPU.
+            bool shouldActive = i <= loaded;
+            if (turnRoot.gameObject.activeSelf != shouldActive)
+            {
+                turnRoot.gameObject.SetActive(shouldActive);
+            }
+        }
     }
     private void CalculateCameraBounds()
     {
         halfHeight = Camera.main.orthographicSize;
         halfWidth = halfHeight * Camera.main.aspect;
+    }
+
+    private void ApplyTurnOrderedObjects(int currentTurn)
+    {
+        if (turnOrderedObjects == null || turnOrderedObjects.Count == 0) return;
+
+        for (int i = 0; i < turnOrderedObjects.Count; i++)
+        {
+            GameObject turnObject = turnOrderedObjects[i];
+            if (turnObject == null) continue;
+
+            bool shouldActive = i == currentTurn;
+            if (turnObject.activeSelf != shouldActive)
+            {
+                turnObject.SetActive(shouldActive);
+            }
+        }
     }
     private void OnValidate()
     {

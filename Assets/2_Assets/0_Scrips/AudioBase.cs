@@ -20,6 +20,9 @@ public class AudioBase : MonoBehaviour
     //for daily reward
     public bool isCheckPlayed;
 
+    //additional : field open level map
+    public bool isOpenLevel = false;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)

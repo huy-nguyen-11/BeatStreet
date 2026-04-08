@@ -144,10 +144,23 @@ public class WaveBoss : MonoBehaviour, IpooledObject
 
             if (playerController != null)
             {
-                if(playerController.isImmortal|| playerController.state == PlayerController.State.Dead) return;
+                if(playerController.isImmortal|| playerController.state == PlayerController.State.Dead || ShouldIgnorePlayerHit(playerController)) return;
                 playerController.HitDirection = direction > 0;
                 playerController.SetHit(currentDamage);
             }
         }
+    }
+
+    private bool ShouldIgnorePlayerHit(PlayerController playerController)
+    {
+        if (playerController == null) return true;
+
+        if (playerController.state == PlayerCharacter.State.Ulti)
+            return true;
+
+        if (GamePlayManager.Instance != null && GamePlayManager.Instance.isCheckUlti)
+            return true;
+
+        return false;
     }
 }

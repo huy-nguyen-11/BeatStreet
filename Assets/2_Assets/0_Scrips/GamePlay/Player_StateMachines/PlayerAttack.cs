@@ -11,6 +11,7 @@ public class PlayerAttack : PlayerStateManager
 
     public override void Enter()
     {
+        playerController.CancelComboGraceWindow();
         playerController.state = PlayerController.State.Attack;
         playerController.rb.linearVelocity = Vector2.zero;
 
@@ -30,25 +31,89 @@ public class PlayerAttack : PlayerStateManager
 
     public override void Update()
     {
+        if (playerController.queuedComboAttack && playerController.IsInsideComboGraceWindow())
+        {
+            playerController.queuedComboAttack = false;
+            playerController.CancelComboGraceWindow(); // Ensure grace window is canceled before starting next attack
+            AdvanceComboAndPlayNext();
+        }
+    }
+
+    private void AdvanceComboAndPlayNext()
+    {
+        int current = playerController.comboIndex;
+        int maxIndex = playerController.comboAttackAnims.Count - 1;
+
+        if (current == maxIndex)
+        {
+            playerController.isImmortal = false;
+            playerController.comboIndex = 0;
+            playerController.queuedComboAttack = false;
+            playerController.lastAttackHadHit = false;
+            playerController.isAttackCooldown = true;
+            playerController.attackCooldownTimer = playerController.attackCooldownDuration;
+            playerController.SwitchToRunState(playerController.playerIdle);
+            return;
+        }
+
+        bool hasRecentHit = playerController.lastAttackHadHit || playerController.IsRecentHit();
+        bool requireHitForThisAdvance = current >= 2;
+        bool canAdvance = !requireHitForThisAdvance || hasRecentHit;
+
+        if (canAdvance)
+        {
+            playerController.comboIndex++;
+            if (playerController.comboIndex > maxIndex)
+                playerController.comboIndex = 0;
+        }
+        else
+        {
+            playerController.comboIndex = 0;
+        }
+
+        playerController.lastAttackHadHit = false;
+        
+        // When advancing from inside grace window or from an event, we play the next attack.
+        // If we were in the grace window, useAddQueue=false is safer because the previous animation is already done.
+        PlayComboAttackWithEvent(useAddQueue: false);
+    }
+
+    public void TriggerQueuedCombo()
+    {
+        if (playerController.queuedComboAttack)
+        {
+            playerController.queuedComboAttack = false;
+            playerController.CancelComboGraceWindow();
+            AdvanceComboAndPlayNext();
+        }
+    }
+
+    private void OnAttackEventFired(Spine.TrackEntry entry)
+    {
+        if (playerController.queuedComboAttack)
+        {
+            playerController.queuedComboAttack = false;
+            AdvanceComboAndPlayNext();
+        }
+        else
+        {
+            playerController.BeginComboGraceWindow();
+        }
     }
 
     private void PlayComboAttackWithEvent(bool useAddQueue)
     {
-        //playerController.lastAttackHadHit = false;
-
         int idx = playerController.comboIndex % playerController.comboAttackAnims.Count;
         string animName = playerController.comboAttackAnims[idx];
 
-        // If this is the last animation in the combo list, make player temporarily immortal
         if (idx == playerController.comboAttackAnims.Count - 1)
         {
             playerController.isImmortal = true;
         }
 
-        //playerController.idAttackArea = playerController.comboIndex;// set id attack area == index combo
-        playerController.idAttackArea = 0;// set id attack area == 0
-        //Debug.Log($"Playing attack anim: {animName} (combo index: {playerController.comboIndex}, useAddQueue: {useAddQueue})");
+        playerController.idAttackArea = 0;
         AudioBase.Instance.AudioPlayer(playerController.comboIndex);
+
         if (!useAddQueue)
         {
             _startedFirstAttack = true;
@@ -59,18 +124,11 @@ public class PlayerAttack : PlayerStateManager
             playerController.AddAnimWithEventHandler(animName, false, 0f, OnAttackEventFired);
         }
 
-        // Apply velocity using isFacingRight (reliable, not rotation.y)
-        //float lunge = playerController.isFacingRight ? 0.5f : -0.5f;
-        //playerController.rb.linearVelocity = Vector2.right * lunge;
-
-        // Stop any previous lunge-stopper coroutine and start a new short stopper so the player
-        // doesn't keep sliding through the rest of the animation.
         if (coroutine != null)
             playerController.StopCoroutine(coroutine);
 
-        // Adjust this duration to taste (0.06 - 0.14 works well). Shorter -> sharper stop.
         float decelDuration = 0.165f;
-        coroutine = playerController.StartCoroutine(StopLungeCoroutine(decelDuration/*, lunge*/));
+        coroutine = playerController.StartCoroutine(StopLungeCoroutine(decelDuration));
     }
 
 
@@ -104,67 +162,6 @@ public class PlayerAttack : PlayerStateManager
         }
 
         coroutine = null;
-    }
-
-    /// <summary>
-    /// Callback khi event "Attack_end" được kích hoạt
-    /// </summary>
-    private void OnAttackEventFired(Spine.TrackEntry entry)
-    {
-        int current = playerController.comboIndex;
-        int maxIndex = playerController.comboAttackAnims.Count - 1;
-
-
-        if (current == maxIndex)
-        {
-            playerController.isImmortal = false;
-            playerController.comboIndex = 0;
-            playerController.queuedComboAttack = false;
-            playerController.lastAttackHadHit = false;
-
-            playerController.isAttackCooldown = true;
-            playerController.attackCooldownTimer = playerController.attackCooldownDuration;
-
-            // Finished full combo chain -> go back to idle
-            playerController.SwitchToRunState(playerController.playerIdle);
-            return;
-        }
-
-        // Decide whether this strike "counts as hit" for advancing.
-        // Use a timestamp window to avoid race conditions where collision detection happens a few frames late.
-        bool hasRecentHit = playerController.lastAttackHadHit || playerController.IsRecentHit();
-
-        // Preserve your original intent: require a real hit to continue into finishers (from index >= 2).
-        bool requireHitForThisAdvance = current >= 2;
-        bool canAdvance = !requireHitForThisAdvance || hasRecentHit;
-
-        if (canAdvance)
-        {
-            playerController.comboIndex++;
-            if (playerController.comboIndex > maxIndex)
-                playerController.comboIndex = 0;
-        }
-        else
-        {
-            // no confirmed hit: reset combo to start
-            playerController.comboIndex = 0;
-        }
-
-        // consume/reset the flag
-        playerController.lastAttackHadHit = false;
-
-        if (playerController.queuedComboAttack)
-        {
-            playerController.queuedComboAttack = false;
-
-            // Queue next strike smoothly (AddAnimation) to avoid hard-cut jitter.
-            PlayComboAttackWithEvent(useAddQueue: true);
-        }
-        else
-        {
-            // No tap queued: allow a short grace window for late taps before returning to idle.
-            playerController.BeginComboGraceWindow();
-        }
     }
 
     public override void Exit()

@@ -15,19 +15,17 @@ public class FillBarEnemy : MonoBehaviour
     {
         SetFadeImg();
     }
-    private void FixedUpdate()
-    {
-        imgFillHp.fillAmount = hp / maxHp;
-    }
     public void OnInit(float maxHp)
     {
         this.maxHp = maxHp;
         hp = maxHp;
+        imgFillHp.fillAmount = 1f;
     }
     public void SetNewHp(float hp)
     {
         SetAnimFade();
         this.hp = Mathf.Clamp(hp, 0, maxHp);
+        imgFillHp.fillAmount = this.hp / maxHp;
         if (this.hp <= 0)
             SetFadeImg();
     }

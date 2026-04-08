@@ -200,14 +200,18 @@ public class PlayerController : PlayerCharacter
 
     // --- Combo input buffer / grace window ---
     // Allow the player to tap slightly late (after end_attack) and still continue the combo.
-    [SerializeField] private float comboGraceDuration = 0.12f;
-    private float comboGraceUntil = -1f;
+    [SerializeField] public float comboGraceDuration = 0.12f;
+    [HideInInspector] public float comboGraceUntil = -1f;
     private Coroutine comboGraceCoroutine;
 
     //for attack grab enemy
     public bool isThrowEnemy = false;
 
     public FillBarPlayer fillBar;
+    private string normalSortingLayer = "Char";
+    [SerializeField] private int sortingBaseOrder = 100;
+    [SerializeField] private float sortingScale = 100f;
+    private MeshRenderer[] cachedMeshRenderers;
 
     #endregion
 
@@ -394,7 +398,10 @@ public class PlayerController : PlayerCharacter
         //if(isFall) return;
 
         if(joystick != null)
+        {
             CheckTouchInput();
+            GetJoy();
+        }
 
         comboTimer += Time.deltaTime;
         HitTimer += Time.deltaTime;
@@ -402,6 +409,36 @@ public class PlayerController : PlayerCharacter
             ResetCombo();
         if (HitTimer > HitResetTime)
             ResetHit();
+    }
+
+    void LateUpdate()
+    {
+        if (IsDead || state == State.Dead) return;
+        if (GamePlayManager.Instance != null && GamePlayManager.Instance.isCheckUlti) return;
+        if (Char == null || skeletonAnimation == null) return;
+
+        if (cachedMeshRenderers == null || cachedMeshRenderers.Length == 0)
+        {
+            cachedMeshRenderers = skeletonAnimation.GetComponentsInChildren<MeshRenderer>(true);
+        }
+        if (cachedMeshRenderers == null || cachedMeshRenderers.Length == 0) return;
+
+        int order = sortingBaseOrder - Mathf.RoundToInt(Char.position.y * sortingScale);
+        for (int i = 0; i < cachedMeshRenderers.Length; i++)
+        {
+            MeshRenderer r = cachedMeshRenderers[i];
+            if (r == null) continue;
+            r.sortingLayerName = normalSortingLayer;
+            if (i == 2)
+            {
+                r.sortingOrder = order + 2;
+            }
+            else
+            {
+                r.sortingOrder = order;
+            }
+
+        }
     }
 
     public bool IsRecentHit()
@@ -417,23 +454,48 @@ public class PlayerController : PlayerCharacter
     public void BeginComboGraceWindow()
     {
         comboGraceUntil = Time.time + comboGraceDuration;
+        
         if (comboGraceCoroutine != null)
             StopCoroutine(comboGraceCoroutine);
         comboGraceCoroutine = StartCoroutine(ComboGraceRoutine(comboGraceUntil));
     }
 
+    public bool IsInsideComboGraceWindow()
+    {
+        return comboGraceCoroutine != null && Time.time < comboGraceUntil;
+    }
+
+    public void CancelComboGraceWindow()
+    {
+        if (comboGraceCoroutine != null)
+        {
+            StopCoroutine(comboGraceCoroutine);
+            comboGraceCoroutine = null;
+        }
+        comboGraceUntil = -1f;
+    }
+
     private IEnumerator ComboGraceRoutine(float until)
     {
-        // Wait until grace expires or we start chaining.
-        while (Time.time < until)
+        // Keep the grace window alive until it is explicitly canceled by the
+        // combo logic or until it naturally expires. Do not exit early just
+        // because queuedComboAttack became true, otherwise we can lose the only
+        // path that returns the player from Attack -> Idle when a late tap
+        // races with state/input update order.
+        while (Time.time < until)   
         {
-            if (queuedComboAttack)
-                yield break;
             yield return null;
         }
 
+        comboGraceCoroutine = null; // Mark as finished *before* potentially triggering next attack
+
+        // If grace window expired and an attack was queued right at the end, trigger it now.
+        if (queuedComboAttack && state == State.Attack)
+        {
+            playerAttack.TriggerQueuedCombo();
+        }
         // If still in Attack state and nothing queued, return to idle smoothly.
-        if (state == State.Attack && !queuedComboAttack && !IsDead && !isJumping && !isResettingFromJump)
+        else if (state == State.Attack && !queuedComboAttack && !IsDead && !isJumping && !isResettingFromJump)
         {
             // Don't use ResetStatus() here (it has jump/ground reset semantics).
             if (rb != null)
@@ -441,6 +503,79 @@ public class PlayerController : PlayerCharacter
             SwitchToRunState(playerIdle);
         }
     }
+
+    private bool IsAirborneInputLocked()
+    {
+        return isFall || (isJumping && !isResettingFromJump);
+    }
+
+    private void QueueMoveStateAfterJumpReset()
+    {
+        if (!isResettingFromJump || joystick == null)
+            return;
+
+        float smoothMag = joystick.RawMagnitude;
+        float walkThreshold = 0.15f;
+        float runThreshold = Mathf.Clamp(speedThreshold, 0f, 1f);
+
+        if (smoothMag >= runThreshold)
+        {
+            SwitchToRunState(playerRun);
+        }
+        else if (smoothMag >= walkThreshold)
+        {
+            SwitchToRunState(playerWalk);
+        }
+    }
+
+    private PlayerStateManager GetImmediateMoveStateFromJoystick()
+    {
+        if (joystick == null || isFall)
+            return null;
+
+        Vector2 rawDir = joystick.RawDirection;
+        if (rawDir.sqrMagnitude <= 0.0001f)
+            return null;
+
+        float smoothMag = joystick.RawMagnitude;
+        float walkThreshold = 0.15f;
+        float runThreshold = Mathf.Clamp(speedThreshold, 0f, 1f);
+
+        if (smoothMag >= runThreshold)
+            return playerRun;
+
+        if (smoothMag >= walkThreshold)
+            return playerWalk;
+
+        return null;
+    }
+
+    private void ApplyImmediateLandingMove(PlayerStateManager moveState)
+    {
+        if (rb == null || joystick == null)
+            return;
+
+        Vector2 rawDir = joystick.RawDirection;
+        if (rawDir.sqrMagnitude <= 0.0001f)
+            return;
+
+        float speed = 0f;
+        if (moveState == playerRun)
+            speed = 2.5f;
+        else if (moveState == playerWalk)
+            speed = 1.2f;
+        else
+            return;
+
+        Vector2 movement = rawDir.normalized * speed;
+        rb.linearVelocity = movement;
+
+        if (Mathf.Abs(rawDir.x) > 0.1f)
+        {
+            SetFacingDirection(rawDir.x > 0f);
+        }
+    }
+    
     public void GetJoy()
     {
         if (GamePlayManager.Instance.isCheckUlti
@@ -637,7 +772,7 @@ public class PlayerController : PlayerCharacter
             switch (touch.phase)
             {
                 case TouchPhase.Began:
-                    if (isJumping || isFall)
+                    if (IsAirborneInputLocked())
                         return;
 
                     // Block only inside configured zones (and optionally any UI if enabled).
@@ -655,7 +790,7 @@ public class PlayerController : PlayerCharacter
 
                     break;
                 case TouchPhase.Moved:
-                    if (isJumping || isFall)
+                    if (IsAirborneInputLocked())
                     {
                         return;
                     }
@@ -682,6 +817,7 @@ public class PlayerController : PlayerCharacter
                         holdTimer = 0f;
                     }
                     GetJoy();
+                    QueueMoveStateAfterJumpReset();
                     //grab enemy
                     if ((state == State.Walk || state == State.Run) && canGrab)
                     {
@@ -690,7 +826,7 @@ public class PlayerController : PlayerCharacter
                     isGetJoy = true;
                     break;
                 case TouchPhase.Stationary:
-                    if (isJumping || isFall)
+                    if (IsAirborneInputLocked())
                         return;
 
                     if (touchStartPositions.ContainsKey(touchId))
@@ -704,10 +840,11 @@ public class PlayerController : PlayerCharacter
                             SwitchToRunState(playerChange);
                         }
                     }
+                    QueueMoveStateAfterJumpReset();
                     break;
 
                 case TouchPhase.Ended:
-                    if (isJumping || isFall)
+                    if (IsAirborneInputLocked())
                         return;
                     if (touchStartPositions.ContainsKey(touchId))
                     {
@@ -812,7 +949,7 @@ public class PlayerController : PlayerCharacter
 
                                 if (delta.magnitude > swipeThreshold)
                                 {
-                                    if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y) /*&& (state == State.Run || state == State.Walk)*/ && !isJumping)
+                                    if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y) /*&& (state == State.Run || state == State.Walk)*/ && (!isJumping || isResettingFromJump))
                                     {
                                         bool isMovingInput = joystick != null && joystick.HandleNormalizedMagnitude > 0.3f;
    
@@ -999,6 +1136,14 @@ public class PlayerController : PlayerCharacter
         // If currently resetting from jump, queue the requested state instead of switching immediately
         if (isJumping || isResettingFromJump)
         {
+            // During landing/reset we may briefly evaluate fallback Idle transitions.
+            // Do not let those overwrite a real movement/action request that was
+            // already queued for the first grounded frame.
+            if (player == playerIdle && pendingStateAfterReset != null && pendingStateAfterReset != playerIdle)
+            {
+                return;
+            }
+
             pendingStateAfterReset = player;
             return;
         }
@@ -1220,104 +1365,52 @@ public class PlayerController : PlayerCharacter
     /// - Đảm bảo |deltaY| với enemy không vượt quá 0.2.
     /// - Nếu hướng đang chọn bị vướng tường thì thử di chuyển sang hướng còn lại.
     /// </summary>
-    public void MoveToIdealUltiPosition(Transform enemyTransform)
+    public bool TryGetIdealUltiPosition(Transform enemyTransform, out Vector3 idealPosition, float idealXDistance = 2.5f, float maxYDelta = 0.2f)
     {
+        idealPosition = Vector3.zero;
         if (enemyTransform == null)
-            return;
+            return false;
 
-        // Dùng Char làm gốc nếu có, vì Rigidbody2D thường nằm ở Char
         Vector3 playerPos = Char != null ? Char.position : transform.position;
         Vector3 enemyPos = enemyTransform.position;
-
-        // Các ngưỡng khoảng cách mong muốn theo trục X so với enemy
-        const float minXDist = 0.85f;
-        const float maxXDist = 1.2f;
-        const float idealXDist = 1.0f; // nằm trong [min, max]
-
-        // Ưu tiên hướng hiện tại (đang đứng bên trái hay bên phải enemy)
         bool isLeftOfEnemy = playerPos.x < enemyPos.x;
-        int[] dirOrder = isLeftOfEnemy
-            ? new int[] { -1, 1 }  // đang ở bên trái -> thử trái trước rồi phải
-            : new int[] { 1, -1 }; // đang ở bên phải -> thử phải trước rồi trái
+
+        int[] directionOrder = isLeftOfEnemy
+            ? new int[] { -1, 1 }
+            : new int[] { 1, -1 };
 
         var gm = GamePlayManager.Instance;
-        Vector3? chosenPos = null;
 
-        // Thử lần lượt 2 phía quanh enemy
-        foreach (int dir in dirOrder)
+        foreach (int dir in directionOrder)
         {
-            // Vị trí mục tiêu lý tưởng theo trục X: cách enemy ~1 đơn vị
-            float targetX = enemyPos.x + dir * idealXDist;
-
-            // Vị trí mục tiêu theo trục Y: giới hạn sao cho |targetY - enemyY| <= 0.2
-            float targetY = Mathf.Clamp(playerPos.y, enemyPos.y - 0.2f, enemyPos.y + 0.2f);
-
+            float targetX = enemyPos.x + (dir * idealXDistance);
+            float targetY = Mathf.Clamp(playerPos.y, enemyPos.y - maxYDelta, enemyPos.y + maxYDelta);
             Vector3 candidate = new Vector3(targetX, targetY, playerPos.z);
 
-            // Nếu có layer tường: không chọn hướng mà đường đi bị chắn bởi tường
-            bool blockedByWall = false;
-            if (obstacleLayer.value != 0)
-            {
-                RaycastHit2D hit = Physics2D.Linecast(playerPos, candidate, obstacleLayer);
-                if (hit.collider != null)
-                {
-                    blockedByWall = true;
-                }
-            }
-            if (blockedByWall)
-                continue;
-
-            // Giới hạn trong biên bản đồ/camera nếu có thiết lập
             if (gm != null)
             {
                 candidate.x = Mathf.Clamp(candidate.x, gm.minPosX, gm.maxPosX);
-
-                // Chỉ clamp Y nếu min/max Y được cấu hình hợp lệ
                 if (gm.maxPosY > gm.minPosY)
                     candidate.y = Mathf.Clamp(candidate.y, gm.minPosY, gm.maxPosY);
             }
 
-            // Kiểm tra lại điều kiện khoảng cách sau khi clamp
-            float dx = Mathf.Abs(candidate.x - enemyPos.x);
-            float dy = Mathf.Abs(candidate.y - enemyPos.y);
-            if (dx < minXDist || dx > maxXDist)
+            if (Mathf.Abs(candidate.x - enemyPos.x) < idealXDistance - 0.05f)
                 continue;
-            if (dy > 0.2f)
+            if (Mathf.Abs(candidate.y - enemyPos.y) > maxYDelta)
                 continue;
 
-            // Tìm được vị trí phù hợp
-            chosenPos = candidate;
-            break;
-        }
-
-        // Nếu cả hai phía đều không thỏa mãn (do tường / biên bản đồ),
-        // fallback: chỉ chỉnh lại trục Y nếu khoảng cách X hiện tại đã tương đối phù hợp.
-        if (!chosenPos.HasValue)
-        {
-            float currentDx = Mathf.Abs(playerPos.x - enemyPos.x);
-            if (currentDx >= minXDist && currentDx <= maxXDist)
+            if (obstacleLayer.value != 0)
             {
-                float newY = Mathf.Clamp(playerPos.y, enemyPos.y - 0.2f, enemyPos.y + 0.2f);
-                Vector3 fallback = new Vector3(playerPos.x, newY, playerPos.z);
-
-                if (gm != null)
-                {
-                    fallback.x = Mathf.Clamp(fallback.x, gm.minPosX, gm.maxPosX);
-                    if (gm.maxPosY > gm.minPosY)
-                        fallback.y = Mathf.Clamp(fallback.y, gm.minPosY, gm.maxPosY);
-                }
-
-                chosenPos = fallback;
+                RaycastHit2D hit = Physics2D.Linecast(playerPos, candidate, obstacleLayer);
+                if (hit.collider != null)
+                    continue;
             }
+
+            idealPosition = candidate;
+            return true;
         }
 
-        if (!chosenPos.HasValue)
-            return;
-
-        if (Char != null)
-            Char.position = chosenPos.Value;
-        else
-            transform.position = chosenPos.Value;
+        return false;
     }
 
     public void SetHit(float dameHit)
@@ -1515,24 +1608,33 @@ public class PlayerController : PlayerCharacter
         // wait one frame so any in-flight state changes or animation events settle
         yield return null;
 
-        // default landing -> Idle
+        // If movement input is already being held before touchdown, promote it to
+        // the first grounded state immediately instead of waiting for a fresh touch
+        // event on a later frame.
+        if (pendingStateAfterReset == null || pendingStateAfterReset == playerIdle)
+        {
+            var immediateMoveState = GetImmediateMoveStateFromJoystick();
+            if (immediateMoveState != null)
+            {
+                pendingStateAfterReset = immediateMoveState;
+            }
+        }
+
+        var toApplyAfterLanding = pendingStateAfterReset;
+        pendingStateAfterReset = null;
+
         if (stateManager != null)
             stateManager.Exit();
-        stateManager = playerIdle;
-        stateManager.Enter();
 
-        // CHỈ reset isJumping SAU KHI đã chuyển state xong
+        // Finish the jump reset before entering the grounded state so we do not
+        // need to bounce through Idle and then queue another state change on the
+        // next line/frame.
         isJumping = false;
         isResettingFromJump = false;
 
-        // apply any queued state requested while we were resetting
-        if (pendingStateAfterReset != null)
-        {
-            var toApply = pendingStateAfterReset;
-            pendingStateAfterReset = null;
-            // this will run SwitchToRunState again (isResettingFromJump == false now)
-            SwitchToRunState(toApply);
-        }
+        stateManager = toApplyAfterLanding ?? playerIdle;
+        stateManager.Enter();
+        ApplyImmediateLandingMove(stateManager);
     }
 
     //public IEnumerator CheckAnimationAndTriggerEvent(string name)

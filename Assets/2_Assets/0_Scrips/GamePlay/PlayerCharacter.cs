@@ -107,7 +107,7 @@ public class PlayerCharacter : MonoBehaviour
 
             if (onEventFired != null && entry != null)
             {
-   
+                bool eventCalled = false;
                 Spine.AnimationState.TrackEntryEventDelegate handler = null;
                  handler = (trackEntry, e) =>
                 {
@@ -117,7 +117,11 @@ public class PlayerCharacter : MonoBehaviour
                         {
                             if (e.Data.Name == "Attack_end" || e.Data.Name == "End_attack")
                             {
-                                onEventFired?.Invoke(entry);
+                                if (!eventCalled)
+                                {
+                                    eventCalled = true;
+                                    onEventFired?.Invoke(entry);
+                                }
                                 skeletonAnimation.AnimationState.Event -= handler;
                             }
                         }
@@ -126,6 +130,17 @@ public class PlayerCharacter : MonoBehaviour
                 };
 
                 skeletonAnimation.AnimationState.Event += handler;
+
+                // Fallback: listen for Complete event to ensure state machine transitions even if Spine event is missed
+                entry.Complete += (t) =>
+                {
+                    if (!eventCalled)
+                    {
+                        eventCalled = true;
+                        onEventFired?.Invoke(entry);
+                    }
+                    skeletonAnimation.AnimationState.Event -= handler;
+                };
             }
         }
     }
@@ -144,6 +159,7 @@ public class PlayerCharacter : MonoBehaviour
         if (onEventFired == null || entry == null)
             return entry;
 
+        bool eventCalled = false;
         Spine.AnimationState.TrackEntryEventDelegate handler = null;
         handler = (trackEntry, e) =>
         {
@@ -153,7 +169,11 @@ public class PlayerCharacter : MonoBehaviour
                 {
                     if (e.Data.Name == "Attack_end" || e.Data.Name == "End_attack")
                     {
-                        onEventFired?.Invoke(entry);
+                        if (!eventCalled)
+                        {
+                            eventCalled = true;
+                            onEventFired?.Invoke(entry);
+                        }
                         skeletonAnimation.AnimationState.Event -= handler;
                     }
                 }
@@ -161,6 +181,18 @@ public class PlayerCharacter : MonoBehaviour
             catch { }
         };
         skeletonAnimation.AnimationState.Event += handler;
+
+        // Fallback: listen for Complete event to ensure state machine transitions even if Spine event is missed
+        entry.Complete += (t) =>
+        {
+            if (!eventCalled)
+            {
+                eventCalled = true;
+                onEventFired?.Invoke(entry);
+            }
+            skeletonAnimation.AnimationState.Event -= handler;
+        };
+
         return entry;
     }
 

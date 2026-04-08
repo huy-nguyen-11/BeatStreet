@@ -38,24 +38,33 @@ public class GameOver : MonoBehaviour
         AudioBase.Instance.SetAudioUI(0);
         GamePlayManager.Instance.BtnBackMain();
     }
+    public void BtnBackLevels()
+    {
+        AudioBase.Instance.SetAudioUI(0);
+        AudioBase.Instance.isOpenLevel = true;
+        GamePlayManager.Instance.BtnBackMain();
+    }
+
     public void BtnUpGrade()
     {
         AudioBase.Instance.SetAudioUI(0);
         GamePlayManager.Instance.BtnBackMain();
     }
-    //public void BtnAgain()
-    //{
-    //    AudioBase.Instance.SetAudioUI(0);
-    //    if (PlayerPrefs.GetInt("Energy") >= 2)
-    //    {
-    //        PlayerPrefs.SetInt("Energy", PlayerPrefs.GetInt("Energy") - 2);
-    //        SceneManager.LoadSceneAsync("2_GamePlay");
-    //    }
-    //    else
-    //    {
-    //        _popupStatus[3].SetActive(true);
-    //    }
-    //}
+    public void BtnAgain()
+    {
+        AudioBase.Instance.SetAudioUI(0);
+        //if (PlayerPrefs.GetInt("Energy") >= 2)
+        //{
+        //    PlayerPrefs.SetInt("Energy", PlayerPrefs.GetInt("Energy") - 2);
+        //    SceneManager.LoadSceneAsync("2_GamePlay");
+        //}
+        //else
+        //{
+        //    _popupStatus[3].SetActive(true);
+        //}\
+        SceneManager.LoadSceneAsync("2_GamePlay");
+    }
+
     //public void BtnBuyEnergy()
     //{
     //    AudioBase.Instance.SetAudioUI(0);
@@ -111,13 +120,14 @@ public class GameOver : MonoBehaviour
         {
             case 0:
                 GamePlayManager.Instance.coin += (int)GamePlayManager.Instance._Player._attributesPet[6];
-                for (int i = 0; i < _popupStatus[id].transform.GetChild(0).childCount; i++)
+                for (int i = 0; i < _popupStatus[id].transform.GetChild(1).GetChild(0).childCount; i++)
                 {
                     if (i == _dataManager.LevelMode)
-                        _popupStatus[id].transform.GetChild(0).GetChild(i).gameObject.SetActive(true);
+                        _popupStatus[id].transform.GetChild(1).GetChild(0).GetChild(i).gameObject.SetActive(true);
                     else
-                        _popupStatus[id].transform.GetChild(0).GetChild(i).gameObject.SetActive(false);
+                        _popupStatus[id].transform.GetChild(1).GetChild(0).GetChild(i).gameObject.SetActive(false);
                 }
+                _popupStatus[id].transform.GetChild(1).GetChild(2).GetComponent<TextMeshProUGUI>().text = "Level " + (_dataManager.LevelSelect + 1);
                 SetGetBonus();
                 _dataManager.SaveFile();
                 break;
@@ -134,7 +144,7 @@ public class GameOver : MonoBehaviour
     private void SetGetBonus()
     {
         //_popupStatus[0].transform.GetChild(1).GetChild(0).GetChild(0).GetComponent<Image>().sprite = GetSprLoot();
-        _popupStatus[0].transform.GetChild(1).GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text = GetCoinBonus().ToString();
+        _popupStatus[0].transform.GetChild(0).GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text = GetCoinBonus().ToString();
         PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + GetCoinBonus());
         //SetTopBar();
     }

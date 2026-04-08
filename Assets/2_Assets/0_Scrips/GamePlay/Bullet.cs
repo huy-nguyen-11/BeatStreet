@@ -55,9 +55,12 @@ public class Bullet : MonoBehaviour, IpooledObject
             
             if (playerController != null)
             {
-                playerController.HitDirection = moveRight;
-                ObjectPooler.Instance.SpawnFromPool("Hit", transform.position, Quaternion.Euler(0, 0, 0));
-                playerController.SetHit(damage);
+                if (!ShouldIgnorePlayerHit(playerController))
+                {
+                    playerController.HitDirection = moveRight;
+                    ObjectPooler.Instance.SpawnFromPool("Hit", transform.position, Quaternion.Euler(0, 0, 0));
+                    playerController.SetHit(damage);
+                }
             }
             
             DestroyBullet();
@@ -106,5 +109,18 @@ public class Bullet : MonoBehaviour, IpooledObject
     public void SetSpeed(float spd)
     {
         speed = spd;
+    }
+
+    private bool ShouldIgnorePlayerHit(PlayerController playerController)
+    {
+        if (playerController == null) return true;
+
+        if (playerController.state == PlayerCharacter.State.Ulti)
+            return true;
+
+        if (GamePlayManager.Instance != null && GamePlayManager.Instance.isCheckUlti)
+            return true;
+
+        return false;
     }
 }

@@ -77,6 +77,10 @@ public class FireDamaga : MonoBehaviour
         {
             foreach (var player in playersInFire)
             {
+                if (player.state == PlayerCharacter.State.Ulti)
+                    continue;
+                if (GamePlayManager.Instance != null && GamePlayManager.Instance.isCheckUlti)
+                    continue;
                 if (player != null && !player.IsDead)
                     player.SetHitFromFire(fireDamage);
             }
