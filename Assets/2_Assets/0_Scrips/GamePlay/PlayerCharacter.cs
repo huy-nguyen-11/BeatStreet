@@ -94,6 +94,11 @@ public class PlayerCharacter : MonoBehaviour
         var entry = skeletonAnimation.AnimationState.SetAnimation(0, anim, false);
         entry.Complete += (t) =>
         {
+            if (playerController == null || playerController.skeletonAnimation == null || playerController.skeletonAnimation.AnimationState == null)
+                return;
+            var current = playerController.skeletonAnimation.AnimationState.GetCurrent(0);
+            if (current != t)
+                return;
             playerController.ResetStatus();
         };
     }

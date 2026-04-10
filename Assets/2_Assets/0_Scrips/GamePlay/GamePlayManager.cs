@@ -150,7 +150,7 @@ public class GamePlayManager : MonoBehaviour
         }
 
         canvasGroup.alpha = 1f;
-        canvasGroup.DOFade(0f, 1).SetDelay(2)
+        canvasGroup.DOFade(0f, 0.75f).SetDelay(1)
             .OnComplete(() =>
             {
                 panelOpenGame.SetActive(false);

@@ -13,7 +13,7 @@ public class EnemyGrabed : EnemyStateMachine
         // Mark state
         enemyController.state = EnemyController.State.Grabed;
 
-        enemyController.skeletonAnimation.GetComponent<MeshRenderer>().sortingOrder = 6;
+        //enemyController.skeletonAnimation.GetComponent<MeshRenderer>().sortingOrder = 6;
         // Stop ongoing coroutines that may change state (DelayAttack, SetStateIdle, etc.)
         try
         {

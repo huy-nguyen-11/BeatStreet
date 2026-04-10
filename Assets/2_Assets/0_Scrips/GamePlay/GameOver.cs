@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,6 +15,8 @@ public class GameOver : MonoBehaviour
     // Revive
     public TextMeshProUGUI txtSeconRevive;
     public GameObject[] _btnRevives;
+    public List<Sprite> sprRevive;
+    public GameObject imgRevive;
     int CoinBonus;
     Coroutine _coroutine;
     DataManager _dataManager;
@@ -135,6 +138,7 @@ public class GameOver : MonoBehaviour
                 break;
             case 2:
                 CheckBtnRevive();
+                ShowPlayerRevive();
                 _coroutine = StartCoroutine(SetTimeOffRevive());
                 break;
         }
@@ -238,5 +242,10 @@ public class GameOver : MonoBehaviour
     {
         GamePlayManager.Instance.SetPlayerRevive();
         gameObject.SetActive(false);
+    }
+
+    private void ShowPlayerRevive()
+    {
+        imgRevive.GetComponent<Image>().sprite = sprRevive[PlayerController.Instance.id];
     }
 }

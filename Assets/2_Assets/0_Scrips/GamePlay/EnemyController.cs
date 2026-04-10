@@ -247,7 +247,7 @@ public class EnemyController : EnemyCharacter
     private void LateUpdate()
     {
         if (state == State.Dead) return;
-        if (state == State.Grabed) return;
+        //if (state == State.Grabed) return;
         if (GamePlayManager.Instance != null && GamePlayManager.Instance.isCheckUlti) return;
         if (Char == null || skeletonAnimation == null) return;
 

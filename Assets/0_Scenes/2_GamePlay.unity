@@ -1772,6 +1772,11 @@ MonoBehaviour:
   _btnRevives:
   - {fileID: 1872935634}
   - {fileID: 1059812145}
+  sprRevive:
+  - {fileID: 423971171140905283, guid: 0838e8e220740994fa1cfef8a8e3226d, type: 3}
+  - {fileID: -9068732801947649175, guid: a893cd3b01ede4345a15d0e6dfe4996e, type: 3}
+  - {fileID: -8279958503548042943, guid: 2065714ddd0cf9b4e8c2e01b56a32589, type: 3}
+  imgRevive: {fileID: 2020701521}
 --- !u!1 &93726377
 GameObject:
   m_ObjectHideFlags: 0
@@ -4502,7 +4507,7 @@ MonoBehaviour:
   m_RendererIndex: -1
   m_VolumeLayerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 0
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
   m_RenderPostProcessing: 0
