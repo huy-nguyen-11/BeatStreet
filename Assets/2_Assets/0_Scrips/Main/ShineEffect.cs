@@ -3,10 +3,17 @@ using UnityEngine;
 
 public class ShineEffect : MonoBehaviour
 {
-    [SerializeField] private float targetX = 500f; 
-    [SerializeField] private float duration = 1f;  
-    [SerializeField] private float delay = 2f;    
+    [SerializeField] private float targetX = 500f;
+    [SerializeField] private float duration = 1f;
+    [SerializeField] private float delay = 2f;
+
     private Sequence shineSequence;
+    private Vector3 originalPosition; 
+
+    void Awake()
+    {
+        originalPosition = transform.localPosition;
+    }
 
     void OnEnable()
     {
@@ -16,23 +23,25 @@ public class ShineEffect : MonoBehaviour
     private void OnDisable()
     {
         shineSequence?.Kill();
+        transform.localPosition = originalPosition;
     }
 
     void StartShineAnimation()
     {
-        Vector3 startPosition = transform.localPosition;
+        shineSequence?.Kill();
+
+        transform.localPosition = originalPosition;
 
         shineSequence = DOTween.Sequence();
 
         shineSequence.Append(
-            transform.DOLocalMoveX(targetX, duration)
+            transform.DOLocalMoveX(targetX, duration) 
                 .SetEase(Ease.Linear)
         )
         .AppendInterval(delay)
         .OnStepComplete(() => {
-            
-            transform.localPosition = startPosition;
+            transform.localPosition = originalPosition;
         })
-        .SetLoops(-1); 
+        .SetLoops(-1);
     }
 }

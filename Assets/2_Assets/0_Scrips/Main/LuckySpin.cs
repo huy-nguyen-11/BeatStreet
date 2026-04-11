@@ -1,4 +1,5 @@
 ﻿using I2.MiniGames;
+using MysticDev;
 using System;
 using System.Collections;
 using System.Globalization;
@@ -18,6 +19,7 @@ public class LuckySpin : MonoBehaviour
     private const string LAST_FREE_SPIN_DATE = "LastFreeSpinDate";
     private DateTime lastFreeSpinDate;
     public bool isRun;
+    public WheelLedManager ledManager;
 
     public Sprite spYellowOn, spYellowOff, spGreenOn, spGreenOff;
     private void OnEnable()
@@ -146,6 +148,7 @@ public class LuckySpin : MonoBehaviour
         if (isRun) return;
         AudioBase.Instance.SetAudioUI(0);
         MainManager.Instance.SetMission(3, 1);
+        ledManager.SpinLed(0.02f);
         isRun = true;
         //lastRewardTime = DateTime.Now;
         //PlayerPrefs.SetString(LAST_REWARD_TIME, lastRewardTime.ToString());
@@ -169,7 +172,7 @@ public class LuckySpin : MonoBehaviour
             if (result)
             {
                 MainManager.Instance.SetMission(3, 1);
-
+                ledManager.SpinLed(0.02f);
                 lastRewardTime = DateTime.Now;
                 PlayerPrefs.SetString(LAST_REWARD_TIME, lastRewardTime.ToString());
                 PlayerPrefs.Save();

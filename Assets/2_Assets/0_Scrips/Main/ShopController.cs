@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Spine;
+using Spine.Unity;
 
 public class ShopController : MonoBehaviour
 {
@@ -313,7 +315,7 @@ public class ShopController : MonoBehaviour
                 PlayerPrefs.SetInt("Key", PlayerPrefs.GetInt("Key") - 1);
                 UpdateKeysAmount();
                 showPopUpReward.rewardAmount = 5;
-                RandomChest(3, 1, 1, 1);
+                RandomChest(3, 1, 1, 1 , id);
             }
             else
             {
@@ -329,7 +331,7 @@ public class ShopController : MonoBehaviour
                 PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 900);
                 PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 500);
                 showPopUpReward.rewardAmount = 11;
-                RandomChest(30, 5, 6, 20);
+                RandomChest(30, 5, 6, 20 , id);
             }
         }
         else
@@ -339,13 +341,13 @@ public class ShopController : MonoBehaviour
                 AudioBase.Instance.SetAudioUI(1);
                 PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 2500);
                 PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 12000);
-                RandomChest(90, 10, 6, 60);
+                RandomChest(90, 10, 6, 60 , id);
                 showPopUpReward.rewardAmount = 11;
             }
         }
         MainManager.Instance.SetTopBar();
     }
-    private void RandomChest(int PlLevelUp, int EnLevelUp, int item, int PlEvolve)
+    private void RandomChest(int PlLevelUp, int EnLevelUp, int item, int PlEvolve , int idChest)
     {
         listPlayerLevelUp.Clear();
         listEnemy.Clear();
@@ -384,9 +386,44 @@ public class ShopController : MonoBehaviour
         CheckListPlayerEvolve();
         CheckListItem();
 
+        //_panels[0].SetActive(false);
+        //_panels[1].SetActive(true);
+        StartCoroutine(OpeChest(idChest));
+        DataManager.Instance.SaveFile();
+    }
+
+    IEnumerator OpeChest(int idChest)
+    {
         _panels[0].SetActive(false);
         _panels[1].SetActive(true);
-        DataManager.Instance.SaveFile();
+        _panels[1].transform.GetChild(0).gameObject.SetActive(false);
+        _panels[1].transform.GetChild(1).gameObject.SetActive(true);
+        SkeletonGraphic skeletonGraphic = _panels[1].transform.GetChild(1).GetComponent<SkeletonGraphic>();
+
+        if (skeletonGraphic != null)
+        {
+            string skinName = "default";
+
+            switch (idChest)
+            {
+                case 0:
+                    skinName = "Chest_1";
+                    break;
+                case 1:
+                    skinName = "Chest_2"; 
+                    break;
+                default:
+                    skinName = "Chest_3"; 
+                    break;
+            }
+            skeletonGraphic.Skeleton.SetSkin(skinName);
+            skeletonGraphic.Skeleton.SetSlotsToSetupPose();
+            skeletonGraphic.LateUpdate();
+        }
+        skeletonGraphic.AnimationState.SetAnimation(0, "Oppen", false);
+        yield return new WaitForSeconds(1.7f);
+        _panels[1].transform.GetChild(1).gameObject.SetActive(false);
+        _panels[1].transform.GetChild(0).gameObject.SetActive(true);
     }
 
     //for button watch ads open reward treasure
@@ -415,7 +452,7 @@ public class ShopController : MonoBehaviour
     void HandleOpenTreasure(bool resut)
     {
         IncrementTreasureAdCount();
-        RandomChest(3, 1, 1, 1);
+        RandomChest(3, 1, 1, 1 , 0);
     }
 
     private void CheckPlayerLevelUp()
