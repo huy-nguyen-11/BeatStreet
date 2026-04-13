@@ -21,6 +21,8 @@ public class ShopController : MonoBehaviour
     public List<int> listItem = new List<int>();
     public List<int> listPlayerEvolve = new List<int>();
     public List<Transform> _listPosGems , _listPosCoins;
+
+    private static readonly int[,] s_exchangePackagesFromMg = BuildExchangePackagesFromMgRewards();
     public TimeReward timeReward1 , timeReward2;
     public CollectItemUICtrl getReward;
     public GameObject _contentShop;
@@ -174,6 +176,91 @@ public class ShopController : MonoBehaviour
         tmpTreasureWatchCount.text = (MAX_DAILY_TREASURE_ADS - GetRemainingTreasureAdViews()) + "/" + MAX_DAILY_TREASURE_ADS;
     }
 
+    private static int[,] BuildExchangePackagesFromMgRewards()
+    {
+        MG_RewardProduct[] coins =
+        {
+            MG_ProductData.Coin_0, MG_ProductData.Coin_1, MG_ProductData.Coin_2,
+            MG_ProductData.Coin_3, MG_ProductData.Coin_4
+        };
+        int[,] packages = new int[coins.Length, 2];
+        for (int i = 0; i < coins.Length; i++)
+        {
+            int amount = coins[i].amount;
+            packages[i, 0] = amount / 100;
+            packages[i, 1] = amount;
+        }
+        return packages;
+    }
+
+
+    private void BindShopItemViewsFromProductData()
+    {
+        ProductIPAData[] coinPacks =
+        {
+            MG_ProductData.Coin_0_Pack, MG_ProductData.Coin_1_Pack, MG_ProductData.Coin_2_Pack,
+            MG_ProductData.Coin_3_Pack, MG_ProductData.Coin_4_Pack
+        };
+        MG_RewardProduct[] coinRewards =
+        {
+            MG_ProductData.Coin_0, MG_ProductData.Coin_1, MG_ProductData.Coin_2,
+            MG_ProductData.Coin_3, MG_ProductData.Coin_4
+        };
+        ProductIPAData[] gemPacks =
+        {
+            MG_ProductData.Gem_0_Pack, MG_ProductData.Gem_1_Pack, MG_ProductData.Gem_2_Pack,
+            MG_ProductData.Gem_3_Pack, MG_ProductData.Gem_4_Pack
+        };
+        MG_RewardProduct[] gemRewards =
+        {
+            MG_ProductData.Gem_0, MG_ProductData.Gem_1, MG_ProductData.Gem_2,
+            MG_ProductData.Gem_3, MG_ProductData.Gem_4
+        };
+
+        if (_listPosCoins != null)
+        {
+            for (int i = 0; i < coinPacks.Length; i++)
+            {
+                int listIndex = i + 1;
+                if (listIndex >= _listPosCoins.Count) break;
+                ShopItemView view = ResolveShopItemView(_listPosCoins[listIndex]);
+                if (view != null)
+                    ApplyPackAndRewardToShopItemView(view, coinPacks[i], coinRewards[i]);
+            }
+        }
+
+        if (_listPosGems != null)
+        {
+            for (int i = 0; i < gemPacks.Length; i++)
+            {
+                int listIndex = i + 1;
+                if (listIndex >= _listPosGems.Count) break;
+                ShopItemView view = ResolveShopItemView(_listPosGems[listIndex]);
+                if (view != null)
+                    ApplyPackAndRewardToShopItemView(view, gemPacks[i], gemRewards[i]);
+            }
+        }
+    }
+
+    private static ShopItemView ResolveShopItemView(Transform t)
+    {
+        if (t == null) return null;
+        ShopItemView view = t.GetComponent<ShopItemView>();
+        if (view == null) view = t.GetComponentInChildren<ShopItemView>(true);
+        return view;
+    }
+
+    private static void ApplyPackAndRewardToShopItemView(ShopItemView view, ProductIPAData pack, MG_RewardProduct reward)
+    {
+        if (view == null || pack == null || reward == null) return;
+
+        string priceText = pack.priceString;
+        if (!string.IsNullOrEmpty(pack.currencyCode))
+            priceText = $"{pack.priceString} {pack.currencyCode}";
+
+        view.SetAll(pack.productName, priceText, reward.amount.ToString());
+    }
+
     private void OnEnable()
     {
         OpenPopup(MainManager.Instance.indexPopupShop);
@@ -189,6 +276,8 @@ public class ShopController : MonoBehaviour
         UpdateTreasureAdCountUI();
 
         UpdateKeysAmount();
+
+        BindShopItemViewsFromProductData();
     }
 
     public void OpenPopup(int index)
@@ -630,15 +719,7 @@ public class ShopController : MonoBehaviour
     {
         if (!isOnClick) return;
         AudioBase.Instance.SetAudioUI(0);
-        // Mảng các gói: {diamond, coin}
-        int[,] exchangePackages = new int[,]
-        {
-        {30, 360},
-        {500, 6600},
-        {1000, 13200},
-        {2000, 26400},
-        {4000, 52800}
-        };
+        int[,] exchangePackages = s_exchangePackagesFromMg;
 
         if (id < 0 || id >= exchangePackages.GetLength(0)) return;
 
@@ -674,9 +755,9 @@ public class ShopController : MonoBehaviour
 
     void HandleRewardCoins(bool resut)
     {
-        PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 50);
+        PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 100);
         IncrementCoinAdCount();
-        getReward.DoAddCoinEffect(_listPosCoins[0].position, PlayerPrefs.GetInt("Coin") - 50, PlayerPrefs.GetInt("Coin"));
+        getReward.DoAddCoinEffect(_listPosCoins[0].position, PlayerPrefs.GetInt("Coin") - 100, PlayerPrefs.GetInt("Coin"));
     }
 
     private void TryExchangeDiamondForCoins(int diamondCost, int coinReward , int _id)
@@ -724,31 +805,35 @@ public class ShopController : MonoBehaviour
         }
         else
         {
-            //MG_Interface.Current.Purchase_Item(MG_ProductData.DiamontPacks[id].productId, (bool result, bool onIAP, string productId) =>
-            //{
-            //    if (result)
-            //    {
-            //        AudioBase.Instance.SetAudioUI(1);
-            //        PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + SetDiamont(id));
-            //        isOnClick = false;
-            //        getReward.DoAddGemsEffect(_listPosGems[id].position, PlayerPrefs.GetInt("Diamont") - SetDiamont(id), PlayerPrefs.GetInt("Diamont"));
-            //        MainManager.Instance.SetTopBar();
-            //        DataManager.Instance.SaveFile();
-            //        StartCoroutine(WaitForCoolDownOnClick());
-            //    }
-            //    else
-            //    {
-            //    }
-            //});
+            IAPProductEnum productEnum = id switch
+            {
+                1 => IAPProductEnum.GEM_0,
+                2 => IAPProductEnum.GEM_1,
+                3 => IAPProductEnum.GEM_2,
+                4 => IAPProductEnum.GEM_3,
+                5 => IAPProductEnum.GEM_4,
+                _ => IAPProductEnum.GEM_0
+            };
+            var product = MG_ProductData.GetProductData(productEnum);
 
-            //for test demo buy diamond
-            AudioBase.Instance.SetAudioUI(1);
-            PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + SetDiamont(id));
-            isOnClick = false;
-            getReward.DoAddGemsEffect(_listPosGems[id].position, PlayerPrefs.GetInt("Diamont") - SetDiamont(id), PlayerPrefs.GetInt("Diamont"));
-            MainManager.Instance.SetTopBar();
-            DataManager.Instance.SaveFile();
-            StartCoroutine(WaitForCoolDownOnClick());
+
+            MG_Interface.Current.Purchase_Item(product.productId, (bool result, bool onIAP, string productId) =>
+            {
+                if (result)
+                {
+                    AudioBase.Instance.SetAudioUI(1);
+                    PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + SetDiamont(id));
+                    isOnClick = false;
+                    getReward.DoAddGemsEffect(_listPosGems[id].position, PlayerPrefs.GetInt("Diamont") - SetDiamont(id), PlayerPrefs.GetInt("Diamont"));
+                    MainManager.Instance.SetTopBar();
+                    DataManager.Instance.SaveFile();
+                    StartCoroutine(WaitForCoolDownOnClick());
+                }
+                else
+                {
+                }
+            });
+
         }
 
     }
@@ -757,10 +842,10 @@ public class ShopController : MonoBehaviour
     {
         if (resutl)
         {
-            PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + 50);
+            PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + 10);
             IncrementAdCount(); // record this ad watch toward daily limit
             isOnClick = false;
-            getReward.DoAddGemsEffect(_listPosGems[0].position, PlayerPrefs.GetInt("Diamont") - 50, PlayerPrefs.GetInt("Diamont"));
+            getReward.DoAddGemsEffect(_listPosGems[0].position, PlayerPrefs.GetInt("Diamont") - 10, PlayerPrefs.GetInt("Diamont"));
             StartCoroutine(WaitForCoolDownOnClick());
         }
     }
@@ -776,15 +861,15 @@ public class ShopController : MonoBehaviour
         switch (id)
         {
             case 1:
-                return 440;
+                return MG_ProductData.Gem_0.amount;
             case 2:
-                return 960;
+                return MG_ProductData.Gem_1.amount;
             case 3:
-                return 2600;
+                return MG_ProductData.Gem_2.amount;
             case 4:
-                return 5600;
+                return MG_ProductData.Gem_3.amount;
             case 5:
-                return 12000;
+                return MG_ProductData.Gem_4.amount;
             default:
                 return 0;
         }

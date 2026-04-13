@@ -373,8 +373,8 @@ namespace I2.MiniGames
 				_Controller.OnReadyForNextRound ();
 			}
 		}
-
-		IEnumerator LuckyReward(int id){
+        public WheelLedManager ledManager;
+        IEnumerator LuckyReward(int id){
 			_Controller.spining = false;
 			//Debug.Log ("Reward Item Id " + id);
 			//PopupItem.GetComponentInChildren<DOTweenAnimation>().DORewind();
@@ -409,6 +409,8 @@ namespace I2.MiniGames
             //PlayerPrefs.SetInt("Key", PlayerPrefs.GetInt("Key") + numb_item[id]);
             //PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 900);
             //PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 500);
+			ledManager.RewardLed();
+            yield return new WaitForSeconds(2f);
 
             PopupItem.transform.GetChild(2).DOScale(Vector3.one, 0.3f).From(Vector3.zero).SetEase(Ease.InOutSine).onComplete = () => {
                 PopupItem.transform.GetChild(2).GetChild(1).DORotate(new Vector3(0, 0, 0), 0.3f, RotateMode.FastBeyond360).From(new Vector3(0, 90, 0)).SetEase(Ease.OutQuad);
@@ -420,7 +422,7 @@ namespace I2.MiniGames
 			if(true)
             //PopupItem.GetComponent<AudioSource>().Play();
             //PopupItem.transform.GetChild(2).GetComponent< DOTweenAnimation>().DOPlay();
-			yield return new WaitForSeconds (3f);
+			yield return new WaitForSeconds (2f);
 			btnBack.SetActive (true);
             PopupItem.transform.GetChild(2).transform.localScale = Vector3.zero;
             PopupItem.transform.GetChild(2).GetChild(1).transform.rotation = new Quaternion(0, 180, 0, 0);

@@ -12,10 +12,11 @@ public enum IAPProductEnum
     COIN_2,
     COIN_3,
     COIN_4,
-    COIN_5,
-    COIN_6,
-    COIN_7,
-
+    GEM_0,
+    GEM_1,
+    GEM_2,
+    GEM_3,
+    GEM_4,
 }
 public class ProductIPAData
 {
@@ -41,22 +42,24 @@ public enum MG_ProductType
 {
     NoAds,
     StaterPack,
-    LimitedPack,
     Coin_0,    
     Coin_1,    
     Coin_2,
     Coin_3,
     Coin_4,
-    Coin_5,
-    Coin_6,
-    Coin_7,
+    Gem_0,
+    Gem_1,
+    Gem_2,
+    Gem_3,
+    Gem_4,
 }
+
 
 public class MG_RewardProduct
 {
     public MG_ProductType type;
     public int amount;
-    public int bonus;
+    public int bonusCoin;
 
     public int healBooster;
     public bool removeAds;
@@ -65,42 +68,40 @@ public class MG_RewardProduct
     {
         this.type = type;
         this.amount = amount;
-        this.bonus = bonus;
+        this.bonusCoin = bonus;
     }
-
 }
 public static class MG_ProductData
 {
     //package
-    public static ProductIPAData NoAds_Pack = new ProductIPAData("Remove_Ads", "dab.removeads", "1.99", "USD");
-    public static ProductIPAData Starter_Pack = new ProductIPAData("Starter_Pack", "dab.Starter_Pack", "1.99", "USD");
-    public static ProductIPAData Limited_Pack = new ProductIPAData("Limited_Pack", "dab.Limited_Pack", "19.99", "USD");
-
+    public static ProductIPAData NoAds_Pack = new ProductIPAData("Remove Ads", "dab.removeads", "2.99", "$");
+    public static ProductIPAData Starter_Pack = new ProductIPAData("Starter Pack", "dab.Starter_Pack", "2.99", "$");
 
     //shop  
-    public static ProductIPAData Coin_0_Pack = new ProductIPAData("Coin_0", "dab.500c", "0.99", "USD");
-    public static ProductIPAData Coin_1_Pack = new ProductIPAData("Coin_1", "dab.1k8c", "1.99", "USD");
-    public static ProductIPAData Coin_2_Pack = new ProductIPAData("Coin_2", "dab.3k2c", "4.99", "USD");
-    public static ProductIPAData Coin_3_Pack = new ProductIPAData("Coin_3", "dab.6k6c", "9.99", "USD");
-    public static ProductIPAData Coin_4_Pack = new ProductIPAData("Coin_4", "dab.13k6c", "19.99", "USD");
-    public static ProductIPAData Coin_5_Pack = new ProductIPAData("Coin_5", "dab.40kc", "49.99", "USD");
-    public static ProductIPAData Coin_6_Pack = new ProductIPAData("Coin_6", "dab.35kc", "99.99", "USD");
-    public static ProductIPAData Coin_7_Pack = new ProductIPAData("Coin_7", "dab.75kc", "49.99", "USD");
-
+    public static ProductIPAData Coin_0_Pack = new ProductIPAData("Coin 1", "dab.500c", "30", "");
+    public static ProductIPAData Coin_1_Pack = new ProductIPAData("Coin 2", "dab.1k8c", "100", "");
+    public static ProductIPAData Coin_2_Pack = new ProductIPAData("Coin 3", "dab.3k2c", "300", "");
+    public static ProductIPAData Coin_3_Pack = new ProductIPAData("Coin 4", "dab.6k6c", "500", "");
+    public static ProductIPAData Coin_4_Pack = new ProductIPAData("Coin 5", "dab.13k6c", "1000", "");
+    public static ProductIPAData Gem_0_Pack = new ProductIPAData("Gem 1", "dab.1xx", "0.99", "$");
+    public static ProductIPAData Gem_1_Pack = new ProductIPAData("Gem 2", "dab.2xx", "1.99", "$");
+    public static ProductIPAData Gem_2_Pack = new ProductIPAData("Gem 3", "dab.3xx", "4.99", "$");
+    public static ProductIPAData Gem_3_Pack = new ProductIPAData("Gem 4", "dab.4xx", "9.99", "$");
+    public static ProductIPAData Gem_4_Pack = new ProductIPAData("Gem 5", "dab.5xx", "19.99", "$");
 
     //MG REward
-    public static MG_RewardProduct NoAdsReward = new MG_RewardProduct(MG_ProductType.NoAds, 200, 0);
-    public static MG_RewardProduct StarterPack = new MG_RewardProduct(MG_ProductType.StaterPack, 1000, 0);
-    public static MG_RewardProduct LimitedPack = new MG_RewardProduct(MG_ProductType.LimitedPack, 10000, 0);
-    public static MG_RewardProduct Coin_0 = new MG_RewardProduct(MG_ProductType.Coin_1, 500, 0);
-    public static MG_RewardProduct Coin_1 = new MG_RewardProduct(MG_ProductType.Coin_1, 1200, 0);
-    public static MG_RewardProduct Coin_2 = new MG_RewardProduct(MG_ProductType.Coin_2, 3000, 0);
+    public static MG_RewardProduct NoAdsReward = new MG_RewardProduct(MG_ProductType.NoAds, 1000, 0);
+    public static MG_RewardProduct StarterPack = new MG_RewardProduct(MG_ProductType.StaterPack, 100, 2000);
+    public static MG_RewardProduct Coin_0 = new MG_RewardProduct(MG_ProductType.Coin_1, 330, 0);
+    public static MG_RewardProduct Coin_1 = new MG_RewardProduct(MG_ProductType.Coin_1, 1100, 0);
+    public static MG_RewardProduct Coin_2 = new MG_RewardProduct(MG_ProductType.Coin_2, 3600, 0);
     public static MG_RewardProduct Coin_3 = new MG_RewardProduct(MG_ProductType.Coin_3, 6000, 0);
-    public static MG_RewardProduct Coin_4 = new MG_RewardProduct(MG_ProductType.Coin_4, 12500, 0);
-    public static MG_RewardProduct Coin_5 = new MG_RewardProduct(MG_ProductType.Coin_5, 35000, 0);
-    public static MG_RewardProduct Coin_6 = new MG_RewardProduct(MG_ProductType.Coin_6, 75000, 0);
-    public static MG_RewardProduct Coin_7 = new MG_RewardProduct(MG_ProductType.Coin_7, 100000, 0);
-
+    public static MG_RewardProduct Coin_4 = new MG_RewardProduct(MG_ProductType.Coin_4, 13200, 0);
+    public static MG_RewardProduct Gem_0 = new MG_RewardProduct(MG_ProductType.Gem_0, 100, 0);
+    public static MG_RewardProduct Gem_1 = new MG_RewardProduct(MG_ProductType.Gem_1, 220, 0);
+    public static MG_RewardProduct Gem_2 = new MG_RewardProduct(MG_ProductType.Gem_2, 600, 0);
+    public static MG_RewardProduct Gem_3 = new MG_RewardProduct(MG_ProductType.Gem_3, 1200, 0);
+    public static MG_RewardProduct Gem_4 = new MG_RewardProduct(MG_ProductType.Gem_4, 2500, 0);
 
     //
     public static ProductIPAData GetProductData(IAPProductEnum iapProductEnum)
@@ -113,9 +114,6 @@ public static class MG_ProductData
                 break;
             case IAPProductEnum.STARTER_PACKAGE:
                 product = Starter_Pack;
-                break;
-            case IAPProductEnum.LIMITED_PACK:
-                product = Limited_Pack;
                 break;
             case IAPProductEnum.COIN_0:
                 product = Coin_0_Pack;
@@ -132,18 +130,22 @@ public static class MG_ProductData
             case IAPProductEnum.COIN_4:
                 product = Coin_4_Pack;
                 break;
-            case IAPProductEnum.COIN_5:
-                product = Coin_5_Pack;
+            case IAPProductEnum.GEM_0:
+                product = Gem_0_Pack;
                 break;
-                
-            case IAPProductEnum.COIN_6:
-                product = Coin_6_Pack;
+            case IAPProductEnum.GEM_1:
+                product = Gem_1_Pack;
                 break;
-                
-            case IAPProductEnum.COIN_7:
-                product = Coin_7_Pack;
+            case IAPProductEnum.GEM_2:
+                product = Gem_2_Pack;
                 break;
-                
+            case IAPProductEnum.GEM_3:
+                product = Gem_3_Pack;
+                break;
+            case IAPProductEnum.GEM_4:
+                product = Gem_4_Pack;
+                break;
+
         }
 
         return product;
@@ -158,10 +160,6 @@ public static class MG_ProductData
         else if (productId == Starter_Pack.productId)
         {
             return StarterPack;
-        }
-        else if (productId == Limited_Pack.productId)
-        {
-            return LimitedPack;
         }
         else if (productId == Coin_0_Pack.productId)
         {
@@ -182,19 +180,27 @@ public static class MG_ProductData
         else if(productId == Coin_4_Pack.productId)
         {
             return Coin_4;
-        }            
-        else if(productId == Coin_5_Pack.productId)
+        }      
+        else if(productId == Gem_0_Pack.productId)
         {
-            return Coin_5;
-        }    
-        else if(productId == Coin_6_Pack.productId)
+            return Gem_0;
+        }  
+        else if(productId == Gem_1_Pack.productId)
         {
-            return Coin_6;
-        }    
-        else if(productId == Coin_7_Pack.productId)
+            return Gem_1;
+        }  
+        else if(productId == Gem_2_Pack.productId)
         {
-            return Coin_7;
-        }    
+            return Gem_2;
+        }  
+        else if(productId == Gem_3_Pack.productId)
+        {
+            return Gem_3;
+        }  
+        else if(productId == Gem_4_Pack.productId)
+        {
+            return Gem_4;
+        }
         return null;
     }
 }

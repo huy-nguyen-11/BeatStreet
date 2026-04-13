@@ -61,14 +61,14 @@ public class WheelLedManager : MonoBehaviour
             SetAllLeds(false);
             for (int i = 0; i < trailLength; i++)
             {
-                int indexToLight = headIndex - i;
-                if (indexToLight < 0)
-                    indexToLight += leds.Length;
+                int indexToLight = headIndex + i;
+                if (indexToLight >= leds.Length)
+                    indexToLight -= leds.Length;
 
                 leds[indexToLight].sprite = ledOnSprite;
             }
 
-            headIndex = (headIndex + 1) % leds.Length;
+            headIndex = (headIndex - 1 + leds.Length) % leds.Length;
 
             yield return new WaitForSeconds(delay);
         }

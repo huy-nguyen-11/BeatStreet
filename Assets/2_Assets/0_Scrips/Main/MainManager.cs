@@ -255,15 +255,128 @@ public class MainManager : MonoBehaviour
             {
                 //AudioBase.Instance.SetAudioUI(1);
                 PlayerPrefs.SetInt("StarterPack", 1);
+                PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + MG_ProductData.StarterPack.amount);
+                PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + MG_ProductData.StarterPack.bonusCoin); // bounus coin
+                DebugRollStarterPackRandomRewards();
                 SetShowButtonPack();
                 popUpGteRewardStarterpack.SetActive(true);
                 OpenPanel(3);
-                //DataManager.Instance.SaveFile();
+                DataManager.Instance.SaveFile();
             }
             else
             {
             }
         });
+    }
+
+
+    public void DebugRollStarterPackRandomRewards()
+    {
+        var dm = DataManager.Instance;
+        if (dm == null || dm.dataBase == null || dm.dataBase.imgEquipItems == null)
+        {
+            Debug.LogWarning("StarterPack roll: DataManager/DataBase/imgEquipItems is null.");
+            return;
+        }
+        if (dm.warehouse == null)
+        {
+            Debug.LogWarning("StarterPack roll: warehouse is null.");
+            return;
+        }
+
+        var db = dm.dataBase.imgEquipItems;
+        EnsureWarehouseSizedForDb(dm, db);
+
+        List<int> itemIds = PickUniqueRandomIds(db.sprItem != null ? db.sprItem.Count : 0, 3);
+        List<int> pieceLevelUpIds = PickUniqueRandomIds(db.sprPiecePlayerLevelUp != null ? db.sprPiecePlayerLevelUp.Count : 0, 3);
+        List<int> pieceEvolveIds = PickUniqueRandomIds(db.sprPiecePlayerEvolve != null ? db.sprPiecePlayerEvolve.Count : 0, 3);
+
+        //Debug.Log($"[StarterPack Rewards] Items({itemIds.Count}), PieceLevelUp({pieceLevelUpIds.Count}), PieceEvolve({pieceEvolveIds.Count})");
+
+        // 1) Items
+        for (int i = 0; i < itemIds.Count; i++)
+        {
+            int id = itemIds[i];
+            dm.warehouse.CountItem[id] += 1;
+            if (dm.warehouse.ListItems != null && !dm.warehouse.ListItems.Contains(id))
+                dm.warehouse.ListItems.Add(id);
+
+            string itemName = (db.titleAttributeItems != null && id >= 0 && id < db.titleAttributeItems.Count)
+                ? db.titleAttributeItems[id]
+                : (db.nameItems != null && id >= 0 && id < db.nameItems.Count ? db.nameItems[id] : $"Item_{id}");
+            string spriteName = (db.sprItem != null && id >= 0 && id < db.sprItem.Count && db.sprItem[id] != null) ? db.sprItem[id].name : "null";
+            //Debug.Log($"[StarterPack Rewards] Item id={id}, name='{itemName}', sprite='{spriteName}'");
+            popUpGteRewardStarterpack.transform.GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetComponent<Image>().sprite = (db.sprItem != null && id >= 0 && id < db.sprItem.Count) ? db.sprItem[id] : null;
+        }
+
+        // 2) Pieces: PlayerLevelUp
+        for (int i = 0; i < pieceLevelUpIds.Count; i++)
+        {
+            int id = pieceLevelUpIds[i];
+            dm.warehouse.CountPiecePlayerLevelUp[id] += 1;
+            string spriteName = (db.sprPiecePlayerLevelUp != null && id >= 0 && id < db.sprPiecePlayerLevelUp.Count && db.sprPiecePlayerLevelUp[id] != null)
+                ? db.sprPiecePlayerLevelUp[id].name
+                : "null";
+            //Debug.Log($"[StarterPack Rewards] PiecePlayerLevelUp id={id}, sprite='{spriteName}'");
+            popUpGteRewardStarterpack.transform.GetChild(0).GetChild(2).GetChild(1).GetChild(0).GetComponent<Image>().sprite = (db.sprPiecePlayerLevelUp != null && id >= 0 && id < db.sprPiecePlayerLevelUp.Count) ? db.sprPiecePlayerLevelUp[id] : null;
+        }
+
+        //// 3) Pieces: PlayerEvolve
+        //for (int i = 0; i < pieceEvolveIds.Count; i++)
+        //{
+        //    int id = pieceEvolveIds[i];
+        //    dm.warehouse.CountPiecePlayerEvolve[id] += 1;
+        //    string spriteName = (db.sprPiecePlayerEvolve != null && id >= 0 && id < db.sprPiecePlayerEvolve.Count && db.sprPiecePlayerEvolve[id] != null)
+        //        ? db.sprPiecePlayerEvolve[id].name
+        //        : "null";
+        //    //Debug.Log($"[StarterPack Rewards] PiecePlayerEvolve id={id}, sprite='{spriteName}'");
+        //    popUpGteRewardStarterpack.transform.GetChild(0).GetChild(2).GetChild(2).GetChild(0).GetComponent<Image>().sprite =
+        //        (db.sprPiecePlayerEvolve != null && id >= 0 && id < db.sprPiecePlayerEvolve.Count) ? db.sprPiecePlayerEvolve[id] : null;
+        //}
+
+        //dm.SaveFile();
+    }
+
+    private static List<int> PickUniqueRandomIds(int maxExclusive, int count)
+    {
+        List<int> result = new List<int>(count);
+        if (maxExclusive <= 0 || count <= 0) return result;
+
+        int target = Mathf.Min(count, maxExclusive);
+        HashSet<int> chosen = new HashSet<int>();
+
+        // hard cap attempts to avoid infinite loops
+        int attempts = 0;
+        int attemptCap = 1000;
+        while (chosen.Count < target && attempts < attemptCap)
+        {
+            attempts++;
+            int id = UnityEngine.Random.Range(0, maxExclusive);
+            if (chosen.Add(id))
+                result.Add(id);
+        }
+        return result;
+    }
+
+    private static void EnsureWarehouseSizedForDb(DataManager dm, ImgEquipItems db)
+    {
+        if (dm == null || dm.warehouse == null || db == null) return;
+
+        if (dm.warehouse.CountItem == null) dm.warehouse.CountItem = new List<int>();
+        if (dm.warehouse.CountPiecePlayerLevelUp == null) dm.warehouse.CountPiecePlayerLevelUp = new List<int>();
+        if (dm.warehouse.CountPiecePlayerEvolve == null) dm.warehouse.CountPiecePlayerEvolve = new List<int>();
+
+        EnsureListSize(dm.warehouse.CountItem, db.sprItem != null ? db.sprItem.Count : 0);
+        EnsureListSize(dm.warehouse.CountPiecePlayerLevelUp, db.sprPiecePlayerLevelUp != null ? db.sprPiecePlayerLevelUp.Count : 0);
+        EnsureListSize(dm.warehouse.CountPiecePlayerEvolve, db.sprPiecePlayerEvolve != null ? db.sprPiecePlayerEvolve.Count : 0);
+        if (dm.warehouse.ListItems == null) dm.warehouse.ListItems = new List<int>();
+    }
+
+    private static void EnsureListSize(List<int> list, int size)
+    {
+        if (size <= 0) return;
+        if (list == null) return;
+        while (list.Count < size) list.Add(0);
     }
 
     // No ads pack
@@ -275,6 +388,7 @@ public class MainManager : MonoBehaviour
             {
                 AudioBase.Instance.SetAudioUI(1);
                 PlayerPrefs.SetInt("NoAds", 1);
+                PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + MG_ProductData.NoAdsReward.amount);
                 SetShowButtonPack();
                 popUpGetRewardNoAds.SetActive(true);
                 OpenPanel(3);
