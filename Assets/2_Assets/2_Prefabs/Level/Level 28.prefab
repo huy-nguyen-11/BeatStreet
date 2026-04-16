@@ -763,8 +763,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!61 &6533320733827606955
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1218,8 +1220,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &1342483944814653731
 GameObject:
   m_ObjectHideFlags: 0
@@ -1873,8 +1877,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!61 &5207699649024328168
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3528,8 +3534,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!61 &1120126393567961056
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3900,8 +3908,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &4570335773842253509
 GameObject:
   m_ObjectHideFlags: 0
@@ -4097,8 +4107,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.8
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &4794268074513129337
 GameObject:
   m_ObjectHideFlags: 0
@@ -4294,8 +4306,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -1.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &4883800122131252675
 GameObject:
   m_ObjectHideFlags: 0
@@ -4913,8 +4927,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!61 &4129029977626802907
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -5789,8 +5805,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &6228882683921147854
 GameObject:
   m_ObjectHideFlags: 0
@@ -5961,6 +5979,7 @@ MonoBehaviour:
   level: 12
   TurnEnemy: 0
   CountX: 0
+  turnOrderedObjects: []
   listTurnEnemy: {fileID: 0}
   PointPlayer: {fileID: 8541654819387571400}
   listWallTurn: {fileID: 0}
@@ -6251,8 +6270,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!61 &2863172937788104544
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -7393,8 +7414,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -1.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &7888700005768695596
 GameObject:
   m_ObjectHideFlags: 0
@@ -8321,7 +8344,7 @@ Transform:
   m_GameObject: {fileID: 8715759674065261006}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.96, y: -0.86, z: 0}
+  m_LocalPosition: {x: 4.12, y: -1.83, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

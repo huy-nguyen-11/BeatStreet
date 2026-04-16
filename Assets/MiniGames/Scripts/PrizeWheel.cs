@@ -1,12 +1,13 @@
-using UnityEngine;
-using UnityEngine.Events;
+using DG.Tweening;
+using I2;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using I2;
-using DG.Tweening;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
+using static Unity.Burst.Intrinsics.X86;
 
 namespace I2.MiniGames
 {
@@ -373,7 +374,10 @@ namespace I2.MiniGames
 				_Controller.OnReadyForNextRound ();
 			}
 		}
+
         public WheelLedManager ledManager;
+        ImgEquipItems imgItems = DataManager.Instance != null && DataManager.Instance.dataBase != null ? DataManager.Instance.dataBase.imgEquipItems : null;
+        int rewardedItemId = -1;
         IEnumerator LuckyReward(int id){
 			_Controller.spining = false;
 			//Debug.Log ("Reward Item Id " + id);
@@ -382,28 +386,43 @@ namespace I2.MiniGames
 			switch (id)
 			{
 				case 0:
-                    PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + 50);
+                    PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 100);
                     break;
 				case 1:
-                    PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 1000);
+                    PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + 10);
                     break;
 				case 2:
-                    PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + 100);
+                    if (imgItems != null && imgItems.sprItem != null && imgItems.sprItem.Count > 0)
+                    {
+                        rewardedItemId = Random.Range(0, imgItems.sprItem.Count);
+
+                        if (DataManager.Instance.warehouse.CountItem != null
+                            && rewardedItemId >= 0
+                            && rewardedItemId < DataManager.Instance.warehouse.CountItem.Count)
+                        {
+                            DataManager.Instance.warehouse.CountItem[rewardedItemId] += 1;
+                            if (!DataManager.Instance.warehouse.ListItems.Contains(rewardedItemId))
+                                DataManager.Instance.warehouse.ListItems.Add(rewardedItemId);
+
+                            DataManager.Instance.SaveFile(); 
+
+                        }
+                    }
                     break;
 				case 3:
-                    PlayerPrefs.SetInt("Key", PlayerPrefs.GetInt("Key") + 3);
+                    PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 200);
                     break;
                 case 4:
-                    PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + 200);
+                    PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 250);
                     break;
                 case 5:
-                    PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 3000);
+                    PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + 20);
                     break;
                 case 6:
-                    PlayerPrefs.SetInt("Key", PlayerPrefs.GetInt("Key") + 5);
+                    PlayerPrefs.SetInt("Key", PlayerPrefs.GetInt("Key") + 1);
                     break;
                 case 7:
-                    PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 5000);
+                    PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 150);
                     break;
             }
             //PlayerPrefs.SetInt("Key", PlayerPrefs.GetInt("Key") + numb_item[id]);
@@ -415,8 +434,13 @@ namespace I2.MiniGames
             PopupItem.transform.GetChild(2).DOScale(Vector3.one, 0.3f).From(Vector3.zero).SetEase(Ease.InOutSine).onComplete = () => {
                 PopupItem.transform.GetChild(2).GetChild(1).DORotate(new Vector3(0, 0, 0), 0.3f, RotateMode.FastBeyond360).From(new Vector3(0, 90, 0)).SetEase(Ease.OutQuad);
             };
-            PopupItem.transform.GetChild(2).GetChild(1).GetChild(0).GetComponent<Image>().sprite = icons[id];
-			PopupItem.transform.GetChild(2).GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text = numb_item[id];
+            //PopupItem.transform.GetChild(2).GetChild(1).GetChild(0).GetComponent<Image>().sprite = icons[id];
+            // Replace the popup sprite assignment line with this conditional assignment
+            if (id == 2 && imgItems != null && imgItems.sprItem != null && rewardedItemId >= 0 && rewardedItemId < imgItems.sprItem.Count)
+                PopupItem.transform.GetChild(2).GetChild(1).GetChild(0).GetComponent<Image>().sprite = imgItems.sprItem[rewardedItemId];
+            else
+                PopupItem.transform.GetChild(2).GetChild(1).GetChild(0).GetComponent<Image>().sprite = icons[id];
+            PopupItem.transform.GetChild(2).GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text = numb_item[id];
 			PopupItem.SetActive (true);
 			yield return new WaitForSeconds(0.5f);
 			if(true)

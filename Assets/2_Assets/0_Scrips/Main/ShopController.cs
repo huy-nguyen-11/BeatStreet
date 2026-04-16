@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -10,7 +10,8 @@ public class ShopController : MonoBehaviour
 {
     [SerializeField] GameObject[] _panels;
     [SerializeField] GameObject prfItem;
-    [SerializeField] GameObject _content;
+    // [SerializeField] GameObject _content;
+    [SerializeField] List<Transform> _listContentRewards;
     [SerializeField] List<GameObject> _listPopUp ;
     [SerializeField] List<Image> _listImageButtons;
     [SerializeField] Sprite spSlect, spNormal;
@@ -23,13 +24,14 @@ public class ShopController : MonoBehaviour
     public List<Transform> _listPosGems , _listPosCoins;
 
     private static readonly int[,] s_exchangePackagesFromMg = BuildExchangePackagesFromMgRewards();
-    public TimeReward timeReward1 , timeReward2;
+    public TimeReward timeReward1 , timeReward2 , timeReward3; 
     public CollectItemUICtrl getReward;
     public GameObject _contentShop;
 
     private bool isOnClick = true;
     private int _contentNextIndex = 0;//indexslot
-    public ShowPopUpReward showPopUpReward;
+    //public ShowPopUpReward showPopUpReward;
+    public List<ShowPopUpReward> listShowPopUpReward;
 
     //for count watch ads to open reward;
     [SerializeField] private TextMeshProUGUI tmpDiamondsWatchCount , tmpCoinsWatchCount , tmpTreasureWatchCount; // assign in inspector (shows "X/3")
@@ -306,22 +308,19 @@ public class ShopController : MonoBehaviour
     public void BtnClaim()
     {
         AudioBase.Instance.SetAudioUI(0);
-        //_panels[0].SetActive(false);
-        //_panels[1].SetActive(false);
-        //for (int i = 0; i < _content.transform.childCount; i++)
-        //{
-        //    Destroy(_content.transform.GetChild(i).gameObject);
-        //}
-        for (int i = 0; i < _content.transform.childCount; i++)
+        foreach (var content in _listContentRewards)
         {
-            var child = _content.transform.GetChild(i).gameObject;
-            //child.SetActive(false);
-            if (child.transform.childCount > 1)
+            if (content == null) continue;
+            for (int i = 0; i < content.childCount; i++)
             {
-                var img = child.transform.GetChild(0).GetComponent<Image>();
-                if (img != null) img.sprite = null;
-                var txt = child.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
-                if (txt != null) txt.text = "";
+                var child = content.GetChild(i).gameObject;
+                if (child.transform.childCount > 1)
+                {
+                    var img = child.transform.GetChild(0).GetComponent<Image>();
+                    if (img != null) img.sprite = null;
+                    var txt = child.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+                    if (txt != null) txt.text = "";
+                }
             }
         }
     }
@@ -350,24 +349,24 @@ public class ShopController : MonoBehaviour
         if (id == 1)
         {
             coin.GetChild(0).GetComponent<TextMeshProUGUI>().text = "+5000";
-            SetTxtCountItem(35, 6, 20);
+            SetTxtCountItem(3, 2, 3);
         }
         else if (id == 2)
         {
             coin.GetChild(0).GetComponent<TextMeshProUGUI>().text = "+12000";
-            SetTxtCountItem(100, 6, 60);
+            SetTxtCountItem(3, 3, 6);
         }
         else
         {
             coin.gameObject.SetActive(false);
-            SetTxtCountItem(4, 1, 1);
+            SetTxtCountItem(2, 1, 1);
         }
     }
-    private void SetTxtCountItem(int item1, int item2, int item3)
+    private void SetTxtCountItem(int numPlayerPiece, int numEvolvePiece, int numItem)
     {
-        _panels[0].transform.GetChild(0).GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = "x" + item1.ToString();
-        _panels[0].transform.GetChild(0).GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = "x" + item2.ToString();
-        _panels[0].transform.GetChild(0).GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = "x" + item3.ToString();
+        _panels[0].transform.GetChild(0).GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = "x" + numPlayerPiece.ToString();
+        _panels[0].transform.GetChild(0).GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = "x" + numEvolvePiece.ToString();
+        _panels[0].transform.GetChild(0).GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = "x" + numItem.ToString();
     }
     private void SetBtnBuy(int id, Transform btn)
     {
@@ -403,13 +402,15 @@ public class ShopController : MonoBehaviour
                 AudioBase.Instance.SetAudioUI(1);
                 PlayerPrefs.SetInt("Key", PlayerPrefs.GetInt("Key") - 1);
                 UpdateKeysAmount();
-                showPopUpReward.rewardAmount = 5;
-                RandomChest(3, 1, 1, 1 , id);
+               // showPopUpReward.rewardAmount = 4;
+                listShowPopUpReward[0].rewardAmount = 4;
+                RandomChest(id);
             }
             else
             {
                 WatchingAdsForOpenTreasure();
-                showPopUpReward.rewardAmount = 5;
+                //showPopUpReward.rewardAmount = 4;
+                listShowPopUpReward[0].rewardAmount = 4;
             }
         }
         else if (id == 1)
@@ -418,9 +419,10 @@ public class ShopController : MonoBehaviour
             {
                 AudioBase.Instance.SetAudioUI(1);
                 PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 900);
-                PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 500);
-                showPopUpReward.rewardAmount = 11;
-                RandomChest(30, 5, 6, 20 , id);
+                PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 2000);
+                //showPopUpReward.rewardAmount = 8;
+                listShowPopUpReward[1].rewardAmount = 8;
+                RandomChest(id);
             }
         }
         else
@@ -429,54 +431,116 @@ public class ShopController : MonoBehaviour
             {
                 AudioBase.Instance.SetAudioUI(1);
                 PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 2500);
-                PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 12000);
-                RandomChest(90, 10, 6, 60 , id);
-                showPopUpReward.rewardAmount = 11;
+                PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + 5000);
+                RandomChest(id);
+                //showPopUpReward.rewardAmount = 12;
+                listShowPopUpReward[2].rewardAmount = 12;
             }
         }
         MainManager.Instance.SetTopBar();
     }
-    private void RandomChest(int PlLevelUp, int EnLevelUp, int item, int PlEvolve , int idChest)
+    private void RandomChest(int idChest)
     {
         listPlayerLevelUp.Clear();
         listEnemy.Clear();
         listItem.Clear();
         listPlayerEvolve.Clear();
-        _content.transform.position = new Vector2(_content.transform.position.x, 0);
 
-        // Prepare slots in _content
-        PrepareContentSlots();
+        Transform targetContent = _listContentRewards[idChest];
+        targetContent.position = new Vector2(targetContent.position.x, 0);
 
-        for (int i = 0; i < PlLevelUp; i++)
+        // Prepare slots in targetContent
+        PrepareContentSlots(targetContent);
+
+        int numPlayerLevelUp = 0;
+        int numEvolve = 0;
+        int numItem = 0;
+        int minQty = 0;
+        int maxQty = 0;
+
+        switch (idChest)
+        {
+            case 0: // Classic
+                numPlayerLevelUp = 2;
+                numEvolve = 1;
+                numItem = 1;
+                minQty = 1;
+                maxQty = 2;
+                break;
+            case 1: // Special
+                numPlayerLevelUp = 3;
+                numEvolve = 2;
+                numItem = 3;
+                minQty = 1;
+                maxQty = 3;
+                
+                break;
+            case 2: // Mythic
+                numPlayerLevelUp = 3;
+                numEvolve = 3;
+                numItem = 6;
+                minQty = 3;
+                maxQty = 5;
+                break;
+        }
+
+        // Add PlayerLevelUp pieces
+        List<int> usedPlIds = new List<int>();
+        for (int i = 0; i < numPlayerLevelUp; i++)
         {
             int id = Random.Range(0, DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerLevelUp.Count);
-            listPlayerLevelUp.Add(id);
+            int loopCount = 0;
+            while (usedPlIds.Contains(id) && loopCount < 100)
+            {
+                id = Random.Range(0, DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerLevelUp.Count);
+                loopCount++;
+            }
+            usedPlIds.Add(id);
+            int qty = Random.Range(minQty, maxQty + 1);
+            for (int j = 0; j < qty; j++) listPlayerLevelUp.Add(id);
         }
-        for (int i = 0; i < EnLevelUp; i++)
-        {
-            int id = Random.Range(0, DataManager.Instance.dataBase.imgEquipItems.sprPieceEnemy.Count);
-            listEnemy.Add(id);
-        }
-        for (int i = 0; i < item; i++)
-        {
-            int id = Random.Range(0, DataManager.Instance.dataBase.imgEquipItems.sprItem.Count);
-            listItem.Add(id);
-            if (!DataManager.Instance.warehouse.ListItems.Contains(id))
-                DataManager.Instance.warehouse.ListItems.Add(id);
-        }
-        for (int i = 0; i < PlEvolve; i++)
+
+        // Add Evolve pieces
+        List<int> usedEvIds = new List<int>();
+        for (int i = 0; i < numEvolve; i++)
         {
             int id = Random.Range(0, DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerEvolve.Count);
-            listPlayerEvolve.Add(id);
+            int loopCount = 0;
+            while (usedEvIds.Contains(id) && loopCount < 100)
+            {
+                id = Random.Range(0, DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerEvolve.Count);
+                loopCount++;
+            }
+            usedEvIds.Add(id);
+            int qty = Random.Range(minQty, maxQty + 1);
+            for (int j = 0; j < qty; j++) listPlayerEvolve.Add(id);
         }
 
-        CheckPlayerLevelUp();
-        //CheckEnemy();
-        CheckListPlayerEvolve();
-        CheckListItem();
+        // Add Items
+        List<int> usedItemIds = new List<int>();
+        for (int i = 0; i < numItem; i++)
+        {
+            int id = Random.Range(0, DataManager.Instance.dataBase.imgEquipItems.sprItem.Count);
+            int loopCount = 0;
+            while (usedItemIds.Contains(id) && loopCount * loopCount < 100)
+            {
+                id = Random.Range(0, DataManager.Instance.dataBase.imgEquipItems.sprItem.Count);
+                loopCount++;
+            }
+            usedItemIds.Add(id);
+            int qty = Random.Range(minQty, maxQty + 1);
+            for (int j = 0; j < qty; j++)
+            {
+                listItem.Add(id);
+                if (!DataManager.Instance.warehouse.ListItems.Contains(id))
+                    DataManager.Instance.warehouse.ListItems.Add(id);
+            }
+        }
 
-        //_panels[0].SetActive(false);
-        //_panels[1].SetActive(true);
+        CheckPlayerLevelUp(targetContent);
+        CheckListPlayerEvolve(targetContent);
+        CheckListItem(targetContent);
+
         StartCoroutine(OpeChest(idChest));
         DataManager.Instance.SaveFile();
     }
@@ -511,8 +575,21 @@ public class ShopController : MonoBehaviour
         }
         skeletonGraphic.AnimationState.SetAnimation(0, "Oppen", false);
         yield return new WaitForSeconds(1.7f);
-        _panels[1].transform.GetChild(1).gameObject.SetActive(false);
+        _panels[1].transform.GetChild(1).gameObject.SetActive(false); // off animation spine chest
         _panels[1].transform.GetChild(0).gameObject.SetActive(true);
+        Transform popUp = _panels[1].transform.GetChild(0).GetChild(1).transform; // Show popup reward
+        popUp.gameObject.SetActive(true);
+        for (int i = 0; i < popUp.transform.childCount; i++)
+        {
+            if (i == idChest)
+            {
+                popUp.GetChild(i).gameObject.SetActive(true);
+            }
+            else
+            {
+                popUp.GetChild(i).gameObject.SetActive(false);
+            }
+        }
     }
 
     //for button watch ads open reward treasure
@@ -533,27 +610,28 @@ public class ShopController : MonoBehaviour
         }
         else if (Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork || Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork)
         {
-            timeReward2.OnFreeButtonClick();
-            MG_Interface.Current.Reward_Show(HandleOpenTreasure); 
+  
+            MG_Interface.Current.Reward_Show(HandleOpenTreasure);
+            timeReward3.OnFreeButtonClick();
         }
     }
 
     void HandleOpenTreasure(bool resut)
     {
         IncrementTreasureAdCount();
-        RandomChest(3, 1, 1, 1 , 0);
+        listShowPopUpReward[0].rewardAmount = 4;
+        RandomChest(0);
     }
 
-    private void CheckPlayerLevelUp()
+    private void CheckPlayerLevelUp(Transform content)
     {
         while (listPlayerLevelUp.Count > 0)
         {
             int checkNumber = listPlayerLevelUp[0];
             int count = listPlayerLevelUp.FindAll(x => x == checkNumber).Count;
-            //GameObject item = Instantiate(prfItem, _content.transform.position, Quaternion.identity, _content.transform);
 
             GameObject item;
-            if (TryGetNextContentSlot(out item))
+            if (TryGetNextContentSlot(content, out item))
             {
                 item.SetActive(true);
                 var img = item.transform.GetChild(0).GetComponent<Image>();
@@ -561,45 +639,22 @@ public class ShopController : MonoBehaviour
                 if (img != null) img.sprite = DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerLevelUp[checkNumber];
                 if (txt != null) txt.text = count.ToString();
             }
-            else
-            {
-                // fallback:
-                item = Instantiate(prfItem, _content.transform.position, Quaternion.identity, _content.transform);
-                item.transform.GetChild(0).GetComponent<Image>().sprite = DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerLevelUp[checkNumber];
-                item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = count.ToString();
-            }
 
-            //item.transform.GetChild(0).GetComponent<Image>().sprite = DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerLevelUp[checkNumber];
-            //item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = count.ToString();
             DataManager.Instance.warehouse.CountPiecePlayerLevelUp[checkNumber] += count;
             listPlayerLevelUp.RemoveAll(x => x == checkNumber);
         }
     }
-    private void CheckEnemy()
-    {
-        while (listEnemy.Count > 0)
-        {
-            int checkNumber = listEnemy[0];
-            int count = listEnemy.FindAll(x => x == checkNumber).Count;
-            GameObject item = Instantiate(prfItem, _content.transform.position, Quaternion.identity, _content.transform);
-            item.transform.GetChild(0).GetComponent<Image>().sprite = DataManager.Instance.dataBase.imgEquipItems.sprPieceEnemy[checkNumber];
-            item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = count.ToString();
-            DataManager.Instance.warehouse.CountPieceEnemy[checkNumber] += count;
-            listEnemy.RemoveAll(x => x == checkNumber);
-        }
-    }
 
-    private void CheckListItem()
+
+    private void CheckListItem(Transform content)
     {
         while (listItem.Count > 0)
         {
             int checkNumber = listItem[0];
             int count = listItem.FindAll(x => x == checkNumber).Count;
-            //GameObject item = Instantiate(prfItem, _content.transform.position, Quaternion.identity, _content.transform);
-            //item.transform.GetChild(0).GetComponent<Image>().sprite = DataManager.Instance.dataBase.imgEquipItems.sprItem[checkNumber];
-            //item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = count.ToString();
+
             GameObject item;
-            if (TryGetNextContentSlot(out item))
+            if (TryGetNextContentSlot(content, out item))
             {
                 item.SetActive(true);
                 var img = item.transform.GetChild(0).GetComponent<Image>();
@@ -607,27 +662,20 @@ public class ShopController : MonoBehaviour
                 if (img != null) img.sprite = DataManager.Instance.dataBase.imgEquipItems.sprItem[checkNumber];
                 if (txt != null) txt.text = count.ToString();
             }
-            else
-            {
-                item = Instantiate(prfItem, _content.transform.position, Quaternion.identity, _content.transform);
-                item.transform.GetChild(0).GetComponent<Image>().sprite = DataManager.Instance.dataBase.imgEquipItems.sprItem[checkNumber];
-                item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = count.ToString();
-            }
+            
             DataManager.Instance.warehouse.CountItem[checkNumber] += count;
             listItem.RemoveAll(x => x == checkNumber);
         }
     }
-    private void CheckListPlayerEvolve()
+    private void CheckListPlayerEvolve(Transform content)
     {
         while (listPlayerEvolve.Count > 0)
         {
             int checkNumber = listPlayerEvolve[0];
             int count = listPlayerEvolve.FindAll(x => x == checkNumber).Count;
-            //GameObject item = Instantiate(prfItem, _content.transform.position, Quaternion.identity, _content.transform);
-            //item.transform.GetChild(0).GetComponent<Image>().sprite = DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerEvolve[checkNumber];
-            //item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = count.ToString();
+
             GameObject item;
-            if (TryGetNextContentSlot(out item))
+            if (TryGetNextContentSlot(content, out item))
             {
                 item.SetActive(true);
                 var img = item.transform.GetChild(0).GetComponent<Image>();
@@ -635,24 +683,20 @@ public class ShopController : MonoBehaviour
                 if (img != null) img.sprite = DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerEvolve[checkNumber];
                 if (txt != null) txt.text = count.ToString();
             }
-            else
-            {
-                item = Instantiate(prfItem, _content.transform.position, Quaternion.identity, _content.transform);
-                item.transform.GetChild(0).GetComponent<Image>().sprite = DataManager.Instance.dataBase.imgEquipItems.sprPiecePlayerEvolve[checkNumber];
-                item.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = count.ToString();
-            }
+
             DataManager.Instance.warehouse.CountPiecePlayerEvolve[checkNumber] += count;
             listPlayerEvolve.RemoveAll(x => x == checkNumber);
         }
     }
 
-    // Reset and deactivate slots in _content, reset index
-    private void PrepareContentSlots()
+    // Reset and deactivate slots in content, reset index
+    private void PrepareContentSlots(Transform content)
     {
         _contentNextIndex = 0;
-        for (int i = 0; i < _content.transform.childCount; i++)
+        if (content == null) return;
+        for (int i = 0; i < content.childCount; i++)
         {
-            var child = _content.transform.GetChild(i).gameObject;
+            var child = content.GetChild(i).gameObject;
             child.SetActive(false);
             if (child.transform.childCount > 1)
             {
@@ -664,14 +708,14 @@ public class ShopController : MonoBehaviour
         }
     }
 
-    // get next available slot in _content, return false if no more slots
-    private bool TryGetNextContentSlot(out GameObject slot)
+    // get next available slot in content, return false if no more slots
+    private bool TryGetNextContentSlot(Transform content, out GameObject slot)
     {
         slot = null;
-        if (_content == null) return false;
-        if (_contentNextIndex < _content.transform.childCount)
+        if (content == null) return false;
+        if (_contentNextIndex < content.childCount)
         {
-            slot = _content.transform.GetChild(_contentNextIndex).gameObject;
+            slot = content.GetChild(_contentNextIndex).gameObject;
             _contentNextIndex++;
             return true;
         }

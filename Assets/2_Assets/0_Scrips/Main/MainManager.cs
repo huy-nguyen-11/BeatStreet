@@ -288,53 +288,70 @@ public class MainManager : MonoBehaviour
         EnsureWarehouseSizedForDb(dm, db);
 
         List<int> itemIds = PickUniqueRandomIds(db.sprItem != null ? db.sprItem.Count : 0, 3);
-        List<int> pieceLevelUpIds = PickUniqueRandomIds(db.sprPiecePlayerLevelUp != null ? db.sprPiecePlayerLevelUp.Count : 0, 3);
-        List<int> pieceEvolveIds = PickUniqueRandomIds(db.sprPiecePlayerEvolve != null ? db.sprPiecePlayerEvolve.Count : 0, 3);
+        List<int> pieceLevelUpIds = PickUniqueRandomIds(db.sprPiecePlayerLevelUp != null ? db.sprPiecePlayerLevelUp.Count : 0, 2);
+        List<int> pieceEvolveIds = PickUniqueRandomIds(db.sprPiecePlayerEvolve != null ? db.sprPiecePlayerEvolve.Count : 0, 1);
 
-        //Debug.Log($"[StarterPack Rewards] Items({itemIds.Count}), PieceLevelUp({pieceLevelUpIds.Count}), PieceEvolve({pieceEvolveIds.Count})");
+        // Container has 6 reward slots:
+        // 0-2: random items, 3-4: PlayerLevelUp pieces, 5: PlayerEvolve piece.
+        Transform popContent = popUpGteRewardStarterpack.transform.GetChild(0).GetChild(2).transform;
+        if (popContent.childCount < 6)
+        {
+            Debug.LogWarning($"StarterPack roll: popContent needs at least 6 children, current={popContent.childCount}.");
+            return;
+        }
 
-        // 1) Items
-        for (int i = 0; i < itemIds.Count; i++)
+        // 1) Random 3 item types, each quantity 1-3.
+        for (int i = 0; i < itemIds.Count && i < 3; i++)
         {
             int id = itemIds[i];
-            dm.warehouse.CountItem[id] += 1;
+            int quantity = UnityEngine.Random.Range(1, 4);
+
+            dm.warehouse.CountItem[id] += quantity;
             if (dm.warehouse.ListItems != null && !dm.warehouse.ListItems.Contains(id))
                 dm.warehouse.ListItems.Add(id);
 
-            string itemName = (db.titleAttributeItems != null && id >= 0 && id < db.titleAttributeItems.Count)
-                ? db.titleAttributeItems[id]
-                : (db.nameItems != null && id >= 0 && id < db.nameItems.Count ? db.nameItems[id] : $"Item_{id}");
-            string spriteName = (db.sprItem != null && id >= 0 && id < db.sprItem.Count && db.sprItem[id] != null) ? db.sprItem[id].name : "null";
-            //Debug.Log($"[StarterPack Rewards] Item id={id}, name='{itemName}', sprite='{spriteName}'");
-            popUpGteRewardStarterpack.transform.GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetComponent<Image>().sprite = (db.sprItem != null && id >= 0 && id < db.sprItem.Count) ? db.sprItem[id] : null;
+            Sprite itemSprite = (db.sprItem != null && id >= 0 && id < db.sprItem.Count) ? db.sprItem[id] : null;
+            SetRewardSlot(popContent.GetChild(i), itemSprite, quantity);
         }
 
-        // 2) Pieces: PlayerLevelUp
-        for (int i = 0; i < pieceLevelUpIds.Count; i++)
+        // 2) Random 2 PlayerLevelUp piece types, each quantity 3-5.
+        for (int i = 0; i < pieceLevelUpIds.Count && i < 2; i++)
         {
             int id = pieceLevelUpIds[i];
-            dm.warehouse.CountPiecePlayerLevelUp[id] += 1;
-            string spriteName = (db.sprPiecePlayerLevelUp != null && id >= 0 && id < db.sprPiecePlayerLevelUp.Count && db.sprPiecePlayerLevelUp[id] != null)
-                ? db.sprPiecePlayerLevelUp[id].name
-                : "null";
-            //Debug.Log($"[StarterPack Rewards] PiecePlayerLevelUp id={id}, sprite='{spriteName}'");
-            popUpGteRewardStarterpack.transform.GetChild(0).GetChild(2).GetChild(1).GetChild(0).GetComponent<Image>().sprite = (db.sprPiecePlayerLevelUp != null && id >= 0 && id < db.sprPiecePlayerLevelUp.Count) ? db.sprPiecePlayerLevelUp[id] : null;
+            int quantity = UnityEngine.Random.Range(3, 6);
+
+            dm.warehouse.CountPiecePlayerLevelUp[id] += quantity;
+
+            Sprite pieceSprite = (db.sprPiecePlayerLevelUp != null && id >= 0 && id < db.sprPiecePlayerLevelUp.Count)
+                ? db.sprPiecePlayerLevelUp[id]
+                : null;
+            SetRewardSlot(popContent.GetChild(3 + i), pieceSprite, quantity);
         }
 
-        //// 3) Pieces: PlayerEvolve
-        //for (int i = 0; i < pieceEvolveIds.Count; i++)
-        //{
-        //    int id = pieceEvolveIds[i];
-        //    dm.warehouse.CountPiecePlayerEvolve[id] += 1;
-        //    string spriteName = (db.sprPiecePlayerEvolve != null && id >= 0 && id < db.sprPiecePlayerEvolve.Count && db.sprPiecePlayerEvolve[id] != null)
-        //        ? db.sprPiecePlayerEvolve[id].name
-        //        : "null";
-        //    //Debug.Log($"[StarterPack Rewards] PiecePlayerEvolve id={id}, sprite='{spriteName}'");
-        //    popUpGteRewardStarterpack.transform.GetChild(0).GetChild(2).GetChild(2).GetChild(0).GetComponent<Image>().sprite =
-        //        (db.sprPiecePlayerEvolve != null && id >= 0 && id < db.sprPiecePlayerEvolve.Count) ? db.sprPiecePlayerEvolve[id] : null;
-        //}
+        // 3) Random 1 PlayerEvolve piece type, quantity 3-5.
+        if (pieceEvolveIds.Count > 0)
+        {
+            int id = pieceEvolveIds[0];
+            int quantity = UnityEngine.Random.Range(3, 6);
 
-        //dm.SaveFile();
+            dm.warehouse.CountPiecePlayerEvolve[id] += quantity;
+
+            Sprite pieceEvolveSprite = (db.sprPiecePlayerEvolve != null && id >= 0 && id < db.sprPiecePlayerEvolve.Count)
+                ? db.sprPiecePlayerEvolve[id]
+                : null;
+            SetRewardSlot(popContent.GetChild(5), pieceEvolveSprite, quantity);
+        }
+    }
+
+    private static void SetRewardSlot(Transform rewardSlot, Sprite sprite, int quantity)
+    {
+        if (rewardSlot == null || rewardSlot.childCount < 2) return;
+
+        Image image = rewardSlot.GetChild(0).GetComponent<Image>();
+        if (image != null) image.sprite = sprite;
+
+        TextMeshProUGUI textAmount = rewardSlot.GetChild(1).GetComponent<TextMeshProUGUI>();
+        if (textAmount != null) textAmount.text = quantity.ToString();
     }
 
     private static List<int> PickUniqueRandomIds(int maxExclusive, int count)

@@ -34,6 +34,7 @@ public class GameOver : MonoBehaviour
         AudioBase.Instance.AudioGPl(1);
         StopCoroutine(_coroutine);
         _popupStatus[2].SetActive(false);
+        GamePlayManager.Instance.CheckTurnPlayShowAds();
         _popupStatus[1].SetActive(true);
     }
     public void BtnBackHome()
@@ -130,7 +131,7 @@ public class GameOver : MonoBehaviour
                     else
                         _popupStatus[id].transform.GetChild(1).GetChild(0).GetChild(i).gameObject.SetActive(false);
                 }
-                _popupStatus[id].transform.GetChild(1).GetChild(2).GetComponent<TextMeshProUGUI>().text = "Level " + (_dataManager.LevelSelect + 1);
+                _popupStatus[id].transform.GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text = "Level " + (_dataManager.LevelSelect + 1);
                 SetGetBonus();
                 _dataManager.SaveFile();
                 break;
@@ -197,6 +198,7 @@ public class GameOver : MonoBehaviour
             txtSeconRevive.text = secon.ToString();
         }
         _popupStatus[2].SetActive(false);
+        GamePlayManager.Instance.CheckTurnPlayShowAds();
         _popupStatus[1].SetActive(true);
     }
     public void BtnRevive(bool Revive)
@@ -214,6 +216,7 @@ public class GameOver : MonoBehaviour
             //    //SetTopBar();
             //}
             AudioBase.Instance.AudioGPl(2);
+            PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") - 5);
             GamePlayManager.Instance.SetMission(0, 40);
             GamePlayManager.Instance.SetMission(4, 1);
             PlayerRevive();
@@ -234,7 +237,7 @@ public class GameOver : MonoBehaviour
     }
     private void CheckBtnRevive()
     {
-        bool checkBtn = PlayerPrefs.GetInt("Diamont") >= 20 ? true : false;
+        bool checkBtn = PlayerPrefs.GetInt("Diamont") >= 5 ? true : false;
         _btnRevives[0].SetActive(checkBtn);
         _btnRevives[1].SetActive(!checkBtn);
     }

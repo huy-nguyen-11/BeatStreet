@@ -80,49 +80,54 @@ public class DealController : MonoBehaviour
     }
     private int RandomType(int id)
     {
-        int type = Random.Range(0, 3);
-        if (id == 0)
+        int type = Random.Range(0, 4); // 0: Player Piece, 1: Evolve Piece, 2: Key, 3: Item
+        
+        // Ensure at least one Key (Type 2)
+        if (id == _objDeals.Length - 1 && !TypeKey)
         {
-            if (type == 2)
-                TypeKey = true;
-            return type;
+            TypeKey = true;
+            return 2;
         }
-        else
+
+        if (type == 2)
         {
-            if (TypeKey)
-            {
-                if (type == 2)
-                    return Random.Range(0, 2);
-                else
-                    return type;
-            }
+            if (TypeKey) // If already have a Key, pick another type
+                return (Random.Range(0, 3) + (Random.Range(0, 2) == 0 ? 0 : 1)) % 4; // pick 0, 1, or 3
             else
-            {
-                if (type == 2)
-                    TypeKey = true;
-                return type;
-            }
+                TypeKey = true;
         }
+        
+        return type;
     }
     private int RandomIdPiece(int idType)
     {
-        if(idType == 0)
+        var db = dataManager.dataBase.imgEquipItems;
+        switch (idType)
         {
-            int id = Random.Range(0, 3);
-            return id;
+            case 0: // Player Piece
+                return Random.Range(0, Mathf.Min(3, db.sprPiecePlayerLevelUp.Count));
+            case 1: // Evolve Piece
+                return Random.Range(0, db.sprPiecePlayerEvolve.Count);
+            case 3: // Item
+                return Random.Range(0, db.sprItem.Count);
+            default: // Key
+                return 0;
         }
-        else
-            return 0;
     }
-    private int SetPrice(int id)
+    private int SetPrice(int idType)
     {
-        int price = id == 2 ? 16 : 125;
-        return price;
+        switch (idType)
+        {
+            case 0: return 125; // Player Piece
+            case 1: return 175; // Evolve Piece
+            case 2: return 20;  // Key (Gem)
+            case 3: return 150; // Item
+            default: return 0;
+        }
     }
-    private bool SetTypePrice(int id)
+    private bool SetTypePrice(int idType)
     {
-        bool typePrice = id == 2 ? true : false;
-        return typePrice;
+        return idType == 2; // Only Key uses gems (true)
     }
     private void SetDeals()
     {
@@ -131,16 +136,19 @@ public class DealController : MonoBehaviour
             DealsCurrent deals = dataManager.dealsCurrent[i];
             _objDeals[i].transform.GetChild(1).GetChild(0).GetComponent<Image>().sprite = SetImgIcon(deals);//icon deal
             _objDeals[i].transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = SetName(deals); //name dael
-            _objDeals[i].transform.GetChild(2).GetChild(0).GetComponent<Image>().DOFillAmount((float)deals.Quantily / 5f, 0); //fill amount
-            _objDeals[i].transform.GetChild(2).GetChild(1).GetComponent<TextMeshProUGUI>().text = deals.Quantily + "/5"; //text quantily
+            
+            int maxQty = deals.IdType == 2 ? 1 : 3;
+            _objDeals[i].transform.GetChild(2).GetChild(0).GetComponent<Image>().DOFillAmount((float)deals.Quantily / (float)maxQty, 0); //fill amount
+            _objDeals[i].transform.GetChild(2).GetChild(1).GetComponent<TextMeshProUGUI>().text = deals.Quantily + "/" + maxQty; //text quantily
             _objDeals[i].transform.GetChild(2).GetChild(2).GetComponent<Image>().sprite = _iconNotUp; //icon not up
-            if (deals.Quantily < 5)
+            
+            if (deals.Quantily < maxQty)
             {
                 _objDeals[i].transform.GetChild(3).gameObject.GetComponent<Button>().interactable = true; // button buy active
                 SetBtnBuy(deals, _objDeals[i].transform.GetChild(3).gameObject);
                 int id = i;
                 bool check = deals.TypePrice;
-                int price = !check ? 125 + (75 * deals.Quantily) : 16 + (16 * deals.Quantily);
+                int price = CalculateCurrentPrice(deals);
                 _objDeals[i].transform.GetChild(3).GetComponent<Button>().onClick.RemoveAllListeners();
                 _objDeals[i].transform.GetChild(3).GetComponent<Button>().onClick.AddListener(delegate
                 {
@@ -154,43 +162,58 @@ public class DealController : MonoBehaviour
             }
         }
     }
+    private int CalculateCurrentPrice(DealsCurrent deal)
+    {
+        switch (deal.IdType)
+        {
+            case 0: return 125 + (35 * deal.Quantily); // Player Piece: 125 base, +35 per buy
+            case 1: return 175 + (55 * deal.Quantily); // Evolve Piece: 175 base, +55 per buy
+            case 2: return 20;  // Key: 20 gem, max 1 (no increase)
+            case 3: return 150 + (45 * deal.Quantily); // Item: 150 base, +45 per buy
+            default: return 0;
+        }
+    }
     private Sprite SetImgIcon(DealsCurrent deal)
     {
-        if (deal.IdType == 0 || deal.IdType == 1)
-            return dataManager.dataBase.imgEquipItems.sprPiecePlayerLevelUp[deal.IdPiece];
-        //else if (deal.IdType == 1)
-        //    return dataManager.dataBase.imgEquipItems.sprPieceEnemy[deal.IdPiece];
-        else
-            return _iconKey;
+        var db = dataManager.dataBase.imgEquipItems;
+        switch (deal.IdType)
+        {
+            case 0: return db.sprPiecePlayerLevelUp[deal.IdPiece];
+            case 1: return db.sprPiecePlayerEvolve[deal.IdPiece];
+            case 3: return db.sprItem[deal.IdPiece];
+            default: return _iconKey; // Type 2
+        }
     }
     private string SetName(DealsCurrent deal)
     {
-        if (deal.Quantily >= 5)
+        int maxQty = deal.IdType == 2 ? 1 : 3;
+        if (deal.Quantily >= maxQty)
         {
             return "<color=red>Sold out!</color>";
         }
         else
         {
-            if (deal.IdType == 0 || deal.IdType == 1)
-                return dataManager.dataBase.imgEquipItems.namePlayer[deal.IdPiece];
-            //else if (deal.IdType == 1)
-            //    return dataManager.dataBase.imgEquipItems.nameEnemy[deal.IdPiece];
-            else
-                return "Key";
+            var db = dataManager.dataBase.imgEquipItems;
+            switch (deal.IdType)
+            {
+                case 0: return db.namePlayer[deal.IdPiece];
+                case 1: return "Evolve Piece"; // You might want to add nameEvolve to db later
+                case 3: return db.nameItems[deal.IdPiece];
+                default: return "Key"; // Type 2
+            }
         }
     }
     private void SetBtnBuy(DealsCurrent deal, GameObject btn)
     {
+        int price = CalculateCurrentPrice(deal);
         if (!deal.TypePrice)
         {
-            int price = 125 + (75 * deal.Quantily);
-            btn.transform.GetChild(0).GetComponent<Image>().sprite = _iconBtn[0];
+            btn.transform.GetChild(0).GetComponent<Image>().sprite = _iconBtn[0]; // Coin icon
             btn.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = price.ToString();
         }
         else
         {
-            int price = 16 + (16 * deal.Quantily);
-            btn.transform.GetChild(0).GetComponent<Image>().sprite = _iconBtn[1];
+            btn.transform.GetChild(0).GetComponent<Image>().sprite = _iconBtn[1]; // Gem icon
             btn.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = price.ToString();
         }
     }
@@ -214,19 +237,27 @@ public class DealController : MonoBehaviour
     }
     private void SetDataEquip(int id)
     {
-        int type = dataManager.dealsCurrent[id].IdType;
-        if (type == 0)
+        DealsCurrent deal = dataManager.dealsCurrent[id];
+        int type = deal.IdType;
+        int idPiece = deal.IdPiece;
+
+        switch (type)
         {
-            dataManager.warehouse.CountPiecePlayerLevelUp[dataManager.dealsCurrent[id].IdPiece]++;
-        }
-        else if (type == 1)
-        {
-            dataManager.warehouse.CountPieceEnemy[dataManager.dealsCurrent[id].IdPiece]++;
-        }
-        else
-        {
-            PlayerPrefs.SetInt("Key", PlayerPrefs.GetInt("Key") + 1);
-            PlayerPrefs.Save();
+            case 0: // Player Piece
+                dataManager.warehouse.CountPiecePlayerLevelUp[idPiece]++;
+                break;
+            case 1: // Evolve Piece
+                dataManager.warehouse.CountPiecePlayerEvolve[idPiece]++;
+                break;
+            case 2: // Key
+                PlayerPrefs.SetInt("Key", PlayerPrefs.GetInt("Key") + 1);
+                PlayerPrefs.Save();
+                break;
+            case 3: // Item
+                dataManager.warehouse.CountItem[idPiece]++;
+                if (!dataManager.warehouse.ListItems.Contains(idPiece))
+                    dataManager.warehouse.ListItems.Add(idPiece);
+                break;
         }
     }
 }

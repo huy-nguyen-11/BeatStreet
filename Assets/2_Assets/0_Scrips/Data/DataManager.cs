@@ -36,6 +36,20 @@ public class DataManager : MonoBehaviour
     public bool isCheckIdPet;
     public bool isActivePet1, isActivePet2;
 
+    // PlayerPrefs key for storing number of plays
+    private const string PlayCountKey = "PlayCount";
+
+    // Property that reads/writes the number of plays to PlayerPrefs (int)
+    public int PlayCount
+    {
+        get => PlayerPrefs.GetInt(PlayCountKey, 0);
+        set
+        {
+            PlayerPrefs.SetInt(PlayCountKey, value);
+            PlayerPrefs.Save();
+        }
+    }
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -55,7 +69,7 @@ public class DataManager : MonoBehaviour
         {
             PlayerPrefs.SetInt("DataDefault", 1);
             PlayerPrefs.SetInt("Coin", 100);
-            PlayerPrefs.SetInt("Diamont", 100);
+            PlayerPrefs.SetInt("Diamont", 10);
             PlayerPrefs.SetInt("Key", 0);
             PlayerPrefs.SetInt("Energy", 20);
             PlayerPrefs.SetFloat("Sound", 1);
@@ -85,7 +99,10 @@ public class DataManager : MonoBehaviour
 
         dataBase = backupDataBase;
     }
+
 }
+
+
 [System.Serializable]
 public class QuestsCurrent
 {

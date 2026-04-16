@@ -29,9 +29,32 @@ public class FillBarPlayer : MonoBehaviour
     }
     public void SetNewMana(float mana)
     {
-        GamePlayManager.Instance.SetBtnUlti(mana == maxMana);
+        //GamePlayManager.Instance.SetBtnUlti(mana == maxMana);
+        //this.mana = Mathf.Clamp(mana, 0, maxMana);
+        //if (!isCheckFly)
+        //    imgFillMana.fillAmount = this.mana / maxMana;
         this.mana = Mathf.Clamp(mana, 0, maxMana);
+        bool isFullMana = (this.mana == maxMana);
+
+        if (!isFullMana)
+        {
+            GamePlayManager.Instance.SetBtnUlti(false);
+        }
+
         if (!isCheckFly)
-            imgFillMana.fillAmount = this.mana / maxMana;
+        {
+            float targetFill = this.mana / maxMana;
+            imgFillMana.DOKill();
+
+            imgFillMana.DOFillAmount(targetFill, 0.3f)
+                .SetEase(Ease.OutQuad)
+                .OnComplete(() =>
+                {
+                    if (isFullMana)
+                    {
+                        GamePlayManager.Instance.SetBtnUlti(true);
+                    }
+                });
+        }
     }
 }

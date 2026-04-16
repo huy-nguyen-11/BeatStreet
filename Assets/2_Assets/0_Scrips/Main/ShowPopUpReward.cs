@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class ShowPopUpReward : MonoBehaviour
 {
@@ -10,7 +11,9 @@ public class ShowPopUpReward : MonoBehaviour
     public float boardTargetHeight = 915f;
     public float boardTargetY = 120f;
     public float boardDuration = 0.5f;
-
+    //for bonus item
+    [SerializeField] private List<Vector2> listBonusItemsPos;
+    [SerializeField] private List<GameObject> listBonusItems;
 
     public List<RectTransform> rewardItems;
     public float flipDuration = 0.4f;
@@ -32,6 +35,25 @@ public class ShowPopUpReward : MonoBehaviour
     {
         ResetState();
         PlaySequence();
+
+        if(listBonusItemsPos == null || listBonusItemsPos.Count == 0 &&  listBonusItems != null)
+        {
+            for (int i = 0; i < listBonusItems.Count; i++)
+            {
+                listBonusItemsPos.Add(new Vector2(listBonusItems[i].GetComponent<RectTransform>().anchoredPosition.x , listBonusItems[i].GetComponent<RectTransform>().anchoredPosition.y));
+            }
+        }
+
+        if(listBonusItemsPos != null && listBonusItemsPos.Count > 0 && listBonusItems != null)
+        {
+            for (int i = 0; i < listBonusItems.Count; i++)
+            {
+                if(i < listBonusItemsPos.Count)
+                {
+                    listBonusItems[i].GetComponent<RectTransform>().anchoredPosition = listBonusItemsPos[i];
+                }
+            }
+        }
     }
 
     private void ResetState()
@@ -52,6 +74,7 @@ public class ShowPopUpReward : MonoBehaviour
             CanvasGroup group = item.GetComponent<CanvasGroup>();
             if (group != null) group.alpha = 1;
         }
+
 
         buttonClaim.SetActive(false);
         buttonClaim.transform.localScale = Vector3.one;
@@ -135,7 +158,7 @@ public class ShowPopUpReward : MonoBehaviour
         GetComponent<GridLayoutGroup>().enabled = false;
         Sequence claimSeq = DOTween.Sequence();
         currentSequence = claimSeq;
-
+        buttonClaim.SetActive(false);
         for (int i = 0; i < rewardItems.Count; i++)
         {
             RectTransform item = rewardItems[i];

@@ -1276,7 +1276,7 @@ Transform:
   m_GameObject: {fileID: 1070808599433485300}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 2.06, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1749,8 +1749,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &1622134611497557973
 GameObject:
   m_ObjectHideFlags: 0
@@ -1946,8 +1948,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &1865665404250417192
 GameObject:
   m_ObjectHideFlags: 0
@@ -2143,8 +2147,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.8
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &2169356004589873726
 GameObject:
   m_ObjectHideFlags: 0
@@ -2613,8 +2619,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &2459534243247871867
 GameObject:
   m_ObjectHideFlags: 0
@@ -3491,8 +3499,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -1.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &3413714427190542763
 GameObject:
   m_ObjectHideFlags: 0
@@ -3766,8 +3776,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -1.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &4151822129219432654
 GameObject:
   m_ObjectHideFlags: 0
@@ -4157,7 +4169,7 @@ Transform:
   m_GameObject: {fileID: 4385583235545096675}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -3.09, y: 0.12, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4366,8 +4378,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!61 &5165869901707298330
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4960,8 +4974,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!61 &8829091763363932043
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -5113,8 +5129,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!61 &3027740711951388515
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -6012,6 +6030,7 @@ MonoBehaviour:
   level: 12
   TurnEnemy: 0
   CountX: 0
+  turnOrderedObjects: []
   listTurnEnemy: {fileID: 0}
   PointPlayer: {fileID: 8541654819387571400}
   listWallTurn: {fileID: 0}
@@ -7063,8 +7082,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!61 &2810274316236756021
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -7666,8 +7687,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!61 &8194202730950417562
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -8005,7 +8028,7 @@ Transform:
   m_GameObject: {fileID: 8511847811615622091}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 4.24, y: -1.44, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -8275,7 +8298,7 @@ Transform:
   m_GameObject: {fileID: 8715759674065261006}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.96, y: -0.86, z: 0}
+  m_LocalPosition: {x: 3.74, y: -1.67, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10137,6 +10160,10 @@ PrefabInstance:
     - target: {fileID: 2767260586420577582, guid: 8a23e683a8fc4524b90ba235746d9f45, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6344557903963660996, guid: 8a23e683a8fc4524b90ba235746d9f45, type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

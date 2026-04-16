@@ -173,12 +173,17 @@ public class DailyReward : MonoBehaviour
         //}
         PlayerPrefs.SetInt("Diamont", PlayerPrefs.GetInt("Diamont") + itemDailys[currentDay].heart);
         PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + itemDailys[currentDay].coins);
-        if(itemDailys[currentDay].heart > 0)
+        if(itemDailys[currentDay].heart > 0 && itemDailys[currentDay].coins == 0)
         {
             getReward.DoAddGemsEffect(listDays[currentDay].transform.position, PlayerPrefs.GetInt("Diamont") - itemDailys[currentDay].heart, PlayerPrefs.GetInt("Diamont"));
         }
+        else if(itemDailys[currentDay].coins > 0 && itemDailys[currentDay].heart == 0)
+        {
+            getReward.DoAddCoinEffect(listDays[currentDay].transform.position, PlayerPrefs.GetInt("Coin") - itemDailys[currentDay].coins, PlayerPrefs.GetInt("Coin"));
+        }
         else
         {
+            getReward.DoAddGemsEffect(listDays[currentDay].transform.position, PlayerPrefs.GetInt("Diamont") - itemDailys[currentDay].heart, PlayerPrefs.GetInt("Diamont"));
             getReward.DoAddCoinEffect(listDays[currentDay].transform.position, PlayerPrefs.GetInt("Coin") - itemDailys[currentDay].coins, PlayerPrefs.GetInt("Coin"));
         }
 

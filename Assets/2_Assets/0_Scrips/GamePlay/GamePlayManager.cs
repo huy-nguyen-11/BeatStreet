@@ -1,4 +1,4 @@
-using DG.Tweening;
+﻿using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -47,6 +47,8 @@ public class GamePlayManager : MonoBehaviour
     // Game
     [SerializeField] Transform[] _Items;
     public List<float> attributePlayer = new List<float>();
+    [SerializeField] private List<Sprite> _listAvaPlayer;
+    [SerializeField] private Image _imgAvaPlayer;
     // Level
     public int levelMap;
     public GameObject[] _prfLevelMap;
@@ -131,12 +133,14 @@ public class GamePlayManager : MonoBehaviour
         CheckAudio();
         SetItem();
 
-
         backUlti0.SetActive(false);
         backUlti1.SetActive(false);
         _posBot = backUlti1.transform.GetChild(1).localPosition;
         _posTop = backUlti1.transform.GetChild(0).localPosition;
         _showFightBoss.SetActive(false);
+
+        _imgAvaPlayer.sprite = _listAvaPlayer[dataManager.idPlayer];
+        txtCombos[0].transform.parent.gameObject.SetActive(false);
     }
 
     void OpenPanelGame()
@@ -310,25 +314,86 @@ public class GamePlayManager : MonoBehaviour
     }
 
 
+    //public void SetAnimCombo(int count)
+    //{
+    //    txtCombos[0].transform.parent.gameObject.SetActive(true);
+    //    txtCombos[0].text = count.ToString();
+    //    txtCombos[0].DOKill();
+    //    txtCombos[0].transform.DOScale(1.6f, 0.2f).From(1).SetEase(Ease.OutBack);
+
+    //    //foreach (var txt in txtCombos)
+    //    //{
+    //    //    txt.DOKill();
+    //    //    txt.DOFade(1, 0);
+    //    //}
+    //    //txtCombos[0].text = count.ToString();
+    //    if (count > 9)
+    //        SetMission(5, 1);
+    //    SetOffTxtCombo();
+    //}
+
+    //IEnumerator OffText()
+    //{
+    //    yield return new WaitForSeconds(1f);
+    //}
+    //private void SetOffTxtCombo()
+    //{
+    //    foreach (var txt in txtCombos)
+    //    {
+    //        //txt.DOFade(0, 1).SetDelay(2);
+    //    }
+    //    //txtCombos[0].transform.parent.gameObject.SetActive(false);
+    //}
+
+    private Coroutine hideComboCoroutine;
+
     public void SetAnimCombo(int count)
     {
+        GameObject parentObj = txtCombos[0].transform.parent.gameObject;
+        txtCombos[0].transform.parent.GetComponent<Image>().DOFade(1, 0f);
+        parentObj.SetActive(true); 
+
         foreach (var txt in txtCombos)
         {
-            txt.DOKill();
-            txt.DOFade(1, 0);
+            txt.DOKill();    
+            txt.DOFade(1, 0);   
+            //txt.text = count.ToString(); 
         }
         txtCombos[0].text = count.ToString();
+        Transform textTransform = txtCombos[0].transform;
+        textTransform.DOKill(); 
+
+        textTransform.DOScale(1.6f, 0.2f).From(Vector3.one).SetEase(Ease.OutBack);
+
         if (count > 9)
             SetMission(5, 1);
-        SetOffTxtCombo();
+
+        if (hideComboCoroutine != null)
+        {
+            StopCoroutine(hideComboCoroutine); 
+        }
+        hideComboCoroutine = StartCoroutine(HideComboRoutine()); 
     }
-    private void SetOffTxtCombo()
+
+    private IEnumerator HideComboRoutine()
     {
+
+        yield return new WaitForSeconds(1.5f);
+
+        float fadeDuration = 0.5f;
+
         foreach (var txt in txtCombos)
         {
-            txt.DOFade(0, 1).SetDelay(1);
+            txt.DOFade(0, fadeDuration);
         }
+        yield return new WaitForSeconds(fadeDuration);
+
+        txtCombos[0].transform.parent.GetComponent<Image>().DOFade(0, 0.7f);
+        txtCombos[0].transform.parent.gameObject.SetActive(false);
+        //todo effect fill mana
     }
+
+
     public IEnumerator OpenPopupGameOver(int id)
     {
         yield return new WaitForSeconds(1f);
@@ -484,9 +549,7 @@ public class GamePlayManager : MonoBehaviour
         {
             if (_levelMap.TurnEnemy >= _levelMap.listTurnEnemy.childCount - 1)
             {
-                _Player.SwitchToRunState(_Player.playerWingame);
-                //AudioBase.Instance.AudioPlayer(11);
-                StartCoroutine(OpenPopupGameOver(0));
+                StartCoroutine(ShowVictory());
             }
             else
             {
@@ -496,6 +559,15 @@ public class GamePlayManager : MonoBehaviour
 
             }
         }
+    }
+
+    IEnumerator ShowVictory()
+    {
+        yield return new WaitForSeconds(1f);
+        _Player.SwitchToRunState(_Player.playerWingame);
+        //AudioBase.Instance.AudioPlayer(11);
+        CheckTurnPlayShowAds();
+        StartCoroutine(OpenPopupGameOver(0));
     }
 
     public void DemoVictory()
@@ -664,6 +736,7 @@ public class GamePlayManager : MonoBehaviour
         Time.timeScale = 1;
         AudioBase.Instance.SetAudioUI(0);
         AudioBase.Instance.isCheckPlayed = true;
+        CheckTurnPlayShowAds();
         _DarkScene.SetActive(true);
         Invoke(nameof(BackMain), 0.5f);
     }
@@ -717,7 +790,7 @@ public class GamePlayManager : MonoBehaviour
         _showFightBoss.SetActive(true);
         yield return new WaitForSeconds(showBossDuration);
         _showFightBoss.SetActive(false);
-
+    
         // return camera to player (center on player Char position)
         Vector3 playerCamPos = _Player != null && _Player.Char != null
             ? new Vector3(_Player.Char.position.x, _CameraFollow.transform.position.y, _CameraFollow.transform.position.z)
@@ -788,5 +861,16 @@ public class GamePlayManager : MonoBehaviour
         float amountToFull = _Player.fillBar.maxMana - _Player.Mana;
         if (amountToFull > 0f)
             _Player.SetMana(amountToFull);
+    }
+
+    public void CheckTurnPlayShowAds()
+    {
+        DataManager.Instance.PlayCount++;
+        if(DataManager.Instance.PlayCount >= 3)
+        {
+            MG_Interface.Current.Interstitial_Show();
+            DataManager.Instance.PlayCount = 0;
+            DataManager.Instance.SaveFile();
+        }
     }
 }

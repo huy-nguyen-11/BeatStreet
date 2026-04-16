@@ -140,8 +140,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!61 &2689322207220927046
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -200,8 +202,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: 0
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &103128980612163561
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,8 +310,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &145006524711401787
 GameObject:
   m_ObjectHideFlags: 0
@@ -583,8 +589,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!61 &6249798929865993965
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -643,8 +651,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: 0
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &400369402129025152
 GameObject:
   m_ObjectHideFlags: 0
@@ -749,8 +759,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &406065670827326157
 GameObject:
   m_ObjectHideFlags: 0
@@ -855,8 +867,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &557901074335817169
 GameObject:
   m_ObjectHideFlags: 0
@@ -1236,8 +1250,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!61 &6289333210942295247
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1296,8 +1312,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: 0
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &909489274641379919
 GameObject:
   m_ObjectHideFlags: 0
@@ -1802,8 +1820,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1900956765
+  m_SortingLayer: 2
   m_SortingOrder: 23
   m_MaskInteraction: 0
   m_Sprite: {fileID: 3090166706533234969, guid: 731cfc16bd29ecc44978549a53736b4c, type: 3}
@@ -2572,8 +2590,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1900956765
+  m_SortingLayer: 2
   m_SortingOrder: 21
   m_MaskInteraction: 0
   m_Sprite: {fileID: -5869057299307999057, guid: 96214b5bd5cf2824282b8f7107e9f0fe, type: 3}
@@ -3071,8 +3089,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1900956765
+  m_SortingLayer: 2
   m_SortingOrder: 22
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: c905b7170119f0a4a93a1c341c9c4099, type: 3}
@@ -3189,8 +3207,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -3.85
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &3082119516266975786
 GameObject:
   m_ObjectHideFlags: 0
@@ -3534,8 +3554,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1900956765
+  m_SortingLayer: 2
   m_SortingOrder: 22
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: c905b7170119f0a4a93a1c341c9c4099, type: 3}
@@ -4094,8 +4114,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &4385583235545096675
 GameObject:
   m_ObjectHideFlags: 0
@@ -4210,8 +4232,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1900956765
+  m_SortingLayer: 2
   m_SortingOrder: 22
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: c905b7170119f0a4a93a1c341c9c4099, type: 3}
@@ -4907,8 +4929,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &5791627111538745487
 GameObject:
   m_ObjectHideFlags: 0
@@ -5013,8 +5037,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.85
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &5966239184717653082
 GameObject:
   m_ObjectHideFlags: 0
@@ -5176,8 +5202,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1900956765
+  m_SortingLayer: 2
   m_SortingOrder: 22
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: c905b7170119f0a4a93a1c341c9c4099, type: 3}
@@ -5543,8 +5569,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &6377305550135018584
 GameObject:
   m_ObjectHideFlags: 0
@@ -5804,8 +5832,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1900956765
+  m_SortingLayer: 2
   m_SortingOrder: 22
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: c905b7170119f0a4a93a1c341c9c4099, type: 3}
@@ -5895,8 +5923,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1900956765
+  m_SortingLayer: 2
   m_SortingOrder: 22
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: c905b7170119f0a4a93a1c341c9c4099, type: 3}
@@ -6013,8 +6041,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -3.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &6703100357885251064
 GameObject:
   m_ObjectHideFlags: 0
@@ -6218,8 +6248,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1900956765
+  m_SortingLayer: 2
   m_SortingOrder: 22
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: c905b7170119f0a4a93a1c341c9c4099, type: 3}
@@ -6292,6 +6322,7 @@ MonoBehaviour:
   level: 12
   TurnEnemy: 0
   CountX: 0
+  turnOrderedObjects: []
   listTurnEnemy: {fileID: 0}
   PointPlayer: {fileID: 8541654819387571400}
   listWallTurn: {fileID: 0}
@@ -6731,8 +6762,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1900956765
+  m_SortingLayer: 2
   m_SortingOrder: 22
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: c905b7170119f0a4a93a1c341c9c4099, type: 3}
@@ -7430,8 +7461,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!61 &5973911038866680883
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -7490,8 +7523,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: 0
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1 &8511847811615622091
 GameObject:
   m_ObjectHideFlags: 0
@@ -7553,7 +7588,7 @@ Transform:
   m_GameObject: {fileID: 8715759674065261006}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.96, y: -0.86, z: 0}
+  m_LocalPosition: {x: -1.29, y: -1.96, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7636,8 +7671,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1900956765
+  m_SortingLayer: 2
   m_SortingOrder: 20
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 1f08eb1a85b94a449b592dc084eb6d09, type: 3}
@@ -7847,8 +7882,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: -0.5
-  threshold: 0.05
+  orderOffset: 0
 --- !u!61 &6350508899605944945
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -7907,8 +7944,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d0b43e9df999f4d992f12773af83a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticDepthObject
+  sortingBaseOrder: 100
+  sortingScale: 100
   yOffset: 0
-  threshold: 0.05
+  orderOffset: 0
 --- !u!1001 &288346578602849420
 PrefabInstance:
   m_ObjectHideFlags: 0
