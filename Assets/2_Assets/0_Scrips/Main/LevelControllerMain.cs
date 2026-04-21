@@ -32,6 +32,7 @@ public class LevelControllerMain : MonoBehaviour
     [SerializeField] GameObject _popUpChangeItem1 , _popUpChangeItem2;
     private int _indexItemSelected = 0;
 
+
     void Start()
     {
         dataManager = DataManager.Instance;
@@ -119,8 +120,9 @@ public class LevelControllerMain : MonoBehaviour
         _popups[0].GetChild(0).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = "LEVEL " + (id + 1).ToString(); // level text
 
         // Set reward
-        _popups[0].GetChild(0).GetChild(2).GetChild(1).GetChild(0).GetComponent<Image>().sprite = GetSprLoot(id);
-        _popups[0].GetChild(0).GetChild(2).GetChild(2).GetChild(0).GetComponent<Image>().sprite = GetSprLoot(id);
+        //_popups[0].GetChild(0).GetChild(2).GetChild(1).GetChild(0).GetComponent<Image>().sprite = GetSprLoot(id,0);
+        //_popups[0].GetChild(0).GetChild(2).GetChild(2).GetChild(0).GetComponent<Image>().sprite = GetSprLoot(id,1);
+        UpdateImageReward(id);
 
         // read star data for this level
         int starCount = dataManager.levelDatas[id].Star; // 0..3
@@ -318,6 +320,26 @@ public class LevelControllerMain : MonoBehaviour
 
         btnPreviousMode.interactable = mode > 0;
         btnNextMode.interactable = mode < unlockedModes - 1;
+
+        //update img reward
+        UpdateImageReward(level);
+    }
+
+    void UpdateImageReward(int _level)
+    {
+        if (dataManager.levelDatas[_level].starRewards[dataManager.LevelMode].isPassed)
+        {
+            _popups[0].GetChild(0).GetChild(2).GetChild(1).GetChild(1).gameObject.SetActive(true); 
+            _popups[0].GetChild(0).GetChild(2).GetChild(2).GetChild(1).gameObject.SetActive(true);
+        }
+        else
+        {
+            _popups[0].GetChild(0).GetChild(2).GetChild(1).GetChild(0).GetComponent<Image>().sprite = GetSprLoot(_level, 0);
+            _popups[0].GetChild(0).GetChild(2).GetChild(2).GetChild(0).GetComponent<Image>().sprite = GetSprLoot(_level, 1);
+
+            _popups[0].GetChild(0).GetChild(2).GetChild(1).GetChild(1).gameObject.SetActive(false);
+            _popups[0].GetChild(0).GetChild(2).GetChild(2).GetChild(1).gameObject.SetActive(false);
+        }
     }
 
     void SetStarImageModeLevel()
@@ -336,20 +358,58 @@ public class LevelControllerMain : MonoBehaviour
         textModeLevel.text = mode == 0 ? "EASY" : mode == 1 ? "MEDIUM" : "HARD";
     }
 
-    private Sprite GetSprLoot(int level)
+    private Sprite GetSprLoot(int level , int typeOfSlot)
     {
-        int type = dataManager.levelDatas[level].Type;
-        switch (type)
+        int type1 = dataManager.levelDatas[level].starRewards[dataManager.LevelMode].rewards[0].itemId; // item 1 id as loot
+        int type2 = dataManager.levelDatas[level].starRewards[dataManager.LevelMode].rewards[1].itemType; // item 2 type as loot
+        Sprite _sprite = null;
+
+        if (type1 > 66 && typeOfSlot == 0) // if get item is coin/gem/key
         {
-            case 0:
-                return dataManager.dataBase.imgEquipItems.sprPiecePlayerLevelUp[dataManager.levelDatas[level].idItem];
-            case 1:
-                return dataManager.dataBase.imgEquipItems.sprPiecePlayerEvolve[dataManager.levelDatas[level].idItem];
-            case 2:
-                return dataManager.dataBase.imgEquipItems.sprItem[dataManager.levelDatas[level].idItem];
-            default:
-                return dataManager.dataBase.imgEquipItems.sprPiecePlayerLevelUp[dataManager.levelDatas[level].idItem];
+            if (type1 == 666)
+            {
+                _sprite = dataManager.dataBase.imgEquipItems.sprItemCommon[0];
+            }
+            else if (type1 == 661)
+            {
+                _sprite = dataManager.dataBase.imgEquipItems.sprItemCommon[1];
+            }
+            else if(type1 == 662)
+            {
+                _sprite = dataManager.dataBase.imgEquipItems.sprItemCommon[2];
+            }
         }
+
+        if (typeOfSlot == 1 && type2 != 666) // if get item 2 and it's not coin/gem/key
+        {
+
+            if (type2 == 0)
+            {
+                _sprite = dataManager.dataBase.imgEquipItems.sprPiecePlayerLevelUp[dataManager.levelDatas[level].starRewards[dataManager.LevelMode].rewards[1].itemId]; // player level up
+            }
+            else if (type2 == 1)
+            {
+                _sprite = dataManager.dataBase.imgEquipItems.sprPiecePlayerEvolve[dataManager.levelDatas[level].starRewards[dataManager.LevelMode].rewards[1].itemId]; // player evolve
+            }
+            else if (type2 == 2)
+            {
+                _sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.levelDatas[level].starRewards[dataManager.LevelMode].rewards[1].itemId]; // item booster
+            }
+        }
+
+        return _sprite;
+
+        //switch (type1)
+        //{
+        //    case 0:
+        //        return dataManager.dataBase.imgEquipItems.sprPiecePlayerLevelUp[dataManager.levelDatas[level].idItem];
+        //    case 1:
+        //        return dataManager.dataBase.imgEquipItems.sprPiecePlayerEvolve[dataManager.levelDatas[level].idItem];
+        //    case 2:
+        //        return dataManager.dataBase.imgEquipItems.sprItem[dataManager.levelDatas[level].idItem];
+        //    default:
+        //        return dataManager.dataBase.imgEquipItems.sprPiecePlayerLevelUp[dataManager.levelDatas[level].idItem];
+        //}
     }
     private void SetListBtn()
     {

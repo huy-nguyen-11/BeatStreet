@@ -1,104 +1,15 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 
 public class CoinController : MonoBehaviour, IpooledObject
 {
-    //public Transform player;
-    //Rigidbody2D rb;
-    //Vector2 moveDirection;
-    //bool isMove = false;
-    //bool isCollected = false;
-
-
-    //public void OnObjectSpawn()
-    //{
-    //    player = GameObject.FindGameObjectWithTag("Player")?.transform;
-    //    rb = GetComponent<Rigidbody2D>();
-    //    MoveToRandomPosition();
-    //    StartCoroutine(SetTimeStop());
-    //    isCollected = false;
-    //    gameObject.transform.GetChild(0).gameObject.SetActive(true);
-    //    gameObject.transform.GetChild(1).gameObject.SetActive(true);
-    //    gameObject.transform.GetChild(2).gameObject.SetActive(false);//effect
-    //}
-
-    //void Start()
-    //{
-
-    //}
-    //void Update()
-    //{
-    //    if(isCollected) return;
-
-    //    if (!isMove)
-    //        transform.Translate(moveDirection * 10 * Time.deltaTime);
-    //    else
-    //    {
-    //        if (Vector2.Distance(transform.position, player.position) < 2)
-    //        {
-    //            MoveToPlayer();
-    //        }
-    //        if (Vector2.Distance(transform.position, player.position) <= 0.3f)
-    //        {
-    //            CollectCoin();
-    //        }
-    //    }
-    //}
-
-    //void CollectCoin()
-    //{
-    //    if (isCollected) return; // 🔥 double check
-
-    //    isCollected = true;
-
-    //    GamePlayManager.Instance.AddCoin();
-
-
-    //    transform.GetChild(0).gameObject.SetActive(false);
-    //    transform.GetChild(1).gameObject.SetActive(false);
-    //    gameObject.transform.GetChild(2).gameObject.SetActive(true);//effect
-
-    //    StartCoroutine(DisableAfterEffect());
-    //}
-
-    //IEnumerator DisableAfterEffect()
-    //{
-    //    yield return new WaitForSeconds(1f);
-
-    //    gameObject.transform.GetChild(2).gameObject.SetActive(false);//effect
-    //    gameObject.SetActive(false);
-    //}
-
-    //void MoveToRandomPosition()
-    //{
-    //    moveDirection = Random.insideUnitCircle.normalized;
-    //}
-    //private void OnCollisionEnter2D(Collision2D collision)
-    //{
-    //    if (!isMove)
-    //        if (collision.collider.gameObject.CompareTag("Wall")
-    //            || collision.collider.gameObject.CompareTag("WallTurn"))
-    //        {
-    //            isMove = true;
-    //        }
-    //}
-    //void MoveToPlayer()
-    //{
-    //    Vector2 directionToPlayer = (player.position - transform.position).normalized;
-    //    rb.linearVelocity = directionToPlayer * 5;
-    //}
-    //IEnumerator SetTimeStop()
-    //{
-    //    float time = Random.Range(0.05f, 0.1f);
-    //    yield return new WaitForSeconds(time);
-    //    isMove = true;
-    //}
     Transform player;
     private Rigidbody2D rb;
 
     private Vector2 moveDirection;
-    private bool isMove = false;
     private bool isCollected = false;
+    private bool hasLanded = false; 
+    private float groundY; // Vị trí Y giả lập mặt đất
 
     private GameObject child0;
     private GameObject child1;
@@ -114,42 +25,62 @@ public class CoinController : MonoBehaviour, IpooledObject
         effect = transform.GetChild(2).gameObject;
 
         isCollected = false;
-        isMove = false;
+        hasLanded = false;
+        // Thêm độ lệch ngẫu nhiên cho mặt đất để tạo cảm giác có chiều sâu (perspective)
+        float randomDepth = Random.Range(-0.15f, 0.15f);
+        groundY = transform.position.y - 0.2f + randomDepth;
 
         rb.simulated = true;
         rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0;
+        rb.gravityScale = 1.5f;
 
         child0.SetActive(true);
         child1.SetActive(true);
         effect.SetActive(false);
 
-        MoveToRandomPosition();
-        StartCoroutine(SetTimeStop());
+        // Random nhẹ kích thước và góc xoay ban đầu
+        transform.localScale = Vector3.one * Random.Range(0.9f, 1.1f);
+        child0.transform.localRotation = Quaternion.Euler(0, 0, Random.Range(0, 360f));
+
+        PopOut();
     }
 
     void Update()
     {
         if (isCollected || player == null) return;
 
-        if (!isMove)
+        // Logic giả lập rơi xuống đất
+        if (!hasLanded)
         {
-            transform.Translate(moveDirection * 10 * Time.deltaTime);
+            if (rb.linearVelocity.y < 0 && transform.position.y <= groundY)
+            {
+                Landing();
+            }
         }
         else
         {
             float distance = Vector2.Distance(transform.position, player.position);
 
-            if (distance < 2f)
+            if (distance < 1f)
             {
                 MoveToPlayer();
             }
 
-            if (distance <= 0.3f)
+            if (distance <= 0.35f)
             {
                 CollectCoin();
             }
         }
+    }
+
+    void Landing()
+    {
+        hasLanded = true;
+        rb.linearVelocity = Vector2.zero;
+        rb.gravityScale = 0;
+        // Snap về vị trí mặt đất giả lập để không bị lún sâu hơn
+        transform.position = new Vector3(transform.position.x, groundY, transform.position.z);
     }
 
     void CollectCoin()
@@ -183,20 +114,20 @@ public class CoinController : MonoBehaviour, IpooledObject
         gameObject.SetActive(false);
     }
 
-    void MoveToRandomPosition()
+    void PopOut()
     {
-        moveDirection = Random.insideUnitCircle.normalized;
+        // Tăng độ rộng văng ngang để các đồng xu không bị chụm lại một chỗ
+        float forceX = Random.Range(-2.5f, 2.5f);
+        float forceY = Random.Range(4f, 7f);
+        rb.linearVelocity = new Vector2(forceX, forceY);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!isMove)
+        // Vẫn giữ lại va chạm với tường để xu không bay xuyên tường khi văng ra
+        if (collision.collider.CompareTag("Wall") || collision.collider.CompareTag("WallTurn"))
         {
-            if (collision.collider.CompareTag("Wall") ||
-                collision.collider.CompareTag("WallTurn"))
-            {
-                isMove = true;
-            }
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         }
     }
 
@@ -205,13 +136,7 @@ public class CoinController : MonoBehaviour, IpooledObject
         if (rb == null || player == null) return;
 
         Vector2 direction = (player.position - transform.position).normalized;
-        rb.linearVelocity = direction * 5f;
-    }
-
-    IEnumerator SetTimeStop()
-    {
-        float time = Random.Range(0.05f, 0.1f);
-        yield return new WaitForSeconds(time);
-        isMove = true;
+        rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, direction * 8f, Time.deltaTime * 5f);
+        rb.gravityScale = 0;
     }
 }

@@ -38,6 +38,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 6f9e8ec8a28c1554a9c7bab2abbb1f65, type: 3}
     - {fileID: 21300000, guid: 1d295daeda1fbb64bbbc55df070ac7cf, type: 3}
     - {fileID: 21300000, guid: 7f12f814b9d57cf4290df7c0d671a93a, type: 3}
+    sprItemCommon:
+    - {fileID: 21300000, guid: 0c4597b18751b5941b0b9610bcb81929, type: 3}
+    - {fileID: 21300000, guid: 9f06596698f93bb4c9dd9571335b8e83, type: 3}
+    - {fileID: 21300000, guid: 7fc9b6b4b859c5c4bb658e5cd4048573, type: 3}
     namePlayer:
     - LEE
     - BOXING
@@ -91,50 +95,66 @@ MonoBehaviour:
     AttributeItems: 140000004b000000640000002d000000320000003200000064000000190000001e000000640000003200000019000000190000003200000046000000
     StarItems: 000000000100000002000000000000000100000002000000000000000100000002000000020000000100000000000000000000000100000002000000
   ListQuests:
-  - NameQuests: Use 60 diamonds
+  - NameQuests: Defeat 30 enemies
     Milestone: 60
+    checkPrice: 0
+    price: 50
+  - NameQuests: Defeat 10 elite enemies
+    Milestone: 5
+    checkPrice: 1
+    price: 20
+  - NameQuests: Defeat 7 bombers
+    Milestone: 7
+    checkPrice: 0
+    price: 100
+  - NameQuests: Defeat any Boss
+    Milestone: 1
     checkPrice: 1
     price: 25
-  - NameQuests: Use 2000 Coin
-    Milestone: 2000
-    checkPrice: 0
-    price: 1000
-  - NameQuests: Upgrade your character 2 times
-    Milestone: 3
-    checkPrice: 1
-    price: 5
-  - NameQuests: Spin the wheel 5 times
-    Milestone: 5
-    checkPrice: 0
-    price: 500
   - NameQuests: Revive 3 times
     Milestone: 3
     checkPrice: 1
-    price: 50
-  - NameQuests: Get a 10 hit combo
-    Milestone: 5
-    checkPrice: 0
-    price: 350
-  - NameQuests: Use skill 20 times
-    Milestone: 20
-    checkPrice: 0
-    price: 300
-  - NameQuests: Do 20 dash attack
+    price: 20
+  - NameQuests: Land 20 kicks on enemies
     Milestone: 20
     checkPrice: 0
     price: 100
-  - NameQuests: Use 5 Untimate on the enemy
+  - NameQuests: Throw enemies 30 times
+    Milestone: 30
+    checkPrice: 0
+    price: 80
+  - NameQuests: Do 15 dash attack
+    Milestone: 15
+    checkPrice: 0
+    price: 100
+  - NameQuests: Grab attack 30 times
+    Milestone: 30
+    checkPrice: 0
+    price: 100
+  - NameQuests: Complete 1 turn without taking damage
+    Milestone: 1
+    checkPrice: 0
+    price: 300
+  - NameQuests: Upgrade character 5 times
+    Milestone: 5
+    checkPrice: 0
+    price: 100
+  - NameQuests: Open 3 reward chests
+    Milestone: 3
+    checkPrice: 1
+    price: 5
+  - NameQuests: Spin the Lucky Wheel 5 times
+    Milestone: 5
+    checkPrice: 1
+    price: 10
+  - NameQuests: Collect 100 dropped coins
+    Milestone: 100
+    checkPrice: 1
+    price: 10
+  - NameQuests: Collect 5 dropped items
     Milestone: 5
     checkPrice: 1
     price: 5
-  - NameQuests: 10 knockouts with a weapon
-    Milestone: 10
-    checkPrice: 0
-    price: 200
-  - NameQuests: Use 5 items
-    Milestone: 5
-    checkPrice: 1
-    price: 25
   HpUpgrade: 0000000012000000120000001200000012000000130000001400000013000000150000001400000016000000160000001700000018000000180000001a0000001b0000001c0000001d0000001f000000210000002200000025000000260000002a0000002c0000002f00000032000000360000003a0000003f000000440000004900000050000000560000005e000000660000006f0000007a00000084000000
   dameUpgrade: 00000000020000000100000002000000020000000200000002000000020000000100000002000000020000000300000002000000020000000200000002000000030000000200000003000000030000000300000003000000030000000300000004000000040000000400000004000000050000000500000005000000060000000600000007000000070000000800000008000000090000000a0000000b000000
   listLevelModeMaps:

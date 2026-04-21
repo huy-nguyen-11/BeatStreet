@@ -22,7 +22,7 @@ public class PlayerSkill1 : PlayerStateManager
         //playerController.rb.linearVelocity = Vector3.zero;
         coroutine = playerController.StartCoroutine(MoveForwardThenStop(attackForwardDistance, attackForwardTimeout));
         playerController.state = PlayerController.State.Skill1;
-        GamePlayManager.Instance.SetMission(6, 1);
+        GamePlayManager.Instance.SetMission(7, 1); // mission 7: perform 1 dash attack
         //AudioBase.Instance.AudioPlayer(0);
         //AudioBase.Instance.AudioPlayer(4);
         //SetSkill1();

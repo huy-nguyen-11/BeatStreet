@@ -1240,13 +1240,11 @@ public class EnemyController : EnemyCharacter
 
     public void SetDead()
     {
-        float chance = Random.Range(0f, 1f);
-        bool isDropItem = chance < 0.15f ? true : false;
-        if (isDropItem)
+        if (GamePlayManager.Instance != null && GamePlayManager.Instance.TryGetDropItemOnEnemyDead(out int numItem))
         {
-            int numItem = Random.Range(0, 4);
             GamePlayManager.Instance.DropItem(numItem, Char.position);
         }
+        TryDropExtremeBossBonusItem();
 
         DropCoin();
         // Force state to Dead and enter EnemyDead state immediately to stop AI
@@ -1325,11 +1323,44 @@ public class EnemyController : EnemyCharacter
 
     public void DropCoin()
     {
-        int number = Random.Range(3, 6);
+        int number = GetCoinDropCountByMode();
         for (int i = 0; i < number; i++)
         {
             //Instantiate(prfCoin, Char.position, Quaternion.identity);
             ObjectPooler.Instance.SpawnFromPool("Coin", Char.position, Quaternion.identity);
+        }
+    }
+
+    private int GetCoinDropCountByMode()
+    {
+        int mode = dataManager != null ? Mathf.Clamp(dataManager.LevelMode, 0, 2) : 0;
+        switch (mode)
+        {
+            case 0: // Normal
+                return Random.Range(1, 3); // 1-2
+            case 1: // Hard
+                return Random.Range(2, 4); // 2-3
+            case 2: // Extreme
+                return Random.Range(3, 5); // 3-4
+            default:
+                return Random.Range(1, 3);
+        }
+    }
+
+    private void TryDropExtremeBossBonusItem()
+    {
+        if (GamePlayManager.Instance == null) return;
+
+        bool isBossEnemy = typeOfEnemy == TypeOfEnemy.Boss || isBoss;
+        if (!isBossEnemy) return;
+
+        int mode = dataManager != null ? Mathf.Clamp(dataManager.LevelMode, 0, 2) : 0;
+        if (mode != 2) return; // Extreme only
+
+        if (Random.value <= 0.25f)
+        {
+            int bonusItemId = Random.Range(0, 5);
+            GamePlayManager.Instance.DropItem(bonusItemId, Char.position);
         }
     }
     public void ResetState()

@@ -1435,6 +1435,10 @@ public class PlayerController : PlayerCharacter
             }
         }
         if (dameHit <= 0) return;
+        if (GamePlayManager.Instance != null)
+        {
+            GamePlayManager.Instance.MarkPlayerTookDamageThisTurn();
+        }
         Hp = Hp - dameHit < 0 ? 0 : Hp - dameHit;
         SpawnTxtHit(dameHit);
         if (Hp > 0)

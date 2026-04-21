@@ -474,19 +474,29 @@ public class MainManager : MonoBehaviour
     //
     public void SetMission(int id, int count)
     {
-        if (id == dataManager.questsCurrent.IdQuest1 || id == dataManager.questsCurrent.IdQuest2)
+        if (id == dataManager.questsCurrent.IdQuest1)
         {
-            int idMission = id == dataManager.questsCurrent.IdQuest1 ?
-                dataManager.questsCurrent.IdQuest1 : dataManager.questsCurrent.IdQuest2;
-            int progress = id == dataManager.questsCurrent.IdQuest1 ? dataManager.questsCurrent.ProgressQuest1
-                : dataManager.questsCurrent.ProgressQuest2;
             int milestone = dataManager.dataBase.ListQuests[id].Milestone;
-            if (progress < milestone)
-            {
-                bool check = id == dataManager.questsCurrent.IdQuest1 ? false : true;
-                if (!check) dataManager.questsCurrent.ProgressQuest1 += count;
-                else dataManager.questsCurrent.ProgressQuest2 += count;
-            }
+            if (dataManager.questsCurrent.ProgressQuest1 < milestone)
+                dataManager.questsCurrent.ProgressQuest1 += count;
+        }
+        else if (id == dataManager.questsCurrent.IdQuest2)
+        {
+            int milestone = dataManager.dataBase.ListQuests[id].Milestone;
+            if (dataManager.questsCurrent.ProgressQuest2 < milestone)
+                dataManager.questsCurrent.ProgressQuest2 += count;
+        }
+        else if (id == dataManager.questsCurrent.IdQuest3)
+        {
+            int milestone = dataManager.dataBase.ListQuests[id].Milestone;
+            if (dataManager.questsCurrent.ProgressQuest3 < milestone)
+                dataManager.questsCurrent.ProgressQuest3 += count;
+        }
+        else if (id == dataManager.questsCurrent.IdQuest4)
+        {
+            int milestone = dataManager.dataBase.ListQuests[id].Milestone;
+            if (dataManager.questsCurrent.ProgressQuest4 < milestone)
+                dataManager.questsCurrent.ProgressQuest4 += count;
         }
     }
 

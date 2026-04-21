@@ -21,7 +21,7 @@ public class PlayerSkill2 : PlayerStateManager
         AudioBase.Instance.AudioPlayer(15);
         playerController.idAttackArea = 5;// set id attack area == 5
         playerController.state = PlayerController.State.Skill2;
-        GamePlayManager.Instance.SetMission(6, 1);
+        //GamePlayManager.Instance.SetMission(6, 1);
         //if (playerController.id == 0)
         //{
         //    moveTimer = 0;

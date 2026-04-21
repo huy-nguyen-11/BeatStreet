@@ -6438,6 +6438,8 @@ MonoBehaviour:
   posThrower: {fileID: 6565233276381134609}
   rangeThrower: 2
   timerCheckThrower: 6
+  sortingBaseOrder: 100
+  sortingScale: 100
   phaseBoss: 1
   auraBoss: {fileID: 0}
   isEnableThrower: 0
@@ -6843,6 +6845,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   isNormalAttack: 0
+  isWukongAttack: 0
 --- !u!50 &261897808418069454
 Rigidbody2D:
   serializedVersion: 5
@@ -7371,7 +7374,7 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 579529517
-  m_SortingLayer: 1
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
@@ -7517,6 +7520,10 @@ PrefabInstance:
     - target: {fileID: 4034130388286078852, guid: a9fca26ba37383d409c725f32b75de9d, type: 3}
       propertyPath: m_SortingOrder
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4034130388286078852, guid: a9fca26ba37383d409c725f32b75de9d, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 579529517
       objectReference: {fileID: 0}
     - target: {fileID: 5952875242037170687, guid: a9fca26ba37383d409c725f32b75de9d, type: 3}
       propertyPath: m_PresetInfoIsWorld

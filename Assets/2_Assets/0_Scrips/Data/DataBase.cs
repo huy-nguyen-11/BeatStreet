@@ -33,6 +33,7 @@ public class ImgEquipItems
     public List<Sprite> sprPiecePlayerEvolve;
     public List<Sprite> sprPieceEnemy;
     public List<Sprite> sprItem;
+    public List<Sprite> sprItemCommon; // coin , diamont, key
     public List<string> namePlayer;
     public List<string> nameEnemy;
     public List<string> nameItems;

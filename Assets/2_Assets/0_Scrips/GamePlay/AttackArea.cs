@@ -428,7 +428,17 @@ public class AttackArea : MonoBehaviour
             }
 
             enemy.enemyController.SetHit(Dame, isMaxHit);
-            if(enemy.enemyController.typeOfEnemy == TypeOfEnemy.Boss)
+            if (PlayerController.Instance != null && PlayerController.Instance.idAttackArea == 2)
+            {
+                GamePlayManager.Instance.SetMission(5, 1); //mission 5: perform 1 jump attack
+            }
+
+            if (PlayerController.Instance != null && PlayerController.Instance.idAttackArea == 4)
+            {
+                GamePlayManager.Instance.SetMission(7, 1); //mission 7: perform 1 dash attack
+            }
+
+            if (enemy.enemyController.typeOfEnemy == TypeOfEnemy.Boss)
             {
                 GamePlayManager.Instance.SetHitCountBoss();
             }
@@ -450,10 +460,11 @@ public class AttackArea : MonoBehaviour
             {
                 StartCoroutine(ResetMaxHitFlag());
             }
+
             if (!isCheckMission)
             {
                 isCheckMission = true;
-                GamePlayManager.Instance.SetMission(7, 1);
+                //GamePlayManager.Instance.SetMission(7, 1);
             }
         }
     }

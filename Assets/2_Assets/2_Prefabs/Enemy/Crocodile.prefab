@@ -82,7 +82,7 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 579529517
-  m_SortingLayer: 1
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
@@ -534,6 +534,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   isNormalAttack: 0
+  isWukongAttack: 0
 --- !u!50 &2284219818242621781
 Rigidbody2D:
   serializedVersion: 5
@@ -2236,7 +2237,7 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 0
+  m_SortingLayerID: 579529517
   m_SortingOrder: 5
   m_TargetDisplay: 0
 --- !u!114 &4922023726663212670
@@ -2994,6 +2995,8 @@ MonoBehaviour:
   posThrower: {fileID: 4889620436729335462}
   rangeThrower: 2.5
   timerCheckThrower: 5
+  sortingBaseOrder: 100
+  sortingScale: 100
   phaseBoss: 1
   auraBoss: {fileID: 0}
   isEnableThrower: 0

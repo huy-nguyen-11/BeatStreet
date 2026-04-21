@@ -58,6 +58,7 @@ public class GamePlayManager : MonoBehaviour
     // Coin
     public TextMeshProUGUI txtCoin;
     public int coin = 0;
+    public bool canClaimStarDataRewardThisRun = false;
 
     //enemy AI manager
     public Dictionary<int, bool> isEnemyOnLeft = new Dictionary<int, bool>();
@@ -77,6 +78,10 @@ public class GamePlayManager : MonoBehaviour
 
     //item buff
     public List<GameObject> listItemBuff = new List<GameObject>();
+    private int _dropTargetPerLevel;
+    private int _dropCountInLevel;
+    private int _singleDropTurn = -1;
+    private readonly HashSet<int> _droppedTurns = new HashSet<int>();
 
     //for grab attack cooldown
     public bool isEnableAttack = true;
@@ -89,6 +94,10 @@ public class GamePlayManager : MonoBehaviour
 
     //panel open game
     [SerializeField] private GameObject panelOpenGame;
+
+    public KeyRewardEffect keyRewardEffect;
+    private bool tookDamageThisTurn = false;
+    private int lastNoDamageMissionAwardedTurn = -1;
 
     private void Awake()
     {
@@ -108,6 +117,7 @@ public class GamePlayManager : MonoBehaviour
     }
     public void Start()
     {
+        canClaimStarDataRewardThisRun = false;
         OpenPanelGame();
         dataManager = DataManager.Instance;
         OnInitGamePlay();
@@ -130,6 +140,7 @@ public class GamePlayManager : MonoBehaviour
             }
         }
         SpawnMap();
+        InitDropPlanForLevel();
         CheckAudio();
         SetItem();
 
@@ -203,6 +214,88 @@ public class GamePlayManager : MonoBehaviour
         GameObject map = Instantiate(_prfLevelMap[levelMap], _prfLevelMap[levelMap].transform.position, Quaternion.identity);
         _levelMap = map.GetComponent<LevelMap>();
     }
+
+    private void InitDropPlanForLevel()
+    {
+        int mode = dataManager != null ? Mathf.Clamp(dataManager.LevelMode, 0, 2) : 0;
+        switch (mode)
+        {
+            case 0: // Normal
+                _dropTargetPerLevel = 1;
+                break;
+            case 1: // Hard
+                _dropTargetPerLevel = Random.Range(1, 3); // 1 or 2
+                break;
+            case 2: // Extreme
+                _dropTargetPerLevel = 2;
+                break;
+            default:
+                _dropTargetPerLevel = 1;
+                break;
+        }
+
+        _dropCountInLevel = 0;
+        _singleDropTurn = -1;
+        _droppedTurns.Clear();
+
+        List<int> eligibleTurns = GetEligibleDropTurns();
+        if (eligibleTurns.Count == 0)
+        {
+            _dropTargetPerLevel = 0;
+            return;
+        }
+
+        _dropTargetPerLevel = Mathf.Min(_dropTargetPerLevel, eligibleTurns.Count);
+        if (_dropTargetPerLevel == 1)
+        {
+            _singleDropTurn = eligibleTurns[Random.Range(0, eligibleTurns.Count)];
+        }
+        tookDamageThisTurn = false;
+        lastNoDamageMissionAwardedTurn = -1;
+    }
+
+    public void MarkPlayerTookDamageThisTurn()
+    {
+        tookDamageThisTurn = true;
+    }
+
+    private List<int> GetEligibleDropTurns()
+    {
+        int totalTurns = _levelMap != null && _levelMap.listTurnEnemy != null
+            ? _levelMap.listTurnEnemy.childCount
+            : 0;
+
+        List<int> turns = new List<int>();
+        if (totalTurns >= 2) turns.Add(2);
+        if (totalTurns >= 3) turns.Add(3);
+        return turns;
+    }
+
+    public bool TryGetDropItemOnEnemyDead(out int itemId)
+    {
+        itemId = -1;
+
+        if (_dropCountInLevel >= _dropTargetPerLevel)
+            return false;
+
+        if (_levelMap == null)
+            return false;
+
+        int currentTurn = _levelMap.TurnEnemy + 1; // TurnEnemy is 0-based
+        if (currentTurn != 2 && currentTurn != 3)
+            return false;
+
+        if (_droppedTurns.Contains(currentTurn))
+            return false;
+
+        if (_singleDropTurn != -1 && currentTurn != _singleDropTurn)
+            return false;
+
+        itemId = Random.Range(0, 5); // keep old item type random
+        _dropCountInLevel++;
+        _droppedTurns.Add(currentTurn);
+        return true;
+    }
     public void SetBtnUlti(bool isActive)
     {
         _BtnGamePlays[0].SetActive(isActive);
@@ -228,7 +321,7 @@ public class GamePlayManager : MonoBehaviour
                         SetBackUltiShow();
                         isCheckUlti = true;
                         _BtnGamePlays[0].SetActive(false);
-                        SetMission(8, 1);
+
                         GetEnemyBeforeUlti();// get enemy who is alive before ulti
                         _Player.SetMana(-100);
                         _Enemy = enemy.transform.GetChild(0).GetComponent<EnemyController>();
@@ -365,8 +458,8 @@ public class GamePlayManager : MonoBehaviour
 
         textTransform.DOScale(1.6f, 0.2f).From(Vector3.one).SetEase(Ease.OutBack);
 
-        if (count > 9)
-            SetMission(5, 1);
+        //if (count > 9)
+        //    SetMission(5, 1);
 
         if (hideComboCoroutine != null)
         {
@@ -414,8 +507,13 @@ public class GamePlayManager : MonoBehaviour
     }
     private void SetDataWinGame()
     {
-        if (dataManager.LevelMode == dataManager.levelDatas[levelMap].Star)
+        var currentStarReward = dataManager.levelDatas[levelMap].starRewards[dataManager.LevelMode];
+        canClaimStarDataRewardThisRun = !currentStarReward.isPassed;
+
+        if (currentStarReward.isPassed == false)
         {
+            currentStarReward.isPassed = true;
+
             if (dataManager.levelDatas[levelMap].Star < 3)
             {
                 dataManager.levelDatas[levelMap].Star++;
@@ -459,7 +557,7 @@ public class GamePlayManager : MonoBehaviour
     public void BtnItem(bool check)
     {
         AudioBase.Instance.SetAudioUI(4);
-        SetMission(10, 1);
+        //SetMission(10, 1);
         int usedItemId = !check ? dataManager.idItem1 : dataManager.idItem2;
         UseOfItems(usedItemId);
 
@@ -547,6 +645,7 @@ public class GamePlayManager : MonoBehaviour
                 count++;
         if (count <= 0)
         {
+            TryCompleteNoDamageTurnMission();
             if (_levelMap.TurnEnemy >= _levelMap.listTurnEnemy.childCount - 1)
             {
                 StartCoroutine(ShowVictory());
@@ -556,14 +655,28 @@ public class GamePlayManager : MonoBehaviour
                 // Next Turn
                 _IconNextTurn.SetActive(true);
                 _levelMap.TurnEnemy++;
+                tookDamageThisTurn = false;
 
             }
         }
     }
 
+    private void TryCompleteNoDamageTurnMission()
+    {
+        if (_levelMap == null) return;
+        int currentTurn = _levelMap.TurnEnemy;
+        if (lastNoDamageMissionAwardedTurn == currentTurn) return;
+
+        if (!tookDamageThisTurn)
+        {
+            SetMission(9, 1);
+        }
+        lastNoDamageMissionAwardedTurn = currentTurn;
+    }
+
     IEnumerator ShowVictory()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(2f);
         _Player.SwitchToRunState(_Player.playerWingame);
         //AudioBase.Instance.AudioPlayer(11);
         CheckTurnPlayShowAds();
@@ -628,19 +741,29 @@ public class GamePlayManager : MonoBehaviour
     }
     public void SetMission(int id, int count)
     {
-        if (id == dataManager.questsCurrent.IdQuest1 || id == dataManager.questsCurrent.IdQuest2)
+        if (id == dataManager.questsCurrent.IdQuest1)
         {
-            int idMission = id == dataManager.questsCurrent.IdQuest1 ?
-                dataManager.questsCurrent.IdQuest1 : dataManager.questsCurrent.IdQuest2;
-            int progress = id == dataManager.questsCurrent.IdQuest1 ? dataManager.questsCurrent.ProgressQuest1
-                : dataManager.questsCurrent.ProgressQuest2;
             int milestone = dataManager.dataBase.ListQuests[id].Milestone;
-            if (progress < milestone)
-            {
-                bool check = id == dataManager.questsCurrent.IdQuest1 ? false : true;
-                if (!check) dataManager.questsCurrent.ProgressQuest1 += count;
-                else dataManager.questsCurrent.ProgressQuest2 += count;
-            }
+            if (dataManager.questsCurrent.ProgressQuest1 < milestone)
+                dataManager.questsCurrent.ProgressQuest1 += count;
+        }
+        else if (id == dataManager.questsCurrent.IdQuest2)
+        {
+            int milestone = dataManager.dataBase.ListQuests[id].Milestone;
+            if (dataManager.questsCurrent.ProgressQuest2 < milestone)
+                dataManager.questsCurrent.ProgressQuest2 += count;
+        }
+        else if (id == dataManager.questsCurrent.IdQuest3)
+        {
+            int milestone = dataManager.dataBase.ListQuests[id].Milestone;
+            if (dataManager.questsCurrent.ProgressQuest3 < milestone)
+                dataManager.questsCurrent.ProgressQuest3 += count;
+        }
+        else if (id == dataManager.questsCurrent.IdQuest4)
+        {
+            int milestone = dataManager.dataBase.ListQuests[id].Milestone;
+            if (dataManager.questsCurrent.ProgressQuest4 < milestone)
+                dataManager.questsCurrent.ProgressQuest4 += count;
         }
     }
     // Revive
@@ -848,6 +971,12 @@ public class GamePlayManager : MonoBehaviour
     {
         GameObject _go = Instantiate(listItemBuff[idItem], posItem, Quaternion.identity);
         _go.GetComponent<ItemPlayer>().Throw(new Vector2(1,0));
+    }
+
+    public void DemoDropItem()
+    {
+        GameObject _go = Instantiate(listItemBuff[2], _Player.Char.transform.position , Quaternion.identity);
+        _go.GetComponent<ItemPlayer>().Throw(new Vector2(1, 0));
     }
 
     // Add inside the GamePlayManager class

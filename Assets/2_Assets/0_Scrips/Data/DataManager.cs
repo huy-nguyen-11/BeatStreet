@@ -108,10 +108,14 @@ public class QuestsCurrent
 {
     public int IdQuest1;
     public int IdQuest2;
+    public int IdQuest3;
+    public int IdQuest4;
     public int ProgressQuest1;
     public int ProgressQuest2;
     public int ProgressQuest3;
     public int ProgressQuest4;
+    public int ProgressQuest5;
+    public int ProgressQuest6;
     public List<int> checkQuest = new List<int>();
 }
 [System.Serializable]
@@ -163,9 +167,28 @@ public class PetData
 [System.Serializable]
 public class LevelData
 {
-    public int Star;
-    public int Mode;
-    public int Type;
-    public int idItem;
+    public int Star; // amount of star achieved in this level
+    //public int Type;
+    //public int idItem;
+
+    public int levelId;
+    // Thay vì 1 biến Star, ta dùng mảng/list để chứa data cho 3 mốc sao
+    public StarReward[] starRewards = new StarReward[3];
 }
+[System.Serializable]
+public class RewardInfo
+{
+    public int itemType; // 0: Mảnh, 1: Mảnh mở rộng, 2: Booster, 3: Gem...// item type 666 is item #
+    public int itemId;   // ID cụ thể của item đó trong kho // id 6660 is coin, id 6661 is gem , id 6662 is key
+    public int amount;   // Số lượng (ví dụ: 30 Coin, 2 Gem)
+}
+
+[System.Serializable]
+public class StarReward
+{
+    public int modeLevel;           //level mode: 0 - Normal, 1 - Hard, 2 - Extreme)
+    public bool isPassed;         // Đã vượt qua mức sao này chưa
+    public List<RewardInfo> rewards; // Danh sách các món đồ "mồi nhử" cho mức sao này
+}
+
 

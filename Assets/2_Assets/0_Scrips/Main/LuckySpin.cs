@@ -147,7 +147,7 @@ public class LuckySpin : MonoBehaviour
     {
         if (isRun) return;
         AudioBase.Instance.SetAudioUI(0);
-        MainManager.Instance.SetMission(3, 1);
+        MainManager.Instance.SetMission(12, 1); // mission 12: perform 1 free spin
         ledManager.SpinLed(0.02f);
         isRun = true;
         //lastRewardTime = DateTime.Now;
@@ -171,7 +171,7 @@ public class LuckySpin : MonoBehaviour
         {
             if (result)
             {
-                MainManager.Instance.SetMission(3, 1);
+                MainManager.Instance.SetMission(12, 1);// mission 12: perform 1 free spin
                 ledManager.SpinLed(0.02f);
                 lastRewardTime = DateTime.Now;
                 PlayerPrefs.SetString(LAST_REWARD_TIME, lastRewardTime.ToString());

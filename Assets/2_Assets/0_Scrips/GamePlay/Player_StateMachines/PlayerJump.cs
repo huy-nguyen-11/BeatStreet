@@ -22,7 +22,6 @@ public class PlayerJump : PlayerStateManager
         if (playerController.fillBar.mana >= 5)
         {
             playerController.velocity = 4.3f;
-            GamePlayManager.Instance.SetMission(6, 1);
             playerController.SetMana(-5);
             playerController.PlayAnim2("Jump_Attack");
             AudioBase.Instance.AudioPlayer(18);

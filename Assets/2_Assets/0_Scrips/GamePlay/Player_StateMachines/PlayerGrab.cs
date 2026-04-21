@@ -279,6 +279,7 @@ public class PlayerGrab : PlayerStateManager
             if (string.Equals(e.Data.Name, "Throw", System.StringComparison.OrdinalIgnoreCase))
             {
                 AudioBase.Instance.AudioPlayer(21);
+                GamePlayManager.Instance.SetMission(6, 1); // mission 6: perform 1 throw attack
                 if (GamePlayManager.Instance.isEnableAttack)
                 {
                     GamePlayManager.Instance.isEnableAttack = false;
@@ -420,12 +421,13 @@ public class PlayerGrab : PlayerStateManager
         }
 
         _grabAttackBusy = true;
+        GamePlayManager.Instance.SetMission(8, 1);
 
         // Play on Spine track 1 so we don't override main grab pose on track 0
         if (playerController.skeletonAnimation != null && playerController.skeletonAnimation.AnimationState != null)
         {
             _grabAttackEntry = playerController.skeletonAnimation.AnimationState.SetAnimation(0, "Grab_Attack", false);
-            playerController.idAttackArea = 6;// set id attack area == 2
+            playerController.idAttackArea = 6;// set id attack area == 6
             if (_grabAttackEntry != null)
             {
                 _grabAttackCompleteHandler = (entry) =>
