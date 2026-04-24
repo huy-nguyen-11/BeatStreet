@@ -223,7 +223,29 @@ public class PlayerUlti : PlayerStateManager
         else if(e.Data.Name == "Hit_Max")
         {
             AudioBase.Instance.AudioPlayer(10);
-            GamePlayManager.Instance._Enemy.SetDead();
+            //GamePlayManager.Instance._Enemy.SetDead();
+            var enemy = GamePlayManager.Instance._Enemy;
+            if (enemy == null) return;
+
+            if (enemy.typeOfEnemy == TypeOfEnemy.Boss)
+            {
+                float damage = enemy.Hp * 0.3f;
+                if (damage <= 0f) damage = 1f;
+                enemy.SetHit(damage);
+
+                // Play overlay damaged animation so boss shows hit animation (not only flash)
+                enemy.PlayAnimOnTrack("Damaged", trackIndex: 1, loop: false);
+
+                // Ensure enemy state machine handles hit (guarded inside SwitchToRunState)
+                if (enemy.state != EnemyController.State.Dead && enemy.state != EnemyController.State.Fall)
+                {
+                    enemy.SwitchToRunState(enemy.enemyHit);
+                }
+            }
+            else
+            {
+                enemy.SetDead();
+            }
         }
     }
 

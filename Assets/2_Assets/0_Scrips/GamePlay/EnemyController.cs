@@ -179,8 +179,9 @@ public class EnemyController : EnemyCharacter
             stateManager.Enter();
         }
         Level = dataManager.dataBase.listModeLevelEnemyMaps[dataManager.LevelSelect].Mode[dataManager.LevelMode];
-        Hp = dataManager.dataBase.listLevelEnemyUpgrades[idEnemy].HP[Level] * (isBoss ? 2f : 1f);
-        dame = dataManager.dataBase.listLevelEnemyUpgrades[idEnemy].Dame[Level] * (isBoss ? 1.5f : 1f);
+        Hp = dataManager.dataBase.listLevelEnemyUpgrades[idEnemy].HP[Level] * (isBoss ? 4f : 1f);
+        dame = dataManager.dataBase.listLevelEnemyUpgrades[idEnemy].Dame[Level] * (isBoss ? 3f : 1f);
+        
         fillBar.OnInit(Hp);
         SetLevel();
 
@@ -1087,6 +1088,7 @@ public class EnemyController : EnemyCharacter
                 {
                     GameObject bomb = ObjectPooler.Instance.SpawnFromPool("Bomb", posThrower.position, transform.rotation);
                     BomEnemy bomEnemy = bomb.GetComponent<BomEnemy>();
+                    bomEnemy.enemyController = this;
                     int dir = Char.transform.rotation.y < 0 ? -1 : 1;
                     bomEnemy.Throw(throwDir: new Vector2(dir, 0f), throwSpeed: 3f, heightForce: 6f);
                 }
@@ -1094,6 +1096,7 @@ public class EnemyController : EnemyCharacter
                 {
                     GameObject molotov = ObjectPooler.Instance.SpawnFromPool("Molotov", posThrower.position, transform.rotation);
                     BomEnemy bomEnemy = molotov.GetComponent<BomEnemy>();
+                    bomEnemy.enemyController = this;
                     int dir = Char.transform.rotation.y < 0 ? -1 : 1;
                     bomEnemy.Throw(throwDir: new Vector2(dir, 0f), throwSpeed: 4f, heightForce: 6f);
                 }
@@ -1101,6 +1104,7 @@ public class EnemyController : EnemyCharacter
                 {
                     GameObject bone = ObjectPooler.Instance.SpawnFromPool("Bone", posThrower.position, transform.rotation);
                     BomEnemy bomEnemy = bone.GetComponent<BomEnemy>();
+                    bomEnemy.enemyController = this;
                     int dir = Char.transform.rotation.y < 0 ? -1 : 1;
                     bomEnemy.Throw(throwDir: new Vector2(dir, 0f), throwSpeed: 8f, heightForce: 3f);
                 }
@@ -1108,6 +1112,7 @@ public class EnemyController : EnemyCharacter
                 {
                     GameObject spoon = ObjectPooler.Instance.SpawnFromPool("Spoon", posThrower.position, transform.rotation);
                     BomEnemy bomEnemy = spoon.GetComponent<BomEnemy>();
+                    bomEnemy.enemyController = this;
                     int dir = Char.transform.rotation.y < 0 ? -1 : 1;
                     bomEnemy.Throw(throwDir: new Vector2(dir, 0f), throwSpeed: 7f, heightForce: 3f);
                 }

@@ -16,7 +16,7 @@ public class PlayerCombo1 : PlayerStateManager
         //playerController.animator.Play("Combo1");
         bool wasRunning = (playerController.state == PlayerController.State.Run);
         playerController.PlayAnimAttack(playerController.animSlideAttack1);
-        GamePlayManager.Instance.SetMission(7, 1); // mission 7: perform 1 dash attack
+        //GamePlayManager.Instance.SetMission(7, 1); // mission 7: perform 1 dash attack
         AudioBase.Instance.AudioPlayer(14);
         AudioBase.Instance.AudioPlayer(2);
         playerController.idAttackArea = 4;// set id attack area == 4

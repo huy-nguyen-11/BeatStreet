@@ -1,0 +1,1199 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1299540147114379872
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5626428253294137269}
+  - component: {fileID: 8839248080351562740}
+  - component: {fileID: 1165970408539800191}
+  m_Layer: 0
+  m_Name: DataManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5626428253294137269
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1299540147114379872}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.6308395, y: 0.07353106, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8839248080351562740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1299540147114379872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a775f69931256f47acf25fc501905d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dataBase: {fileID: 11400000, guid: 98caca5d2c9704d48a3819875ba399fb, type: 2}
+  levelDatas:
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 0
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  - Star: 0
+    levelId: 0
+    starRewards:
+    - modeLevel: 0
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 666
+        amount: 100
+      - itemType: 0
+        itemId: 2
+        amount: 1
+    - modeLevel: 1
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 661
+        amount: 20
+      - itemType: 1
+        itemId: 2
+        amount: 2
+    - modeLevel: 2
+      isPassed: 0
+      rewards:
+      - itemType: 66
+        itemId: 662
+        amount: 1
+      - itemType: 2
+        itemId: 2
+        amount: 1
+  LevelCurren: 1
+  LevelSelect: 0
+  LevelMode: 0
+  isRotateScreen: 0
+  isCheckVip: 0
+  isFreeAdsSpin: 0
+  priceSpin: 100
+  questsCurrent:
+    IdQuest1: 0
+    IdQuest2: 0
+    IdQuest3: 0
+    IdQuest4: 0
+    ProgressQuest1: 0
+    ProgressQuest2: 0
+    ProgressQuest3: 0
+    ProgressQuest4: 0
+    ProgressQuest5: 0
+    ProgressQuest6: 0
+    checkQuest: 
+  dealsCurrent: []
+  warehouse:
+    CountPiecePlayerLevelUp: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+    CountPiecePlayerEvolve: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+    CountPieceEnemy: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+    CountItem: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+    ListItems: 
+  idItem1: 99
+  idItem2: 99
+  AutoSelect: 0
+  playerData:
+  - Hp: 45
+    Dame: 5
+    Mana: 4
+    Level: 1
+    LevelEvolve: 10
+    LevelUnlockCharacter: 0
+    pieceUnlock: 0
+    CheckVip: 0
+    isUnlock: 1
+  - Hp: 60
+    Dame: 8
+    Mana: 4
+    Level: 1
+    LevelEvolve: 20
+    LevelUnlockCharacter: 5
+    pieceUnlock: 5
+    CheckVip: 0
+    isUnlock: 0
+  - Hp: 80
+    Dame: 4
+    Mana: 4
+    Level: 1
+    LevelEvolve: 20
+    LevelUnlockCharacter: 10
+    pieceUnlock: 11
+    CheckVip: 0
+    isUnlock: 0
+  - Hp: 45
+    Dame: 4
+    Mana: 4
+    Level: 1
+    LevelEvolve: 20
+    LevelUnlockCharacter: 20
+    pieceUnlock: 20
+    CheckVip: 0
+    isUnlock: 0
+  - Hp: 45
+    Dame: 4
+    Mana: 4
+    Level: 1
+    LevelEvolve: 30
+    LevelUnlockCharacter: 30
+    pieceUnlock: 32
+    CheckVip: 0
+    isUnlock: 0
+  - Hp: 45
+    Dame: 4
+    Mana: 4
+    Level: 1
+    LevelEvolve: 30
+    LevelUnlockCharacter: 40
+    pieceUnlock: 44
+    CheckVip: 0
+    isUnlock: 0
+  - Hp: 45
+    Dame: 4
+    Mana: 4
+    Level: 1
+    LevelEvolve: 40
+    LevelUnlockCharacter: 50
+    pieceUnlock: 50
+    CheckVip: 0
+    isUnlock: 0
+  - Hp: 45
+    Dame: 4
+    Mana: 4
+    Level: 1
+    LevelEvolve: 40
+    LevelUnlockCharacter: 60
+    pieceUnlock: 62
+    CheckVip: 0
+    isUnlock: 0
+  - Hp: 45
+    Dame: 4
+    Mana: 4
+    Level: 1
+    LevelEvolve: 50
+    LevelUnlockCharacter: 70
+    pieceUnlock: 70
+    CheckVip: 0
+    isUnlock: 0
+  - Hp: 45
+    Dame: 4
+    Mana: 4
+    Level: 1
+    LevelEvolve: 40
+    LevelUnlockCharacter: 0
+    pieceUnlock: 150
+    CheckVip: 0
+    isUnlock: 0
+  - Hp: 45
+    Dame: 4
+    Mana: 4
+    Level: 1
+    LevelEvolve: 40
+    LevelUnlockCharacter: 0
+    pieceUnlock: 150
+    CheckVip: 0
+    isUnlock: 0
+  - Hp: 45
+    Dame: 4
+    Mana: 4
+    Level: 1
+    LevelEvolve: 40
+    LevelUnlockCharacter: 0
+    pieceUnlock: 150
+    CheckVip: 0
+    isUnlock: 0
+  enemyData:
+  - Hp: 24
+    Dame: 2
+    Level: 1
+  - Hp: 0
+    Dame: 0
+    Level: 1
+  - Hp: 0
+    Dame: 0
+    Level: 1
+  - Hp: 0
+    Dame: 0
+    Level: 1
+  - Hp: 0
+    Dame: 0
+    Level: 1
+  - Hp: 0
+    Dame: 0
+    Level: 1
+  petData:
+  - petAttribute: 1
+    Level: 1
+    countPieceUnlock: 2
+    isUnlock: 0
+  - petAttribute: 5
+    Level: 1
+    countPieceUnlock: 2
+    isUnlock: 0
+  - petAttribute: 15
+    Level: 1
+    countPieceUnlock: 3
+    isUnlock: 0
+  - petAttribute: 5
+    Level: 1
+    countPieceUnlock: 3
+    isUnlock: 0
+  - petAttribute: 1
+    Level: 1
+    countPieceUnlock: 4
+    isUnlock: 0
+  - petAttribute: 10
+    Level: 1
+    countPieceUnlock: 3
+    isUnlock: 0
+  - petAttribute: 10
+    Level: 1
+    countPieceUnlock: 4
+    isUnlock: 0
+  - petAttribute: 25
+    Level: 1
+    countPieceUnlock: 4
+    isUnlock: 0
+  - petAttribute: 10
+    Level: 1
+    countPieceUnlock: 4
+    isUnlock: 0
+  - petAttribute: 5
+    Level: 1
+    countPieceUnlock: 5
+    isUnlock: 0
+  - petAttribute: 5
+    Level: 1
+    countPieceUnlock: 5
+    isUnlock: 0
+  - petAttribute: 5
+    Level: 1
+    countPieceUnlock: 5
+    isUnlock: 0
+  - petAttribute: 5
+    Level: 1
+    countPieceUnlock: 5
+    isUnlock: 0
+  - petAttribute: 5
+    Level: 1
+    countPieceUnlock: 6
+    isUnlock: 0
+  - petAttribute: 10
+    Level: 1
+    countPieceUnlock: 6
+    isUnlock: 0
+  - petAttribute: 1
+    Level: 1
+    countPieceUnlock: 10
+    isUnlock: 0
+  - petAttribute: 2
+    Level: 1
+    countPieceUnlock: 10
+    isUnlock: 0
+  - petAttribute: 1
+    Level: 1
+    countPieceUnlock: 10
+    isUnlock: 0
+  idPlayer: 0
+  idPet1: 99
+  idPet2: 99
+  isCheckIdPet: 0
+  isActivePet1: 0
+  isActivePet2: 0
+--- !u!114 &1165970408539800191
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1299540147114379872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4fe0290b01ed9c4a99608a7351d1a6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxEnergy: 20
+  recoveryTime: 300

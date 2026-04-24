@@ -85,7 +85,7 @@ namespace MysticDev
             if (checkDevMode)
             {
                 devPopup.gameObject.SetActive( true );
-                devPopup.UpdatePosition(true);
+                //devPopup.UpdatePosition(true);
                 InitDevParams();
                 
             }
@@ -120,7 +120,7 @@ namespace MysticDev
             if (checkDevMode)
             {
                 devPopup.gameObject.SetActive( true );
-                devPopup.UpdatePosition( true );
+                //devPopup.UpdatePosition( true );
                 reporter.SetActive( true );
                 InitDevParams();
             }

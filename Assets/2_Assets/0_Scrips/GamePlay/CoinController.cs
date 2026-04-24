@@ -95,7 +95,7 @@ public class CoinController : MonoBehaviour, IpooledObject
         rb.simulated = false;
 
         GamePlayManager.Instance.AddCoin();
-
+        GamePlayManager.Instance.SetMission(13, 1); //set mission coin collected
 
         child0.SetActive(false);
         child1.SetActive(false);

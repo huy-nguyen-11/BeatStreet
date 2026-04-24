@@ -148,7 +148,7 @@ public class GameOver : MonoBehaviour
             case 1:
                 break;
             case 2:
-                CheckBtnRevive();
+                //CheckBtnRevive();
                 ShowPlayerRevive();
                 _coroutine = StartCoroutine(SetTimeOffRevive());
                 break;
@@ -425,7 +425,7 @@ public class GameOver : MonoBehaviour
     }
     IEnumerator SetTimeOffRevive()
     {
-        int secon = 10;
+        int secon = 5;
         txtSeconRevive.text = secon.ToString();
         while (secon > 0)
         {
@@ -433,10 +433,10 @@ public class GameOver : MonoBehaviour
             secon--;
             txtSeconRevive.text = secon.ToString();
         }
-        _popupStatus[2].SetActive(false);
-        GamePlayManager.Instance.CheckTurnPlayShowAds();
-        _popupStatus[1].SetActive(true);
-        GetRewardDefeat();
+        _popupStatus[2].transform.GetChild(0).GetChild(3).gameObject.SetActive(true); // button no thanks
+        //GamePlayManager.Instance.CheckTurnPlayShowAds();
+        //_popupStatus[1].SetActive(true);
+        //GetRewardDefeat();
     }
     public void BtnRevive(bool Revive)
     {

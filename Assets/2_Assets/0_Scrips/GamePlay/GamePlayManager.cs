@@ -589,16 +589,32 @@ public class GamePlayManager : MonoBehaviour
     {
         if (idSkill.Contains(id))
         {
+            Debug.Log("using item skill with id: " + id);
             attributePlayer[0] = dataManager.dataBase.imgEquipItems.AttributeItems[id];
-            StartCoroutine(SetItemSkill());
+
+            if(id == 0 || id == 1) // skill increase grab enemey
+            {
+                // to do increase grab time when grab enemy
+                _Player.timeGrabEnemy += _Player.timeGrabEnemy * (attributePlayer[0] / 100f); // increase time grab enemy when use skill item
+
+                //todo effect skill item grab enemy
+            }
+            else
+            {
+                _Player.SetMana(_Player.fillBar.maxMana * (attributePlayer[0] / 100)); // fill mana to 100% when use skill item 
+                _Player.SetHp(_Player.fillBar.maxHp * (50f / 100f)); // bonus 50% hp when use skill item 
+            }
+            //StartCoroutine(SetItemSkill()); comment because this item not limit time, it just increase mana , hp and time grab eneemy when use
         }
         else if (idDefence.Contains(id))
         {
+            Debug.Log("using item defence with id: " + id);
             attributePlayer[1] = dataManager.dataBase.imgEquipItems.AttributeItems[id];
             StartCoroutine(SetItemDefence());
         }
         else if (idAttack.Contains(id))
         {
+            Debug.Log("using item attack with id: " + id + "data:" + dataManager.dataBase.imgEquipItems.AttributeItems[id] + "title" + dataManager.dataBase.imgEquipItems.titleAttributeItems[id]);
             attributePlayer[2] = dataManager.dataBase.imgEquipItems.AttributeItems[id];
             StartCoroutine(SetItemDame());
         }
@@ -622,14 +638,15 @@ public class GamePlayManager : MonoBehaviour
     IEnumerator SetItemDefence()
     {
         isActiveDefence = true;
-        yield return new WaitForSeconds(_Player._attributesPet[2]);
+        yield return new WaitForSeconds(60);
         isActiveDefence = false;
     }
     IEnumerator SetItemDame()
     {
         float dameItem = _Player.Dame * (attributePlayer[2] / 100f);
         _Player.Dame += dameItem;
-        yield return new WaitForSeconds(_Player._attributesPet[2]);
+        Debug.Log("Player dame after use item: " + _Player.Dame);
+        yield return new WaitForSeconds(60);
         _Player.Dame -= dameItem;
     }
     // for level game

@@ -192,10 +192,13 @@ public class ItemPlayer : MonoBehaviour
                         _playerChar.effectMana.SetActive(true);
                         goEffect = _playerChar.effectMana;
                     }
+
+                    GamePlayManager.Instance.SetMission(14, 1); //set mission booster collected
                 }
                 else
                 {
                     GamePlayManager.Instance.keyRewardEffect.PlayKeyRewardEffect();
+                    GamePlayManager.Instance.SetMission(14, 1); //set mission booster collected
                 }
                
                 StartCoroutine(DestroyItem());

@@ -96,8 +96,8 @@ public class DailyReward : MonoBehaviour
                 listDays[i].transform.GetChild(1).gameObject.SetActive(false); // day normal
                 listDays[i].transform.GetChild(2).gameObject.SetActive(false); // is claimed
 
-                scaleTween = listDays[i].transform.GetChild(1).transform.DOScale(1.06f, 0.5f).SetEase(Ease.InOutQuad)
-                    .SetLoops(-1, LoopType.Yoyo);
+                //scaleTween = listDays[i].transform.GetChild(1).transform.DOScale(1.06f, 0.5f).SetEase(Ease.InOutQuad)
+                //    .SetLoops(-1, LoopType.Yoyo);
                 buttonClaim.GetComponent<Button>().interactable = true;
                 buttonClaimX2.GetComponent<Button>().interactable = true;
             }

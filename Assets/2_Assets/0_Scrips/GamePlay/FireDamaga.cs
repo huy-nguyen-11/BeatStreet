@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class FireDamaga : MonoBehaviour
 {
-    private int fireDamage = 5;
+    public int fireDamage = 20;
     public float damageInterval = 1f;
 
     private Coroutine damageCoroutine;

@@ -197,7 +197,7 @@ public class KnifeBoss : MonoBehaviour, IpooledObject
                 {
                     return;
                 }
-                int damage = 1; // You can set the damage value as needed
+                int damage = 30; // You can set the damage value as needed
                 playerController.HitDirection = playerController.Char.transform.position.x >= transform.position.x;
                 playerController.SetHit(damage);
             }

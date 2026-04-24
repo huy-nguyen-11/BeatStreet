@@ -6,7 +6,7 @@ public class PlayerGrab : PlayerStateManager
 {
     private EnemyChar grabbedEnemy;
     private EnemyController grabbedEnemyController;
-    private float grabDuration = 3f;
+    //private float grabDuration = 3f;
     private float grabTimer = 0f;
     private float cooldownTimer = 0f;
     private bool isGrabActive = false;
@@ -138,7 +138,7 @@ public class PlayerGrab : PlayerStateManager
         grabTimer += Time.deltaTime;
 
         // Wait for grab duration to complete
-        if (grabTimer >= grabDuration)
+        if (grabTimer >= playerController.timeGrabEnemy)
         {
             // don't interrupt an ongoing throw animation flow
             if (!_throwInProgress)

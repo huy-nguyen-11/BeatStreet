@@ -31,7 +31,7 @@ public class LevelControllerMain : MonoBehaviour
 
     [SerializeField] GameObject _popUpChangeItem1 , _popUpChangeItem2;
     private int _indexItemSelected = 0;
-
+    public GameObject effectLevelSelect;
 
     void Start()
     {
@@ -153,6 +153,13 @@ public class LevelControllerMain : MonoBehaviour
     {
         Transform itemButton1 = _popups[0].GetChild(0).GetChild(3); // item equip 1
         Transform itemButton2 = _popups[0].GetChild(0).GetChild(4); // item equip 2
+
+        // Safety check: If already duplicated for some reason, clear the second slot
+        if (dataManager.idItem1 != 99 && dataManager.idItem1 == dataManager.idItem2)
+        {
+            dataManager.idItem2 = 99;
+        }
+
         if (dataManager.AutoSelect)
         {
             if (dataManager.idItem1 == 99 || dataManager.idItem2 == 99)
@@ -180,8 +187,8 @@ public class LevelControllerMain : MonoBehaviour
                         int count = GetCountSafe(id);
                         if (count <= 0) continue;
 
-                        if (otherEquippedId != 99 && id == otherEquippedId && count < 2)
-                            continue; // only 1 copy, cannot equip into both slots
+                        if (otherEquippedId != 99 && id == otherEquippedId)
+                            continue; // item already equipped in the other slot
 
                         candidates.Add(id);
                     }
@@ -197,53 +204,7 @@ public class LevelControllerMain : MonoBehaviour
             }
         }
 
-        itemButton1.GetChild(1).gameObject.SetActive(dataManager.idItem1 != 99);
-        itemButton2.GetChild(1).gameObject.SetActive(dataManager.idItem2 != 99);
-        itemButton1.GetChild(0).gameObject.SetActive(dataManager.idItem1 != 99);
-        itemButton2.GetChild(0).gameObject.SetActive(dataManager.idItem2 != 99);
-        if (dataManager.idItem1 != 99)
-        {
-            itemButton1.GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.idItem1];
-        }
-        if (dataManager.idItem2 != 99)
-        {
-            itemButton2.GetChild(0).GetComponent<Image>().sprite = dataManager.dataBase.imgEquipItems.sprItem[dataManager.idItem2];
-        }
-
-        //back up
-        //Transform itemButton1 = _popups[0].GetChild(0).GetChild(3); // item equip 1
-        //Transform itemButton2 = _popups[0].GetChild(0).GetChild(4); // item equip 2
-        //if (dataManager.AutoSelect)
-        //{
-        //    if (dataManager.idItem1 == 99 || dataManager.idItem2 == 99)
-        //    {
-        //        if (dataManager.warehouse.ListItems.Count > 2)
-        //        {
-        //            if (dataManager.idItem1 == 99)
-        //            {
-        //                int RandomId = Random.Range(0, dataManager.warehouse.ListItems.Count);
-        //                dataManager.idItem1 = dataManager.warehouse.ListItems[RandomId];
-        //            }
-        //            if (dataManager.idItem2 == 99)
-        //            {
-        //                int RandomId2 = Random.Range(0, dataManager.warehouse.ListItems.Count);
-        //                dataManager.idItem2 = dataManager.warehouse.ListItems[RandomId2];
-        //            }
-        //        }
-        //        else
-        //        {
-        //            if (dataManager.warehouse.ListItems.Count > 0 && dataManager.idItem1 == 99)
-        //            {
-        //                dataManager.idItem1 = dataManager.warehouse.ListItems[0];
-        //            }
-        //            if (dataManager.warehouse.ListItems.Count > 0 && dataManager.idItem2 == 99)
-        //            {
-        //                dataManager.idItem2 = dataManager.warehouse.ListItems[dataManager.warehouse.ListItems.Count == 2 ? 1 : 0];
-        //            }
-
-        //        }
-        //    }
-        //}
+        GetItemActive();
     }
      
     public void BtnMode(int id)
@@ -453,6 +414,7 @@ public class LevelControllerMain : MonoBehaviour
                 else
                 {
                     // visual selected state applied to the highest unlocked level
+                    effectLevelSelect.transform.position = _btnLevels[i].position; // move selection effect to this button
                     _btnLevels[i].GetComponent<Image>().sprite = _sprBtn[2]; // base button 
                     _btnLevels[i].transform.GetChild(0).GetComponent<Image>().sprite = _sprBtn[3]; // top base button
                     _btnLevels[i].GetChild(0).GetChild(0).gameObject.SetActive(false); // text level
@@ -573,10 +535,7 @@ public class LevelControllerMain : MonoBehaviour
             _popUpChangeItem2.SetActive(false);
             dataManager.idItem2 = 99;
         }
-        _popups[0].GetChild(0).GetChild(3).GetChild(0).gameObject.SetActive(dataManager.idItem1 != 99); // item 1 icon
-        _popups[0].GetChild(0).GetChild(3).GetChild(1).gameObject.SetActive(dataManager.idItem1 != 99); // item 1 icon remove
-        _popups[0].GetChild(0).GetChild(4).GetChild(0).gameObject.SetActive(dataManager.idItem2 != 99); //item 2 icon
-        _popups[0].GetChild(0).GetChild(4).GetChild(1).gameObject.SetActive(dataManager.idItem2 != 99); // item 2 icon remove
+        GetItemActive();
     }
 
     public void ButtonChange(int item)
@@ -601,11 +560,11 @@ public class LevelControllerMain : MonoBehaviour
     {
         _popups[1].gameObject.SetActive(true);
 
-        Debug.Log(" count of list:" + dataManager.warehouse.ListItems.Count);
-        for (int i = 0; i < dataManager.warehouse.ListItems.Count; i++)
-        {
-            Debug.Log("name of iem" + dataManager.warehouse.ListItems[i].ToString());
-        }
+        //Debug.Log(" count of list:" + dataManager.warehouse.ListItems.Count);
+        //for (int i = 0; i < dataManager.warehouse.ListItems.Count; i++)
+        //{
+        //    Debug.Log("name of iem" + dataManager.warehouse.ListItems[i].ToString());
+        //}
 
         int totalPages = 3;
 
@@ -644,7 +603,9 @@ public class LevelControllerMain : MonoBehaviour
 
                     // Set button event
                     Button btn = page.GetChild(i).GetComponent<Button>();
-                    btn.interactable = true;
+                    //bool itemInOtherSlot = (item == 0 && idItem == dataManager.idItem2) || (item == 1 && idItem == dataManager.idItem1);
+                    //bool hasOnlyOneCopy = dataManager.warehouse.CountItem[idItem] < 2;
+                    //btn.enabled = !(itemInOtherSlot && hasOnlyOneCopy);
                     btn.onClick.RemoveAllListeners();
                     btn.onClick.AddListener(() =>
                     {
@@ -778,10 +739,18 @@ public class LevelControllerMain : MonoBehaviour
         AudioBase.Instance.SetAudioUI(0);
         if (btn == 0)
         {
+            if (dataManager.idItem2 == item)
+            {
+                dataManager.idItem2 = 99;
+            }
             dataManager.idItem1 = item;
         }
         else
         {
+            if (dataManager.idItem1 == item)
+            {
+                dataManager.idItem1 = 99;
+            }
             dataManager.idItem2 = item;
         }
         GetItemActive();
@@ -790,9 +759,6 @@ public class LevelControllerMain : MonoBehaviour
     }
     private void GetItemActive()
     {
-        //Transform item1 = _popups[0].GetChild(1).GetChild(2).GetChild(0);
-        //Transform item2 = _popups[0].GetChild(1).GetChild(2).GetChild(1);
-
         Transform item1 = _popups[0].GetChild(0).GetChild(3); // item equip 1
         Transform item2 = _popups[0].GetChild(0).GetChild(4); // item equip 2
 

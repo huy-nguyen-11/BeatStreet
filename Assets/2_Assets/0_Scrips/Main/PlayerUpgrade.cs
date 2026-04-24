@@ -428,15 +428,15 @@ public class PlayerUpgrade : MonoBehaviour
             int level = _dataManager.playerData[id].Level;
             if (countUpGrade == 1)
             {
-                return 50 + (75 * level);
+                return 25 + (25 * level);
             }
             else
             {
-                int priceCurren = 50 + (75 * level);
+                int priceCurren = 25 + (25 * level);
                 int priceSellect = priceCurren;
                 for (int i = 2; i <= countUpGrade; i++)
                 {
-                    priceSellect += 50 + (75 * i);
+                    priceSellect += 20 + (25 * i);
                 }
                 return priceSellect;
             }
@@ -446,20 +446,20 @@ public class PlayerUpgrade : MonoBehaviour
             int level = _dataManager.playerData[id].Level;
             int price = 0;
             if (level + 1 < 29)
-                price = 20;
+                price = 10;
             else if (level + 1 > 29 && level + 1 < 39)
-                price = 30;
+                price = 20;
             else
-                price = 40;
+                price = 30;
             if (countUpGrade > 1)
                 for (int i = level + 1; i < countUpGrade + level; i++)
                 {
                     if (i < 29)
-                        price += 20;
+                        price += 10;
                     else if (i > 28 && i < 39)
-                        price += 30;
+                        price += 20;
                     else
-                        price += 40;
+                        price += 30;
                 }
             return price;
         }
@@ -562,9 +562,9 @@ public class PlayerUpgrade : MonoBehaviour
             if (PlayerPrefs.GetInt(keyPrice) >= price)
             {
                 AudioBase.Instance.SetAudioUI(4);
-                if (keyPrice == "Diamont") MainManager.Instance.SetMission(0, price);
-                else MainManager.Instance.SetMission(1, price);
-                MainManager.Instance.SetMission(2, 1);
+                if (keyPrice == "Coin") MainManager.Instance.SetMission(10, 1);// mission up grade player
+                //else MainManager.Instance.SetMission(1, price);
+                //MainManager.Instance.SetMission(2, 1);
                 PlayerPrefs.SetInt(keyPrice, PlayerPrefs.GetInt(keyPrice) - price);
                 SetAttribute(id);
                 BtnInformation(id);

@@ -24,7 +24,7 @@ public class WaveBoss : MonoBehaviour, IpooledObject
     public LayerMask enemyLayer;
 
     //damagae
-    private int baseDamage = 5;
+    private int baseDamage = 65;
     private int currentDamage;
 
     public void OnObjectSpawn()

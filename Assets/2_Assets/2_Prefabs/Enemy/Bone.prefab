@@ -117,8 +117,8 @@ MonoBehaviour:
     m_Bits: 0
   explosion: {fileID: 0}
   fire: {fileID: 0}
-  explosionDamagePlayer: 1
-  explosionDamageEnemy: 3
+  enemyController: {fileID: 0}
+  indexOfDamage: 0.4
   explosionRadius: 0.6
 --- !u!61 &8740587627051586359
 BoxCollider2D:

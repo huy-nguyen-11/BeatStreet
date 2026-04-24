@@ -123,7 +123,10 @@ public class PlayerController : PlayerCharacter
     public int idTounchRun;
     private float holdTimer;
     [SerializeField] private float holdMoveTolerancePixels = 25f; 
-    [SerializeField] private float holdJoystickTolerance = 0.5f; 
+    [SerializeField] private float holdJoystickTolerance = 0.5f;
+
+    //for controll using item
+    public float timeGrabEnemy = 3;
 
     private static bool IsPointerOverAnyUI(int fingerId)
     {
@@ -267,8 +270,11 @@ public class PlayerController : PlayerCharacter
         isSpeedUpAttack = false;
         if(fxStrength != null)
             fxStrength.SetActive(false);
+
+        // for control using item
+        timeGrabEnemy = 3;
     }
-    
+
     private void OnDestroy()
     {
 

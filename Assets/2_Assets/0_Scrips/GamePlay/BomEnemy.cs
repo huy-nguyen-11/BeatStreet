@@ -32,6 +32,9 @@ public class BomEnemy : MonoBehaviour , IpooledObject
     private bool isEnableHit = true;
     private bool moveRight = true;
 
+    public EnemyController enemyController;
+    public float indexOfDamage;
+
     public void OnObjectSpawn()
     {
         if (explosion != null)
@@ -141,6 +144,7 @@ public class BomEnemy : MonoBehaviour , IpooledObject
             GetComponent<SpriteRenderer>().enabled = false;
             //transform.GetChild(0).GetChild(0).gameObject.SetActive(true); // active broken bomb sprite
             fireGo = Instantiate(fire, transform.position, Quaternion.identity);
+            fire.GetComponent<FireDamaga>().fireDamage = (int)(enemyController.dame*indexOfDamage);
             StartCoroutine(DisableFireChildrenSequentially(fireGo));
         }
         else
@@ -235,8 +239,6 @@ public class BomEnemy : MonoBehaviour , IpooledObject
     }
 
     [Header("Explosion")]
-    [SerializeField] private float explosionDamagePlayer = 1f;
-    [SerializeField] private float explosionDamageEnemy = 3f;
     [SerializeField] private float explosionRadius = 0.6f;
 
     void DealExplosionDamage()
@@ -261,7 +263,7 @@ public class BomEnemy : MonoBehaviour , IpooledObject
 
                 player.playerController.HitDirection = player.transform.position.x >= transform.position.x;
                 player.playerController.HitCount = 2;
-                player.playerController.SetHit(explosionDamagePlayer);
+                player.playerController.SetHit(enemyController.dame*indexOfDamage);
                 ObjectPooler.Instance.SpawnFromPool("Hit", transform.position, Quaternion.Euler(0, 0, 0));
                 continue;
             }
@@ -273,7 +275,7 @@ public class BomEnemy : MonoBehaviour , IpooledObject
             if (enemyChar != null && enemyChar.enemyController != null
                 && enemyChar.enemyController.state != EnemyCharacter.State.Dead)
             {
-                enemyChar.enemyController.SetHit(explosionDamageEnemy);
+                enemyChar.enemyController.SetHit((enemyController.dame * indexOfDamage)/1.5f);
             }
         }
     }
@@ -299,7 +301,7 @@ public class BomEnemy : MonoBehaviour , IpooledObject
                     return;
 
                 playerController.HitDirection = moveRight;
-                playerController.SetHit(1);
+                playerController.SetHit(enemyController.dame*indexOfDamage);
                 ObjectPooler.Instance.SpawnFromPool("Hit", transform.position, Quaternion.Euler(0, 0, 0));
                 isEnableHit = false;
             }

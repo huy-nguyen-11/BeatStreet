@@ -452,6 +452,8 @@ public class ShopController : MonoBehaviour
         // Prepare slots in targetContent
         PrepareContentSlots(targetContent);
 
+        MainManager.Instance.SetMission(11,1); // Mission: Open chest
+
         int numPlayerLevelUp = 0;
         int numEvolve = 0;
         int numItem = 0;
